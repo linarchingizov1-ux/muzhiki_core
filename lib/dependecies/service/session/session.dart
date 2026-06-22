@@ -1,0 +1,382 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:app_links/app_links.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fresh_dio/fresh_dio.dart';
+import 'package:http_cache_hive_store/http_cache_hive_store.dart';
+import 'package:muzhiki_core/dependecies/exception/global_map_error.dart';
+import 'package:muzhiki_core/dependecies/service/session/extension/roles_company.dart';
+import 'package:muzhiki_core/dependecies/service/session/model/session_roles.dart';
+import 'package:muzhiki_core/dependecies/service/session/model/user.dart';
+import 'package:muzhiki_core/dependecies/service/session/pkce.dart';
+import 'package:muzhiki_core/dependecies/service/session/user_session.dart';
+import 'package:muzhiki_core/muzhiki_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class SessionApp extends ChangeNotifier {
+  final PersistCookieJar cookieJar;
+  final HiveCacheStore hiveStore;
+  final SharedPreferences sharedPreferences;
+  final Fresh<String> fresh;
+  final Dio dioRefresh;
+  final Dio dio;
+  final bool getRoles;
+  final UserSession userSession;
+  final VoidCallback? onSessionResumed;
+
+  StreamSubscription<AuthenticationStatus>? _authSub;
+
+  AuthenticationStatus _status = AuthenticationStatus.initial;
+  AuthenticationStatus get status => _status;
+
+  bool get isAuth => _status == AuthenticationStatus.authenticated;
+  bool get isUnauth => _status == AuthenticationStatus.unauthenticated;
+  bool get isInitial => _status == AuthenticationStatus.initial;
+  Future<String?> get token async => await fresh.token;
+  final Completer<void> _ready = Completer<void>();
+  Future<void> get ready => _ready.future;
+  UserModel? _user;
+  UserModel? get user => _user;
+  SessionApp({
+    this.onSessionResumed,
+    required this.dio,
+    this.getRoles = false,
+    required this.userSession,
+    required this.dioRefresh,
+    required this.sharedPreferences,
+    required this.fresh,
+    required this.cookieJar,
+    required this.hiveStore,
+  });
+
+  Future<UserModel?> getRolesBased({
+    required UserModel? currUser,
+    required String token,
+  }) async {
+    if (currUser == null) return null;
+
+    final saveDateTime = currUser.createdAt;
+
+    if (saveDateTime == null ||
+        DateTime.now().difference(saveDateTime).inHours >= 1) {
+      try {
+        final rolesData = await dioRefresh.get(
+          "https://api.master.muzhiki.pro/api/v1/get-roles",
+          options: Options(headers: {'Authorization': 'Bearer $token'}),
+        );
+
+        if (rolesData.data != null) {
+          final newRoles = RolesModel.fromJson(rolesData.data["data"]);
+
+          final companies = newRoles.info.getCompaniesByRole(
+            currUser.roles?.currentRole,
+          );
+
+          final allowedInformator = newRoles.info.accessAllowedInformator;
+          final savedCompanyId = currUser.selectedRolesCompany;
+          final exists = companies.any((c) => c.id == savedCompanyId);
+
+          final validCompanyId = exists
+              ? savedCompanyId
+              : (companies.isNotEmpty ? companies.first.id : "");
+
+          currUser = currUser.copyWith(
+            isAllowedAccessInformator: allowedInformator,
+            roles: newRoles,
+            selectedRolesCompany: validCompanyId,
+            createdAt: DateTime.now(),
+          );
+
+          await userSession.saveUserSession(currUser);
+        }
+      } catch (_) {
+        return currUser;
+      }
+    }
+
+    return currUser;
+  }
+
+  Future<void> init() async {
+    final token = await fresh.token;
+
+    if (token != null && token.isNotEmpty) {
+      _status = AuthenticationStatus.authenticated;
+      var currUser = await userSession.restoreUser();
+      bool? allowedInformator;
+
+      if (getRoles) {
+        await getRolesBased(currUser: currUser, token: token);
+      }
+
+      allowedInformator ??= currUser?.roles?.info.accessAllowedInformator;
+
+      _user = currUser?.copyWith(isAllowedAccessInformator: allowedInformator);
+      onSessionResumed?.call();
+    } else {
+      _status = AuthenticationStatus.unauthenticated;
+      cleareSession();
+    }
+
+    _authSub = fresh.authenticationStatus.listen((status) {
+      if (_status == status) return;
+      _status = status;
+      notifyListeners();
+    });
+    _ready.complete();
+    notifyListeners();
+  }
+
+  Future<void> selectedCompany({required String id}) async {
+    if (_user == null) return;
+    _user = _user!.copyWith(selectedRolesCompany: id);
+    await userSession.saveSelectedUserCompany(id: id, userId: user!.mpid);
+    notifyListeners();
+  }
+
+  Future<bool> loginSession({String path = '/'}) async {
+    try {
+      final appLinks = AppLinks();
+      final completer = Completer<String>();
+      await sharedPreferences.remove('pkce_verifier');
+
+      final pkce = await PkcePair.generate();
+      await sharedPreferences.setString('pkce_verifier', pkce.verifier);
+
+      final redirectUri = 'muzhikimyapp.master://auth';
+
+      final authUri = Uri.https('id2.muzhiki.pro', path, {
+        'redirect_url': redirectUri,
+        'code_challenge': pkce.challenge,
+      });
+
+      String result;
+
+      if (Platform.isAndroid) {
+        final sub = appLinks.uriLinkStream.listen((uri) {
+          if (uri.toString().startsWith(redirectUri)) {
+            completer.complete(uri.toString());
+          }
+        });
+        await launchUrl(authUri, mode: LaunchMode.externalApplication);
+        result = await completer.future.timeout(
+          const Duration(minutes: 15),
+          onTimeout: () async {
+            await sharedPreferences.remove('pkce_verifier');
+            MuzhikiCore.I.banner.show(message: 'Время авторизации вышло');
+            return 'timeout';
+          },
+        );
+        await sub.cancel();
+      } else {
+        result =
+            await FlutterWebAuth2.authenticate(
+              url: authUri.toString(),
+              callbackUrlScheme: 'muzhikimyapp.master',
+            ).timeout(
+              const Duration(minutes: 15),
+              onTimeout: () async {
+                await sharedPreferences.remove('pkce_verifier');
+                MuzhikiCore.I.banner.show(message: 'Время авторизации вышло');
+                return 'timeout';
+              },
+            );
+      }
+
+      if (result == 'timeout') {
+        return false;
+      }
+
+      if (result.isEmpty) {
+        MuzhikiCore.I.banner.show(message: 'Редирект ссылка пустая');
+        return false;
+      }
+
+      final callbackUri = Uri.parse(result);
+
+      if (callbackUri.queryParameters.isEmpty) {
+        MuzhikiCore.I.banner.show(message: 'Пустые queryParameters');
+
+        return false;
+      }
+
+      final authCode = callbackUri.queryParameters['auth_code'] ?? '';
+      final verifier = sharedPreferences.getString('pkce_verifier') ?? '';
+
+      if (authCode.isEmpty || verifier.isEmpty) {
+        MuzhikiCore.I.banner.show(message: 'Пустой авторизационный код');
+        return false;
+      }
+
+      final response = await dioRefresh.post(
+        'https://api.master.muzhiki.pro/api/v1/auth/token',
+        data: {'code': authCode, 'code_verifier': verifier, 'mode': 'cookie'},
+      );
+
+      final token = response.data['data']?['access_token'] as String?;
+      RolesModel? roles;
+      try {
+        final rolesData = await dioRefresh.get(
+          'https://api.master.muzhiki.pro/api/v1/get-roles',
+          options: Options(headers: {'Authorization': 'Bearer $token'}),
+        );
+
+        roles = RolesModel.fromJson(rolesData.data["data"]);
+      } catch (e) {
+        MuzhikiCore.I.banner.show(
+          message: 'Ошибка при получении роли пользователя',
+        );
+      }
+
+      if (token == null || token.isEmpty) {
+        MuzhikiCore.I.banner.show(message: 'Авторизация отклонена');
+
+        return false;
+      }
+
+      final userJson = response.data['data']?['user'];
+
+      final fullName = (userJson['full_name'] ?? '').toString();
+
+      final parts = fullName
+          .trim()
+          .split(RegExp(r'\s+'))
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      String firstName = '';
+      String lastName = '';
+
+      if (parts.isNotEmpty) {
+        firstName = parts.first;
+      }
+
+      if (parts.length > 1) {
+        lastName = parts.sublist(1).join(' ');
+      }
+
+      final savedCompanyId = sharedPreferences.getString(
+        "selected_company_${userJson['id']}",
+      );
+
+      String? selectedCompany = savedCompanyId;
+      bool allowedInformator = false;
+
+      if (roles != null) {
+        allowedInformator = roles.info.accessAllowedInformator;
+        final companies = roles.info.getCompaniesByRole(roles.currentRole);
+
+        final hasSavedCompany = companies.any((c) => c.id == savedCompanyId);
+
+        if (!hasSavedCompany) {
+          selectedCompany = companies.isNotEmpty ? companies.first.id : null;
+        }
+      }
+      final isFirstAuth = sharedPreferences.getBool('first_auth');
+      final user = UserModel(
+        isAllowedAccessInformator: allowedInformator,
+        isFirstAuth: isFirstAuth ?? true,
+        selectedRolesCompany: selectedCompany ?? "",
+        createdAt: DateTime.now(),
+        roles: roles,
+        firstName: firstName,
+        lastName: lastName,
+        mpid: userJson['id'].toString(),
+        username: userJson['full_name'] ?? '',
+        isFake: userJson['is_fake'] ?? false,
+        phone: userJson['phone'] ?? '',
+      );
+
+      await userSession.saveUserSession(user);
+      _user = user;
+      notifyListeners();
+      Future.delayed(const Duration(seconds: 3), () => fresh.setToken(token));
+
+      return true;
+    } catch (e, st) {
+      await sharedPreferences.remove('pkce_verifier');
+      if (e is PlatformException && Platform.isIOS) {
+        if (e.message == 'User canceled login') {
+          return false;
+        } else {
+          rethrow;
+        }
+      } else {
+        final error = GlobalMapErrorApp.map(e, st);
+        MuzhikiCore.I.banner.show(
+          message: error.debugMessage ?? error.stackTrace.toString(),
+        );
+        return false;
+      }
+    }
+  }
+
+  Future<void> removeAccount({required String phone}) async {
+    final response = await dio.delete(
+      'https://auth.muzhiki.pro/api/v1/delete-account',
+      data: {"phone": phone},
+    );
+    await dio.post(
+      'https://auth.muzhiki.pro/api/v1/logout',
+      data: {"app_name": "mp_master_app"},
+      options: Options(extra: {'isRefreshRequest': false, 'showError': false}),
+    );
+    if (response.data['success'] == true) {
+      cleareSession();
+    }
+  }
+
+  Future<UserModel> editAccount({
+    required Map<String, dynamic> userData,
+  }) async {
+    try {
+      await dio.post(
+        "https://auth.muzhiki.pro/api/v1/change-info",
+        data: {
+          "name": userData['first_name'],
+          "last_name": userData['last_name'],
+          "phone": _user!.phone,
+        },
+      );
+      _user = _user!.copyWith(
+        firstName: userData['first_name'],
+        lastName: userData['last_name'],
+      );
+      await userSession.saveUserSession(_user!);
+      await userSession.restoreUser();
+      _user = user;
+      return _user!;
+    } catch (e, st) {
+      throw GlobalMapErrorApp.map(e, st);
+    }
+  }
+
+  Future<void> logoutSession() async {
+    await dio.post(
+      "https://auth.muzhiki.pro/api/v1/logout",
+      data: {"app_name": "mp_master_app"},
+      options: Options(extra: {'isRefreshRequest': false, 'showError': false}),
+    );
+    await FirebaseMessaging.instance.deleteToken();
+    cleareSession();
+  }
+
+  void cleareSession() {
+    fresh.clearToken();
+    userSession.clearUserSession();
+    cookieJar.deleteAll();
+    hiveStore.clean();
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
+  }
+}

@@ -8,8 +8,29 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  app_links: ^7.1.2
+  cookie_jar: ^4.0.9
+  crypto: ^3.0.7
+  dio: ^5.9.2
+  dio_cache_interceptor: ^4.0.6
+  dio_cookie_manager: ^3.4.0
+  firebase_messaging: ^16.4.0
   flutter:
     sdk: flutter
+  flutter_screenutil: ^5.9.3
+  flutter_secure_storage: ^10.3.1
+  flutter_web_auth_2: ^5.0.3
+  fresh_dio: ^0.6.0
+  go_router: ^17.3.0
+  http_cache_hive_store: ^5.1.0
+  json_annotation: ^4.12.0
+  path: ^1.9.1
+  path_provider: ^2.1.6
+  shared_preferences: ^2.5.5
+  talker: ^5.1.17
+  talker_dio_logger: ^5.1.17
+  url_launcher: ^6.3.2
+  vpn_detector: ^1.3.1
 
 dev_dependencies:
   flutter_test:
