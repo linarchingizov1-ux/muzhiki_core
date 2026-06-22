@@ -6,6 +6,7 @@ import 'package:muzhiki_core/dependecies/model/dependencies_model.dart';
 import 'package:muzhiki_core/dependecies/model/network_model.dart';
 import 'package:muzhiki_core/dependecies/model/service_model.dart';
 import 'package:muzhiki_core/dependecies/model/storage_model.dart';
+import 'package:muzhiki_core/dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/dependecies/network/network_factory.dart';
 import 'package:muzhiki_core/dependecies/network/utils/network_vnp_detector.dart';
 import 'package:muzhiki_core/dependecies/service/app_banner/app_banner_controller.dart';
@@ -49,6 +50,7 @@ class MuzhikiCore {
     final hiveStore = HiveCacheStore(directory.path);
     final talker = Talker();
     final vpnDetector = AppVpnDetector();
+    final mapper = NetworkMapErrorApp();
     vpnDetector.init();
     final network = await NetworkFactory.create(
       vpnDetector: vpnDetector,
@@ -73,7 +75,6 @@ class MuzhikiCore {
       bannerController: BannerController.I,
     );
     final networkModel = NetworkModel(
-      mapper: network.mapper,
       vpnDetector: network.vpnDetector,
       networkStatusController: network.networkStatusController,
       authDio: network.authDio,
@@ -87,6 +88,7 @@ class MuzhikiCore {
       directory: directory,
     );
     return DependenciesModel(
+      mapper: mapper,
       network: networkModel,
       service: serviceModel,
       storage: storageModel,

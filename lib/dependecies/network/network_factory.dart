@@ -5,7 +5,6 @@ import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/dependecies/model/network_model.dart';
-import 'package:muzhiki_core/dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/dependecies/network/utils/network_status_controller.dart';
 import 'package:muzhiki_core/dependecies/network/utils/network_vnp_detector.dart';
@@ -98,10 +97,8 @@ class NetworkFactory {
     refreshDio.interceptors.addAll([talkerInterceptor]);
 
     authDio.interceptors.addAll([errorInterceptor, cacheInterceptor, fresh]);
-    final mapper = NetworkMapErrorApp();
 
     return NetworkModel(
-      mapper: mapper,
       networkStatusController: newtworkStateController,
       authDio: authDio,
       refreshDio: refreshDio,
