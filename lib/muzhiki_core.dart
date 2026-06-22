@@ -75,6 +75,7 @@ class MuzhikiCore {
       bannerController: BannerController.I,
     );
     final networkModel = NetworkModel(
+      mapper: network.mapper,
       vpnDetector: network.vpnDetector,
       networkStatusController: network.networkStatusController,
       authDio: network.authDio,
