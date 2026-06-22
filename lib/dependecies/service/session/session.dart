@@ -308,7 +308,7 @@ class SessionApp extends ChangeNotifier {
           rethrow;
         }
       } else {
-        final error = GlobalMapErrorApp.map(e, st);
+        final error = GlobalMapErrorApp.I.map(e, st);
         MuzhikiCore.I.banner.show(
           message: error.debugMessage ?? error.stackTrace.toString(),
         );
@@ -353,7 +353,7 @@ class SessionApp extends ChangeNotifier {
       _user = user;
       return _user!;
     } catch (e, st) {
-      throw GlobalMapErrorApp.map(e, st);
+      throw GlobalMapErrorApp.I.map(e, st);
     }
   }
 
