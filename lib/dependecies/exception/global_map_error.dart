@@ -5,7 +5,7 @@ import 'package:muzhiki_core/dependecies/network/exception/network_map_error.dar
 class GlobalMapErrorApp {
   const GlobalMapErrorApp._();
   static final I = const GlobalMapErrorApp._();
-  static GlobalExceptionApp map(Object error, [StackTrace? stackTrace]) {
+  GlobalExceptionApp map(Object error, [StackTrace? stackTrace]) {
     if (error is GlobalExceptionApp) {
       return error;
     }
