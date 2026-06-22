@@ -50,7 +50,8 @@ class MuzhikiCore {
     final hiveStore = HiveCacheStore(directory.path);
     final talker = Talker();
     final vpnDetector = AppVpnDetector();
-    final mapper = NetworkMapErrorApp();
+    final mapper = NetworkMapErrorApp.I;
+
     vpnDetector.init();
     final network = await NetworkFactory.create(
       vpnDetector: vpnDetector,
@@ -87,6 +88,7 @@ class MuzhikiCore {
       token: tokenStorage,
       directory: directory,
     );
+
     return DependenciesModel(
       mapper: mapper,
       network: networkModel,

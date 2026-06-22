@@ -9,7 +9,7 @@ class GlobalMapErrorApp {
     }
 
     if (error is DioException) {
-      return NetworkMapErrorApp.map(error);
+      return NetworkMapErrorApp.I.map(error);
     }
 
     if (error is TypeError) {

@@ -4,7 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:muzhiki_core/dependecies/network/exception/network_exception.dart';
 
 class NetworkMapErrorApp {
-  static NetworkExceptionApp map(DioException e) {
+  const NetworkMapErrorApp._();
+  static final I = const NetworkMapErrorApp._();
+  NetworkExceptionApp map(DioException e) {
     final statusCode = e.response?.statusCode;
     final data = e.response?.data;
     final error = e.error;
