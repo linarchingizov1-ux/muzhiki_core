@@ -3,6 +3,8 @@ import 'package:muzhiki_core/dependecies/exception/global_exception.dart';
 import 'package:muzhiki_core/dependecies/network/exception/network_map_error.dart';
 
 class GlobalMapErrorApp {
+  const GlobalMapErrorApp._();
+  static final I = const GlobalMapErrorApp._();
   static GlobalExceptionApp map(Object error, [StackTrace? stackTrace]) {
     if (error is GlobalExceptionApp) {
       return error;

@@ -2,11 +2,11 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
+import 'package:muzhiki_core/dependecies/exception/global_map_error.dart';
 import 'package:muzhiki_core/dependecies/model/dependencies_model.dart';
 import 'package:muzhiki_core/dependecies/model/network_model.dart';
 import 'package:muzhiki_core/dependecies/model/service_model.dart';
 import 'package:muzhiki_core/dependecies/model/storage_model.dart';
-import 'package:muzhiki_core/dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/dependecies/network/network_factory.dart';
 import 'package:muzhiki_core/dependecies/network/utils/network_vnp_detector.dart';
 import 'package:muzhiki_core/dependecies/service/app_banner/app_banner_controller.dart';
@@ -50,7 +50,7 @@ class MuzhikiCore {
     final hiveStore = HiveCacheStore(directory.path);
     final talker = Talker();
     final vpnDetector = AppVpnDetector();
-    final mapper = NetworkMapErrorApp.I;
+    final mapper = GlobalMapErrorApp.I;
 
     vpnDetector.init();
     final network = await NetworkFactory.create(
