@@ -71,6 +71,11 @@ class MuzhikiCore {
       cookieJar: cookieJar,
       hiveStore: hiveStore,
     );
+    if (_isUninstalling) {
+      await sharedPreferences.clear();
+      session.cleareSession();
+      await sharedPreferences.setBool('isUninstalling', false);
+    }
     final serviceModel = ServiceModel(
       session: session,
       talker: talker,
