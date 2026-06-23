@@ -6,7 +6,9 @@ homepage:
 environment:
   sdk: ^3.12.1
   flutter: ">=1.17.0"
-
+dependency_overrides:
+  win32: ^6.0.1
+  
 dependencies:
   app_links: ^7.1.2
   cached_network_image: ^3.4.1
@@ -16,7 +18,7 @@ dependencies:
   dio: ^5.9.2
   dio_cache_interceptor: ^4.0.6
   dio_cookie_manager: ^3.4.0
-  file_picker: ^3.0.4
+  file_picker: ^11.0.2
   firebase_messaging: ^16.4.0
   flutter:
     sdk: flutter
