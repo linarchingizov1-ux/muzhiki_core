@@ -36,7 +36,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   }
 
   Future<List<PlatformFile>> _addDoc() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: ['doc', 'docx', 'pdf', 'xlsx'],
