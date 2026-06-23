@@ -27,9 +27,7 @@ class MuzhikiCore {
 
   BannerController get banner => BannerController.I;
 
-  bool? _isUninstalling;
-
-  bool get isUninstalling => _isUninstalling ?? true;
+  late bool _isUninstalling;
 
   Future<DependenciesModel> init({
     VoidCallback? onSessionResumed,
@@ -47,7 +45,7 @@ class MuzhikiCore {
       () => SharedPreferences.getInstance(),
     );
     final secureStorage = const FlutterSecureStorage();
-    _isUninstalling = sharedPreferences.getBool('isUninstalling');
+    _isUninstalling = sharedPreferences.getBool('isUninstalling') ?? true;
     final tokenStorage = SecureStringTokenStorage(secureStorage);
     final hiveStore = HiveCacheStore(directory.path);
     final talker = Talker();
