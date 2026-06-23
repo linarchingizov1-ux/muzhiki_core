@@ -6,8 +6,6 @@ homepage:
 environment:
   sdk: ^3.12.1
   flutter: ">=1.17.0"
-dependency_overrides:
-  win32: ^6.0.1
   
 dependencies:
   app_links: ^7.1.2
