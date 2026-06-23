@@ -17,6 +17,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker/talker.dart';
+import 'package:vpn_detector/vpn_detector.dart';
 
 class MuzhikiCore {
   MuzhikiCore._();
@@ -33,6 +34,7 @@ class MuzhikiCore {
   Future<DependenciesModel> init({
     VoidCallback? onSessionResumed,
     bool getRoles = false,
+    bool vpnDetectorOn = true,
   }) async {
     final directory = await Future.microtask(
       () => getApplicationDocumentsDirectory(),
@@ -52,7 +54,6 @@ class MuzhikiCore {
     final vpnDetector = AppVpnDetector();
     final mapper = AppErrorMapper.I;
 
-    vpnDetector.init();
     final network = await NetworkFactory.create(
       vpnDetector: vpnDetector,
       talker: talker,
@@ -75,6 +76,16 @@ class MuzhikiCore {
       talker: talker,
       bannerController: BannerController.I,
     );
+    if (vpnDetectorOn) {
+      vpnDetector.stream.listen((status) {
+        if (status == VpnStatus.active) {
+          BannerController.I.show(
+            message:
+                "Активно VPN соединение.\nНекоторые функции могут быть недоступны",
+          );
+        }
+      });
+    }
     final networkModel = NetworkModel(
       vpnDetector: network.vpnDetector,
       networkStatusController: network.networkStatusController,
