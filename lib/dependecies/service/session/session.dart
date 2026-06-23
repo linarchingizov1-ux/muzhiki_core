@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
-import 'package:muzhiki_core/dependecies/exception/global_map_error.dart';
+import 'package:muzhiki_core/dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/dependecies/service/session/extension/roles_company.dart';
 import 'package:muzhiki_core/dependecies/service/session/model/session_roles.dart';
 import 'package:muzhiki_core/dependecies/service/session/model/user.dart';
@@ -308,7 +308,7 @@ class SessionApp extends ChangeNotifier {
           rethrow;
         }
       } else {
-        final error = GlobalMapErrorApp.I.map(e, st);
+        final error = AppErrorMapper.I.map(e, st);
         MuzhikiCore.I.banner.show(
           message: error.debugMessage ?? error.stackTrace.toString(),
         );
@@ -353,7 +353,7 @@ class SessionApp extends ChangeNotifier {
       _user = user;
       return _user!;
     } catch (e, st) {
-      throw GlobalMapErrorApp.I.map(e, st);
+      throw AppErrorMapper.I.map(e, st);
     }
   }
 

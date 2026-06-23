@@ -14,7 +14,7 @@ class AppErrorInterceptor extends Interceptor {
         err.requestOptions.extra['isRefreshRequest'] == true;
 
     if (showError && !isRefreshRequest && !err.isAuthError) {
-      final mapped = NetworkMapErrorApp.I.map(err);
+      final mapped = AppErrorMapper.I.map(err);
 
       if (err.isBackendError) {
         NetworkStatusController.I.setErrorBackend();

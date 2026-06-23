@@ -1,17 +1,172 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:muzhiki_core/dependecies/network/exception/network_exception.dart';
 
-class NetworkMapErrorApp {
-  const NetworkMapErrorApp._();
-  static final I = const NetworkMapErrorApp._();
-  NetworkExceptionApp map(DioException e) {
+class AppErrorMapper {
+  const AppErrorMapper._();
+
+  static final I = const AppErrorMapper._();
+
+  AppException map(Object error, [StackTrace? stackTrace]) {
+    if (error is PlatformException) {
+      final isActivityNotFound = error.code == 'ACTIVITY_NOT_FOUND';
+
+      return AppException(
+        message: isActivityNotFound
+            ? 'На устройстве не найдено приложение для открытия ссылки'
+            : error.message ?? 'Ошибка платформы.',
+      );
+    }
+    if (error is AppException) {
+      return error;
+    }
+
+    final photoError = PhotoErrorMapper.map(error, stackTrace);
+    if (photoError != null) {
+      return photoError;
+    }
+
+    if (error is DioException) {
+      return DioErrorMapper.map(error);
+    }
+
+    if (error is TypeError) {
+      return AppException(
+        message: 'Ошибка обработки данных.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is FormatException) {
+      return AppException(
+        message: 'Некорректный формат данных.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is RangeError) {
+      return AppException(
+        message: 'Ошибка при чтении данных.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is NoSuchMethodError) {
+      return AppException(
+        message: 'При обработке данных произошла ошибка.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return AppException(
+      message: 'Произошла неизвестная ошибка.',
+      originalError: error,
+      stackTrace: stackTrace,
+    );
+  }
+}
+
+sealed class PhotoPrepareException implements Exception {
+  final String path;
+
+  const PhotoPrepareException(this.path);
+}
+
+class PhotoFileNotFoundException extends PhotoPrepareException {
+  const PhotoFileNotFoundException(super.path);
+}
+
+class PhotoFileEmptyException extends PhotoPrepareException {
+  const PhotoFileEmptyException(super.path);
+}
+
+class PhotoDecodeException extends PhotoPrepareException {
+  const PhotoDecodeException(super.path);
+}
+
+class PhotoNotEnoughFilesException implements Exception {
+  const PhotoNotEnoughFilesException();
+}
+
+class PhotoSetIdNotReturnedException implements Exception {
+  const PhotoSetIdNotReturnedException();
+}
+
+class SupportedUserNotFoundExceptionMap extends AppNetworkException {
+  SupportedUserNotFoundExceptionMap({
+    required super.message,
+    super.statusCode,
+    super.originalError,
+  });
+}
+
+class SupportedIsFakeUser extends AppNetworkException {
+  SupportedIsFakeUser({
+    required super.message,
+    super.statusCode,
+    super.originalError,
+  });
+}
+
+class PhotoErrorMapper {
+  static AppException? map(Object error, [StackTrace? stackTrace]) {
+    if (error is PhotoNotEnoughFilesException) {
+      return AppException(
+        message: 'Недостаточно фото.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is PhotoFileNotFoundException) {
+      return AppException(
+        message: 'Один из файлов фото не найден.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is PhotoFileEmptyException) {
+      return AppException(
+        message: 'Один из файлов фото пустой.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is PhotoDecodeException) {
+      return AppException(
+        message: 'Не удалось обработать одно из изображений.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is PhotoSetIdNotReturnedException) {
+      return AppException(
+        message: 'Сервер не вернул id фотосета.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return null;
+  }
+}
+
+class DioErrorMapper {
+  static AppNetworkException map(DioException e) {
     final statusCode = e.response?.statusCode;
     final data = e.response?.data;
     final error = e.error;
 
-    if (error is NetworkExceptionApp) {
+    if (error is AppNetworkException) {
       return error;
     }
 
@@ -20,7 +175,7 @@ class NetworkMapErrorApp {
     final combinedText = '$errorText $messageText';
 
     if (_isNoInternet(error, combinedText)) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Нет подключения к интернету. Проверьте соединение.',
         statusCode: statusCode,
         originalError: e,
@@ -28,7 +183,7 @@ class NetworkMapErrorApp {
     }
 
     if (_isConnectionInterrupted(error, combinedText)) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Соединение было прервано. Попробуйте ещё раз.',
         statusCode: statusCode,
         originalError: e,
@@ -36,7 +191,7 @@ class NetworkMapErrorApp {
     }
 
     if (_isTlsOrCertificateError(error, combinedText)) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Ошибка безопасного соединения.',
         statusCode: statusCode,
         originalError: e,
@@ -44,15 +199,34 @@ class NetworkMapErrorApp {
     }
 
     if (e.type == DioExceptionType.badResponse) {
-      return NetworkExceptionApp(
-        message: _mapStatusCode(statusCode, data),
-        statusCode: statusCode,
-        originalError: e,
-      );
+      final message = _mapStatusCode(statusCode, data);
+      final unsuccessUserSupportApp = e.response?.statusCode == 404;
+      final isFakeUser = e.response?.statusCode == 403;
+
+      if (unsuccessUserSupportApp) {
+        return SupportedUserNotFoundExceptionMap(
+          message: message,
+          statusCode: statusCode,
+          originalError: e,
+        );
+      }
+      if (isFakeUser) {
+        return SupportedIsFakeUser(
+          message: message,
+          statusCode: statusCode,
+          originalError: e,
+        );
+      } else {
+        return AppNetworkException(
+          message: message,
+          statusCode: statusCode,
+          originalError: e,
+        );
+      }
     }
 
     if (e.type == DioExceptionType.connectionTimeout) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Превышено время ожидания подключения.',
         statusCode: statusCode,
         originalError: e,
@@ -60,7 +234,7 @@ class NetworkMapErrorApp {
     }
 
     if (e.type == DioExceptionType.sendTimeout) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Превышено время отправки данных.',
         statusCode: statusCode,
         originalError: e,
@@ -68,7 +242,7 @@ class NetworkMapErrorApp {
     }
 
     if (e.type == DioExceptionType.receiveTimeout) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Сервер слишком долго отвечает.',
         statusCode: statusCode,
         originalError: e,
@@ -76,7 +250,7 @@ class NetworkMapErrorApp {
     }
 
     if (e.type == DioExceptionType.badCertificate) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Ошибка сертификата безопасности.',
         statusCode: statusCode,
         originalError: e,
@@ -84,7 +258,7 @@ class NetworkMapErrorApp {
     }
 
     if (e.type == DioExceptionType.cancel) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Запрос был отменён.',
         statusCode: statusCode,
         originalError: e,
@@ -92,7 +266,7 @@ class NetworkMapErrorApp {
     }
 
     if (e.type == DioExceptionType.connectionError) {
-      return NetworkExceptionApp(
+      return AppNetworkException(
         message: 'Ошибка интернет-соединения. Проверьте интернет.',
         statusCode: statusCode,
         originalError: e,
@@ -102,21 +276,21 @@ class NetworkMapErrorApp {
     if (e.type == DioExceptionType.unknown) {
       final backendMessage = _extractBackendMessage(data);
       if (backendMessage != null) {
-        return NetworkExceptionApp(
+        return AppNetworkException(
           message: backendMessage,
           statusCode: statusCode,
           originalError: e,
         );
       }
 
-      return NetworkExceptionApp(
-        message: 'Неизвестная ошибка сети. Попробуйте позже.',
+      return AppNetworkException(
+        message: 'Неизвестная ошибка сети. ${e.error?.runtimeType} ${e.error}.',
         statusCode: statusCode,
         originalError: e,
       );
     }
 
-    return NetworkExceptionApp(
+    return AppNetworkException(
       message: 'Не удалось выполнить запрос. Попробуйте позже.',
       statusCode: statusCode,
       originalError: e,
@@ -206,7 +380,7 @@ class NetworkMapErrorApp {
       case 410:
         return backendMessage ?? 'Данные больше недоступны.';
       case 413:
-        return 'Размер файла слишком большой.';
+        return backendMessage ?? 'Размер файла слишком большой.';
       case 415:
         return backendMessage ?? 'Неподдерживаемый формат данных.';
       case 419:
@@ -280,6 +454,10 @@ class NetworkMapErrorApp {
     if (data is String && data.trim().isNotEmpty) {
       final normalized = _normalizeRawBackendString(data);
       return normalized;
+    }
+
+    if (data is String && data.trim().isNotEmpty) {
+      return data;
     }
 
     return null;
