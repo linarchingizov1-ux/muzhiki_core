@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/dependecies/model/network_model.dart';
@@ -15,11 +17,15 @@ import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 
 class NetworkFactory {
   static Future<NetworkModel> create({
+    required bool enableTalker,
     required AppVpnDetector vpnDetector,
     required Talker talker,
     required HiveCacheStore store,
     required SecureStringTokenStorage tokenStorage,
+    required PersistCookieJar cookieJar,
   }) async {
+    await cookieJar.forceInit();
+    final cookieManager = CookieManager(cookieJar);
     final newtworkStateController = NetworkStatusController.I;
     final cacheOptions = CacheOptions(
       store: store,
@@ -74,7 +80,8 @@ class NetworkFactory {
     );
     final talkerInterceptor = TalkerDioLogger(
       talker: talker,
-      settings: const TalkerDioLoggerSettings(
+      settings: TalkerDioLoggerSettings(
+        enabled: enableTalker,
         printErrorData: false,
         printErrorHeaders: false,
 
@@ -94,9 +101,14 @@ class NetworkFactory {
         printResponseTime: false,
       ),
     );
-    refreshDio.interceptors.addAll([talkerInterceptor]);
+    refreshDio.interceptors.addAll([cookieManager, talkerInterceptor]);
 
-    authDio.interceptors.addAll([errorInterceptor, cacheInterceptor, fresh]);
+    authDio.interceptors.addAll([
+      cookieManager,
+      errorInterceptor,
+      cacheInterceptor,
+      fresh,
+    ]);
 
     return NetworkModel(
       networkStatusController: newtworkStateController,

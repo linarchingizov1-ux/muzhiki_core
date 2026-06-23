@@ -31,6 +31,7 @@ class MuzhikiCore {
 
   Future<DependenciesModel> init({
     VoidCallback? onSessionResumed,
+    bool enableTalker = true,
     bool getRoles = false,
     bool vpnDetectorOn = true,
   }) async {
@@ -51,8 +52,14 @@ class MuzhikiCore {
     final talker = Talker();
     final vpnDetector = AppVpnDetector();
     final mapper = AppErrorMapper.I;
+    final cookie = PersistCookieJar(
+      ignoreExpires: true,
+      storage: FileStorage(path.join(directory.path, '.cookies')),
+    );
 
     final network = await NetworkFactory.create(
+      cookieJar: cookie,
+      enableTalker: enableTalker,
       vpnDetector: vpnDetector,
       talker: talker,
       store: hiveStore,

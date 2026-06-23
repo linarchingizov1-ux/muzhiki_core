@@ -1,0 +1,107 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'socket_connection.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+MessageModel _$MessageModelFromJson(Map<String, dynamic> json) => MessageModel(
+  avatar: json['avatar'] as String?,
+  name: json['operator_name'] as String?,
+  id: json['id'] as String,
+  createdAt: MessageModel._fromJsonDate(json['created_at'] as String),
+  text: json['text'] as String,
+  type: $enumDecode(_$MessageTypeEnumMap, json['type']),
+  attachments:
+      (json['attachments'] as List<dynamic>?)
+          ?.map((e) => AttachmentsModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$MessageModelToJson(MessageModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'text': instance.text,
+      'type': _$MessageTypeEnumMap[instance.type]!,
+      'avatar': instance.avatar,
+      'operator_name': instance.name,
+      'attachments': instance.attachments,
+    };
+
+const _$MessageTypeEnumMap = {MessageType.operator: 2, MessageType.client: 1};
+
+AttachmentsModel _$AttachmentsModelFromJson(Map<String, dynamic> json) =>
+    AttachmentsModel(
+      type: $enumDecode(_$ChatAttachmentTypeEnumMap, json['type']),
+      url: json['url'] as String,
+      name: json['name'] as String?,
+    );
+
+Map<String, dynamic> _$AttachmentsModelToJson(AttachmentsModel instance) =>
+    <String, dynamic>{
+      'type': _$ChatAttachmentTypeEnumMap[instance.type]!,
+      'url': instance.url,
+      'name': instance.name,
+    };
+
+const _$ChatAttachmentTypeEnumMap = {
+  ChatAttachmentType.photo: 'photo',
+  ChatAttachmentType.video: 'video',
+  ChatAttachmentType.document: 'document',
+};
+
+_SocketConnectionModel _$SocketConnectionModelFromJson(
+  Map<String, dynamic> json,
+) => _SocketConnectionModel(
+  id: (json['id'] as num).toInt(),
+  type: $enumDecode(_$ChatTypeEnumMap, json['type']),
+  chatId: (json['chat_id'] as num).toInt(),
+  avatar: readAvatar(json, 'avatar') as String?,
+  deadline: json['deadline'] == null
+      ? null
+      : DateTime.parse(json['deadline'] as String),
+  messages:
+      (json['messages'] as List<dynamic>?)
+          ?.map((e) => MessageModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  status: $enumDecode(_$SocketConnectionChatStatusEnumMap, json['status']),
+  canWrite: json['can_write'] as bool,
+  createdAt: fromJsonDate(json['created_at'] as String),
+  title: json['title'] as String,
+  channelId: (json['channel_id'] as num).toInt(),
+  isRated: json['rated'] as bool? ?? false,
+);
+
+Map<String, dynamic> _$SocketConnectionModelToJson(
+  _SocketConnectionModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'type': _$ChatTypeEnumMap[instance.type]!,
+  'chat_id': instance.chatId,
+  'avatar': instance.avatar,
+  'deadline': instance.deadline?.toIso8601String(),
+  'messages': instance.messages,
+  'status': _$SocketConnectionChatStatusEnumMap[instance.status]!,
+  'can_write': instance.canWrite,
+  'created_at': instance.createdAt.toIso8601String(),
+  'title': instance.title,
+  'channel_id': instance.channelId,
+  'rated': instance.isRated,
+};
+
+const _$ChatTypeEnumMap = {
+  ChatType.ticket: 'ticket',
+  ChatType.session: 'session',
+};
+
+const _$SocketConnectionChatStatusEnumMap = {
+  SocketConnectionChatStatus.close: 'Закрыт',
+  SocketConnectionChatStatus.work: 'В работе',
+  SocketConnectionChatStatus.open: 'Открыт',
+  SocketConnectionChatStatus.wait: 'waiting',
+  SocketConnectionChatStatus.activeTicket: 'activeTicket',
+};
