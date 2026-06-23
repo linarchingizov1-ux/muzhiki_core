@@ -52,7 +52,7 @@ class NetworkFactory {
       refreshToken: (token, client) async {
         try {
           final response = await client.get(
-            'AppPathConstant.refresh',
+            'https://auth.muzhiki.pro/api/v1/auth/refresh',
             options: Options(
               extra: {'isRefreshRequest': true, 'showError': false},
             ),

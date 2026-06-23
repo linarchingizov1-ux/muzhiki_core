@@ -218,7 +218,7 @@ class SessionApp extends ChangeNotifier {
       }
 
       final response = await dioRefresh.post(
-        'https://api.master.muzhiki.pro/api/v1/auth/token',
+        'https://auth.muzhiki.pro/api/v1/auth/token',
         data: {'code': authCode, 'code_verifier': verifier, 'mode': 'cookie'},
       );
 
