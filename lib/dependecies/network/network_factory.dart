@@ -104,6 +104,7 @@ class NetworkFactory {
     refreshDio.interceptors.addAll([cookieManager, talkerInterceptor]);
 
     authDio.interceptors.addAll([
+      talkerInterceptor,
       cookieManager,
       errorInterceptor,
       cacheInterceptor,
