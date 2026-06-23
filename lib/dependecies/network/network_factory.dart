@@ -25,7 +25,7 @@ class NetworkFactory {
     required PersistCookieJar cookieJar,
   }) async {
     await cookieJar.forceInit();
-    final cookieManager = CookieManager(cookieJar);
+
     final newtworkStateController = NetworkStatusController.I;
     final cacheOptions = CacheOptions(
       store: store,
@@ -78,6 +78,7 @@ class NetworkFactory {
         }
       },
     );
+    final cookieManager = CookieManager(cookieJar);
     final talkerInterceptor = TalkerDioLogger(
       talker: talker,
       settings: TalkerDioLoggerSettings(
@@ -104,8 +105,9 @@ class NetworkFactory {
     refreshDio.interceptors.addAll([cookieManager, talkerInterceptor]);
 
     authDio.interceptors.addAll([
-      talkerInterceptor,
       cookieManager,
+      talkerInterceptor,
+
       errorInterceptor,
       cacheInterceptor,
       fresh,

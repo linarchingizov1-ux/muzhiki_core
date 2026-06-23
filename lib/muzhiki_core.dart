@@ -38,10 +38,6 @@ class MuzhikiCore {
     final directory = await Future.microtask(
       () => getApplicationDocumentsDirectory(),
     );
-    final cookieJar = PersistCookieJar(
-      ignoreExpires: true,
-      storage: FileStorage(path.join(directory.path, ".cookies")),
-    );
     final sharedPreferences = await Future.microtask(
       () => SharedPreferences.getInstance(),
     );
@@ -73,7 +69,7 @@ class MuzhikiCore {
       dio: network.authDio,
       sharedPreferences: sharedPreferences,
       fresh: network.fresh,
-      cookieJar: cookieJar,
+      cookieJar: cookie,
       hiveStore: hiveStore,
     );
     await session.init();
