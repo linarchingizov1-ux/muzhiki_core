@@ -140,7 +140,10 @@ class SessionApp extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> loginSession({String path = '/'}) async {
+  Future<bool> loginSession({
+    String path = '/',
+    String redirect = "muzhikimyapp.master",
+  }) async {
     try {
       final appLinks = AppLinks();
       final completer = Completer<String>();
@@ -149,7 +152,7 @@ class SessionApp extends ChangeNotifier {
       final pkce = await PkcePair.generate();
       await sharedPreferences.setString('pkce_verifier', pkce.verifier);
 
-      final redirectUri = 'muzhikimyapp.master://auth';
+      final redirectUri = '$redirect://auth';
 
       final authUri = Uri.https('id2.muzhiki.pro', path, {
         'redirect_url': redirectUri,
@@ -178,7 +181,7 @@ class SessionApp extends ChangeNotifier {
         result =
             await FlutterWebAuth2.authenticate(
               url: authUri.toString(),
-              callbackUrlScheme: 'muzhikimyapp.master',
+              callbackUrlScheme: redirect,
             ).timeout(
               const Duration(minutes: 15),
               onTimeout: () async {
