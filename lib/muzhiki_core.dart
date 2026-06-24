@@ -33,6 +33,7 @@ class MuzhikiCore {
     VoidCallback? onSessionResumed,
     bool enableTalker = true,
     bool getRoles = false,
+    bool showReqHeaders = false,
     bool vpnDetectorOn = true,
   }) async {
     final directory = await Future.microtask(
@@ -54,6 +55,7 @@ class MuzhikiCore {
     );
 
     final network = await NetworkFactory.create(
+      showReqHeaders: showReqHeaders,
       cookieJar: cookie,
       enableTalker: enableTalker,
       vpnDetector: vpnDetector,

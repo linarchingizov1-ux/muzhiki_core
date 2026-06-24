@@ -18,6 +18,7 @@ import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 class NetworkFactory {
   static Future<NetworkModel> create({
     required bool enableTalker,
+    required bool showReqHeaders,
     required AppVpnDetector vpnDetector,
     required Talker talker,
     required HiveCacheStore store,
@@ -90,7 +91,7 @@ class NetworkFactory {
 
         printRequestData: false,
         printRequestExtra: false,
-        printRequestHeaders: false,
+        printRequestHeaders: showReqHeaders,
 
         printResponseData: true,
 
