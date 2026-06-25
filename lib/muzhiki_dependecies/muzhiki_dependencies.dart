@@ -51,7 +51,7 @@ class MuzhikiDependencies {
     final mapper = AppErrorMapper.I;
     final cookie = PersistCookieJar(
       ignoreExpires: true,
-      storage: FileStorage(path.join(directory.path, '.cookies')),
+      storage: FileStorage(path.join(directory.path, '${typeApp.nameApp}/.cookies')),
     );
 
     final network = await NetworkFactory.create(
@@ -66,6 +66,7 @@ class MuzhikiDependencies {
     final UserSession userSession = UserSession(sharedPreferences);
     final session = SessionApp(
       typeApp: typeApp,
+      getRoles: getRoles,
       userSession: userSession,
       dioRefresh: network.refreshDio,
       dio: network.authDio,
