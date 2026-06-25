@@ -32,6 +32,7 @@ class MuzhikiDependencies {
   Future<DependenciesModel> init({
     bool enableTalker = true,
     bool getRoles = false,
+    bool showReqHeaders = false,
     bool vpnDetectorOn = true,
     required TypeApp typeApp,
   }) async {
@@ -54,6 +55,7 @@ class MuzhikiDependencies {
     );
 
     final network = await NetworkFactory.create(
+      showReqHeaders: showReqHeaders,
       cookieJar: cookie,
       enableTalker: enableTalker,
       vpnDetector: vpnDetector,
