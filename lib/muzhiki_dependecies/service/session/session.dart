@@ -151,7 +151,6 @@ class SessionApp extends ChangeNotifier {
 
   Future<bool> loginSession({
     String path = '/',
-    bool getRolesInLogin = false,
   }) async {
     try {
       final appLinks = AppLinks();
@@ -239,7 +238,7 @@ class SessionApp extends ChangeNotifier {
 
       final token = response.data['data']?['access_token'] as String?;
       RolesModel? roles;
-      if (getRolesInLogin == true) {
+      if (getRoles == true) {
         try {
           final rolesData = await dioRefresh.get(
             'https://api.master.muzhiki.pro/api/v1/get-roles',
