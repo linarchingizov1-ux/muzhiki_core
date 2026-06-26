@@ -52,6 +52,7 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     _sessionUpdates = bridgeAuthUsecase.sessionUpdates;
     _controller = _buildController();
     _listenSessionUpdates();
+    bridgeAuthUsecase.seedSession();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.loadRequest(Uri.parse(widget.initialUrl));
@@ -181,7 +182,6 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
         _bootstrapBridgeJs(_platformAppInfo.$1),
       );
       _bridgeInjectedForCurrentPage = true;
-      bridgeAuthUsecase.seedSession();
     } catch (e) {
       debugPrint('Bridge injection failed: $e');
     }
