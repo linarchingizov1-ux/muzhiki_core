@@ -57,6 +57,13 @@ class NetworkFactory {
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
+        final cookies = await cookieJar.loadForRequest(
+          Uri.parse('https://auth.muzhiki.pro/api/v1/auth/refresh'),
+        );
+
+        talker.warning('Refresh cookies: $cookies');
+        talker.warning('Тип клиента: ${client.runtimeType}');
+        talker.warning('Hash клиента: ${identityHashCode(client)}');
         try {
           final response = await client.get(
             'https://auth.muzhiki.pro/api/v1/auth/refresh',
