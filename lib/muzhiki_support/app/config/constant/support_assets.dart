@@ -8,7 +8,7 @@ class SupportAssets {
 
 class _SupportAssetsPng {
   const _SupportAssetsPng();
-  static const _base = 'packages/muzhiki_core/assets/support/png/';
+  static const _base = 'packages/muzhiki_core/assets/support/png';
   final starEnable = '$_base/star_e.png';
   final starDisable = '$_base/star_dis.png';
   final informatorBackground = '$_base/informator_background.png';
@@ -17,7 +17,7 @@ class _SupportAssetsPng {
 class _SupportAssetsSvg {
   const _SupportAssetsSvg();
 
-  static const _base = 'packages/muzhiki_support/assets/support/svg/';
+  static const _base = 'packages/muzhiki_core/assets/support/svg';
   final arrowBack = '$_base/arrow_back.svg';
   final add = '$_base/add.svg';
   final info = '$_base/info.svg';
