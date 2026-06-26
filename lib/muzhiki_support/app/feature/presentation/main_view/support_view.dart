@@ -34,7 +34,6 @@ class SupportView extends StatefulWidget {
 }
 
 class _SupportViewState extends State<SupportView> {
-  late ChatCubit chatCubit;
   SessionRole? role;
 
   @override
@@ -43,7 +42,7 @@ class _SupportViewState extends State<SupportView> {
   }
 
   Future<void> loadChats() async {
-    await chatCubit.getMyChats();
+    await widget.chatCubit.getMyChats();
 
     switch (widget.action) {
       case SupportNone():
@@ -59,7 +58,7 @@ class _SupportViewState extends State<SupportView> {
         break;
 
       case SupportCreateSession(:final supportChatsEventWidgets):
-        chatCubit.createSession(
+        widget.chatCubit.createSession(
           action: (sessionId) {
             if (mounted) {
               context.pushNamed(
@@ -87,18 +86,18 @@ class _SupportViewState extends State<SupportView> {
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.dark,
       child: RefreshIndicator.noSpinner(
-        onRefresh: () async => chatCubit.getMyChats(),
+        onRefresh: () async => widget.chatCubit.getMyChats(),
         child: Scaffold(
           floatingActionButtonLocation:
               FloatingActionButtonLocation.miniEndFloat,
           floatingActionButton: BlocProvider.value(
-            value: chatCubit,
+            value: widget.chatCubit,
             child: BlocBuilder<ChatCubit, ChatState>(
               builder: (context, state) {
                 if (state.chatStatus == StateStatus.success) {
                   return InkWell(
                     onTap: () {
-                      chatCubit.createSession(
+                      widget.chatCubit.createSession(
                         action: (sessionId) {
                           context.pushNamed(
                             SupportRouteConstant.I.chat,
