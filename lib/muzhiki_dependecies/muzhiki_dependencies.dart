@@ -30,11 +30,14 @@ class MuzhikiDependencies {
     final talker = Talker();
     final vpnDetector = AppVpnDetector();
     final mapper = AppErrorMapper.I;
+    final pathCoockies = path.join(
+      directory.path,
+      '${typeApp.nameApp}/.cookies',
+    );
+    talker.debug("Папка с куками $pathCoockies");
     final cookie = PersistCookieJar(
       ignoreExpires: true,
-      storage: FileStorage(
-        path.join(directory.path, '${typeApp.nameApp}/.cookies'),
-      ),
+      storage: FileStorage(pathCoockies),
     );
 
     final network = await NetworkFactory.create(
@@ -59,10 +62,46 @@ class MuzhikiDependencies {
       hiveStore: hiveStore,
     );
     divesRadius = await ScreenCornerRadius.get();
+    talker.debug('Session.init START');
+
+    final beforeInitCookies = await cookie.loadForRequest(
+      Uri.parse('https://auth.muzhiki.pro'),
+    );
+
+    talker.debug(
+      'До session.init(): ${beforeInitCookies.map((e) => '${e.name}=${e.value}').toList()}',
+    );
+
     await session.init();
+
+    final afterInitCookies = await cookie.loadForRequest(
+      Uri.parse('https://auth.muzhiki.pro'),
+    );
+
+    talker.debug(
+      'После session.init(): ${afterInitCookies.map((e) => '${e.name}=${e.value}').toList()}',
+    );
     if (_isUninstalling) {
+      final beforeClearCookies = await cookie.loadForRequest(
+        Uri.parse('https://auth.muzhiki.pro'),
+      );
+
+      talker.warning(
+        'До cleareSession(): ${beforeClearCookies.map((e) => '${e.name}=${e.value}').toList()}',
+      );
+
       await sharedPreferences.clear();
+
       session.cleareSession();
+
+      final afterClearCookies = await cookie.loadForRequest(
+        Uri.parse('https://auth.muzhiki.pro'),
+      );
+
+      talker.warning(
+        'После cleareSession(): ${afterClearCookies.map((e) => '${e.name}=${e.value}').toList()}',
+      );
+
       await sharedPreferences.setBool('isUninstalling', false);
     }
 
