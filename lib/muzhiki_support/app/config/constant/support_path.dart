@@ -11,6 +11,7 @@ class SupportPath {
       'https://api.webchat.muzhiki.pro/get-mobile-widget';
   static const reopenWebChat = 'https://api.webchat.muzhiki.pro/session-reopen';
   static const postScoreWebChat = 'https://api.webchat.muzhiki.pro/set-score';
+  static const sendProblems = 'https://api.webchat.muzhiki.pro/problems';
   static String getMessageChat({required int sessionId}) =>
       '$_baseSupportURL/chat/$sessionId';
 }

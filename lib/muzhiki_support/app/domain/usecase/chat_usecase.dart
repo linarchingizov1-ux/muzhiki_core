@@ -1,3 +1,4 @@
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/my_chat.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/repository/chat_repository.dart';
@@ -18,9 +19,6 @@ class ChatUseCase {
     required int sessionId,
   }) async => await _chatRepository.getMessageChat(sessionId: sessionId);
 
-  // Future<MobileWidgetModel?> getMobileWidget() async =>
-  //     await _chatRepository.getMobileWidget();
-
   Future<bool> reopenWebChat({required int sessionId}) async =>
       await _chatRepository.reopenWebChat(sessionId: sessionId);
 
@@ -31,4 +29,8 @@ class ChatUseCase {
     sessionId: sessionId,
     score: score,
   );
+  Future<void> sendProblems({
+    required AppException error,
+    required String source,
+  }) => _chatRepository.sendProblems(error: error, source: source);
 }

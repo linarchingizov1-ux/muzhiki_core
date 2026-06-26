@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_core/muzhiki_support/app/config/app_colors.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/chat_websocket_state.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
@@ -31,7 +31,7 @@ class _ChatBottomAreaTicketWidgetsState
         padding: EdgeInsets.all(10.r),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18.r),
-          color: AppColors.white,
+          color: SupportColors.white,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +60,7 @@ class _ChatBottomAreaTicketWidgetsState
                 child: Text(
                   'Срок выполнения ${widget.state.socket!.deadline}',
                   style: TextStyle(
-                    color: AppColors.alertTextGrey,
+                    color: SupportColors.alertTextGrey,
                     height: 1.h,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
@@ -71,7 +71,7 @@ class _ChatBottomAreaTicketWidgetsState
             Text(
               'После решения задачи вам придет уведомление',
               style: TextStyle(
-                color: AppColors.alertTextGrey,
+                color: SupportColors.alertTextGrey,
                 height: 1.h,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
@@ -81,9 +81,9 @@ class _ChatBottomAreaTicketWidgetsState
             AppButton(
               isLoading: isLoadingReopen,
               height: 43,
-              backgroundColor: AppColors.light,
-              progressColor: AppColors.black17,
-              labelColor: AppColors.black17,
+              backgroundColor: SupportColors.light,
+              progressColor: SupportColors.black17,
+              labelColor: SupportColors.black17,
               mode: ButtonMode.rounded,
               onPressed: () {
                 setState(() {

@@ -1,190 +1,184 @@
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:freezed_annotation/freezed_annotation.dart';
-// import 'package:mp_master_app/src/core/dependencies/app_dependencies.dart';
-// import 'package:mp_master_app/src/core/dependencies/mapper.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/model/my_chat.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/websocket/extension/chat_extension.dart';
+import 'package:muzhiki_core/muzhiki_support/app/domain/usecase/chat_usecase.dart';
 
-// import 'package:mp_master_app/src/core/utils/extension/support/chat_extension.dart';
-// import 'package:mp_master_app/src/data/model/support/my_chat.dart';
-// import 'package:mp_master_app/src/core/websocket/model/socket_connection.dart';
-// import 'package:mp_master_app/src/domain/usecase/problems_usecase.dart';
-// import 'package:mp_master_app/src/domain/usecase/support/chat_usecase.dart';
-// import 'package:muzhiki_core/dependecies/network/exception/network_exception.dart';
-// import 'package:muzhiki_core/dependecies/network/exception/network_map_error.dart';
+part 'chat_state.dart';
+part 'chat_cubit.freezed.dart';
 
-// part 'chat_state.dart';
-// part 'chat_cubit.freezed.dart';
+class ChatCubit extends Cubit<ChatState> {
+  final ChatUseCase chatUseCase;
+  ChatCubit({required this.chatUseCase}) : super(const ChatState());
 
-// class ChatCubit extends Cubit<ChatState> {
-//   ChatCubit() : super(const ChatState());
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    super.onError(error, stackTrace);
+  }
 
-//   final chatUseCase = getIt<ChatUseCase>();
-//   final problemsUseCase = getIt<ProblemsUsecase>();
+  Future<void> getMyChats() async {
+    emit(state.copyWith(chatStatus: StateStatus.loading));
+    try {
+      final myChat = await chatUseCase.getMyChats(page: state.chatPage);
 
-//   @override
-//   void onError(Object error, StackTrace stackTrace) {
-//     super.onError(error, stackTrace);
-//   }
+      int channelId;
+      if (state.channelId != null) {
+        channelId = state.channelId!;
+      } else if (myChat.channels.isNotEmpty) {
+        channelId = myChat.channels.first.id;
+      } else {
+        channelId = 0;
+      }
 
-//   Future<void> getMyChats() async {
-//     emit(state.copyWith(chatStatus: StateStatus.loading));
-//     try {
-//       final myChat = await chatUseCase.getMyChats(page: state.chatPage);
+      final chats = myChat.chatsChannel(channelId: channelId);
 
-//       int channelId;
-//       if (state.channelId != null) {
-//         channelId = state.channelId!;
-//       } else if (myChat.channels.isNotEmpty) {
-//         channelId = myChat.channels.first.id;
-//       } else {
-//         channelId = 0;
-//       }
+      emit(
+        state.copyWith(
+          chatStatus: StateStatus.success,
+          myChat: myChat,
+          chats: chats,
+          channelId: channelId,
+        ),
+      );
+    } catch (e, st) {
+      if (e is SupportedUserNotFoundExceptionMap) {
+        emit(state.copyWith(chatStatus: StateStatus.userNotFound));
+        addError(e, st);
+      }
+      if (e is SupportedIsFakeUser) {
+        emit(state.copyWith(chatStatus: StateStatus.isFakeUser));
+        addError(e, st);
+      } else {
+        emit(
+          state.copyWith(
+            chatStatus: StateStatus.fail,
+            error: e as AppException,
+          ),
+        );
+        addError(e, st);
+      }
+    }
+  }
 
-//       final chats = myChat.chatsChannel(channelId: channelId);
+  Future<void> onPopScopeResultForChat() async {
+    try {
+      final myChat = await chatUseCase.getMyChats(page: state.chatPage);
 
-//       emit(
-//         state.copyWith(
-//           chatStatus: StateStatus.success,
-//           myChat: myChat,
-//           chats: chats,
-//           channelId: channelId,
-//         ),
-//       );
-//     } catch (e, st) {
-//       if (e is SupportedUserNotFoundExceptionMap) {
-//         emit(state.copyWith(chatStatus: StateStatus.userNotFound));
-//         addError(e, st);
-//       }
-//       if (e is SupportedIsFakeUser) {
-//         emit(state.copyWith(chatStatus: StateStatus.isFakeUser));
-//         addError(e, st);
-//       } else {
-//         emit(
-//           state.copyWith(
-//             chatStatus: StateStatus.fail,
-//             error: e as AppException,
-//           ),
-//         );
-//         addError(e, st);
-//       }
-//     }
-//   }
+      int channelId;
+      if (state.channelId != null) {
+        channelId = state.channelId!;
+      } else if (myChat.channels.isNotEmpty) {
+        channelId = myChat.channels.first.id;
+      } else {
+        channelId = 0;
+      }
 
-//   Future<void> onPopScopeResultForChat() async {
-//     try {
-//       final myChat = await chatUseCase.getMyChats(page: state.chatPage);
+      final chats = myChat.chatsChannel(channelId: channelId);
 
-//       int channelId;
-//       if (state.channelId != null) {
-//         channelId = state.channelId!;
-//       } else if (myChat.channels.isNotEmpty) {
-//         channelId = myChat.channels.first.id;
-//       } else {
-//         channelId = 0;
-//       }
+      emit(state.copyWith(myChat: myChat, chats: chats, channelId: channelId));
+    } catch (e, st) {
+      addError(AppErrorMapper.I.map(e, st), st);
+    }
+  }
 
-//       final chats = myChat.chatsChannel(channelId: channelId);
+  Future<void> getMessageChat({required int id}) async {
+    try {
+      emit(state.copyWith(chatStatus: StateStatus.loading));
 
-//       emit(state.copyWith(myChat: myChat, chats: chats, channelId: channelId));
-//     } catch (e, st) {
-//       addError(mapperError.map(e, st), st);
-//     }
-//   }
+      final message = await chatUseCase.getMessageChat(sessionId: id);
 
-//   Future<void> getMessageChat({required int id}) async {
-//     try {
-//       emit(state.copyWith(chatStatus: StateStatus.loading));
+      emit(
+        state.copyWith(
+          chatStatus: StateStatus.success,
+          messageChat: message.messages,
+        ),
+      );
+    } catch (e, st) {
+      addError(AppErrorMapper.I.map(e, st), st);
 
-//       final message = await chatUseCase.getMessageChat(sessionId: id);
+      emit(state.copyWith(chatStatus: StateStatus.success));
+    }
+  }
 
-//       emit(
-//         state.copyWith(
-//           chatStatus: StateStatus.success,
-//           messageChat: message.messages,
-//         ),
-//       );
-//     } catch (e, st) {
-//       addError(mapperError.map(e, st), st);
+  Future<void> createSession({Function(int sessionId)? action}) async {
+    if (state.chatStatus != StateStatus.success) {
+      return;
+    }
+    if (state.channelId == null) return;
 
-//       emit(state.copyWith(chatStatus: StateStatus.success));
-//     }
-//   }
+    try {
+      emit(state.copyWith(chatStatus: StateStatus.loading));
 
-//   Future<void> createSession({Function(int sessionId)? action}) async {
-//     if (state.chatStatus != StateStatus.success) {
-//       return;
-//     }
-//     if (state.channelId == null) return;
+      final sessionId = await chatUseCase.createSession(
+        channelId: state.channelId!,
+      );
 
-//     try {
-//       emit(state.copyWith(chatStatus: StateStatus.loading));
+      final socketConnection = await chatUseCase.getMessageChat(
+        sessionId: sessionId,
+      );
 
-//       final sessionId = await chatUseCase.createSession(
-//         channelId: state.channelId!,
-//       );
+      action?.call(sessionId);
 
-//       final socketConnection = await chatUseCase.getMessageChat(
-//         sessionId: sessionId,
-//       );
+      final myChats = await chatUseCase.getMyChats(page: state.chatPage);
 
-//       action?.call(sessionId);
+      int channelId;
+      if (state.channelId != null) {
+        channelId = state.channelId!;
+      } else if (myChats.channels.isNotEmpty) {
+        channelId = myChats.channels.first.id;
+      } else {
+        channelId = 0;
+      }
 
-//       final myChats = await chatUseCase.getMyChats(page: state.chatPage);
+      final chats = myChats.chatsChannel(channelId: channelId);
 
-//       int channelId;
-//       if (state.channelId != null) {
-//         channelId = state.channelId!;
-//       } else if (myChats.channels.isNotEmpty) {
-//         channelId = myChats.channels.first.id;
-//       } else {
-//         channelId = 0;
-//       }
+      emit(
+        state.copyWith(
+          chatStatus: StateStatus.success,
+          socketConnection: socketConnection,
+          chats: chats,
+        ),
+      );
+    } catch (e, st) {
+      addError(AppErrorMapper.I.map(e, st), st);
 
-//       final chats = myChats.chatsChannel(channelId: channelId);
+      emit(state.copyWith(chatStatus: StateStatus.success));
+    }
+  }
 
-//       emit(
-//         state.copyWith(
-//           chatStatus: StateStatus.success,
-//           socketConnection: socketConnection,
-//           chats: chats,
-//         ),
-//       );
-//     } catch (e, st) {
-//       addError(mapperError.map(e, st), st);
+  Future<void> selecteChannel({
+    required int index,
+    required int channelId,
+  }) async {
+    if (index == state.selectedChannels) return;
+    if (state.myChat == null) return;
 
-//       emit(state.copyWith(chatStatus: StateStatus.success));
-//     }
-//   }
+    final chats = state.myChat!.chatsChannel(channelId: channelId);
 
-//   Future<void> selecteChannel({
-//     required int index,
-//     required int channelId,
-//   }) async {
-//     if (index == state.selectedChannels) return;
-//     if (state.myChat == null) return;
+    emit(
+      state.copyWith(
+        channelId: channelId,
+        selectedChannels: index,
+        chats: chats,
+      ),
+    );
+  }
 
-//     final chats = state.myChat!.chatsChannel(channelId: channelId);
+  void sendProblems({required AppException? error}) async {
+    final error = state.error;
 
-//     emit(
-//       state.copyWith(
-//         channelId: channelId,
-//         selectedChannels: index,
-//         chats: chats,
-//       ),
-//     );
-//   }
-
-//   void sendProblems({required AppException? error}) async {
-//     final error = state.error;
-
-//     final validError =
-//         error?.message ??
-//         error?.originalError ??
-//         error?.debugMessage ??
-//         error?.stackTrace?.toString() ??
-//         'No details';
-//     await problemsUseCase.sendProblems(
-//       error: error ?? AppException(message: validError.toString()),
-//       source: 'Список чатов поддержки (mp_master)',
-//     );
-//   }
-// }
+    final validError =
+        error?.message ??
+        error?.originalError ??
+        error?.debugMessage ??
+        error?.stackTrace?.toString() ??
+        'No details';
+    await chatUseCase.sendProblems(
+      error: error ?? AppException(message: validError.toString()),
+      source: 'Список чатов поддержки (mp_master)',
+    );
+  }
+}

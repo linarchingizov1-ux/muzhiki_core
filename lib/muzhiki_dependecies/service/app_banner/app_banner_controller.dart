@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_widgets.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/muzhiki_dependencies.dart';
+
+import '../../../muzhiki_core.dart';
 
 class BannerController {
   BannerController._();

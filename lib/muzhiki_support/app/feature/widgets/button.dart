@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:muzhiki_core/muzhiki_support/app/config/app_colors.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 
 enum ButtonMode { classic, black, description, circle, rounded }
 
@@ -23,7 +23,7 @@ class AppButton extends StatelessWidget {
   final double borderRadius;
   const AppButton({
     this.sizeProgress = 28,
-    this.progressColor = AppColors.white,
+    this.progressColor = SupportColors.white,
     this.isLoading = false,
     this.width = double.infinity,
     this.labelPadding,
@@ -31,7 +31,7 @@ class AppButton extends StatelessWidget {
     required this.mode,
     this.height = 56,
     super.key,
-    this.backgroundColor = AppColors.black17,
+    this.backgroundColor = SupportColors.black17,
     this.labelColor,
     this.labelWeight,
     this.assetIcon,
@@ -76,14 +76,16 @@ class AppButton extends StatelessWidget {
                             fontSize: labelSize.sp,
                             fontWeight: labelWeight ?? FontWeight.w700,
                             color: disable != null && disable!
-                                ? (backgroundColor == AppColors.black17
-                                      ? AppColors.white.withValues(alpha: 0.3)
-                                      : AppColors.black17.withValues(
+                                ? (backgroundColor == SupportColors.black17
+                                      ? SupportColors.white.withValues(
+                                          alpha: 0.3,
+                                        )
+                                      : SupportColors.black17.withValues(
                                           alpha: 0.3,
                                         ))
-                                : backgroundColor == AppColors.black17
-                                ? AppColors.white
-                                : labelColor ?? AppColors.black17,
+                                : backgroundColor == SupportColors.black17
+                                ? SupportColors.white
+                                : labelColor ?? SupportColors.black17,
                           ),
                         ),
                       ],
@@ -120,12 +122,12 @@ class AppButton extends StatelessWidget {
                           fontSize: labelSize.sp,
                           fontWeight:
                               labelWeight ??
-                              (backgroundColor != AppColors.light
+                              (backgroundColor != SupportColors.light
                                   ? FontWeight.w700
                                   : FontWeight.w600),
-                          color: backgroundColor != AppColors.light
-                              ? AppColors.white
-                              : AppColors.black17,
+                          color: backgroundColor != SupportColors.light
+                              ? SupportColors.white
+                              : SupportColors.black17,
                         ),
                       ),
                       if (description != null)
@@ -134,9 +136,9 @@ class AppButton extends StatelessWidget {
                             description!,
                             style: TextStyle(
                               fontSize: 10.sp,
-                              color: backgroundColor != AppColors.light
-                                  ? AppColors.white
-                                  : AppColors.grey,
+                              color: backgroundColor != SupportColors.light
+                                  ? SupportColors.white
+                                  : SupportColors.grey,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -155,8 +157,8 @@ class AppButton extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(borderRadius.r),
               color: disable != null && disable!
-                  ? AppColors.black17.withValues(alpha: 0.3)
-                  : AppColors.black17,
+                  ? SupportColors.black17.withValues(alpha: 0.3)
+                  : SupportColors.black17,
             ),
             child: Center(
               child: isLoading
@@ -174,8 +176,8 @@ class AppButton extends StatelessWidget {
                             fontSize: labelSize,
                             fontWeight: labelWeight ?? FontWeight.w700,
                             color: disable != null && disable!
-                                ? AppColors.white.withValues(alpha: 0.5)
-                                : AppColors.white,
+                                ? SupportColors.white.withValues(alpha: 0.5)
+                                : SupportColors.white,
                           ),
                         ),
                         if (description != null)
@@ -185,7 +187,7 @@ class AppButton extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w400,
-                                color: AppColors.grey,
+                                color: SupportColors.grey,
                               ),
                             ),
                           ),
@@ -247,8 +249,8 @@ class AppButton extends StatelessWidget {
                         fontSize: labelSize.sp,
                         color: disable != null && disable!
                             ? labelColor?.withValues(alpha: 0.2) ??
-                                  AppColors.white.withValues(alpha: 0.2)
-                            : labelColor ?? AppColors.white,
+                                  SupportColors.white.withValues(alpha: 0.2)
+                            : labelColor ?? SupportColors.white,
                         fontWeight: labelWeight ?? FontWeight.w500,
                       ),
                     ),

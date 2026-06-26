@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
+import 'package:muzhiki_core/muzhiki_core.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/extension/roles_company.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_roles.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/pkce.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/muzhiki_dependencies.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -149,9 +149,7 @@ class SessionApp extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> loginSession({
-    String path = '/',
-  }) async {
+  Future<bool> loginSession({String path = '/'}) async {
     try {
       final appLinks = AppLinks();
       final completer = Completer<String>();

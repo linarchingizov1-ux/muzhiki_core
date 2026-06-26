@@ -1,118 +1,125 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:mp_master_app/src/core/dependencies/app_dependencies.dart';
-// import 'package:mp_master_app/src/core/utils/extension/support/date_format.dart';
-// import 'package:mp_master_app/src/core/websocket/chat_websocket_app.dart';
-// import 'package:mp_master_app/src/data/model/navigation_event.dart';
-// import 'package:mp_master_app/src/features/main/view_support/chat_view/chat_bottom_widgets.dart';
-// import 'package:mp_master_app/src/features/main/view_support/chat_view/chat_header_widgets.dart';
-// import 'package:mp_master_app/src/features/main/view_support/chat_view/chat_message_widgets.dart';
-// import 'package:mp_master_app/src/features/main/view_support/state/attachments/attachments_cubit.dart';
+import 'dart:io';
 
-// String _startNewSessionText = 'Здравствуйте 👋!';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/model/support_chats_event_widgets.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
+import 'package:muzhiki_core/muzhiki_support/app/domain/usecase/chat_usecase.dart';
+import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/chat_view/chat_bottom_widgets.dart';
+import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/chat_view/chat_header_widgets.dart';
+import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/chat_view/chat_message_widgets.dart';
+import 'package:muzhiki_core/muzhiki_support/app/feature/state/attachments/attachments_cubit.dart';
+import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
 
-// Object? _chatViewExtra;
+String _startNewSessionText = 'Здравствуйте 👋!';
 
-// class ChatView extends StatefulWidget {
-//   final int id;
-//   final Object? extra;
+Object? _chatViewExtra;
 
-//   const ChatView({super.key, required this.id, this.extra});
+class ChatView extends StatefulWidget {
+  final ChatUseCase chatUseCase;
+  final ChatCubit chatCubit;
+  final Directory directory;
+  final SessionApp session;
+  final AttachmentsCubit attachmentsCubit;
+  final int id;
+  final Object? extra;
 
-//   @override
-//   State<ChatView> createState() => _ChatViewState();
-// }
+  const ChatView({
+    super.key,
+    required this.id,
+    this.extra,
+    required this.chatUseCase,
+    required this.session,
+    required this.attachmentsCubit,
+    required this.chatCubit,
+    required this.directory,
+  });
 
-// class _ChatViewState extends State<ChatView> {
-//   late final AppWebsocketChat websocketApp;
-//   late final AttachmentsCubit attachmentsCubit;
+  @override
+  State<ChatView> createState() => _ChatViewState();
+}
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     websocketApp = AppWebsocketChat(widget.id);
-//     attachmentsCubit = getIt<AttachmentsCubit>();
-//     websocketApp.connect();
-//     _chatViewExtra = widget.extra;
-//     if (_chatViewExtra is OpenSupportRecordsEvent) {
-//       final event = _chatViewExtra as OpenSupportRecordsEvent;
-//       final record = event.model;
+class _ChatViewState extends State<ChatView> {
+  late final AppWebsocketChat websocketApp;
+  late final AttachmentsCubit attachmentsCubit;
+  late final SupportChatsEventWidgets chatsEventWidgets;
 
-//       final services = record.services.map((s) => s.name).join(', ');
+  @override
+  void initState() {
+    super.initState();
+    websocketApp = AppWebsocketChat(
+      sessionChatId: widget.id,
+      chatUsecase: widget.chatUseCase,
+      session: widget.session,
+    );
+    websocketApp.connect();
+    chatsEventWidgets = widget.extra as SupportChatsEventWidgets;
+    if (chatsEventWidgets.type == SupportChatsEventWidgetsType.records) {
+      _startNewSessionText = chatsEventWidgets.label;
+    }
+  }
 
-//       _startNewSessionText = [
-//         'Здравствуйте 👋!\n',
+  @override
+  void dispose() {
+    websocketApp.dispose();
+    attachmentsCubit.clear();
+    super.dispose();
+  }
 
-//         'Пишу насчет записи. Клиент: ${record.client?.name ?? 'Нет имени'}.\n',
+  EdgeInsets get mq => MediaQuery.paddingOf(context);
 
-//         '• ID записи: ${record.id}',
-//         '• Статус: ${record.status.name}',
-//         if (record.companyName?.trim().isNotEmpty == true)
-//           '• Салон: ${record.companyName}',
-//         '• Дата: ${record.datetime?.formatDate}',
-//         '• Комментарий: ${record.comment ?? 'нет'}',
-//         '• Услуги: $services',
-//       ].join('\n');
-//     }
-//   }
+  double get topInset => mq.top;
+  double get bottomInset => mq.bottom;
 
-//   @override
-//   void dispose() {
-//     websocketApp.dispose();
-//     attachmentsCubit.clear();
-//     super.dispose();
-//   }
+  @override
+  Widget build(BuildContext context) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        body: StreamBuilder(
+          initialData: websocketApp.state,
+          stream: websocketApp.stream,
+          builder: (context, snapshot) {
+            return Stack(
+              children: [
+                ChatMessageWidgets(
+                  websocket: websocketApp,
+                  topInset: topInset,
+                  bottomInset: bottomInset,
+                  snapshot: snapshot,
+                  chatCubit: widget.chatCubit,
+                  directory: widget.directory,
+                ),
+                Positioned(
+                  left: 17.w,
+                  right: 17.w,
+                  top: topInset + 10.h,
+                  child: ChatHeaderWidgets(
+                    snapshot: snapshot,
+                    chatViewExtra: _chatViewExtra,
+                  ),
+                ),
 
-//   EdgeInsets get mq => MediaQuery.paddingOf(context);
-
-//   double get topInset => mq.top;
-//   double get bottomInset => mq.bottom;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return AnnotatedRegion<SystemUiOverlayStyle>(
-//       value: SystemUiOverlayStyle.dark,
-//       child: Scaffold(
-//         body: StreamBuilder(
-//           initialData: websocketApp.state,
-//           stream: websocketApp.stream,
-//           builder: (context, snapshot) {
-//             return Stack(
-//               children: [
-//                 ChatMessageWidgets(
-//                   websocket: websocketApp,
-//                   topInset: topInset,
-//                   bottomInset: bottomInset,
-//                   snapshot: snapshot,
-//                 ),
-//                 Positioned(
-//                   left: 17.w,
-//                   right: 17.w,
-//                   top: topInset + 10.h,
-//                   child: ChatHeaderWidgets(
-//                     snapshot: snapshot,
-//                     chatViewExtra: _chatViewExtra,
-//                   ),
-//                 ),
-
-//                 Positioned(
-//                   left: 17.w,
-//                   right: 17.w,
-//                   bottom: bottomInset + 15.h,
-//                   child: ChatBottomWidgets(
-//                     snapshot: snapshot,
-//                     attachmentsCubit: attachmentsCubit,
-//                     websocket: websocketApp,
-//                     sessionId: widget.id,
-//                     initMessage: _startNewSessionText,
-//                   ),
-//                 ),
-//               ],
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
+                Positioned(
+                  left: 17.w,
+                  right: 17.w,
+                  bottom: bottomInset + 15.h,
+                  child: ChatBottomWidgets(
+                    snapshot: snapshot,
+                    attachmentsCubit: attachmentsCubit,
+                    websocket: websocketApp,
+                    sessionId: widget.id,
+                    initMessage: _startNewSessionText,
+                    directory: widget.directory,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

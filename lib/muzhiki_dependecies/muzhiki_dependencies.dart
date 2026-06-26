@@ -1,23 +1,4 @@
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http_cache_hive_store/http_cache_hive_store.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/model/dependencies_model.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/model/service_model.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/model/storage_model.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/network_factory.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/utils/network_vnp_detector.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/session/token_storage.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:talker/talker.dart';
-import 'package:vpn_detector/vpn_detector.dart';
+part of 'package:muzhiki_core/muzhiki_core.dart';
 
 class MuzhikiDependencies {
   MuzhikiDependencies._();
@@ -26,7 +7,7 @@ class MuzhikiDependencies {
   GlobalKey<NavigatorState> get routerKey => _rootKey;
 
   BannerController get banner => BannerController.I;
-
+  ScreenRadius? divesRadius;
   late bool _isUninstalling;
 
   Future<DependenciesModel> init({
@@ -51,7 +32,9 @@ class MuzhikiDependencies {
     final mapper = AppErrorMapper.I;
     final cookie = PersistCookieJar(
       ignoreExpires: true,
-      storage: FileStorage(path.join(directory.path, '${typeApp.nameApp}/.cookies')),
+      storage: FileStorage(
+        path.join(directory.path, '${typeApp.nameApp}/.cookies'),
+      ),
     );
 
     final network = await NetworkFactory.create(
@@ -75,6 +58,7 @@ class MuzhikiDependencies {
       cookieJar: cookie,
       hiveStore: hiveStore,
     );
+    divesRadius = await ScreenCornerRadius.get();
     await session.init();
     if (_isUninstalling) {
       await sharedPreferences.clear();

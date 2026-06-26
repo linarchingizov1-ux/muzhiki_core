@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_core/muzhiki_support/app/config/app_assets.dart';
-import 'package:muzhiki_core/muzhiki_support/app/config/app_colors.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/chat_websocket_state.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
@@ -44,7 +44,7 @@ class _ChatBottomAreaRatedWidgetsState
         padding: EdgeInsets.all(10.r),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18.r),
-          color: AppColors.white,
+          color: SupportColors.white,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +58,7 @@ class _ChatBottomAreaRatedWidgetsState
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
-                color: AppColors.alertTextGrey,
+                color: SupportColors.alertTextGrey,
               ),
             ),
 
@@ -81,8 +81,8 @@ class _ChatBottomAreaRatedWidgetsState
                       child:
                           Image.asset(
                                 isSelected
-                                    ? AppAssets.I.png.starEnable
-                                    : AppAssets.I.png.starDisable,
+                                    ? SupportAssets.I.png.starEnable
+                                    : SupportAssets.I.png.starDisable,
                               )
                               .animate(target: isSelected ? 1 : 0)
                               .shimmer(duration: 500.ms, delay: 80.ms)
@@ -116,7 +116,7 @@ class _ChatBottomAreaRatedWidgetsState
               AppButton(
                     height: 43,
                     isLoading: isLoadingReview,
-                    progressColor: AppColors.white,
+                    progressColor: SupportColors.white,
                     mode: ButtonMode.rounded,
                     onPressed: () {
                       if (selectedStar == 0 && widget.state.socket == null) {
@@ -158,9 +158,9 @@ class _ChatBottomAreaRatedWidgetsState
                 child: AppButton(
                   height: 43,
                   isLoading: isLoadingReopen,
-                  backgroundColor: AppColors.light,
-                  progressColor: AppColors.black17,
-                  labelColor: AppColors.black17,
+                  backgroundColor: SupportColors.light,
+                  progressColor: SupportColors.black17,
+                  labelColor: SupportColors.black17,
                   mode: ButtonMode.rounded,
                   onPressed: () {
                     if (selectedStar == 0 && widget.state.socket == null) {

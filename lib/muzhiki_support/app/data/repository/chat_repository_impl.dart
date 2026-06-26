@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
-import 'package:muzhiki_core/muzhiki_support/app/config/app_path.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_path.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/my_chat.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/repository/chat_repository.dart';
@@ -55,22 +56,6 @@ class ChatRepositoryImpl implements ChatRepository {
     }
   }
 
-  // @override
-  // Future<MobileWidgetModel?> getMobileWidget() async {
-  //   try {
-  //     final response = await dio.get(SupportPath.I.getMobileWidgets);
-
-  //     if (response.data == null ||
-  //         response.data is Map && (response.data as Map).isEmpty) {
-  //       return null;
-  //     }
-
-  //     return MobileWidgetModel.fromJson(response.data);
-  //   } catch (e, st) {
-  //     throw AppErrorMapper.I.map(e, st);
-  //   }
-  // }
-
   @override
   Future<bool> reopenWebChat({required int sessionId}) async {
     try {
@@ -102,6 +87,25 @@ class ChatRepositoryImpl implements ChatRepository {
       } else {
         return false;
       }
+    } catch (e, st) {
+      throw AppErrorMapper.I.map(e, st);
+    }
+  }
+
+  @override
+  Future<void> sendProblems({
+    required AppException error,
+    required String source,
+  }) async {
+    try {
+      await dio.post(
+        SupportPath.sendProblems,
+        data: {
+          "app": "master-app",
+          "description": error.message,
+          "source": source,
+        },
+      );
     } catch (e, st) {
       throw AppErrorMapper.I.map(e, st);
     }

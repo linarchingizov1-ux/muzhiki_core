@@ -1,14 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:muzhiki_core/muzhiki_bridge/data/model/bridge_session.dart';
-import 'package:muzhiki_core/muzhiki_bridge/data/repository/bridge_auth_repository.dart';
-import 'package:muzhiki_core/muzhiki_bridge/domain/usecase/bridge_auth_usecase.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+part of 'package:muzhiki_core/muzhiki_core.dart';
 
 class MpBridgeWebView extends StatefulWidget {
   final String initialUrl;

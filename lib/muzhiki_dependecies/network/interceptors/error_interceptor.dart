@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:muzhiki_core/muzhiki_core.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/extension/dio_error_extension.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/utils/network_status_controller.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/muzhiki_dependencies.dart';
 
 class AppErrorInterceptor extends Interceptor {
   AppErrorInterceptor();
