@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
@@ -46,6 +47,8 @@ class NetworkFactory {
     );
     final refreshDio = Dio(baseOptions);
     final authDio = Dio(baseOptions);
+    Completer<String>? refreshCompleter;
+    DateTime? refreshStartedAt;
     final errorInterceptor = AppErrorInterceptor();
     final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
     final fresh = Fresh<String>(
@@ -57,20 +60,33 @@ class NetworkFactory {
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
-        final cookies = await cookieJar.loadForRequest(
-          Uri.parse('https://auth.muzhiki.pro/api/v1/auth/refresh'),
-        );
+        if (refreshCompleter != null) {
+          final startedAt = refreshStartedAt;
 
-        talker.warning('Refresh cookies: $cookies');
-        talker.warning('Тип клиента: ${client.runtimeType}');
-        talker.warning('Hash клиента: ${identityHashCode(client)}');
+          if (startedAt != null &&
+              DateTime.now().difference(startedAt) <
+                  const Duration(minutes: 1)) {
+            return refreshCompleter!.future;
+          }
+
+          refreshCompleter!.completeError(RevokeTokenException());
+          refreshCompleter = null;
+          refreshStartedAt = null;
+        }
+
+        final completer = Completer<String>();
+        refreshCompleter = completer;
+        refreshStartedAt = DateTime.now();
+
         try {
-          final response = await client.get(
-            'https://auth.muzhiki.pro/api/v1/auth/refresh',
-            options: Options(
-              extra: {'isRefreshRequest': true, 'showError': false},
-            ),
-          );
+          final response = await client
+              .get(
+                'https://auth.muzhiki.pro/api/v1/auth/refresh',
+                options: Options(
+                  extra: {'isRefreshRequest': true, 'showError': false},
+                ),
+              )
+              .timeout(const Duration(minutes: 1));
 
           final newAccessToken =
               response.data['data']['access_token'] as String?;
@@ -79,10 +95,20 @@ class NetworkFactory {
             throw RevokeTokenException();
           }
 
+          completer.complete(newAccessToken);
+
           return newAccessToken;
         } catch (e, st) {
           talker.error('Ошибка ревреша', e, st);
+
+          if (!completer.isCompleted) {
+            completer.completeError(RevokeTokenException());
+          }
+
           throw RevokeTokenException();
+        } finally {
+          refreshCompleter = null;
+          refreshStartedAt = null;
         }
       },
     );
