@@ -43,7 +43,6 @@ class ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<ChatView> {
   late final AppWebsocketChat websocketApp;
-  late final AttachmentsCubit attachmentsCubit;
   late final SupportChatsEventWidgets chatsEventWidgets;
 
   @override
@@ -67,7 +66,7 @@ class _ChatViewState extends State<ChatView> {
   @override
   void dispose() {
     websocketApp.dispose();
-    attachmentsCubit.clear();
+    widget.attachmentsCubit.clear();
     super.dispose();
   }
 
@@ -111,7 +110,7 @@ class _ChatViewState extends State<ChatView> {
                   bottom: bottomInset + 15.h,
                   child: ChatBottomWidgets(
                     snapshot: snapshot,
-                    attachmentsCubit: attachmentsCubit,
+                    attachmentsCubit: widget.attachmentsCubit,
                     websocket: websocketApp,
                     sessionId: widget.id,
                     initMessage: _startNewSessionText,
