@@ -55,9 +55,12 @@ class _ChatViewState extends State<ChatView> {
       session: widget.session,
     );
     websocketApp.connect();
-    chatsEventWidgets = widget.extra as SupportChatsEventWidgets;
-    if (chatsEventWidgets.type == SupportChatsEventWidgetsType.records) {
-      _startNewSessionText = chatsEventWidgets.label;
+    switch (widget.extra) {
+      case SupportChatsEventWidgets event:
+        if (event.type == SupportChatsEventWidgetsType.records) {
+          _startNewSessionText = event.label;
+        }
+        break;
     }
   }
 
