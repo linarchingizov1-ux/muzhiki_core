@@ -55,7 +55,9 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     bridgeAuthUsecase.seedSession();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller.loadRequest(Uri.parse(widget.initialUrl));
+      _controller.loadRequest(
+        Uri.parse("${widget.initialUrl}/?native_app=true"),
+      );
     });
   }
 

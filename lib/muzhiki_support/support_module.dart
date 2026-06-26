@@ -23,7 +23,10 @@ class SupportModule {
   const SupportModule._();
   static final routeConstant = SupportRouteConstant.I;
 
-  static List<RouteBase> routers(SupportModuleConfig config) {
+  static List<RouteBase> routers(
+    SupportModuleConfig config,
+    bool showInformator,
+  ) {
     final ChatUseCase chatUseCase = ChatUseCase(
       ChatRepositoryImpl(config.authDio),
     );
@@ -41,6 +44,7 @@ class SupportModule {
               ? state.extra as SupportAction
               : const SupportNone();
           return SupportView(
+            showInformator: showInformator,
             action: action,
             chatCubit: chatCubit,
             homeRoute: config.homeRoute,
@@ -80,7 +84,7 @@ class SupportModule {
         builder: (context, state) {
           final initialUrl =
               state.uri.queryParameters['initialUrl'] ??
-              'https://bus-wa.muzhiki.pro/?native_app=true';
+              'https://bus-wa.muzhiki.pro';
           return InformatorView(
             initialUrl: initialUrl,
             session: config.session,
