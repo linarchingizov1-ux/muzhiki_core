@@ -39,6 +39,7 @@ class _SupportViewState extends State<SupportView> {
   @override
   void initState() {
     super.initState();
+    loadChats();
   }
 
   Future<void> loadChats() async {
