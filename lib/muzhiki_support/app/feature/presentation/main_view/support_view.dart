@@ -71,6 +71,14 @@ class _SupportViewState extends State<SupportView> {
           },
         );
         break;
+      case SupportOpenInformator(:final initalURL):
+        if (mounted) {
+          context.pushNamed(
+            SupportRouteConstant.I.informator,
+            queryParameters: {"initialUrl": initalURL},
+          );
+        }
+        break;
     }
   }
 

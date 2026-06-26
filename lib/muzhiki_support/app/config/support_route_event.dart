@@ -8,6 +8,11 @@ class SupportNone extends SupportAction {
   const SupportNone();
 }
 
+class SupportOpenInformator extends SupportAction {
+  final String? initalURL;
+  const SupportOpenInformator({this.initalURL});
+}
+
 class SupportCreateSession extends SupportAction {
   final SupportChatsEventWidgets supportChatsEventWidgets;
   const SupportCreateSession({required this.supportChatsEventWidgets});
