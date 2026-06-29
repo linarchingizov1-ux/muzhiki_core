@@ -1,13 +1,17 @@
 part of 'package:muzhiki_core/muzhiki_core.dart';
 
 class MpBridgeWebView extends StatefulWidget {
+  final bool showAppBar;
   final String initialUrl;
   final String version, build;
+  final String? companyId;
   final SessionApp session;
 
   const MpBridgeWebView({
     super.key,
+    this.showAppBar = true,
     required this.initialUrl,
+    this.companyId,
     required this.build,
     required this.version,
     required this.session,
@@ -53,11 +57,13 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     _controller = _buildController();
     _listenSessionUpdates();
     bridgeAuthUsecase.seedSession();
-
+    final url = Uri.parse(
+      widget.companyId != null
+          ? "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
+          : "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}",
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller.loadRequest(
-        Uri.parse("${widget.initialUrl}/?native_app=true"),
-      );
+      _controller.loadRequest(url);
     });
   }
 
