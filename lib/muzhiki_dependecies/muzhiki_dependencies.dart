@@ -34,12 +34,16 @@ class MuzhikiDependencies {
       directory.path,
       '${typeApp.nameApp}/.cookies',
     );
+
     talker.debug("Папка с куками $pathCoockies");
     final cookie = PersistCookieJar(
       ignoreExpires: true,
       storage: FileStorage(pathCoockies),
     );
-
+    final logCookies = await cookie.loadForRequest(
+      Uri.parse('https://auth.muzhiki.pro'),
+    );
+    talker.debug("Куки: $logCookies");
     final network = await NetworkFactory.create(
       showReqHeaders: showReqHeaders,
       cookieJar: cookie,
