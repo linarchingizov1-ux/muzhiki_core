@@ -57,11 +57,10 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     _controller = _buildController();
     _listenSessionUpdates();
     bridgeAuthUsecase.seedSession();
-    final url = Uri.parse(
-      widget.companyId != null
-          ? "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
-          : "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}",
-    );
+    final urlParse = widget.companyId != null
+        ? "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
+        : "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}";
+    final url = Uri.parse(urlParse);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.loadRequest(url);
     });
