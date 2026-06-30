@@ -15,16 +15,26 @@ class AppErrorMapper {
 
       switch (error.code) {
         case 'ACTIVITY_NOT_FOUND':
-          message =
-              'На устройстве не найдено приложение для открытия ссылки\nРекомендуем установить Chrome либо Firefox';
+        case 'LAUNCH_ERROR':
+          final errorMessage = error.message?.toLowerCase() ?? '';
+
+          if (errorMessage.contains('id2.muzhiki.pro') ||
+              errorMessage.contains('auth')) {
+            message =
+                'На устройстве не найдено приложение для открытия ссылки\nРекомендуем установить Chrome либо Firefox';
+          } else if (errorMessage.contains('docs.google.com') ||
+              errorMessage.contains('document')) {
+            message =
+                'Не нашли ни браузера, ни других действий, позволяющих обработать ссылку';
+          } else {
+            message =
+                'На устройстве не найдено приложение для открытия ссылки.';
+          }
           break;
+
         case 'PERMISSION_DENIED':
           message =
               'Доступ запрещен. Пожалуйста, проверьте настройки разрешений';
-          break;
-        case 'LAUNCH_ERROR':
-          message =
-              'На устройстве не найдено приложение для открытия ссылки внутри приложения';
           break;
         case 'NETWORK_ERROR':
           message = 'Ошибка сети при взаимодействии с платформой';
@@ -35,26 +45,21 @@ class AppErrorMapper {
         case 'CANCELED':
           message = 'Авторизация или просмотр отменены пользователем.';
           break;
-
         case 'FAILED_TO_LAUNCH_SFSAFARIVIEWCONTROLLER':
           message =
               'Не удалось запустить встроенный браузер. Пожалуйста, вернитесь в приложение и попробуйте снова.';
           break;
-
         case 'INVALID_URL':
         case 'argument-error':
           message = 'Указана неверная или поврежденная ссылка.';
           break;
-
         case 'UNSUPPORTED_SCHEME':
           message = 'Тип ссылки не поддерживается вашим устройством.';
           break;
-
         case 'CHANNEL_ERROR':
           message =
               'Внутренняя ошибка связи с платформой. Перезапустите приложение.';
           break;
-
         default:
           message = error.message != null && error.message!.isNotEmpty
               ? error.message!
