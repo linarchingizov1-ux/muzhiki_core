@@ -22,6 +22,10 @@ class AppErrorMapper {
           message =
               'Доступ запрещен. Пожалуйста, проверьте настройки разрешений';
           break;
+        case 'LAUNCH_ERROR':
+          message =
+              'На устройстве не найдено приложение для открытия ссылки внутри приложения';
+          break;
         case 'NETWORK_ERROR':
           message = 'Ошибка сети при взаимодействии с платформой';
           break;
