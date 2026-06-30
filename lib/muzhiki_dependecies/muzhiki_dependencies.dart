@@ -31,12 +31,8 @@ class MuzhikiDependencies {
     final talker = Talker();
     final vpnDetector = AppVpnDetector();
     final mapper = AppErrorMapper.I;
-    final pathCoockies = path.join(
-      directory.path,
-      '${typeApp.nameApp}/.cookies',
-    );
+    final pathCoockies = path.join(directory.path, '.cookies');
 
-    talker.debug("Папка с куками $pathCoockies");
     final cookie = PersistCookieJar(
       ignoreExpires: true,
       storage: FileStorage(pathCoockies),
