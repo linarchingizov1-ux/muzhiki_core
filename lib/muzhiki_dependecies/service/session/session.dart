@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:app_links/app_links.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
@@ -310,19 +308,11 @@ class SessionApp extends ChangeNotifier {
       return true;
     } catch (e, st) {
       await sharedPreferences.remove('pkce_verifier');
-      if (e is PlatformException && Platform.isIOS) {
-        if (e.message == 'User canceled login') {
-          return false;
-        } else {
-          rethrow;
-        }
-      } else {
-        final error = AppErrorMapper.I.map(e, st);
-        MuzhikiDependencies.I.banner.show(
-          message: error.debugMessage ?? error.stackTrace.toString(),
-        );
-        return false;
-      }
+      final error = AppErrorMapper.I.map(e, st);
+      MuzhikiDependencies.I.banner.show(
+        message: error.debugMessage ?? error.stackTrace.toString(),
+      );
+      return false;
     }
   }
 
