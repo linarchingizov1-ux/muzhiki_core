@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:app_links/app_links.dart';
+// import 'package:app_links/app_links.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/pkce.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 enum TypeApp {
   master("mp_master_app", "muzhikimyapp.master"),
@@ -151,8 +151,8 @@ class SessionApp extends ChangeNotifier {
 
   Future<bool> loginSession({String path = '/'}) async {
     try {
-      final appLinks = AppLinks();
-      final completer = Completer<String>();
+      // final appLinks = AppLinks();
+      // final completer = Completer<String>();
       await sharedPreferences.remove('pkce_verifier');
 
       final pkce = await PkcePair.generate();
@@ -167,40 +167,58 @@ class SessionApp extends ChangeNotifier {
 
       String result;
 
-      if (Platform.isAndroid) {
-        final sub = appLinks.uriLinkStream.listen((uri) {
-          if (uri.toString().startsWith(redirectUri)) {
-            completer.complete(uri.toString());
-          }
-        });
-        await launchUrl(authUri, mode: LaunchMode.externalApplication);
-        result = await completer.future.timeout(
-          const Duration(minutes: 15),
-          onTimeout: () async {
-            await sharedPreferences.remove('pkce_verifier');
-            MuzhikiDependencies.I.banner.show(
-              message: 'Время авторизации вышло',
-            );
-            return 'timeout';
-          },
-        );
-        await sub.cancel();
-      } else {
-        result =
-            await FlutterWebAuth2.authenticate(
-              url: authUri.toString(),
-              callbackUrlScheme: typeApp.scheme,
-            ).timeout(
-              const Duration(minutes: 15),
-              onTimeout: () async {
-                await sharedPreferences.remove('pkce_verifier');
-                MuzhikiDependencies.I.banner.show(
-                  message: 'Время авторизации вышло',
-                );
-                return 'timeout';
-              },
-            );
-      }
+      result =
+          await FlutterWebAuth2.authenticate(
+                url: authUri.toString(),
+                options: const FlutterWebAuth2Options(preferEphemeral: true),
+                callbackUrlScheme: typeApp.scheme,
+              )
+              .timeout(
+                const Duration(minutes: 15),
+                onTimeout: () async {
+                  await sharedPreferences.remove('pkce_verifier');
+                  MuzhikiDependencies.I.banner.show(
+                    message: 'Время авторизации вышло',
+                  );
+                  return 'timeout';
+                },
+              )
+              .onError(((error, stackTrace) => ""));
+      // [Убрал временно]*
+      // if (Platform.isAndroid) {
+      //   final sub = appLinks.uriLinkStream.listen((uri) {
+      //     if (uri.toString().startsWith(redirectUri)) {
+      //       completer.complete(uri.toString());
+      //     }
+      //   });
+      //   await launchUrl(authUri, mode: LaunchMode.externalApplication);
+      //   result = await completer.future.timeout(
+      //     const Duration(minutes: 15),
+      //     onTimeout: () async {
+      //       await sharedPreferences.remove('pkce_verifier');
+      //       MuzhikiDependencies.I.banner.show(
+      //         message: 'Время авторизации вышло',
+      //       );
+      //       return 'timeout';
+      //     },
+      //   );
+      //   await sub.cancel();
+      // } else {
+      //   result =
+      //       await FlutterWebAuth2.authenticate(
+      //         url: authUri.toString(),
+      //         callbackUrlScheme: typeApp.scheme,
+      //       ).timeout(
+      //         const Duration(minutes: 15),
+      //         onTimeout: () async {
+      //           await sharedPreferences.remove('pkce_verifier');
+      //           MuzhikiDependencies.I.banner.show(
+      //             message: 'Время авторизации вышло',
+      //           );
+      //           return 'timeout';
+      //         },
+      //       );
+      // }
 
       if (result == 'timeout') {
         return false;
