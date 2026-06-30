@@ -27,9 +27,11 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
 
   late final WebViewController _controller;
   late final Stream<BridgeSession> _sessionUpdates;
+  StreamSubscription? _sessionSubscription;
 
   bool _bridgeInjectedForCurrentPage = false;
   bool isLoading = true;
+  bool disposed = false;
 
   (String platform, String appVersion, String buildNumber)
   get _platformAppInfo {
@@ -68,13 +70,19 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
 
   @override
   void dispose() {
-    logout();
+    unawaited(logout());
+    disposed = true;
+    _sessionSubscription?.cancel();
     bridgeAuthUsecase.dispose();
     super.dispose();
   }
 
   void _listenSessionUpdates() {
-    _sessionUpdates.listen((session) async {
+    _sessionSubscription?.cancel();
+
+    _sessionSubscription = _sessionUpdates.listen((session) async {
+      if (!mounted || disposed) return;
+
       await _dispatchEvent(
         type: 'auth:tokenUpdated',
         payload: {
@@ -198,31 +206,31 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     final platformJson = jsonEncode(platform);
 
     return '''
-      (function() {
-        if (window.MPBridge && window.MPBridge.__mpInstalled === true) {
-          return true;
-        }
-
-        window.MPBridge = {
-          __mpInstalled: true,
-          platform: $platformJson,
-          version: "1.0",
-
-          postMessage: function(messageJson) {
-            try {
-              $_channelName.postMessage(
-                typeof messageJson === 'string'
-                  ? messageJson
-                  : JSON.stringify(messageJson)
-              );
-            } catch (e) {
-              console.error('MPBridge.postMessage failed', e);
-            }
-          }
-        };
-
+    (function() {
+      if (window.MPBridge?.__mpInstalled === true) {
         return true;
-      })();
+      }
+
+      window.MPBridge = {
+        __mpInstalled: true,
+        platform: $platformJson,
+        version: "1.0",
+
+        postMessage: function(messageJson) {
+          try {
+            window.$_channelName.postMessage(
+              typeof messageJson === 'string'
+                ? messageJson
+                : JSON.stringify(messageJson)
+            );
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      };
+
+      return true;
+    })();
     ''';
   }
 
@@ -382,21 +390,26 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     required String type,
     required Map<String, dynamic> payload,
   }) async {
+    if (disposed || !mounted) return;
+
     final eventJson = jsonEncode({'type': type, 'payload': payload});
 
     final js =
         '''
-        (function() {
-          window.dispatchEvent(new CustomEvent('mp:bridge', {
-            detail: $eventJson
-          }));
-        })();
-        ''';
+    (function() {
+      window.dispatchEvent(new CustomEvent('mp:bridge', {
+        detail: $eventJson
+      }));
+    })();
+  ''';
 
     try {
       if (!_bridgeInjectedForCurrentPage) {
         await _ensureBridgeInjected();
       }
+
+      if (disposed || !mounted) return;
+
       await _controller.runJavaScript(js);
     } catch (e) {
       debugPrint('Dispatch event failed: $e');
@@ -410,18 +423,13 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
       transitionBuilder: (Widget child, Animation<double> animation) {
         return FadeTransition(opacity: animation, child: child);
       },
-      child: isLoading
-          ? Center(
-              key: const ValueKey('loader'),
-              child: CircularProgressIndicator(),
-            )
-          : SafeArea(
-              top: false,
-              child: WebViewWidget(
-                key: const ValueKey('webview'),
-                controller: _controller,
-              ),
-            ),
+      child: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+
+          if (isLoading) const Center(child: CircularProgressIndicator()),
+        ],
+      ),
     );
   }
 }
