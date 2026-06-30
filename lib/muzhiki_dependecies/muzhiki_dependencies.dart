@@ -28,7 +28,6 @@ class MuzhikiDependencies {
     final tokenStorage = SecureStringTokenStorage(secureStorage);
     final hiveStore = HiveCacheStore(directory.path);
     final talker = Talker();
-    final vpnDetector = AppVpnDetector();
     final mapper = AppErrorMapper.I;
     final pathCoockies = path.join(directory.path, '.cookies');
 
@@ -40,7 +39,6 @@ class MuzhikiDependencies {
       showReqHeaders: showReqHeaders,
       cookieJar: cookie,
       enableTalker: enableTalker,
-      vpnDetector: vpnDetector,
       talker: talker,
       store: hiveStore,
       tokenStorage: tokenStorage,

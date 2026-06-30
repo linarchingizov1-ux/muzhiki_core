@@ -11,7 +11,6 @@ import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/utils/network_status_controller.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/utils/network_vnp_detector.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/token_storage.dart';
 import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
@@ -21,7 +20,6 @@ class NetworkFactory {
   static Future<NetworkModel> create({
     required bool enableTalker,
     required bool showReqHeaders,
-    required AppVpnDetector vpnDetector,
     required Talker talker,
     required HiveCacheStore store,
     required SecureStringTokenStorage tokenStorage,
@@ -154,7 +152,6 @@ class NetworkFactory {
       authDio: authDio,
       refreshDio: refreshDio,
       fresh: fresh,
-      vpnDetector: vpnDetector,
     );
   }
 }

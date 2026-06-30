@@ -20,7 +20,6 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.d
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/video_player.dart';
 import 'package:screen_corner_radius/screen_corner_radius.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_factory.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/utils/network_vnp_detector.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/token_storage.dart';
@@ -29,7 +28,6 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker/talker.dart';
-import 'package:vpn_detector/vpn_detector.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
