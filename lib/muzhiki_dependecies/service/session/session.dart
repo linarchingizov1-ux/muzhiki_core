@@ -14,7 +14,6 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/pkce.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:talker/talker.dart';
 
 enum TypeApp {
   master("mp_master_app", "muzhikimyapp.master"),
@@ -298,7 +297,6 @@ class SessionApp extends ChangeNotifier {
     } catch (e, st) {
       await sharedPreferences.remove('pkce_verifier');
       final error = AppErrorMapper.I.map(e, st);
-      Talker().error("[SESSION LOGIN]: $e");
       MuzhikiDependencies.I.banner.show(message: error.message);
       return false;
     }
