@@ -14,7 +14,6 @@ class MuzhikiDependencies {
     bool enableTalker = true,
     bool getRoles = false,
     bool showReqHeaders = false,
-    bool vpnDetectorOn = true,
     required TypeApp typeApp,
   }) async {
     final directory = await Future.microtask(
@@ -76,16 +75,6 @@ class MuzhikiDependencies {
       talker: talker,
       bannerController: BannerController.I,
     );
-    if (vpnDetectorOn) {
-      vpnDetector.stream.listen((status) {
-        if (status == VpnStatus.active) {
-          BannerController.I.show(
-            message:
-                "Активно VPN соединение.\nНекоторые функции могут быть недоступны",
-          );
-        }
-      });
-    }
     final storageModel = StorageModel(
       sharedPreferences: sharedPreferences,
       secure: secureStorage,

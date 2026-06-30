@@ -17,8 +17,6 @@ import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 
-DateTime? refreshBlockedUntil;
-
 class NetworkFactory {
   static Future<NetworkModel> create({
     required bool enableTalker,
@@ -60,12 +58,6 @@ class NetworkFactory {
       tokenHeader: (token) => {'Authorization': 'Bearer $token'},
       shouldRefresh: (response) {
         final code = response?.statusCode;
-
-        if (refreshBlockedUntil != null &&
-            DateTime.now().isBefore(refreshBlockedUntil!)) {
-          return false;
-        }
-
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
@@ -109,8 +101,6 @@ class NetworkFactory {
           return newAccessToken;
         } catch (e, st) {
           talker.error('Ошибка ревреша', e, st);
-
-          refreshBlockedUntil = DateTime.now().add(const Duration(minutes: 30));
 
           if (!completer.isCompleted) {
             completer.completeError(RevokeTokenException());
