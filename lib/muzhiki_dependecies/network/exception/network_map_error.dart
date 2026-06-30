@@ -11,13 +11,28 @@ class AppErrorMapper {
 
   AppException map(Object error, [StackTrace? stackTrace]) {
     if (error is PlatformException) {
-      final isActivityNotFound = error.code == 'ACTIVITY_NOT_FOUND';
+      String message;
 
-      return AppException(
-        message: isActivityNotFound
-            ? 'На устройстве не найдено приложение для открытия ссылки'
-            : error.message ?? 'Ошибка платформы.',
-      );
+      switch (error.code) {
+        case 'ACTIVITY_NOT_FOUND':
+          message =
+              'На устройстве не найдено приложение для открытия ссылки\nРекомендуем установить Chrome либо Firefox';
+          break;
+        case 'PERMISSION_DENIED':
+          message =
+              'Доступ запрещен. Пожалуйста, проверьте настройки разрешений';
+          break;
+        case 'NETWORK_ERROR':
+          message = 'Ошибка сети при взаимодействии с платформой';
+          break;
+        case 'PLAY_SERVICES_NOT_AVAILABLE':
+          message = 'Сервисы Google Play недоступны на этом устройстве';
+          break;
+        default:
+          message = error.message ?? 'Ошибка платформы.';
+      }
+
+      return AppException(message: message);
     }
     if (error is AppException) {
       return error;

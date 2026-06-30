@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/chat_attachment.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ChatMessageBubble extends StatefulWidget {
   final AppWebsocketChat websocketChat;
