@@ -32,11 +32,40 @@ class AppErrorMapper {
         case 'PLAY_SERVICES_NOT_AVAILABLE':
           message = 'Сервисы Google Play недоступны на этом устройстве';
           break;
+        case 'CANCELED':
+          message = 'Авторизация или просмотр отменены пользователем.';
+          break;
+
+        case 'FAILED_TO_LAUNCH_SFSAFARIVIEWCONTROLLER':
+          message =
+              'Не удалось запустить встроенный браузер. Пожалуйста, вернитесь в приложение и попробуйте снова.';
+          break;
+
+        case 'INVALID_URL':
+        case 'argument-error':
+          message = 'Указана неверная или поврежденная ссылка.';
+          break;
+
+        case 'UNSUPPORTED_SCHEME':
+          message = 'Тип ссылки не поддерживается вашим устройством.';
+          break;
+
+        case 'CHANNEL_ERROR':
+          message =
+              'Внутренняя ошибка связи с платформой. Перезапустите приложение.';
+          break;
+
         default:
-          message = error.message ?? 'Ошибка платформы.';
+          message = error.message != null && error.message!.isNotEmpty
+              ? error.message!
+              : 'Произошла непредвиденная ошибка системы.';
       }
 
-      return AppException(message: message);
+      return AppException(
+        message: message,
+        originalError: error,
+        stackTrace: stackTrace,
+      );
     }
     if (error is AppException) {
       return error;
