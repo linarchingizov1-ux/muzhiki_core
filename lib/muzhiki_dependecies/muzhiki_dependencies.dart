@@ -24,7 +24,8 @@ class MuzhikiDependencies {
       () => SharedPreferences.getInstance(),
     );
     final secureStorage = const FlutterSecureStorage();
-    _isUninstalling = sharedPreferences.getBool('isUninstalling') ?? true;
+    _isUninstalling =
+        sharedPreferences.getBool('${typeApp.nameApp}-isUninstalling') ?? true;
     final tokenStorage = SecureStringTokenStorage(secureStorage);
     final hiveStore = HiveCacheStore(directory.path);
     final talker = Talker();
@@ -40,10 +41,6 @@ class MuzhikiDependencies {
       ignoreExpires: true,
       storage: FileStorage(pathCoockies),
     );
-    final logCookies = await cookie.loadForRequest(
-      Uri.parse('https://auth.muzhiki.pro'),
-    );
-    talker.debug("Куки: $logCookies");
     final network = await NetworkFactory.create(
       showReqHeaders: showReqHeaders,
       cookieJar: cookie,
@@ -66,47 +63,16 @@ class MuzhikiDependencies {
       hiveStore: hiveStore,
     );
     divesRadius = await ScreenCornerRadius.get();
-    talker.debug('Session.init START');
-
-    final beforeInitCookies = await cookie.loadForRequest(
-      Uri.parse('https://auth.muzhiki.pro'),
-    );
-
-    talker.debug(
-      'До session.init(): ${beforeInitCookies.map((e) => '${e.name}=${e.value}').toList()}',
-    );
-
     await session.init();
-
-    final afterInitCookies = await cookie.loadForRequest(
-      Uri.parse('https://auth.muzhiki.pro'),
-    );
-
-    talker.debug(
-      'После session.init(): ${afterInitCookies.map((e) => '${e.name}=${e.value}').toList()}',
-    );
     if (_isUninstalling) {
-      final beforeClearCookies = await cookie.loadForRequest(
-        Uri.parse('https://auth.muzhiki.pro'),
-      );
-
-      talker.warning(
-        'До cleareSession(): ${beforeClearCookies.map((e) => '${e.name}=${e.value}').toList()}',
-      );
-
       await sharedPreferences.clear();
 
       session.cleareSession();
 
-      final afterClearCookies = await cookie.loadForRequest(
-        Uri.parse('https://auth.muzhiki.pro'),
+      await sharedPreferences.setBool(
+        '${typeApp.nameApp}-isUninstalling',
+        false,
       );
-
-      talker.warning(
-        'После cleareSession(): ${afterClearCookies.map((e) => '${e.name}=${e.value}').toList()}',
-      );
-
-      await sharedPreferences.setBool('isUninstalling', false);
     }
 
     final serviceModel = ServiceModel(
