@@ -161,6 +161,7 @@ class SessionApp extends ChangeNotifier {
       final sub = appLinks.uriLinkStream.listen((uri) {
         if (uri.toString().startsWith(redirectUri)) {
           completer.complete(uri.toString());
+          MuzhikiUrlLaunch.I.close();
         }
       });
       await MuzhikiUrlLaunch.I.openURL(
@@ -180,6 +181,7 @@ class SessionApp extends ChangeNotifier {
         },
       );
       await sub.cancel();
+
       if (result == 'timeout') {
         return false;
       }

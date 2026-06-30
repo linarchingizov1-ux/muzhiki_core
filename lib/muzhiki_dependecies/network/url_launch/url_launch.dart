@@ -37,6 +37,8 @@ class MuzhikiUrlLaunch {
         ),
         safariVCOptions: SafariViewControllerOptions(
           barCollapsingEnabled: true,
+          modalPresentationStyle:
+              ViewControllerModalPresentationStyle.pageSheet,
           dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
         ),
       );
@@ -47,6 +49,15 @@ class MuzhikiUrlLaunch {
         final error = AppErrorMapper.I.map(e, st);
         BannerController.I.show(message: error.message);
       }
+    }
+  }
+
+  Future<void> close() async {
+    try {
+      await closeCustomTabs();
+    } catch (e, st) {
+      final error = AppErrorMapper.I.map(e, st);
+      BannerController.I.show(message: error.message);
     }
   }
 }
