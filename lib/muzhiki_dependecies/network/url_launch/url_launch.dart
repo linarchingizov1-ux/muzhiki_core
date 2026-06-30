@@ -1,6 +1,7 @@
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
+import 'package:talker/talker.dart';
 
 class MuzhikiUrlLaunch {
   const MuzhikiUrlLaunch._();
@@ -29,6 +30,7 @@ class MuzhikiUrlLaunch {
         ),
       );
     } catch (e, st) {
+      Talker().error("Ошибка открытия ссылки: $e");
       if (throwError) {
         throw AppErrorMapper.I.map(e, st);
       } else {
