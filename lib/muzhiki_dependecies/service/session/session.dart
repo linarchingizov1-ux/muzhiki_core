@@ -310,7 +310,7 @@ class SessionApp extends ChangeNotifier {
     } catch (e, st) {
       await sharedPreferences.remove('pkce_verifier');
       final error = AppErrorMapper.I.map(e, st);
-      Talker().error(error);
+      Talker().error("[SESSION LOGIN]: $e");
       MuzhikiDependencies.I.banner.show(message: error.message);
       return false;
     }
