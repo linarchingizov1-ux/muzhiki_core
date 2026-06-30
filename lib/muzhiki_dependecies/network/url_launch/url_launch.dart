@@ -13,7 +13,18 @@ class MuzhikiUrlLaunch {
     bool throwError = true,
   }) async {
     try {
-      final parseURL = Uri.https(url, path ?? "", queryParameters);
+      Uri parseURL;
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        final baseUri = Uri.parse(url);
+        parseURL = baseUri.replace(
+          path: path != null ? '${baseUri.path}$path' : null,
+          queryParameters: queryParameters != null
+              ? {...baseUri.queryParameters, ...queryParameters}
+              : null,
+        );
+      } else {
+        parseURL = Uri.https(url, path ?? "", queryParameters);
+      }
       await launchUrl(
         parseURL,
         customTabsOptions: CustomTabsOptions(
