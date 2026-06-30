@@ -124,13 +124,6 @@ class MuzhikiDependencies {
         }
       });
     }
-    final networkModel = NetworkModel(
-      vpnDetector: network.vpnDetector,
-      networkStatusController: network.networkStatusController,
-      authDio: network.authDio,
-      refreshDio: network.refreshDio,
-      fresh: network.fresh,
-    );
     final storageModel = StorageModel(
       sharedPreferences: sharedPreferences,
       secure: secureStorage,
@@ -140,7 +133,7 @@ class MuzhikiDependencies {
 
     return DependenciesModel(
       mapper: mapper,
-      network: networkModel,
+      network: network,
       service: serviceModel,
       storage: storageModel,
     );

@@ -3,11 +3,11 @@ import 'package:app_links/app_links.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_core.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/extension/roles_company.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_roles.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart';
@@ -158,31 +158,19 @@ class SessionApp extends ChangeNotifier {
 
       final redirectUri = '${typeApp.scheme}://auth';
 
-      final authUri = Uri.https('id2.muzhiki.pro', path, {
-        'redirect_url': redirectUri,
-        'code_challenge': pkce.challenge,
-      });
-
       String result;
       final sub = appLinks.uriLinkStream.listen((uri) {
         if (uri.toString().startsWith(redirectUri)) {
           completer.complete(uri.toString());
         }
       });
-      await launchUrl(
-        authUri,
-        customTabsOptions: CustomTabsOptions(
-          shareState: CustomTabsShareState.on,
-          urlBarHidingEnabled: true,
-          showTitle: false,
-          closeButton: CustomTabsCloseButton(
-            icon: CustomTabsCloseButtonIcons.back,
-          ),
-        ),
-        safariVCOptions: SafariViewControllerOptions(
-          barCollapsingEnabled: true,
-          dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
-        ),
+      await MuzhikiUrlLaunch.I.openURL(
+        url: 'id2.muzhiki.pro',
+        path: path,
+        queryParameters: {
+          'redirect_url': redirectUri,
+          'code_challenge': pkce.challenge,
+        },
       );
       result = await completer.future.timeout(
         const Duration(minutes: 15),

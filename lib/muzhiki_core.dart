@@ -6,7 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/dependencies_model.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/service_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/storage_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
