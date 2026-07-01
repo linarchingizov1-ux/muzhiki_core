@@ -14,6 +14,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/pkce.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:talker/talker.dart';
 
 enum TypeApp {
   master("mp_master_app", "muzhikimyapp.master"),
@@ -171,7 +172,9 @@ class SessionApp extends ChangeNotifier {
           'redirect_url': redirectUri,
           'code_challenge': pkce.challenge,
         },
-      );
+      ).onError((error, stackTrace) {
+        Talker().error("ошибка в MuzhikiUrlLaunch.I.openURL:\n$error\n$stackTrace");
+      });
       result = await completer.future.timeout(
         const Duration(minutes: 15),
         onTimeout: () async {
