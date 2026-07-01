@@ -165,6 +165,7 @@ class SessionApp extends ChangeNotifier {
           MuzhikiUrlLaunch.I.close();
         }
       });
+      await MuzhikiUrlLaunch.I.close();
       await MuzhikiUrlLaunch.I.openURL(
         url: 'id2.muzhiki.pro',
         path: path,
@@ -172,9 +173,7 @@ class SessionApp extends ChangeNotifier {
           'redirect_url': redirectUri,
           'code_challenge': pkce.challenge,
         },
-      ).onError((error, stackTrace) {
-        Talker().error("ошибка в MuzhikiUrlLaunch.I.openURL:\n$error\n$stackTrace");
-      });
+      );
       result = await completer.future.timeout(
         const Duration(minutes: 15),
         onTimeout: () async {
