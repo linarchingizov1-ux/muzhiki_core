@@ -14,7 +14,6 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/pkce.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:talker/talker.dart';
 
 enum TypeApp {
   master("mp_master_app", "muzhikimyapp.master"),
@@ -147,7 +146,7 @@ class SessionApp extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearAccessToken() async => await fresh.clearToken();
+  void refreshSession() async => await fresh.refreshToken();
 
   Future<bool> loginSession({String path = '/'}) async {
     try {
