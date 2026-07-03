@@ -6,20 +6,21 @@ class SecureStringTokenStorage implements TokenStorage<String> {
 
   final FlutterSecureStorage _storage;
 
-  static const _key = 'access_token';
+  static const accessToken = 'access_token';
+  static const refresToken = 'refresh_token';
 
   @override
   Future<String?> read() async {
-    return _storage.read(key: _key);
+    return _storage.read(key: accessToken);
   }
 
   @override
   Future<void> write(String token) async {
-    await _storage.write(key: _key, value: token);
+    await _storage.write(key: accessToken, value: token);
   }
 
   @override
   Future<void> delete() async {
-    await _storage.delete(key: _key);
+    await _storage.delete(key: accessToken);
   }
 }

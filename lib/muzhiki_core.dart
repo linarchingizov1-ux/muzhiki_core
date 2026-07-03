@@ -24,7 +24,7 @@ import 'package:screen_corner_radius/screen_corner_radius.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_factory.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/session/token_storage.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';

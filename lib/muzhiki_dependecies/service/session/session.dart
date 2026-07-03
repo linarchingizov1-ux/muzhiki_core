@@ -146,6 +146,8 @@ class SessionApp extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearAccessToken() async => await fresh.clearToken();
+
   Future<bool> loginSession({String path = '/'}) async {
     try {
       final appLinks = AppLinks();

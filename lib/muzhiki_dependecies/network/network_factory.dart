@@ -11,7 +11,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/utils/network_status_controller.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/session/token_storage.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
@@ -82,6 +82,7 @@ class NetworkFactory {
               .get(
                 'https://auth.muzhiki.pro/api/v1/auth/refresh',
                 options: Options(
+                  headers: {"X-Refresh-Token": token},
                   extra: {'isRefreshRequest': true, 'showError': false},
                 ),
               )
@@ -89,6 +90,8 @@ class NetworkFactory {
 
           final newAccessToken =
               response.data['data']['access_token'] as String?;
+          final newRefreshToken =
+              response.data['data']['refrsh_token'] as String?;
 
           if (newAccessToken == null || newAccessToken.isEmpty) {
             throw RevokeTokenException();
