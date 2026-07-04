@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:app_links/app_links.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.d
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/extension/roles_company.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_roles.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/session/pkce.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -165,7 +163,7 @@ class SessionApp extends ChangeNotifier {
     try {
       yield AuthState.load;
 
-      final redirectUri = '${typeApp.scheme}://auth';
+      final redirectUri = '${typeApp.scheme}://';
 
       final appAuth = FlutterAppAuth();
       AuthorizationResponse? authResponse;
