@@ -3,6 +3,7 @@ import 'package:app_links/app_links.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_core.dart';
@@ -53,8 +54,6 @@ class SessionApp extends ChangeNotifier {
     final storage = await tokenStorage.read();
     return storage?.accessToken;
   }
-
-  StreamSubscription<Uri>? sub2Auth;
 
   final Completer<void> _ready = Completer<void>();
   Future<void> get ready => _ready.future;
@@ -160,49 +159,58 @@ class SessionApp extends ChangeNotifier {
   void refreshSession() async => await fresh.refreshToken();
 
   Stream<AuthState> loginSession({String path = '/'}) async* {
-    await sub2Auth?.cancel();
-    sub2Auth = null;
     await MuzhikiUrlLaunch.I.close();
     yield AuthState.init;
     await sharedPreferences.remove('pkce_verifier');
-    await sharedPreferences.remove('pkce_challenge');
     try {
-      final appLinks = AppLinks();
-      final completer = Completer<String>();
       yield AuthState.load;
-      final pkce = await PkcePair.generate();
-      await sharedPreferences.setString('pkce_verifier', pkce.verifier);
-      await sharedPreferences.setString('pkce_challenge', pkce.challenge);
 
       final redirectUri = '${typeApp.scheme}://auth';
 
-      String result = '';
-      sub2Auth = appLinks.uriLinkStream.listen((uri) {
-        if (uri.toString().startsWith(redirectUri)) {
-          completer.complete(uri.toString());
-          MuzhikiUrlLaunch.I.close();
-        }
-      });
-      final pceChallenge = sharedPreferences.getString("pkce_challenge");
+      final appAuth = FlutterAppAuth();
+      AuthorizationResponse? authResponse;
+
       yield AuthState.inBrows;
-      await MuzhikiUrlLaunch.I.openURL(
-        url: 'id2.muzhiki.pro',
-        path: path,
-        queryParameters: {
-          'redirect_url': redirectUri,
-          'code_challenge': pceChallenge,
-        },
-      );
-      result = await completer.future.timeout(
-        const Duration(minutes: 15),
-        onTimeout: () async {
-          await sharedPreferences.remove('pkce_verifier');
-          await sharedPreferences.remove('pkce_challenge');
-          MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
-          return 'timeout';
-        },
-      );
-      await sub2Auth?.cancel();
+
+      try {
+        authResponse = await appAuth
+            .authorize(
+              AuthorizationRequest(
+                'dummy_client_id',
+                redirectUri,
+                serviceConfiguration: AuthorizationServiceConfiguration(
+                  authorizationEndpoint: Uri.https(
+                    'id2.muzhiki.pro',
+                    path,
+                  ).toString(),
+                  tokenEndpoint: '',
+                ),
+                additionalParameters: {'redirect_url': redirectUri},
+              ),
+            )
+            .timeout(const Duration(minutes: 15));
+      } on TimeoutException {
+        await sharedPreferences.remove('pkce_verifier');
+        MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
+        yield AuthState.error;
+        return;
+      } catch (e) {
+        MuzhikiDependencies.I.banner.show(
+          message: 'Авторизация отменена или произошла ошибка',
+        );
+        yield AuthState.error;
+        return;
+      }
+
+      String result = '';
+      if (authResponse.authorizationCode != null) {
+        await sharedPreferences.setString(
+          'pkce_verifier',
+          authResponse.codeVerifier ?? '',
+        );
+
+        result = '$redirectUri?auth_code=${authResponse.authorizationCode}';
+      }
 
       if (result == 'timeout') {
         MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
@@ -242,7 +250,6 @@ class SessionApp extends ChangeNotifier {
       );
 
       final token = response.data['data']?['access_token'] as String?;
-      // final refresh = response.data['data']?['refresh_token'] as String?;
       RolesModel? roles;
       if (getRoles == true) {
         try {
@@ -259,10 +266,7 @@ class SessionApp extends ChangeNotifier {
         }
       }
 
-      if (token == null || token.isEmpty)
-      // && refresh == null ||
-      // refresh != null && refresh.isEmpty)
-      {
+      if (token == null || token.isEmpty) {
         MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
 
         yield AuthState.error;
@@ -332,9 +336,6 @@ class SessionApp extends ChangeNotifier {
 
       yield AuthState.success;
     } catch (e, st) {
-      await sub2Auth?.cancel();
-      await sharedPreferences.remove('pkce_challenge');
-      await sharedPreferences.remove('pkce_verifier');
       final error = AppErrorMapper.I.map(e, st);
       MuzhikiDependencies.I.banner.show(message: error.message);
       yield AuthState.error;
