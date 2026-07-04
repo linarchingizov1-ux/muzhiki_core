@@ -164,7 +164,7 @@ class SessionApp extends ChangeNotifier {
     try {
       yield AuthState.load;
 
-      final redirectUri = '${typeApp.scheme}://';
+      final redirectUri = '${typeApp.scheme}://auth';
       developer.log('=== [AUTH LOG] НАЧАЛО СЕССИИ ===', name: 'MuzhikiAuth');
       developer.log(
         '[AUTH LOG] Используемый scheme: ${typeApp.scheme}',
