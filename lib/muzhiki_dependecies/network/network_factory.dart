@@ -62,6 +62,7 @@ class NetworkFactory {
         if (token?.refreshToken.isNotEmpty ?? false) {
           headers['X-Refresh-Token'] = token!.refreshToken;
         }
+        talker.debug("Заголовок запроса refresh: $headers");
         try {
           final response = await client.get(
             'https://auth.muzhiki.pro/api/v1/auth/refresh',
