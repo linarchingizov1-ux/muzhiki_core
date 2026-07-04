@@ -14,6 +14,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_r
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as developer;
 
 enum AuthState { init, load, inBrows, success, error }
 
@@ -164,6 +165,19 @@ class SessionApp extends ChangeNotifier {
       yield AuthState.load;
 
       final redirectUri = '${typeApp.scheme}://';
+      developer.log('=== [AUTH LOG] НАЧАЛО СЕССИИ ===', name: 'MuzhikiAuth');
+      developer.log(
+        '[AUTH LOG] Используемый scheme: ${typeApp.scheme}',
+        name: 'MuzhikiAuth',
+      );
+      developer.log(
+        '[AUTH LOG] Сформированный redirectUri: $redirectUri',
+        name: 'MuzhikiAuth',
+      );
+      developer.log(
+        '[AUTH LOG] Путь авторизации (path): $path',
+        name: 'MuzhikiAuth',
+      );
 
       final appAuth = FlutterAppAuth();
       AuthorizationResponse? authResponse;
@@ -171,28 +185,50 @@ class SessionApp extends ChangeNotifier {
       yield AuthState.inBrows;
 
       try {
+        final authUrl = Uri.https('id2.muzhiki.pro', path).toString();
+        developer.log(
+          '[AUTH LOG] Открываем URL авторизации: $authUrl',
+          name: 'MuzhikiAuth',
+        );
+        developer.log(
+          '[AUTH LOG] Дополнительные параметры запроса: {redirect_url: $redirectUri}',
+          name: 'MuzhikiAuth',
+        );
+
         authResponse = await appAuth
             .authorize(
               AuthorizationRequest(
                 'dummy_client_id',
                 redirectUri,
                 serviceConfiguration: AuthorizationServiceConfiguration(
-                  authorizationEndpoint: Uri.https(
-                    'id2.muzhiki.pro',
-                    path,
-                  ).toString(),
+                  authorizationEndpoint: authUrl,
                   tokenEndpoint: '',
                 ),
                 additionalParameters: {'redirect_url': redirectUri},
               ),
             )
             .timeout(const Duration(minutes: 15));
+
+        developer.log(
+          '[AUTH LOG] Нативный AppAuth успешно вернул ответ в Dart!',
+          name: 'MuzhikiAuth',
+        );
       } on TimeoutException {
+        developer.log(
+          '[AUTH LOG] [ERROR] Произошел таймаут операции (15 минут)',
+          name: 'MuzhikiAuth',
+        );
         await sharedPreferences.remove('pkce_verifier');
         MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
         yield AuthState.error;
         return;
-      } catch (e) {
+      } catch (e, st) {
+        developer.log(
+          '[AUTH LOG] [ERROR] Исключение внутри блока appAuth.authorize',
+          name: 'MuzhikiAuth',
+          error: e,
+          stackTrace: st,
+        );
         MuzhikiDependencies.I.banner.show(
           message: 'Авторизация отменена или произошла ошибка',
         );
@@ -200,14 +236,44 @@ class SessionApp extends ChangeNotifier {
         return;
       }
 
+      developer.log(
+        '[AUTH LOG] Проверяем объект authResponse...',
+        name: 'MuzhikiAuth',
+      );
+      developer.log('[AUTH LOG] authResponse НЕ null.', name: 'MuzhikiAuth');
+      developer.log(
+        '[AUTH LOG] authorizationCode: "${authResponse.authorizationCode}"',
+        name: 'MuzhikiAuth',
+      );
+      developer.log(
+        '[AUTH LOG] codeVerifier: "${authResponse.codeVerifier}"',
+        name: 'MuzhikiAuth',
+      );
+      developer.log(
+        '[AUTH LOG] authorizationAdditionalParameters: ${authResponse.authorizationAdditionalParameters}',
+        name: 'MuzhikiAuth',
+      );
       String result = '';
       if (authResponse.authorizationCode != null) {
+        developer.log(
+          '[AUTH LOG] Код авторизации найден. Сохраняем pkce_verifier...',
+          name: 'MuzhikiAuth',
+        );
         await sharedPreferences.setString(
           'pkce_verifier',
           authResponse.codeVerifier ?? '',
         );
 
         result = '$redirectUri?auth_code=${authResponse.authorizationCode}';
+        developer.log(
+          '[AUTH LOG] Итоговая строка result успешно собрана: $result',
+          name: 'MuzhikiAuth',
+        );
+      } else {
+        developer.log(
+          '[AUTH LOG] [WARNING] Условие (authorizationCode != null) провалено. См. параметры выше.',
+          name: 'MuzhikiAuth',
+        );
       }
 
       if (result == 'timeout') {
@@ -217,22 +283,38 @@ class SessionApp extends ChangeNotifier {
       }
 
       if (result.isEmpty) {
+        developer.log(
+          '[AUTH LOG] [FATAL] Переходим к ошибке: result пустой',
+          name: 'MuzhikiAuth',
+        );
         MuzhikiDependencies.I.banner.show(message: 'Редирект ссылка пустая');
         yield AuthState.error;
         return;
       }
 
       final callbackUri = Uri.parse(result);
+      developer.log(
+        '[AUTH LOG] Спарсили callbackUri. Параметры: ${callbackUri.queryParameters}',
+        name: 'MuzhikiAuth',
+      );
 
       if (callbackUri.queryParameters.isEmpty) {
         MuzhikiDependencies.I.banner.show(message: 'Пустые queryParameters');
-
         yield AuthState.error;
         return;
       }
 
       final authCode = callbackUri.queryParameters['auth_code'] ?? '';
       final verifier = sharedPreferences.getString('pkce_verifier') ?? '';
+
+      developer.log(
+        '[AUTH LOG] Извлеченный authCode: "$authCode"',
+        name: 'MuzhikiAuth',
+      );
+      developer.log(
+        '[AUTH LOG] Извлеченный verifier из SharedPreferences: "$verifier"',
+        name: 'MuzhikiAuth',
+      );
 
       if (authCode.isEmpty || verifier.isEmpty) {
         MuzhikiDependencies.I.banner.show(
@@ -242,22 +324,44 @@ class SessionApp extends ChangeNotifier {
         return;
       }
 
+      developer.log(
+        '[AUTH LOG] Отправляем POST запрос на обмен токенов...',
+        name: 'MuzhikiAuth',
+      );
       final response = await dioRefresh.post(
         'https://auth.muzhiki.pro/api/v1/auth/token',
         data: {'code': authCode, 'code_verifier': verifier, 'mode': 'cookie'},
+      );
+      developer.log(
+        '[AUTH LOG] Ответ сервера токенов: ${response.data}',
+        name: 'MuzhikiAuth',
       );
 
       final token = response.data['data']?['access_token'] as String?;
       RolesModel? roles;
       if (getRoles == true) {
         try {
+          developer.log(
+            '[AUTH LOG] Запрашиваем роли пользователя...',
+            name: 'MuzhikiAuth',
+          );
           final rolesData = await dioRefresh.get(
             'https://api.master.muzhiki.pro/api/v1/get-roles',
             options: Options(headers: {'Authorization': 'Bearer $token'}),
           );
 
           roles = RolesModel.fromJson(rolesData.data["data"]);
-        } catch (e) {
+          developer.log(
+            '[AUTH LOG] Роли успешно получены.',
+            name: 'MuzhikiAuth',
+          );
+        } catch (e, st) {
+          developer.log(
+            '[AUTH LOG] [ERROR] Ошибка при получении ролей',
+            name: 'MuzhikiAuth',
+            error: e,
+            stackTrace: st,
+          );
           MuzhikiDependencies.I.banner.show(
             message: 'Ошибка при получении роли пользователя',
           );
@@ -266,7 +370,6 @@ class SessionApp extends ChangeNotifier {
 
       if (token == null || token.isEmpty) {
         MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
-
         yield AuthState.error;
         return;
       }
@@ -332,8 +435,18 @@ class SessionApp extends ChangeNotifier {
         () => fresh.setToken(AuthTokens(accessToken: token, refreshToken: "")),
       );
 
+      developer.log(
+        '[AUTH LOG] Авторизация полностью успешна!',
+        name: 'MuzhikiAuth',
+      );
       yield AuthState.success;
     } catch (e, st) {
+      developer.log(
+        '[AUTH LOG] [GLOBAL ERROR] Произошел сбой в блоке catch стрима',
+        name: 'MuzhikiAuth',
+        error: e,
+        stackTrace: st,
+      );
       final error = AppErrorMapper.I.map(e, st);
       MuzhikiDependencies.I.banner.show(message: error.message);
       yield AuthState.error;
