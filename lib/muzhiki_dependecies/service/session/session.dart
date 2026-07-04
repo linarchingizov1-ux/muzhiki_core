@@ -52,6 +52,8 @@ class SessionApp extends ChangeNotifier {
     return storage?.accessToken;
   }
 
+  StreamSubscription<Uri>? sub2Auth;
+
   final Completer<void> _ready = Completer<void>();
   Future<void> get ready => _ready.future;
   UserModel? _user;
@@ -156,41 +158,48 @@ class SessionApp extends ChangeNotifier {
   void refreshSession() async => await fresh.refreshToken();
 
   Future<bool> loginSession({String path = '/'}) async {
+    await sub2Auth?.cancel();
+    sub2Auth = null;
+    await MuzhikiUrlLaunch.I.close();
+
+    await sharedPreferences.remove('pkce_verifier');
+    await sharedPreferences.remove('pkce_challenge');
     try {
       final appLinks = AppLinks();
       final completer = Completer<String>();
-      await sharedPreferences.remove('pkce_verifier');
 
       final pkce = await PkcePair.generate();
       await sharedPreferences.setString('pkce_verifier', pkce.verifier);
+      await sharedPreferences.setString('pkce_challenge', pkce.challenge);
 
       final redirectUri = '${typeApp.scheme}://auth';
 
       String result;
-      final sub = appLinks.uriLinkStream.listen((uri) {
+      sub2Auth = appLinks.uriLinkStream.listen((uri) {
         if (uri.toString().startsWith(redirectUri)) {
           completer.complete(uri.toString());
           MuzhikiUrlLaunch.I.close();
         }
       });
-      await MuzhikiUrlLaunch.I.close();
+      final pceChallenge = sharedPreferences.getString("pkce_challenge");
       await MuzhikiUrlLaunch.I.openURL(
         url: 'id2.muzhiki.pro',
         path: path,
         queryParameters: {
           'redirect_url': redirectUri,
-          'code_challenge': pkce.challenge,
+          'code_challenge': pceChallenge,
         },
       );
       result = await completer.future.timeout(
         const Duration(minutes: 15),
         onTimeout: () async {
           await sharedPreferences.remove('pkce_verifier');
+          await sharedPreferences.remove('pkce_challenge');
           MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
           return 'timeout';
         },
       );
-      await sub.cancel();
+      await sub2Auth?.cancel();
 
       if (result == 'timeout') {
         return false;
@@ -314,6 +323,8 @@ class SessionApp extends ChangeNotifier {
 
       return true;
     } catch (e, st) {
+      await sub2Auth?.cancel();
+      await sharedPreferences.remove('pkce_challenge');
       await sharedPreferences.remove('pkce_verifier');
       final error = AppErrorMapper.I.map(e, st);
       MuzhikiDependencies.I.banner.show(message: error.message);
