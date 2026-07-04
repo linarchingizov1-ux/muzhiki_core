@@ -225,7 +225,7 @@ class SessionApp extends ChangeNotifier {
       );
 
       final token = response.data['data']?['access_token'] as String?;
-      final refresh = response.data['data']?['refresh_token'] as String?;
+      // final refresh = response.data['data']?['refresh_token'] as String?;
       RolesModel? roles;
       if (getRoles == true) {
         try {
@@ -242,9 +242,10 @@ class SessionApp extends ChangeNotifier {
         }
       }
 
-      if (token == null ||
-          token.isEmpty && refresh == null ||
-          refresh != null && refresh.isEmpty) {
+      if (token == null || token.isEmpty)
+      // && refresh == null ||
+      // refresh != null && refresh.isEmpty)
+      {
         MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
 
         return false;
@@ -308,9 +309,7 @@ class SessionApp extends ChangeNotifier {
       notifyListeners();
       Future.delayed(
         const Duration(seconds: 3),
-        () => fresh.setToken(
-          AuthTokens(accessToken: token, refreshToken: refresh!),
-        ),
+        () => fresh.setToken(AuthTokens(accessToken: token, refreshToken: "")),
       );
 
       return true;
