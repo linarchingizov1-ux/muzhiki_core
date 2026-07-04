@@ -254,7 +254,20 @@ class SessionApp extends ChangeNotifier {
         name: 'MuzhikiAuth',
       );
       String result = '';
-      if (authResponse.authorizationCode != null) {
+
+      String? extractedCode = authResponse.authorizationCode;
+
+      if (extractedCode == null &&
+          authResponse.authorizationAdditionalParameters != null) {
+        extractedCode =
+            authResponse.authorizationAdditionalParameters!['auth_code'];
+        developer.log(
+          '[AUTH LOG] Стандартный code пуст. Успешно извлечен кастомный auth_code из additionalParameters: "$extractedCode"',
+          name: 'MuzhikiAuth',
+        );
+      }
+
+      if (extractedCode != null && extractedCode.isNotEmpty) {
         developer.log(
           '[AUTH LOG] Код авторизации найден. Сохраняем pkce_verifier...',
           name: 'MuzhikiAuth',
@@ -264,14 +277,14 @@ class SessionApp extends ChangeNotifier {
           authResponse.codeVerifier ?? '',
         );
 
-        result = '$redirectUri?auth_code=${authResponse.authorizationCode}';
+        result = '$redirectUri?auth_code=$extractedCode';
         developer.log(
           '[AUTH LOG] Итоговая строка result успешно собрана: $result',
           name: 'MuzhikiAuth',
         );
       } else {
         developer.log(
-          '[AUTH LOG] [WARNING] Условие (authorizationCode != null) провалено. См. параметры выше.',
+          '[AUTH LOG] [WARNING] Ни code, ни auth_code не найдены в ответе.',
           name: 'MuzhikiAuth',
         );
       }
