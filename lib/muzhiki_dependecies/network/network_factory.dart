@@ -80,10 +80,11 @@ class NetworkFactory {
         } catch (e, st) {
           final error = AppErrorMapper.I.map(e, st);
           if (error.message == "Resresh-токен не найден в базе." ||
-              error.message == "Токен уже использован ранее.") {
+              error.message == "Токен уже использован ранее." ||
+              error.message == "Refresh токен был отозван") {
             throw RevokeTokenException();
           }
-          rethrow;
+          return token ?? const AuthTokens(accessToken: "", refreshToken: "");
         }
       },
     );
