@@ -16,20 +16,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/pkce.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-sealed class AuthState {}
-
-class AuthLoading extends AuthState {}
-
-class AuthWaitingRedirect extends AuthState {}
-
-class AuthSuccess extends AuthState {}
-
-class AuthTimeout extends AuthState {}
-
-class AuthError extends AuthState {
-  final String message;
-  AuthError(this.message);
-}
+enum AuthState { init, load, inBrows, success, error }
 
 enum TypeApp {
   master("mp_master_app", "muzhikimyapp.master"),
@@ -176,20 +163,20 @@ class SessionApp extends ChangeNotifier {
     await sub2Auth?.cancel();
     sub2Auth = null;
     await MuzhikiUrlLaunch.I.close();
-    yield AuthLoading();
+    yield AuthState.init;
     await sharedPreferences.remove('pkce_verifier');
     await sharedPreferences.remove('pkce_challenge');
     try {
       final appLinks = AppLinks();
       final completer = Completer<String>();
-      yield AuthWaitingRedirect();
+      yield AuthState.load;
       final pkce = await PkcePair.generate();
       await sharedPreferences.setString('pkce_verifier', pkce.verifier);
       await sharedPreferences.setString('pkce_challenge', pkce.challenge);
 
       final redirectUri = '${typeApp.scheme}://auth';
 
-      String result;
+      String result = '';
       sub2Auth = appLinks.uriLinkStream.listen((uri) {
         if (uri.toString().startsWith(redirectUri)) {
           completer.complete(uri.toString());
@@ -197,6 +184,7 @@ class SessionApp extends ChangeNotifier {
         }
       });
       final pceChallenge = sharedPreferences.getString("pkce_challenge");
+      yield AuthState.inBrows;
       await MuzhikiUrlLaunch.I.openURL(
         url: 'id2.muzhiki.pro',
         path: path,
@@ -217,30 +205,35 @@ class SessionApp extends ChangeNotifier {
       await sub2Auth?.cancel();
 
       if (result == 'timeout') {
-        yield AuthTimeout();
+        MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
+        yield AuthState.error;
+        return;
       }
 
       if (result.isEmpty) {
-        // MuzhikiDependencies.I.banner.show(message: 'Редирект ссылка пустая');
-        yield AuthError('Редирект ссылка пустая');
+        MuzhikiDependencies.I.banner.show(message: 'Редирект ссылка пустая');
+        yield AuthState.error;
+        return;
       }
 
       final callbackUri = Uri.parse(result);
 
       if (callbackUri.queryParameters.isEmpty) {
-        // MuzhikiDependencies.I.banner.show(message: 'Пустые queryParameters');
+        MuzhikiDependencies.I.banner.show(message: 'Пустые queryParameters');
 
-        yield AuthError('Пустые queryParameters');
+        yield AuthState.error;
+        return;
       }
 
       final authCode = callbackUri.queryParameters['auth_code'] ?? '';
       final verifier = sharedPreferences.getString('pkce_verifier') ?? '';
 
       if (authCode.isEmpty || verifier.isEmpty) {
-        // MuzhikiDependencies.I.banner.show(
-        //   message: 'Пустой авторизационный код',
-        // );
-        yield AuthError('Пустой авторизационный код');
+        MuzhikiDependencies.I.banner.show(
+          message: 'Пустой авторизационный код',
+        );
+        yield AuthState.error;
+        return;
       }
 
       final response = await dioRefresh.post(
@@ -270,9 +263,9 @@ class SessionApp extends ChangeNotifier {
       // && refresh == null ||
       // refresh != null && refresh.isEmpty)
       {
-        // MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
+        MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
 
-        yield AuthError('Авторизация отклонена');
+        yield AuthState.error;
         return;
       }
 
@@ -337,14 +330,14 @@ class SessionApp extends ChangeNotifier {
         () => fresh.setToken(AuthTokens(accessToken: token, refreshToken: "")),
       );
 
-      yield AuthSuccess();
+      yield AuthState.success;
     } catch (e, st) {
       await sub2Auth?.cancel();
       await sharedPreferences.remove('pkce_challenge');
       await sharedPreferences.remove('pkce_verifier');
       final error = AppErrorMapper.I.map(e, st);
-      // MuzhikiDependencies.I.banner.show(message: error.message);
-      yield AuthError(error.message);
+      MuzhikiDependencies.I.banner.show(message: error.message);
+      yield AuthState.error;
     }
   }
 
