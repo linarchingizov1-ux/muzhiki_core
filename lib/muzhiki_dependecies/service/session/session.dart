@@ -392,7 +392,8 @@ class SessionApp extends ChangeNotifier {
         ),
       );
     } catch (e, st) {
-      throw AppErrorMapper.I.map(e, st);
+      final error = AppErrorMapper.I.map(e, st);
+      MuzhikiDependencies.I.banner.show(message: error.message);
     } finally {
       firebaseRemoveFCM?.call();
       cleareSession();
