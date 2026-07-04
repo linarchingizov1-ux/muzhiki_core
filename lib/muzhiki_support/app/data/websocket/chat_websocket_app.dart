@@ -9,6 +9,7 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/chat_websocke
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/message/new_message.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/usecase/chat_usecase.dart';
+import 'package:talker/talker.dart';
 import 'package:uuid/v4.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -356,7 +357,7 @@ class AppWebsocketChat extends WebSocketChat {
 
   void _handleError(Object e, StackTrace st, {required bool showBanner}) {
     final mapped = AppErrorMapper.I.map(e, st);
-
+    Talker().error(e, st);
     if (!showBanner) return;
 
     final now = DateTime.now();
