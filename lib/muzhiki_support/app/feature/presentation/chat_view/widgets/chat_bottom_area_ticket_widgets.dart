@@ -85,17 +85,22 @@ class _ChatBottomAreaTicketWidgetsState
               progressColor: SupportColors.black17,
               labelColor: SupportColors.black17,
               mode: ButtonMode.rounded,
-              onPressed: () {
+              onPressed: () async {
                 setState(() {
                   isLoadingReopen = true;
                 });
-                widget.webSocketApp
-                    .reopenWebChat(sessionId: widget.state.socket!.id)
-                    .then((_) {
-                      setState(() {
-                        isLoadingReopen = false;
-                      });
+
+                try {
+                  final socketId = widget.state.socket?.id;
+                  if (socketId == null) return;
+                  await widget.webSocketApp.reopenWebChat(sessionId: socketId);
+                } finally {
+                  if (mounted) {
+                    setState(() {
+                      isLoadingReopen = false;
                     });
+                  }
+                }
               },
               label: 'Мне нужно уточнить детали',
             ),
