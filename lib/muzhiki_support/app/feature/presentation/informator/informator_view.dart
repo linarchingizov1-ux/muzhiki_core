@@ -45,6 +45,7 @@ class _InformatorViewState extends State<InformatorView> {
       backgroundColor: SupportColors.white,
       appBar: AppBar(title: const Text('Информатор')),
       body: MpBridgeWebView(
+        showAppBar: false,
         initialUrl: widget.initialUrl,
         build: widget.build,
         version: widget.versin,
