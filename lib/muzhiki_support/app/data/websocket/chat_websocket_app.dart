@@ -100,11 +100,14 @@ class AppWebsocketChat extends WebSocketChat {
       _emit((s) => s.copyWith(socket: socketConnection, messages: messages));
 
       final token = await session.fresh.token;
+      if (token?.accessToken == null) {
+        return;
+      }
 
       final uri = Uri.parse('wss://api.webchat.muzhiki.pro/ws').replace(
         queryParameters: {
           'chat_id': '${socketConnection.chatId}',
-          'token': token,
+          'token': token!.accessToken,
           'is_client': 'true',
         },
       );
