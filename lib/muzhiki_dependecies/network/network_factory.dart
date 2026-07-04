@@ -8,6 +8,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/utils/network_status_controller.dart';
@@ -57,19 +58,32 @@ class NetworkFactory {
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
-        final response = await client.get(
-          'https://auth.muzhiki.pro/api/v1/auth/refresh',
-          options: Options(headers: {"X-Refresh-Token": token?.refreshToken}),
-        );
-        final access = response.data['data']['access_token'] as String?;
-        final refresh = response.data['data']['refrsh_token'] as String?;
-        if (access == null ||
-            refresh == null ||
-            response.data["error"] == "Токен уже использован ранее." ||
-            response.data["error"] == "Resresh-токен не найден в базе.") {
-          throw RevokeTokenException();
+        final headers = <String, dynamic>{};
+        if (token?.refreshToken.isNotEmpty ?? false) {
+          headers['X-Refresh-Token'] = token!.refreshToken;
         }
-        return AuthTokens(accessToken: access, refreshToken: refresh);
+        try {
+          final response = await client.get(
+            'https://auth.muzhiki.pro/api/v1/auth/refresh',
+            options: Options(headers: headers),
+          );
+          final access = response.data['data']['access_token'] as String?;
+          final refresh = response.data['data']['refresh_token'] as String?;
+          if (access == null ||
+              refresh == null ||
+              response.data["error"] == "Токен уже использован ранее." ||
+              response.data["error"] == "Resresh-токен не найден в базе.") {
+            throw RevokeTokenException();
+          }
+          return AuthTokens(accessToken: access, refreshToken: refresh);
+        } catch (e, st) {
+          final error = AppErrorMapper.I.map(e, st);
+          if (error.message == "Resresh-токен не найден в базе." ||
+              error.message == "Токен уже использован ранее.") {
+            throw RevokeTokenException();
+          }
+          rethrow;
+        }
       },
     );
     final cookieManager = CookieManager(cookieJar);
