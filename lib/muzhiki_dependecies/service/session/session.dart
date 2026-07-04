@@ -383,13 +383,20 @@ class SessionApp extends ChangeNotifier {
   }
 
   Future<void> logoutSession({VoidCallback? firebaseRemoveFCM}) async {
-    await dio.post(
-      "https://auth.muzhiki.pro/api/v1/logout",
-      data: {"app_name": typeApp.nameApp},
-      options: Options(extra: {'isRefreshRequest': false, 'showError': false}),
-    );
-    firebaseRemoveFCM?.call();
-    cleareSession();
+    try {
+      await dio.post(
+        "https://auth.muzhiki.pro/api/v1/logout",
+        data: {"app_name": typeApp.nameApp},
+        options: Options(
+          extra: {'isRefreshRequest': false, 'showError': false},
+        ),
+      );
+    } catch (e, st) {
+      throw AppErrorMapper.I.map(e, st);
+    } finally {
+      firebaseRemoveFCM?.call();
+      cleareSession();
+    }
   }
 
   void cleareSession() {
