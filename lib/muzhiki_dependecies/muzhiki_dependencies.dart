@@ -25,7 +25,7 @@ class MuzhikiDependencies {
     final secureStorage = const FlutterSecureStorage();
     _isUninstalling =
         sharedPreferences.getBool('${typeApp.nameApp}-isUninstalling') ?? true;
-    final tokenStorage = SecureStringTokenStorage(secureStorage);
+    final tokenStorage = SecureTokenStorage(secureStorage);
     final hiveStore = HiveCacheStore(directory.path);
     final talker = Talker();
     final mapper = AppErrorMapper.I;
@@ -45,6 +45,7 @@ class MuzhikiDependencies {
     );
     final UserSession userSession = UserSession(sharedPreferences);
     final session = SessionApp(
+      tokenStorage: tokenStorage,
       typeApp: typeApp,
       getRoles: getRoles,
       userSession: userSession,

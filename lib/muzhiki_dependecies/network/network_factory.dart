@@ -22,7 +22,7 @@ class NetworkFactory {
     required bool showReqHeaders,
     required Talker talker,
     required HiveCacheStore store,
-    required SecureStringTokenStorage tokenStorage,
+    required SecureTokenStorage tokenStorage,
     required PersistCookieJar cookieJar,
   }) async {
     await cookieJar.forceInit();
@@ -46,72 +46,30 @@ class NetworkFactory {
     );
     final refreshDio = Dio(baseOptions);
     final authDio = Dio(baseOptions);
-    Completer<String>? refreshCompleter;
-    DateTime? refreshStartedAt;
     final errorInterceptor = AppErrorInterceptor();
     final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
-    final fresh = Fresh<String>(
+    final fresh = Fresh<AuthTokens>(
       tokenStorage: tokenStorage,
       httpClient: refreshDio,
-      tokenHeader: (token) => {'Authorization': 'Bearer $token'},
+      tokenHeader: (token) => {'Authorization': 'Bearer ${token.accessToken}'},
       shouldRefresh: (response) {
         final code = response?.statusCode;
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
-        if (refreshCompleter != null) {
-          final startedAt = refreshStartedAt;
-
-          if (startedAt != null &&
-              DateTime.now().difference(startedAt) <
-                  const Duration(minutes: 1)) {
-            return refreshCompleter!.future;
-          }
-
-          refreshCompleter!.completeError(RevokeTokenException());
-          refreshCompleter = null;
-          refreshStartedAt = null;
-        }
-
-        final completer = Completer<String>();
-        refreshCompleter = completer;
-        refreshStartedAt = DateTime.now();
-
-        try {
-          final response = await client
-              .get(
-                'https://auth.muzhiki.pro/api/v1/auth/refresh',
-                options: Options(
-                  headers: {"X-Refresh-Token": token},
-                  extra: {'isRefreshRequest': true, 'showError': false},
-                ),
-              )
-              .timeout(const Duration(minutes: 1));
-
-          final newAccessToken =
-              response.data['data']['access_token'] as String?;
-          final newRefreshToken =
-              response.data['data']['refrsh_token'] as String?;
-
-          if (newAccessToken == null || newAccessToken.isEmpty) {
-            throw RevokeTokenException();
-          }
-
-          completer.complete(newAccessToken);
-
-          return newAccessToken;
-        } catch (e, st) {
-          talker.error('Ошибка ревреша', e, st);
-
-          if (!completer.isCompleted) {
-            completer.completeError(RevokeTokenException());
-          }
-
+        final response = await client.get(
+          'https://auth.muzhiki.pro/api/v1/auth/refresh',
+          options: Options(headers: {"X-Refresh-Token": token?.refreshToken}),
+        );
+        final access = response.data['data']['access_token'] as String?;
+        final refresh = response.data['data']['refrsh_token'] as String?;
+        if (access == null ||
+            refresh == null ||
+            response.data["error"] == "Токен уже использован ранее." ||
+            response.data["error"] == "Resresh-токен не найден в базе.") {
           throw RevokeTokenException();
-        } finally {
-          refreshCompleter = null;
-          refreshStartedAt = null;
         }
+        return AuthTokens(accessToken: access, refreshToken: refresh);
       },
     );
     final cookieManager = CookieManager(cookieJar);

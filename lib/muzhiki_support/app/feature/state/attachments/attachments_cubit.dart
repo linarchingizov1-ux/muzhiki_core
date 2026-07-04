@@ -29,11 +29,14 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
 
   Future<List<PlatformFile>> _addImage() async {
     final picker = ImagePicker();
+
     final images = await picker.pickMultiImage();
 
-    return images
-        .map((x) => PlatformFile(name: x.name, path: x.path, size: 0))
-        .toList();
+    if (images.isEmpty) {
+      return [];
+    }
+
+    return Future.wait(images.map(_copyPickedFile));
   }
 
   Future<List<PlatformFile>> _addDoc() async {
@@ -46,11 +49,14 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
 
   Future<List<PlatformFile>> _addVideo() async {
     final picker = ImagePicker();
+
     final videos = await picker.pickMultiVideo();
 
-    return videos
-        .map((x) => PlatformFile(name: x.name, path: x.path, size: 0))
-        .toList();
+    if (videos.isEmpty) {
+      return [];
+    }
+
+    return Future.wait(videos.map(_copyPickedFile));
   }
 
   void clear() {
@@ -105,17 +111,18 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
             platformFile: file,
             type: type,
           );
-
-          fileSize = await preparedFile.length();
-
+          if (!await preparedFile.exists()) {
+            throw FileSystemException(
+              'Не удается найти указанный файл',
+              preparedFile.path,
+            );
+          }
           emit(state.copyWith(stage: AttachmentProcessStage.uploading));
-
-          final fileName = p.basename(preparedFile.path);
 
           final formData = FormData.fromMap({
             'file': await MultipartFile.fromFile(
               preparedFile.path,
-              filename: fileName,
+              filename: p.basename(preparedFile.path),
             ),
           });
 
@@ -218,6 +225,10 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   }
 
   Future<File?> compressImageFile(File file) async {
+    if (!await file.exists()) {
+      throw FileSystemException('Не удается найти указанный файл', file.path);
+    }
+
     final targetPath = p.join(
       directory.path,
       'img_${DateTime.now().millisecondsSinceEpoch}.jpg',
@@ -226,7 +237,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
     final result = await FlutterImageCompress.compressAndGetFile(
       file.path,
       targetPath,
-      quality: 100,
+      quality: 90,
       minWidth: 1280,
       minHeight: 720,
       format: CompressFormat.jpeg,
@@ -236,14 +247,38 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   }
 
   Future<File?> compressVideoFile(File file) async {
+    if (!await file.exists()) {
+      throw FileSystemException('Не удается найти указанный файл', file.path);
+    }
+
     final info = await VideoCompress.compressVideo(
       file.path,
       quality: VideoQuality.Res1280x720Quality,
-      deleteOrigin: false,
       includeAudio: true,
+      deleteOrigin: false,
     );
 
     return info?.file;
+  }
+
+  Future<PlatformFile> _copyPickedFile(XFile x) async {
+    final source = File(x.path);
+
+    if (!await source.exists()) {
+      throw FileSystemException('Не удается найти указанный файл', x.path);
+    }
+
+    final extension = p.extension(x.path);
+
+    final targetPath = p.join(directory.path, '${const Uuid().v4()}$extension');
+
+    final copied = await source.copy(targetPath);
+
+    return PlatformFile(
+      name: x.name,
+      path: copied.path,
+      size: await copied.length(),
+    );
   }
 
   Future<File> prepareFileForUpload({
@@ -252,14 +287,45 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   }) async {
     final original = File(platformFile.path!);
 
+    if (!await original.exists()) {
+      throw FileSystemException(
+        'Не удается найти указанный файл',
+        original.path,
+      );
+    }
+
     switch (type) {
       case ChatAttachmentType.photo:
         final result = await compressImageFile(original);
-        return result ?? original;
+
+        if (result == null) {
+          return original;
+        }
+
+        if (!await result.exists()) {
+          throw FileSystemException(
+            'Не удается найти указанный файл',
+            result.path,
+          );
+        }
+
+        return result;
 
       case ChatAttachmentType.video:
         final result = await compressVideoFile(original);
-        return result ?? original;
+
+        if (result == null) {
+          return original;
+        }
+
+        if (!await result.exists()) {
+          throw FileSystemException(
+            'Не удается найти указанный файл',
+            result.path,
+          );
+        }
+
+        return result;
 
       case ChatAttachmentType.document:
         return original;

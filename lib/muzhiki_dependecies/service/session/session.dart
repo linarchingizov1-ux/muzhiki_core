@@ -7,6 +7,7 @@ import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_core.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/extension/roles_company.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_roles.dart';
@@ -31,7 +32,8 @@ class SessionApp extends ChangeNotifier {
   final PersistCookieJar cookieJar;
   final HiveCacheStore hiveStore;
   final SharedPreferences sharedPreferences;
-  final Fresh<String> fresh;
+  final Fresh<AuthTokens> fresh;
+  final SecureTokenStorage tokenStorage;
   final Dio dioRefresh;
   final Dio dio;
   final bool getRoles;
@@ -45,12 +47,17 @@ class SessionApp extends ChangeNotifier {
   bool get isAuth => _status == AuthenticationStatus.authenticated;
   bool get isUnauth => _status == AuthenticationStatus.unauthenticated;
   bool get isInitial => _status == AuthenticationStatus.initial;
-  Future<String?> get token async => await fresh.token;
+  Future<String?> get accessToken async {
+    final storage = await tokenStorage.read();
+    return storage?.accessToken;
+  }
+
   final Completer<void> _ready = Completer<void>();
   Future<void> get ready => _ready.future;
   UserModel? _user;
   UserModel? get user => _user;
   SessionApp({
+    required this.tokenStorage,
     required this.typeApp,
     required this.dio,
     this.getRoles = false,
@@ -111,15 +118,15 @@ class SessionApp extends ChangeNotifier {
   }
 
   Future<void> init() async {
-    final token = await fresh.token;
+    final storage = await tokenStorage.read();
 
-    if (token != null && token.isNotEmpty) {
+    if (storage != null && storage.accessToken.isNotEmpty) {
       _status = AuthenticationStatus.authenticated;
       var currUser = await userSession.restoreUser();
       bool? allowedInformator;
 
       if (getRoles) {
-        await getRolesBased(currUser: currUser, token: token);
+        await getRolesBased(currUser: currUser, token: storage.accessToken);
       }
 
       allowedInformator ??= currUser?.roles?.info.accessAllowedInformator;
@@ -218,6 +225,7 @@ class SessionApp extends ChangeNotifier {
       );
 
       final token = response.data['data']?['access_token'] as String?;
+      final refresh = response.data['data']?['refresh_token'] as String?;
       RolesModel? roles;
       if (getRoles == true) {
         try {
@@ -234,7 +242,9 @@ class SessionApp extends ChangeNotifier {
         }
       }
 
-      if (token == null || token.isEmpty) {
+      if (token == null ||
+          token.isEmpty && refresh == null ||
+          refresh != null && refresh.isEmpty) {
         MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
 
         return false;
@@ -296,7 +306,12 @@ class SessionApp extends ChangeNotifier {
       await userSession.saveUserSession(user);
       _user = user;
       notifyListeners();
-      Future.delayed(const Duration(seconds: 3), () => fresh.setToken(token));
+      Future.delayed(
+        const Duration(seconds: 3),
+        () => fresh.setToken(
+          AuthTokens(accessToken: token, refreshToken: refresh!),
+        ),
+      );
 
       return true;
     } catch (e, st) {

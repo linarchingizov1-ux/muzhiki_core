@@ -18,7 +18,7 @@ class BridgeAuthRepositoryImpl implements BridgeAuthRepository {
 
   @override
   Future<void> seedSession() async {
-    final token = await session.token ?? '';
+    final token = await session.accessToken ?? '';
 
     _session = BridgeSession(
       accessToken: token,

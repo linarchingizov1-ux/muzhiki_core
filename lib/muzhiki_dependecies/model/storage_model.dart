@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class StorageModel {
   final SharedPreferences sharedPreferences;
   final FlutterSecureStorage secure;
-  final SecureStringTokenStorage token;
+  final SecureTokenStorage token;
   final Directory directory;
 
   const StorageModel({
