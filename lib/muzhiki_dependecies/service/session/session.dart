@@ -16,6 +16,21 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/pkce.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+sealed class AuthState {}
+
+class AuthLoading extends AuthState {}
+
+class AuthWaitingRedirect extends AuthState {}
+
+class AuthSuccess extends AuthState {}
+
+class AuthTimeout extends AuthState {}
+
+class AuthError extends AuthState {
+  final String message;
+  AuthError(this.message);
+}
+
 enum TypeApp {
   master("mp_master_app", "muzhikimyapp.master"),
   bussines("mp_business_mobile_app", "muzhikimyapp"),
@@ -157,17 +172,17 @@ class SessionApp extends ChangeNotifier {
 
   void refreshSession() async => await fresh.refreshToken();
 
-  Future<bool> loginSession({String path = '/'}) async {
+  Stream<AuthState> loginSession({String path = '/'}) async* {
     await sub2Auth?.cancel();
     sub2Auth = null;
     await MuzhikiUrlLaunch.I.close();
-
+    yield AuthLoading();
     await sharedPreferences.remove('pkce_verifier');
     await sharedPreferences.remove('pkce_challenge');
     try {
       final appLinks = AppLinks();
       final completer = Completer<String>();
-
+      yield AuthWaitingRedirect();
       final pkce = await PkcePair.generate();
       await sharedPreferences.setString('pkce_verifier', pkce.verifier);
       await sharedPreferences.setString('pkce_challenge', pkce.challenge);
@@ -202,30 +217,30 @@ class SessionApp extends ChangeNotifier {
       await sub2Auth?.cancel();
 
       if (result == 'timeout') {
-        return false;
+        yield AuthTimeout();
       }
 
       if (result.isEmpty) {
-        MuzhikiDependencies.I.banner.show(message: 'Редирект ссылка пустая');
-        return false;
+        // MuzhikiDependencies.I.banner.show(message: 'Редирект ссылка пустая');
+        yield AuthError('Редирект ссылка пустая');
       }
 
       final callbackUri = Uri.parse(result);
 
       if (callbackUri.queryParameters.isEmpty) {
-        MuzhikiDependencies.I.banner.show(message: 'Пустые queryParameters');
+        // MuzhikiDependencies.I.banner.show(message: 'Пустые queryParameters');
 
-        return false;
+        yield AuthError('Пустые queryParameters');
       }
 
       final authCode = callbackUri.queryParameters['auth_code'] ?? '';
       final verifier = sharedPreferences.getString('pkce_verifier') ?? '';
 
       if (authCode.isEmpty || verifier.isEmpty) {
-        MuzhikiDependencies.I.banner.show(
-          message: 'Пустой авторизационный код',
-        );
-        return false;
+        // MuzhikiDependencies.I.banner.show(
+        //   message: 'Пустой авторизационный код',
+        // );
+        yield AuthError('Пустой авторизационный код');
       }
 
       final response = await dioRefresh.post(
@@ -255,9 +270,10 @@ class SessionApp extends ChangeNotifier {
       // && refresh == null ||
       // refresh != null && refresh.isEmpty)
       {
-        MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
+        // MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
 
-        return false;
+        yield AuthError('Авторизация отклонена');
+        return;
       }
 
       final userJson = response.data['data']?['user'];
@@ -321,14 +337,14 @@ class SessionApp extends ChangeNotifier {
         () => fresh.setToken(AuthTokens(accessToken: token, refreshToken: "")),
       );
 
-      return true;
+      yield AuthSuccess();
     } catch (e, st) {
       await sub2Auth?.cancel();
       await sharedPreferences.remove('pkce_challenge');
       await sharedPreferences.remove('pkce_verifier');
       final error = AppErrorMapper.I.map(e, st);
-      MuzhikiDependencies.I.banner.show(message: error.message);
-      return false;
+      // MuzhikiDependencies.I.banner.show(message: error.message);
+      yield AuthError(error.message);
     }
   }
 
