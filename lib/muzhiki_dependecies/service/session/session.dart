@@ -204,7 +204,7 @@ class SessionApp extends ChangeNotifier {
                   authorizationEndpoint: authUrl,
                   tokenEndpoint: '',
                 ),
-                additionalParameters: {'redirect_url': redirectUri},
+                additionalParameters: {'redirect_url': redirectUri, "app_name": typeApp.nameApp},
               ),
             )
             .timeout(const Duration(minutes: 15));
