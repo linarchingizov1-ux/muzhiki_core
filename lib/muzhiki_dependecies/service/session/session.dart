@@ -253,7 +253,6 @@ class SessionApp extends ChangeNotifier {
         '[AUTH LOG] authorizationAdditionalParameters: ${authResponse.authorizationAdditionalParameters}',
         name: 'MuzhikiAuth',
       );
-      String result = '';
 
       String? extractedCode = authResponse.authorizationCode;
 
@@ -276,12 +275,6 @@ class SessionApp extends ChangeNotifier {
           'pkce_verifier',
           authResponse.codeVerifier ?? '',
         );
-
-        result = '$redirectUri?auth_code=$extractedCode';
-        developer.log(
-          '[AUTH LOG] Итоговая строка result успешно собрана: $result',
-          name: 'MuzhikiAuth',
-        );
       } else {
         developer.log(
           '[AUTH LOG] [WARNING] Ни code, ни auth_code не найдены в ответе.',
@@ -289,53 +282,7 @@ class SessionApp extends ChangeNotifier {
         );
       }
 
-      if (result == 'timeout') {
-        MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
-        yield AuthState.error;
-        return;
-      }
-
-      if (result.isEmpty) {
-        developer.log(
-          '[AUTH LOG] [FATAL] Переходим к ошибке: result пустой',
-          name: 'MuzhikiAuth',
-        );
-        MuzhikiDependencies.I.banner.show(message: 'Редирект ссылка пустая');
-        yield AuthState.error;
-        return;
-      }
-
-      final callbackUri = Uri.parse(result);
-      developer.log(
-        '[AUTH LOG] Спарсили callbackUri. Параметры: ${callbackUri.queryParameters}',
-        name: 'MuzhikiAuth',
-      );
-
-      if (callbackUri.queryParameters.isEmpty) {
-        MuzhikiDependencies.I.banner.show(message: 'Пустые queryParameters');
-        yield AuthState.error;
-        return;
-      }
-
-      final authCode = callbackUri.queryParameters['auth_code'] ?? '';
       final verifier = sharedPreferences.getString('pkce_verifier') ?? '';
-
-      developer.log(
-        '[AUTH LOG] Извлеченный authCode: "$authCode"',
-        name: 'MuzhikiAuth',
-      );
-      developer.log(
-        '[AUTH LOG] Извлеченный verifier из SharedPreferences: "$verifier"',
-        name: 'MuzhikiAuth',
-      );
-
-      if (authCode.isEmpty || verifier.isEmpty) {
-        MuzhikiDependencies.I.banner.show(
-          message: 'Пустой авторизационный код',
-        );
-        yield AuthState.error;
-        return;
-      }
 
       developer.log(
         '[AUTH LOG] Отправляем POST запрос на обмен токенов...',
@@ -343,7 +290,11 @@ class SessionApp extends ChangeNotifier {
       );
       final response = await dioRefresh.post(
         'https://auth.muzhiki.pro/api/v1/auth/token',
-        data: {'code': authCode, 'code_verifier': verifier, 'mode': 'cookie'},
+        data: {
+          'code': authResponse.authorizationAdditionalParameters!['auth_code'],
+          'code_verifier': verifier,
+          'mode': 'cookie',
+        },
       );
       developer.log(
         '[AUTH LOG] Ответ сервера токенов: ${response.data}',

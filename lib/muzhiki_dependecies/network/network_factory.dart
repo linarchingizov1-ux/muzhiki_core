@@ -73,7 +73,8 @@ class NetworkFactory {
           if (access == null ||
               refresh == null ||
               response.data["error"] == "Токен уже использован ранее." ||
-              response.data["error"] == "Resresh-токен не найден в базе.") {
+              response.data["error"] == "Resresh-токен не найден в базе." ||
+              response.data["error"] == "Resresh токен был отозван") {
             throw RevokeTokenException();
           }
           return AuthTokens(accessToken: access, refreshToken: refresh);
