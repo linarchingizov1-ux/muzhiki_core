@@ -20,7 +20,7 @@ enum AuthState { init, load, inBrows, success, error }
 
 enum TypeApp {
   master("mp_master_app", "muzhikimyapp.master"),
-  bussines("mp_business_mobile_app", "muzhikimyapp"),
+  bussines("mp_business_mobile_app", "com.mpbussines.com"),
   support("mp_support_app", "muzhikimyapp.support"),
   client("mp_client_app", "");
 
