@@ -479,7 +479,13 @@ class SessionApp extends ChangeNotifier {
     fresh.clearToken();
     userSession.clearUserSession();
     cookieJar.deleteAll();
-    hiveStore.clean();
+  try {
+     hiveStore.clean(); 
+  } catch (e, st) {
+          final error = AppErrorMapper.I.map(e, st);
+      MuzhikiDependencies.I.banner.show(message: error.message);
+     hiveStore.delete('dio_cache'); 
+  }
   }
 
   @override
