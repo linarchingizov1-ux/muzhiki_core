@@ -215,6 +215,7 @@ class SessionApp extends ChangeNotifier {
       }
 
       if (extractedCode != null && extractedCode.isNotEmpty) {
+        talker.debug("code_verifier: ${authResponse.codeVerifier}");
         await sharedPreferences.setString(
           'pkce_verifier',
           authResponse.codeVerifier ?? '',
