@@ -26,8 +26,8 @@ class AppErrorMapper {
       );
     }
     if (error is FlutterAppAuthPlatformErrorDetails) {
-      if (error.error ==
-          "Failed to authorize: No suitable browser is available") {
+      if (error.error != null &&
+          error.error!.contains("No suitable browser is available")) {
         return AppException(
           message:
               'На устройстве не найдено приложение для открытия ссылки\nРекомендуем установить Chrome либо Firefox',
