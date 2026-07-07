@@ -19,10 +19,10 @@ import 'package:talker/talker.dart';
 enum AuthState { init, load, inBrows, success, error }
 
 enum TypeApp {
-  master("mp_master_app", "app.mpMaster.com"),
-  bussines("mp_business_mobile_app", "app.mpBussines.com"),
-  support("mp_support_app", "app.mpSupport.com"),
-  client("mp_client_app", "app.mpClient.com");
+  master("mp_master_app", "app.mpmaster.com"),
+  bussines("mp_business_mobile_app", "app.mpbussines.com"),
+  support("mp_support_app", "app.mpsupport.com"),
+  client("mp_client_app", "app.mpclient.com");
 
   final String nameApp;
   final String scheme;
