@@ -18,14 +18,9 @@ class AppErrorMapper {
         stackTrace: stackTrace,
       );
     }
-    if (error is FlutterAppAuthPlatformErrorDetails) {
-      print('runtimeType: ${error.runtimeType}');
-      print('code: ${error.code}');
-      print('message: ${error.domain}');
-      print('details: ${error.errorDescription}');
-    }
 
     if (error is FlutterAppAuthPlatformException) {
+      print('FlutterAppAuthPlatformException: ${error.message}');
       return AppException(
         message: error.message ?? 'Произошла ошибка при авторизации.',
         originalError: error.platformErrorDetails,
