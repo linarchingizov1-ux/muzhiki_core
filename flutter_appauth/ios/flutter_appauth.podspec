@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
 A new flutter plugin project.
                        DESC
   s.homepage         = 'http://example.com'
-  s.license          = { :file => '../LICENSE' }
+  s.license          = { :type => 'MIT' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
   s.source_files = 'flutter_appauth/Sources/flutter_appauth/**/*.{h,m}'
