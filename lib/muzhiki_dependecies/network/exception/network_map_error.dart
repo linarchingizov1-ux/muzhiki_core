@@ -11,7 +11,6 @@ class AppErrorMapper {
   static final I = const AppErrorMapper._();
 
   AppException map(Object error, [StackTrace? stackTrace]) {
-    print('AppErrorMapper.map: $error');
     if (error is FlutterAppAuthUserCancelledException) {
       return AppException(
         message: 'Авторизация отменена пользователем.',
@@ -26,18 +25,12 @@ class AppErrorMapper {
         stackTrace: StackTrace.current,
       );
     }
-    if (error is FlutterAppAuthPlatformErrorDetails) {
-      if (error.error != null &&
-          error.error!.contains("No suitable browser is available")) {
+    if (error is PlatformException) {
+      if (error.code == 'no_browser_available') {
         return AppException(
           message:
-              'На устройстве не найдено приложение для открытия ссылки\nРекомендуем установить Chrome либо Firefox',
-          originalError: error,
-          stackTrace: stackTrace,
-        );
-      } else {
-        return AppException(
-          message: error.error ?? 'Произошла ошибка при авторизации.',
+              'На устройстве не найден браузер для авторизации.\n'
+              'Установите Google Chrome, Firefox или другой поддерживаемый браузер.',
           originalError: error,
           stackTrace: stackTrace,
         );
