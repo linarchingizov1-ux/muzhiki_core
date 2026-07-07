@@ -161,7 +161,6 @@ class SessionApp extends ChangeNotifier {
     final talker = Talker();
     await MuzhikiUrlLaunch.I.close();
     yield AuthState.init;
-    await sharedPreferences.remove('pkce_verifier');
     try {
       yield AuthState.load;
 
@@ -192,7 +191,6 @@ class SessionApp extends ChangeNotifier {
             )
             .timeout(const Duration(minutes: 15));
       } on TimeoutException {
-        await sharedPreferences.remove('pkce_verifier');
         MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
         yield AuthState.error;
         return;
@@ -206,118 +204,109 @@ class SessionApp extends ChangeNotifier {
         return;
       }
       talker.debug("Ответ от сервера: $authResponse");
-      String? extractedCode = authResponse.authorizationCode;
 
-      if (extractedCode == null &&
-          authResponse.authorizationAdditionalParameters != null) {
-        extractedCode =
-            authResponse.authorizationAdditionalParameters!['auth_code'];
-      }
-
-      if (extractedCode != null && extractedCode.isNotEmpty) {
-        talker.debug("code_verifier: ${authResponse.codeVerifier}");
-        await sharedPreferences.setString(
-          'pkce_verifier',
-          authResponse.codeVerifier ?? '',
+      final code = authResponse.authorizationAdditionalParameters!['auth_code'];
+      final codeVerifier = authResponse.codeVerifier;
+      talker.debug("auth_code: $code");
+      talker.debug("code_verifier: $codeVerifier");
+      if (code != null && codeVerifier != null) {
+        final response = await dioRefresh.post(
+          'https://auth.muzhiki.pro/api/v1/auth/token',
+          data: {'code': code, 'code_verifier': codeVerifier, 'mode': 'cookie'},
         );
-      }
 
-      final verifier = sharedPreferences.getString('pkce_verifier') ?? '';
+        final token = response.data['data']?['access_token'] as String?;
+        RolesModel? roles;
+        if (getRoles == true) {
+          try {
+            final rolesData = await dioRefresh.get(
+              'https://api.master.muzhiki.pro/api/v1/get-roles',
+              options: Options(headers: {'Authorization': 'Bearer $token'}),
+            );
 
-      final response = await dioRefresh.post(
-        'https://auth.muzhiki.pro/api/v1/auth/token',
-        data: {
-          'code': authResponse.authorizationAdditionalParameters!['auth_code'],
-          'code_verifier': verifier,
-          'mode': 'cookie',
-        },
-      );
-
-      final token = response.data['data']?['access_token'] as String?;
-      RolesModel? roles;
-      if (getRoles == true) {
-        try {
-          final rolesData = await dioRefresh.get(
-            'https://api.master.muzhiki.pro/api/v1/get-roles',
-            options: Options(headers: {'Authorization': 'Bearer $token'}),
-          );
-
-          roles = RolesModel.fromJson(rolesData.data["data"]);
-        } catch (e) {
-          MuzhikiDependencies.I.banner.show(
-            message: 'Ошибка при получении роли пользователя',
-          );
+            roles = RolesModel.fromJson(rolesData.data["data"]);
+          } catch (e) {
+            MuzhikiDependencies.I.banner.show(
+              message: 'Ошибка при получении роли пользователя',
+            );
+          }
         }
-      }
 
-      if (token == null || token.isEmpty) {
-        MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
+        if (token == null || token.isEmpty) {
+          MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
+          yield AuthState.error;
+          return;
+        }
+
+        final userJson = response.data['data']?['user'];
+
+        final fullName = (userJson['full_name'] ?? '').toString();
+
+        final parts = fullName
+            .trim()
+            .split(RegExp(r'\s+'))
+            .where((e) => e.isNotEmpty)
+            .toList();
+
+        String firstName = '';
+        String lastName = '';
+
+        if (parts.isNotEmpty) {
+          firstName = parts.first;
+        }
+
+        if (parts.length > 1) {
+          lastName = parts.sublist(1).join(' ');
+        }
+
+        final savedCompanyId = sharedPreferences.getString(
+          "selected_company_${userJson['id']}",
+        );
+
+        String? selectedCompany = savedCompanyId;
+        bool allowedInformator = false;
+
+        if (roles != null) {
+          allowedInformator = roles.info.accessAllowedInformator;
+          final companies = roles.info.getCompaniesByRole(roles.currentRole);
+
+          final hasSavedCompany = companies.any((c) => c.id == savedCompanyId);
+
+          if (!hasSavedCompany) {
+            selectedCompany = companies.isNotEmpty ? companies.first.id : null;
+          }
+        }
+        final isFirstAuth = sharedPreferences.getBool('first_auth');
+        final user = UserModel(
+          isAllowedAccessInformator: allowedInformator,
+          isFirstAuth: isFirstAuth ?? true,
+          selectedRolesCompany: selectedCompany ?? "",
+          createdAt: DateTime.now(),
+          roles: roles,
+          firstName: firstName,
+          lastName: lastName,
+          mpid: userJson['id'].toString(),
+          username: userJson['full_name'] ?? '',
+          isFake: userJson['is_fake'] ?? false,
+          phone: userJson['phone'] ?? '',
+        );
+
+        await userSession.saveUserSession(user);
+        _user = user;
+        notifyListeners();
+        Future.delayed(
+          const Duration(seconds: 3),
+          () =>
+              fresh.setToken(AuthTokens(accessToken: token, refreshToken: "")),
+        );
+
+        yield AuthState.success;
+      } else {
+        MuzhikiDependencies.I.banner.show(
+          message: 'Авторизация отклонена: отсутствует код авторизации',
+        );
         yield AuthState.error;
-        return;
       }
-
-      final userJson = response.data['data']?['user'];
-
-      final fullName = (userJson['full_name'] ?? '').toString();
-
-      final parts = fullName
-          .trim()
-          .split(RegExp(r'\s+'))
-          .where((e) => e.isNotEmpty)
-          .toList();
-
-      String firstName = '';
-      String lastName = '';
-
-      if (parts.isNotEmpty) {
-        firstName = parts.first;
-      }
-
-      if (parts.length > 1) {
-        lastName = parts.sublist(1).join(' ');
-      }
-
-      final savedCompanyId = sharedPreferences.getString(
-        "selected_company_${userJson['id']}",
-      );
-
-      String? selectedCompany = savedCompanyId;
-      bool allowedInformator = false;
-
-      if (roles != null) {
-        allowedInformator = roles.info.accessAllowedInformator;
-        final companies = roles.info.getCompaniesByRole(roles.currentRole);
-
-        final hasSavedCompany = companies.any((c) => c.id == savedCompanyId);
-
-        if (!hasSavedCompany) {
-          selectedCompany = companies.isNotEmpty ? companies.first.id : null;
-        }
-      }
-      final isFirstAuth = sharedPreferences.getBool('first_auth');
-      final user = UserModel(
-        isAllowedAccessInformator: allowedInformator,
-        isFirstAuth: isFirstAuth ?? true,
-        selectedRolesCompany: selectedCompany ?? "",
-        createdAt: DateTime.now(),
-        roles: roles,
-        firstName: firstName,
-        lastName: lastName,
-        mpid: userJson['id'].toString(),
-        username: userJson['full_name'] ?? '',
-        isFake: userJson['is_fake'] ?? false,
-        phone: userJson['phone'] ?? '',
-      );
-
-      await userSession.saveUserSession(user);
-      _user = user;
-      notifyListeners();
-      Future.delayed(
-        const Duration(seconds: 3),
-        () => fresh.setToken(AuthTokens(accessToken: token, refreshToken: "")),
-      );
-
-      yield AuthState.success;
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
       MuzhikiDependencies.I.banner.show(message: error.message);
