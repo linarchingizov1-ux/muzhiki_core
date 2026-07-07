@@ -70,6 +70,9 @@ class NetworkFactory {
           );
           final access = response.data['data']['access_token'] as String?;
           final refresh = response.data['data']['refresh_token'] as String?;
+          talker.debug(
+            "Выполнили ревреш, ответ: ${response.data}, access: $access, refresh: $refresh",
+          );
           if (access == null ||
               refresh == null ||
               response.data["error"] == "Токен уже использован ранее." ||
@@ -80,6 +83,7 @@ class NetworkFactory {
           return AuthTokens(accessToken: access, refreshToken: refresh);
         } catch (e, st) {
           final error = AppErrorMapper.I.map(e, st);
+          talker.debug("Ошибка в ревреше ${error.message}, stack: $st");
           if (error.message == "Resresh-токен не найден в базе." ||
               error.message == "Токен уже использован ранее." ||
               error.message == "Refresh токен был отозван") {
