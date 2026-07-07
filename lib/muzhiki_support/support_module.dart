@@ -7,8 +7,9 @@ class SupportModuleConfig {
   final SessionApp session;
   final Dio authDio;
   final Directory directory;
-
+  final TypeApp typeApp;
   const SupportModuleConfig({
+    required this.typeApp,
     required this.authDio,
     required this.homeRoute,
     required this.profileRoute,
@@ -44,6 +45,8 @@ class SupportModule {
               ? state.extra as SupportAction
               : const SupportNone();
           return SupportView(
+            sessionApp: config.session,
+            typeApp: config.typeApp,
             showInformator: showInformator,
             action: action,
             chatCubit: chatCubit,

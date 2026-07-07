@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_roles.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_route_constant.dart';
@@ -18,10 +19,14 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.d
 class SupportView extends StatefulWidget {
   final String homeRoute, profileRoute;
   final ChatCubit chatCubit;
+  final SessionApp? sessionApp;
   final bool showInformator;
   final SupportAction action;
+  final TypeApp typeApp;
   const SupportView({
     super.key,
+    required this.typeApp,
+    this.sessionApp,
     required this.chatCubit,
     required this.action,
     required this.homeRoute,
@@ -132,7 +137,10 @@ class _SupportViewState extends State<SupportView> {
           ),
           body: CustomScrollView(
             slivers: [
-              const SliverHomeAppbarWidget(),
+              SliverHomeAppbarWidget(
+                typeApp: widget.typeApp,
+                sessionApp: widget.sessionApp,
+              ),
               if (widget.showInformator) const SliverInformator(),
               SliverChoiWidget(chatCubit: widget.chatCubit),
               SliverChatContainerWidget(
