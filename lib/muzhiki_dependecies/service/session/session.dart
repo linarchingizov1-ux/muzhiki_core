@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:app_links/app_links.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -15,15 +14,14 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_r
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer' as developer;
 
 enum AuthState { init, load, inBrows, success, error }
 
 enum TypeApp {
-  master("mp_master_app", "muzhikimyapp.master"),
-  bussines("mp_business_mobile_app", "com.mpbussines.com"),
-  support("mp_support_app", "muzhikimyapp.support"),
-  client("mp_client_app", "");
+  master("mp_master_app", "app.mpMaster"),
+  bussines("mp_business_mobile_app", "app.mpBussines"),
+  support("mp_support_app", "app.mpSupport"),
+  client("mp_client_app", "app.mpClient");
 
   final String nameApp;
   final String scheme;
@@ -166,19 +164,6 @@ class SessionApp extends ChangeNotifier {
       yield AuthState.load;
 
       final redirectUri = '${typeApp.scheme}://auth/';
-      developer.log('=== [AUTH LOG] НАЧАЛО СЕССИИ ===', name: 'MuzhikiAuth');
-      developer.log(
-        '[AUTH LOG] Используемый scheme: ${typeApp.scheme}',
-        name: 'MuzhikiAuth',
-      );
-      developer.log(
-        '[AUTH LOG] Сформированный redirectUri: $redirectUri',
-        name: 'MuzhikiAuth',
-      );
-      developer.log(
-        '[AUTH LOG] Путь авторизации (path): $path',
-        name: 'MuzhikiAuth',
-      );
 
       final appAuth = FlutterAppAuth();
       AuthorizationResponse? authResponse;
@@ -187,14 +172,6 @@ class SessionApp extends ChangeNotifier {
 
       try {
         final authUrl = Uri.https('id2.muzhiki.pro', path).toString();
-        developer.log(
-          '[AUTH LOG] Открываем URL авторизации: $authUrl',
-          name: 'MuzhikiAuth',
-        );
-        developer.log(
-          '[AUTH LOG] Дополнительные параметры запроса: {redirect_url: $redirectUri}',
-          name: 'MuzhikiAuth',
-        );
 
         authResponse = await appAuth
             .authorize(
@@ -205,31 +182,19 @@ class SessionApp extends ChangeNotifier {
                   authorizationEndpoint: authUrl,
                   tokenEndpoint: '',
                 ),
-                additionalParameters: {'redirect_url': redirectUri, "app_name": typeApp.nameApp},
+                additionalParameters: {
+                  'redirect_url': redirectUri,
+                  "app_name": typeApp.nameApp,
+                },
               ),
             )
             .timeout(const Duration(minutes: 15));
-
-        developer.log(
-          '[AUTH LOG] Нативный AppAuth успешно вернул ответ в Dart!',
-          name: 'MuzhikiAuth',
-        );
       } on TimeoutException {
-        developer.log(
-          '[AUTH LOG] [ERROR] Произошел таймаут операции (15 минут)',
-          name: 'MuzhikiAuth',
-        );
         await sharedPreferences.remove('pkce_verifier');
         MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
         yield AuthState.error;
         return;
-      } catch (e, st) {
-        developer.log(
-          '[AUTH LOG] [ERROR] Исключение внутри блока appAuth.authorize',
-          name: 'MuzhikiAuth',
-          error: e,
-          stackTrace: st,
-        );
+      } catch (e) {
         MuzhikiDependencies.I.banner.show(
           message: 'Авторизация отменена или произошла ошибка',
         );
@@ -237,58 +202,23 @@ class SessionApp extends ChangeNotifier {
         return;
       }
 
-      developer.log(
-        '[AUTH LOG] Проверяем объект authResponse...',
-        name: 'MuzhikiAuth',
-      );
-      developer.log('[AUTH LOG] authResponse НЕ null.', name: 'MuzhikiAuth');
-      developer.log(
-        '[AUTH LOG] authorizationCode: "${authResponse.authorizationCode}"',
-        name: 'MuzhikiAuth',
-      );
-      developer.log(
-        '[AUTH LOG] codeVerifier: "${authResponse.codeVerifier}"',
-        name: 'MuzhikiAuth',
-      );
-      developer.log(
-        '[AUTH LOG] authorizationAdditionalParameters: ${authResponse.authorizationAdditionalParameters}',
-        name: 'MuzhikiAuth',
-      );
-
       String? extractedCode = authResponse.authorizationCode;
 
       if (extractedCode == null &&
           authResponse.authorizationAdditionalParameters != null) {
         extractedCode =
             authResponse.authorizationAdditionalParameters!['auth_code'];
-        developer.log(
-          '[AUTH LOG] Стандартный code пуст. Успешно извлечен кастомный auth_code из additionalParameters: "$extractedCode"',
-          name: 'MuzhikiAuth',
-        );
       }
 
       if (extractedCode != null && extractedCode.isNotEmpty) {
-        developer.log(
-          '[AUTH LOG] Код авторизации найден. Сохраняем pkce_verifier...',
-          name: 'MuzhikiAuth',
-        );
         await sharedPreferences.setString(
           'pkce_verifier',
           authResponse.codeVerifier ?? '',
-        );
-      } else {
-        developer.log(
-          '[AUTH LOG] [WARNING] Ни code, ни auth_code не найдены в ответе.',
-          name: 'MuzhikiAuth',
         );
       }
 
       final verifier = sharedPreferences.getString('pkce_verifier') ?? '';
 
-      developer.log(
-        '[AUTH LOG] Отправляем POST запрос на обмен токенов...',
-        name: 'MuzhikiAuth',
-      );
       final response = await dioRefresh.post(
         'https://auth.muzhiki.pro/api/v1/auth/token',
         data: {
@@ -297,36 +227,18 @@ class SessionApp extends ChangeNotifier {
           'mode': 'cookie',
         },
       );
-      developer.log(
-        '[AUTH LOG] Ответ сервера токенов: ${response.data}',
-        name: 'MuzhikiAuth',
-      );
 
       final token = response.data['data']?['access_token'] as String?;
       RolesModel? roles;
       if (getRoles == true) {
         try {
-          developer.log(
-            '[AUTH LOG] Запрашиваем роли пользователя...',
-            name: 'MuzhikiAuth',
-          );
           final rolesData = await dioRefresh.get(
             'https://api.master.muzhiki.pro/api/v1/get-roles',
             options: Options(headers: {'Authorization': 'Bearer $token'}),
           );
 
           roles = RolesModel.fromJson(rolesData.data["data"]);
-          developer.log(
-            '[AUTH LOG] Роли успешно получены.',
-            name: 'MuzhikiAuth',
-          );
-        } catch (e, st) {
-          developer.log(
-            '[AUTH LOG] [ERROR] Ошибка при получении ролей',
-            name: 'MuzhikiAuth',
-            error: e,
-            stackTrace: st,
-          );
+        } catch (e) {
           MuzhikiDependencies.I.banner.show(
             message: 'Ошибка при получении роли пользователя',
           );
@@ -400,18 +312,8 @@ class SessionApp extends ChangeNotifier {
         () => fresh.setToken(AuthTokens(accessToken: token, refreshToken: "")),
       );
 
-      developer.log(
-        '[AUTH LOG] Авторизация полностью успешна!',
-        name: 'MuzhikiAuth',
-      );
       yield AuthState.success;
     } catch (e, st) {
-      developer.log(
-        '[AUTH LOG] [GLOBAL ERROR] Произошел сбой в блоке catch стрима',
-        name: 'MuzhikiAuth',
-        error: e,
-        stackTrace: st,
-      );
       final error = AppErrorMapper.I.map(e, st);
       MuzhikiDependencies.I.banner.show(message: error.message);
       yield AuthState.error;
@@ -480,13 +382,13 @@ class SessionApp extends ChangeNotifier {
     fresh.clearToken();
     userSession.clearUserSession();
     cookieJar.deleteAll();
-  try {
-     hiveStore.clean(); 
-  } catch (e, st) {
-          final error = AppErrorMapper.I.map(e, st);
+    try {
+      hiveStore.clean();
+    } catch (e, st) {
+      final error = AppErrorMapper.I.map(e, st);
       MuzhikiDependencies.I.banner.show(message: error.message);
-     hiveStore.delete('dio_cache'); 
-  }
+      hiveStore.delete('dio_cache');
+    }
   }
 
   @override

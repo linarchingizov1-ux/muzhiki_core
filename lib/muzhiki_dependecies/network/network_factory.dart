@@ -11,7 +11,6 @@ import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/utils/network_status_controller.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
@@ -28,7 +27,6 @@ class NetworkFactory {
   }) async {
     await cookieJar.forceInit();
 
-    final newtworkStateController = NetworkStatusController.I;
     final cacheOptions = CacheOptions(
       store: store,
       policy: CachePolicy.refreshForceCache,
@@ -61,6 +59,7 @@ class NetworkFactory {
         try {
           final response = await client.get(
             'https://auth.muzhiki.pro/api/v1/auth/refresh',
+            options: Options(extra: {"isRefreshReq": true}),
           );
           final access = response.data['data']['access_token'] as String?;
           if (access == null ||
@@ -72,7 +71,6 @@ class NetworkFactory {
           return AuthTokens(accessToken: access, refreshToken: "");
         } catch (e, st) {
           final error = AppErrorMapper.I.map(e, st);
-          talker.debug("Ошибка в ревреше ${error.message}, stack: $st");
           if (error.message == "Resresh-токен не найден в базе." ||
               error.message == "Токен уже использован ранее." ||
               error.message == "Refresh token был отозван") {
@@ -119,7 +117,6 @@ class NetworkFactory {
 
     return NetworkModel(
       uriLauncer: MuzhikiUrlLaunch.I,
-      networkStatusController: newtworkStateController,
       authDio: authDio,
       refreshDio: refreshDio,
       fresh: fresh,
