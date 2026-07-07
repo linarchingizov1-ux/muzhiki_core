@@ -20,7 +20,17 @@ class AppErrorMapper {
     }
 
     if (error is FlutterAppAuthPlatformException) {
-      print('FlutterAppAuthPlatformException: ${error.message}');
+      if (error.message != null &&
+          error.message!.contains(
+            "Failed to authorize: No suitable browser is available",
+          )) {
+        return AppException(
+          message:
+              "На устройстве не найдено приложение для открытия ссылки\nРекомендуем установить Chrome либо Firefox",
+          originalError: error.platformErrorDetails,
+          stackTrace: StackTrace.current,
+        );
+      }
       return AppException(
         message: error.message ?? 'Произошла ошибка при авторизации.',
         originalError: error.platformErrorDetails,
