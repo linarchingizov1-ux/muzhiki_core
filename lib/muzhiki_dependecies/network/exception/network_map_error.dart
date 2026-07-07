@@ -25,16 +25,15 @@ class AppErrorMapper {
         stackTrace: StackTrace.current,
       );
     }
+    if (error is FlutterAppAuthPlatformErrorDetails) {
+      print('runtimeType: ${error.runtimeType}');
+      print('code: ${error.code}');
+      print('message: ${error.domain}');
+      print('details: ${error.errorDescription}');
+    }
 
     if (error is PlatformException) {
       String message;
-
-      if (error is FlutterAppAuthPlatformErrorDetails) {
-        print('runtimeType: ${error.runtimeType}');
-        print('code: ${error.code}');
-        print('message: ${error.message}');
-        print('details: ${error.details}');
-      }
 
       switch (error.code) {
         case 'ACTIVITY_NOT_FOUND':
