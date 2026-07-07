@@ -25,19 +25,20 @@ class AppErrorMapper {
         stackTrace: StackTrace.current,
       );
     }
+
     if (error is PlatformException) {
-      if (error.code == 'no_browser_available') {
+      String message;
+
+      if (error.message?.contains('No suitable browser is available') ??
+          false) {
         return AppException(
           message:
               'На устройстве не найден браузер для авторизации.\n'
-              'Установите Google Chrome, Firefox или другой поддерживаемый браузер.',
+              'Рекомендуем установить Chrome либо Firefox.',
           originalError: error,
           stackTrace: stackTrace,
         );
       }
-    }
-    if (error is PlatformException) {
-      String message;
 
       switch (error.code) {
         case 'ACTIVITY_NOT_FOUND':
