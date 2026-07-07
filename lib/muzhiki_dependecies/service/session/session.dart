@@ -14,6 +14,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_r
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:talker/talker.dart';
 
 enum AuthState { init, load, inBrows, success, error }
 
@@ -157,6 +158,7 @@ class SessionApp extends ChangeNotifier {
   void refreshSession() async => await fresh.refreshToken();
 
   Stream<AuthState> loginSession({String path = '/'}) async* {
+    final talker = Talker();
     await MuzhikiUrlLaunch.I.close();
     yield AuthState.init;
     await sharedPreferences.remove('pkce_verifier');
@@ -194,14 +196,16 @@ class SessionApp extends ChangeNotifier {
         MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
         yield AuthState.error;
         return;
-      } catch (e) {
+      } catch (e, st) {
+        final error = AppErrorMapper.I.map(e, st);
+        talker.debug("Ошибка ${error.message}, Оригинал ${error.debugMessage}");
         MuzhikiDependencies.I.banner.show(
           message: 'Авторизация отменена или произошла ошибка',
         );
         yield AuthState.error;
         return;
       }
-
+      talker.debug("Ответ от сервера: $authResponse");
       String? extractedCode = authResponse.authorizationCode;
 
       if (extractedCode == null &&
