@@ -18,10 +18,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum AuthState { init, load, inBrows, success, error }
 
 enum TypeApp {
-  master("mp_master_app", "app.mpMaster"),
-  bussines("mp_business_mobile_app", "app.mpBussines"),
-  support("mp_support_app", "app.mpSupport"),
-  client("mp_client_app", "app.mpClient");
+  master("mp_master_app", "app.mpMaster.com"),
+  bussines("mp_business_mobile_app", "app.mpBussines.com"),
+  support("mp_support_app", "app.mpSupport.com"),
+  client("mp_client_app", "app.mpClient.com");
 
   final String nameApp;
   final String scheme;
