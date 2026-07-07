@@ -199,9 +199,9 @@ class SessionApp extends ChangeNotifier {
       } catch (e, st) {
         final error = AppErrorMapper.I.map(e, st);
         talker.debug("Ошибка ${error.message}, Оригинал ${error.debugMessage}");
-        MuzhikiDependencies.I.banner.show(
-          message: 'Авторизация отменена или произошла ошибка',
-        );
+        if (error.message != "Авторизация отменена пользователем.") {
+          MuzhikiDependencies.I.banner.show(message: error.message);
+        }
         yield AuthState.error;
         return;
       }

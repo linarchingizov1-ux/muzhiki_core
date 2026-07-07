@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 
 class AppErrorMapper {
@@ -10,6 +11,20 @@ class AppErrorMapper {
   static final I = const AppErrorMapper._();
 
   AppException map(Object error, [StackTrace? stackTrace]) {
+    if (error is FlutterAppAuthUserCancelledException) {
+      return AppException(
+        message: 'Авторизация отменена пользователем.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+    if (error is FlutterAppAuthPlatformException) {
+      return AppException(
+        message: error.message ?? 'Произошла ошибка при авторизации.',
+        originalError: error.platformErrorDetails,
+        stackTrace: StackTrace.current,
+      );
+    }
     if (error is PlatformException) {
       String message;
 
