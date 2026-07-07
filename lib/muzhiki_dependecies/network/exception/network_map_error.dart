@@ -11,6 +11,7 @@ class AppErrorMapper {
   static final I = const AppErrorMapper._();
 
   AppException map(Object error, [StackTrace? stackTrace]) {
+    print('AppErrorMapper.map: $error');
     if (error is FlutterAppAuthUserCancelledException) {
       return AppException(
         message: 'Авторизация отменена пользователем.',
