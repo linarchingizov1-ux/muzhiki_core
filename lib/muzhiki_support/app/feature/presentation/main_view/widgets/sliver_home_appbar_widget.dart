@@ -19,6 +19,10 @@ class SliverHomeAppbarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (typeApp == TypeApp.support && sessionApp != null) {
       return SliverAppBar(
+        centerTitle: false,
+        pinned: true,
+        automaticallyImplyLeading: false,
+
         title: SupportAppBar(
           sessionApp: sessionApp!,
           firebaseRemoveFCM: firebaseRemoveFCM,

@@ -71,10 +71,8 @@ class _SupportAppBarState extends State<SupportAppBar> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
+        top: MediaQuery.of(context).padding.top + 5.h,
         bottom: 20.h,
-        left: 17.w,
-        right: 17.w,
       ),
       child: SizedBox(
         height: 44.h,
