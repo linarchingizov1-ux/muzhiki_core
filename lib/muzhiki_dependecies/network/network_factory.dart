@@ -58,25 +58,15 @@ class NetworkFactory {
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
-        final headers = <String, dynamic>{};
-        if (token?.refreshToken.isNotEmpty ?? false) {
-          headers['X-Refresh-Token'] = token!.refreshToken;
-        }
-        talker.debug("Заголовок запроса refresh: $headers");
         try {
           final response = await client.get(
             'https://auth.muzhiki.pro/api/v1/auth/refresh',
-            options: Options(headers: headers),
           );
           final access = response.data['data']['access_token'] as String?;
-          // final refresh = response.data['data']['refresh_token'] as String?;
-          talker.debug(
-            "Выполнили ревреш, ответ: ${response.data}, access: $access",
-          );
           if (access == null ||
               response.data["error"] == "Токен уже использован ранее." ||
               response.data["error"] == "Resresh-токен не найден в базе." ||
-              response.data["error"] == "Resresh токен был отозван") {
+              response.data["error"] == "Refresh token был отозван") {
             throw RevokeTokenException();
           }
           return AuthTokens(accessToken: access, refreshToken: "refresh");
@@ -85,7 +75,7 @@ class NetworkFactory {
           talker.debug("Ошибка в ревреше ${error.message}, stack: $st");
           if (error.message == "Resresh-токен не найден в базе." ||
               error.message == "Токен уже использован ранее." ||
-              error.message == "Refresh токен был отозван") {
+              error.message == "Refresh token был отозван") {
             throw RevokeTokenException();
           }
           return token ?? const AuthTokens(accessToken: "", refreshToken: "");
