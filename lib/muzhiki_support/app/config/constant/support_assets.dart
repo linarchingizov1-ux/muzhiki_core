@@ -20,6 +20,7 @@ class _SupportAssetsSvg {
   static const _base = 'packages/muzhiki_core/assets/support/svg';
   final arrowBack = '$_base/arrow_back.svg';
   final dashboard = '$_base/dashboard.svg';
+  final logout = '$_base/logout.svg';
   final add = '$_base/add.svg';
   final info = '$_base/info.svg';
   final doc = '$_base/doc.svg';

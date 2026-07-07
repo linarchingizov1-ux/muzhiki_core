@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 
 class SupportAppBarMenu extends StatelessWidget {
@@ -40,7 +41,13 @@ class SupportAppBarMenu extends StatelessWidget {
 }
 
 class DashboardMenuBottomWidgets extends StatelessWidget {
-  const DashboardMenuBottomWidgets({super.key});
+  final SessionApp sessionApp;
+  final void Function()? firebaseRemoveFCM;
+  const DashboardMenuBottomWidgets({
+    super.key,
+    required this.sessionApp,
+    this.firebaseRemoveFCM,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,14 +85,13 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
         //   description: 'Версия и информация',
         //   onTap: () => context.pushNamed(AppRouteConstant.infoApp),
         // ),
-        // menuAction(
-        //   icon: AppAssetsSvg.logout,
-        //   title: 'Выйти из системы',
-        //   description: 'И завершить сессию',
-        //   onTap: () => sessionApp.logoutSession(
-        //     firebaseRemoveFCM: FirebaseMessaging.instance.deleteToken,
-        //   ),
-        // ),
+        menuAction(
+          icon: SupportAssets.I.svg.logout,
+          title: 'Выйти из системы',
+          description: 'И завершить сессию',
+          onTap: () =>
+              sessionApp.logoutSession(firebaseRemoveFCM: firebaseRemoveFCM),
+        ),
       ],
     );
   }
