@@ -69,7 +69,7 @@ class NetworkFactory {
               response.data["error"] == "Refresh token был отозван") {
             throw RevokeTokenException();
           }
-          return AuthTokens(accessToken: access, refreshToken: "refresh");
+          return AuthTokens(accessToken: access, refreshToken: "");
         } catch (e, st) {
           final error = AppErrorMapper.I.map(e, st);
           talker.debug("Ошибка в ревреше ${error.message}, stack: $st");
