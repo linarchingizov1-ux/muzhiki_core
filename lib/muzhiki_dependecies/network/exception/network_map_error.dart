@@ -29,15 +29,11 @@ class AppErrorMapper {
     if (error is PlatformException) {
       String message;
 
-      if (error.message?.contains('No suitable browser is available') ??
-          false) {
-        return AppException(
-          message:
-              'На устройстве не найден браузер для авторизации.\n'
-              'Рекомендуем установить Chrome либо Firefox.',
-          originalError: error,
-          stackTrace: stackTrace,
-        );
+      if (error is FlutterAppAuthPlatformErrorDetails) {
+        print('runtimeType: ${error.runtimeType}');
+        print('code: ${error.code}');
+        print('message: ${error.message}');
+        print('details: ${error.details}');
       }
 
       switch (error.code) {
