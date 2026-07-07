@@ -21,7 +21,7 @@ enum AuthState { init, load, inBrows, success, error }
 
 enum TypeApp {
   master("mp_master_app", "muzhikimyapp.master"),
-  bussines("mp_business_mobile_app", "muzhikimyapp"),
+  bussines("mp_business_mobile_app", "com.mpbussines.com"),
   support("mp_support_app", "muzhikimyapp.support"),
   client("mp_client_app", "");
 
@@ -205,7 +205,7 @@ class SessionApp extends ChangeNotifier {
                   authorizationEndpoint: authUrl,
                   tokenEndpoint: '',
                 ),
-                additionalParameters: {'redirect_url': redirectUri},
+                additionalParameters: {'redirect_url': redirectUri, "app_name": typeApp.nameApp},
               ),
             )
             .timeout(const Duration(minutes: 15));
@@ -480,7 +480,13 @@ class SessionApp extends ChangeNotifier {
     fresh.clearToken();
     userSession.clearUserSession();
     cookieJar.deleteAll();
-    hiveStore.clean();
+  try {
+     hiveStore.clean(); 
+  } catch (e, st) {
+          final error = AppErrorMapper.I.map(e, st);
+      MuzhikiDependencies.I.banner.show(message: error.message);
+     hiveStore.delete('dio_cache'); 
+  }
   }
 
   @override

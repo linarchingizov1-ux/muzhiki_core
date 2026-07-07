@@ -21,7 +21,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
-  flutter_appauth: ^12.0.2
+  flutter_appauth:
+    path: flutter_appauth
   flutter_bloc: ^9.1.1
   flutter_custom_tabs: ^2.5.0
   flutter_image_compress: ^2.4.0
