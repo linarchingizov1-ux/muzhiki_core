@@ -26,7 +26,7 @@ class AppErrorMapper {
       );
     }
     if (error is FlutterAppAuthPlatformErrorDetails) {
-      if (error.code ==
+      if (error.error ==
           "Failed to authorize: No suitable browser is available") {
         return AppException(
           message:
@@ -36,7 +36,7 @@ class AppErrorMapper {
         );
       } else {
         return AppException(
-          message: error.code ?? 'Произошла ошибка при авторизации.',
+          message: error.error ?? 'Произошла ошибка при авторизации.',
           originalError: error,
           stackTrace: stackTrace,
         );
