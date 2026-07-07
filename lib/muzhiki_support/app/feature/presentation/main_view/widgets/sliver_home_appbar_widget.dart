@@ -16,7 +16,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (typeApp == TypeApp.support && sessionApp != null) {
-      return SupportAppBar(sessionApp: sessionApp!);
+      return SliverAppBar(title: SupportAppBar(sessionApp: sessionApp!));
     } else {
       return SliverPadding(
         padding: EdgeInsetsGeometry.only(bottom: 5.h),
