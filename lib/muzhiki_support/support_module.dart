@@ -8,7 +8,9 @@ class SupportModuleConfig {
   final Dio authDio;
   final Directory directory;
   final TypeApp typeApp;
+  final void Function()? firebaseRemoveFCM;
   const SupportModuleConfig({
+    this.firebaseRemoveFCM,
     required this.typeApp,
     required this.authDio,
     required this.homeRoute,
@@ -45,6 +47,7 @@ class SupportModule {
               ? state.extra as SupportAction
               : const SupportNone();
           return SupportView(
+            firebaseRemoveFCM: config.firebaseRemoveFCM,
             sessionApp: config.session,
             typeApp: config.typeApp,
             showInformator: showInformator,

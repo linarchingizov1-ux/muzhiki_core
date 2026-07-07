@@ -20,6 +20,7 @@ class SupportView extends StatefulWidget {
   final String homeRoute, profileRoute;
   final ChatCubit chatCubit;
   final SessionApp? sessionApp;
+  final void Function()? firebaseRemoveFCM;
   final bool showInformator;
   final SupportAction action;
   final TypeApp typeApp;
@@ -28,6 +29,7 @@ class SupportView extends StatefulWidget {
     required this.typeApp,
     this.sessionApp,
     required this.chatCubit,
+    required this.firebaseRemoveFCM,
     required this.action,
     required this.homeRoute,
     this.showInformator = false,
@@ -140,6 +142,7 @@ class _SupportViewState extends State<SupportView> {
               SliverHomeAppbarWidget(
                 typeApp: widget.typeApp,
                 sessionApp: widget.sessionApp,
+                firebaseRemoveFCM: widget.firebaseRemoveFCM,
               ),
               if (widget.showInformator) const SliverInformator(),
               SliverChoiWidget(chatCubit: widget.chatCubit),

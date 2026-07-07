@@ -7,16 +7,23 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/appbar_main/app
 class SliverHomeAppbarWidget extends StatelessWidget {
   final TypeApp typeApp;
   final SessionApp? sessionApp;
+  final Function()? firebaseRemoveFCM;
   const SliverHomeAppbarWidget({
     super.key,
     required this.typeApp,
     this.sessionApp,
+    this.firebaseRemoveFCM,
   });
 
   @override
   Widget build(BuildContext context) {
     if (typeApp == TypeApp.support && sessionApp != null) {
-      return SliverAppBar(title: SupportAppBar(sessionApp: sessionApp!));
+      return SliverAppBar(
+        title: SupportAppBar(
+          sessionApp: sessionApp!,
+          firebaseRemoveFCM: firebaseRemoveFCM,
+        ),
+      );
     } else {
       return SliverPadding(
         padding: EdgeInsetsGeometry.only(bottom: 5.h),
