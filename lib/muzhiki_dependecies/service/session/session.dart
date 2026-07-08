@@ -170,7 +170,9 @@ class SessionApp extends ChangeNotifier {
       AuthorizationResponse? authResponse;
 
       yield AuthState.inBrows;
-
+      talker.debug(
+        "До ответа сервера есть ли допуск к информатору ? ${user?.isAllowedAccessInformator}",
+      );
       try {
         final authUrl = Uri.https('id2.muzhiki.pro', path).toString();
 
@@ -196,19 +198,18 @@ class SessionApp extends ChangeNotifier {
         return;
       } catch (e, st) {
         final error = AppErrorMapper.I.map(e, st);
-        talker.debug("Ошибка ${error.message}, Оригинал ${error.debugMessage}");
         if (error.message != "Авторизация отменена пользователем.") {
           MuzhikiDependencies.I.banner.show(message: error.message);
         }
         yield AuthState.error;
         return;
       }
-      talker.debug("Ответ от сервера: $authResponse");
-
+      talker.debug(
+        "После сервера есть ли допуск к информатору ? ${user?.isAllowedAccessInformator}",
+      );
       final code = authResponse.authorizationAdditionalParameters!['auth_code'];
       final codeVerifier = authResponse.codeVerifier;
-      talker.debug("auth_code: $code");
-      talker.debug("code_verifier: $codeVerifier");
+
       if (code != null && codeVerifier != null) {
         try {
           final response = await dioRefresh.post(
@@ -269,11 +270,14 @@ class SessionApp extends ChangeNotifier {
 
           String? selectedCompany = savedCompanyId;
           bool allowedInformator = false;
-
+          talker.debug(
+            "Когда обменяли на токен и только объявили allowedInformator есть доступ к информатору ? $allowedInformator",
+          );
           if (roles != null) {
+            talker.debug("Есть роли, смотрим допуск");
             allowedInformator = roles.info.accessAllowedInformator;
             final companies = roles.info.getCompaniesByRole(roles.currentRole);
-
+            talker.debug("Есть доступ к информатору ? $allowedInformator");
             final hasSavedCompany = companies.any(
               (c) => c.id == savedCompanyId,
             );
