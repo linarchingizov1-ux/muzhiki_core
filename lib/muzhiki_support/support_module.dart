@@ -28,7 +28,7 @@ class SupportModule {
 
   static List<RouteBase> routers(
     SupportModuleConfig config,
-    bool showInformator,
+    bool? showInformator,
   ) {
     final ChatUseCase chatUseCase = ChatUseCase(
       ChatRepositoryImpl(config.authDio),
@@ -46,11 +46,15 @@ class SupportModule {
           final action = state.extra is SupportAction
               ? state.extra as SupportAction
               : const SupportNone();
+          final isAllowedInformator =
+              showInformator ??
+              config.session.user != null &&
+                  config.session.user!.isAllowedAccessInformator;
           return SupportView(
             firebaseRemoveFCM: config.firebaseRemoveFCM,
             sessionApp: config.session,
             typeApp: config.typeApp,
-            showInformator: showInformator,
+            showInformator: isAllowedInformator,
             action: action,
             chatCubit: chatCubit,
             homeRoute: config.homeRoute,
