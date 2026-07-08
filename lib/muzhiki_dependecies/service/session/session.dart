@@ -288,6 +288,9 @@ class SessionApp extends ChangeNotifier {
                   : null;
             }
           }
+          talker.debug(
+            "Есть доступ к информатору когда мы вышли в roles != null проверки ? $allowedInformator",
+          );
           final isFirstAuth = sharedPreferences.getBool('first_auth');
           final user = UserModel(
             isAllowedAccessInformator: allowedInformator,
