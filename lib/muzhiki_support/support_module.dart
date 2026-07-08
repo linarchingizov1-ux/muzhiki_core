@@ -26,10 +26,10 @@ class SupportModule {
   const SupportModule._();
   static final routeConstant = SupportRouteConstant.I;
 
-  static List<RouteBase> routers(
-    SupportModuleConfig config,
+  static List<RouteBase> routers({
+    required SupportModuleConfig config,
     bool? showInformator,
-  ) {
+  }) {
     final ChatUseCase chatUseCase = ChatUseCase(
       ChatRepositoryImpl(config.authDio),
     );
