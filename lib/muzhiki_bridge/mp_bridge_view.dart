@@ -6,10 +6,12 @@ class MpBridgeWebView extends StatefulWidget {
   final String version, build;
   final String? companyId;
   final SessionApp session;
+  final List<int>? masterAudit;
 
   const MpBridgeWebView({
     super.key,
     this.showAppBar = true,
+    this.masterAudit,
     required this.initialUrl,
     this.companyId,
     required this.build,
@@ -61,6 +63,8 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     bridgeAuthUsecase.seedSession();
     final urlParse = widget.companyId != null
         ? "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
+        : widget.masterAudit != null && widget.masterAudit!.isNotEmpty
+        ? "${widget.initialUrl}/${widget.masterAudit!.first}/audits/${widget.masterAudit!.last}?native_app=true&show_header=${widget.showAppBar}"
         : "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}";
     final url = Uri.parse(urlParse);
     WidgetsBinding.instance.addPostFrameCallback((_) {
