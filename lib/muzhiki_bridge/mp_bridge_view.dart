@@ -55,7 +55,7 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
   void initState() {
     super.initState();
 
-    if (widget.initialUrl.contains("https://bus-wa.muzhiki.pro")) {
+    if (widget.initialUrl.contains("bus-wa")) {
       print("Запрашиваем разрешение на камеру");
       Permission.camera.request();
     }
