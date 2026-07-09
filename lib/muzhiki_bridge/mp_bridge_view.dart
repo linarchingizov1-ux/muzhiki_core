@@ -146,40 +146,46 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
       params = const PlatformWebViewControllerCreationParams();
     }
 
-    final controller = WebViewController.fromPlatformCreationParams(params)
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)
-      ..addJavaScriptChannel(
-        _channelName,
-        onMessageReceived: (JavaScriptMessage message) async {
-          await _handleWebMessage(message.message);
-        },
-      )
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (url) async {
-            _bridgeInjectedForCurrentPage = false;
-            await _ensureBridgeInjected();
-          },
-          onPageFinished: (url) async {
-            if (mounted) {
-              setState(() {
-                isLoading = false;
-              });
-            }
-            await _ensureBridgeInjected();
-          },
-          onWebResourceError: (error) {
-            setState(() {
-              isLoading = false;
-            });
-            debugPrint(
-              'Web resource error: ${error.description}, '
-              'mainFrame=${error.isForMainFrame}',
-            );
-          },
-        ),
-      );
+    final controller =
+        WebViewController.fromPlatformCreationParams(
+            params,
+            onPermissionRequest: (request) {
+              request.grant();
+            },
+          )
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setBackgroundColor(Colors.white)
+          ..addJavaScriptChannel(
+            _channelName,
+            onMessageReceived: (JavaScriptMessage message) async {
+              await _handleWebMessage(message.message);
+            },
+          )
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onPageStarted: (url) async {
+                _bridgeInjectedForCurrentPage = false;
+                await _ensureBridgeInjected();
+              },
+              onPageFinished: (url) async {
+                if (mounted) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }
+                await _ensureBridgeInjected();
+              },
+              onWebResourceError: (error) {
+                setState(() {
+                  isLoading = false;
+                });
+                debugPrint(
+                  'Web resource error: ${error.description}, '
+                  'mainFrame=${error.isForMainFrame}',
+                );
+              },
+            ),
+          );
 
     if (controller.platform is AndroidWebViewController) {
       AndroidWebViewController.enableDebugging(kDebugMode);
