@@ -20,6 +20,7 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/main_view/
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/attachments/attachments_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/video_player.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:screen_corner_radius/screen_corner_radius.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_factory.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';

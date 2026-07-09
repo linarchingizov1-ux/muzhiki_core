@@ -4,6 +4,7 @@ class MpBridgeWebView extends StatefulWidget {
   final bool showAppBar;
   final String initialUrl;
   final String version, build;
+  final bool needCamera;
   final String? companyId;
   final SessionApp session;
   final List<int>? masterAudit;
@@ -11,6 +12,7 @@ class MpBridgeWebView extends StatefulWidget {
   const MpBridgeWebView({
     super.key,
     this.showAppBar = true,
+    this.needCamera = false,
     this.masterAudit,
     required this.initialUrl,
     this.companyId,
@@ -54,6 +56,10 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.needCamera) {
+      Permission.camera.request();
+    }
     bridgeAuthUsecase = BridgeAuthUsecase(
       repository: BridgeAuthRepositoryImpl(widget.session),
     );
