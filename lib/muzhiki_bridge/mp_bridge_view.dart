@@ -56,6 +56,7 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     super.initState();
 
     if (widget.initialUrl.contains("https://bus-wa.muzhiki.pro")) {
+      print("Запрашиваем разрешение на камеру");
       Permission.camera.request();
     }
     bridgeAuthUsecase = BridgeAuthUsecase(
