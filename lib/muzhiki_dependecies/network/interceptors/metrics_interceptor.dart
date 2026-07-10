@@ -1,11 +1,9 @@
-import 'dart:convert';
-
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/extension/dio_error_extension.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/extension/req_and_res_size_bytes.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_metric.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
-import 'dart:developer';
 
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
 
@@ -48,7 +46,6 @@ class MetricsInterceptor extends Interceptor {
 
   void _saveMetrics({Response? response, DioException? error}) {
     final request = response?.requestOptions ?? error?.requestOptions;
-    log("[ТИП СОЕДИНЕНИЯ]\n\n${connectivityService.currentType}");
 
     if (request == null) return;
 
@@ -89,11 +86,6 @@ class MetricsInterceptor extends Interceptor {
           response?.headers.value('x-request-id') ??
           error?.response?.headers.value('x-request-id'),
     );
-    final prettyJson = const JsonEncoder.withIndent(
-      '  ',
-    ).convert(metric.toJson());
-
-    log("[МЕТРИКИ ДЛЯ БЭКА]\n\n$prettyJson");
-    metricsStorage.saveMetrics(metrics: metric);
+    unawaited(metricsStorage.saveMetrics(metrics: metric));
   }
 }
