@@ -37,22 +37,31 @@ class MetricsInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    if (options.extra['skipMetrics'] == true) {
+      handler.next(options);
+      return;
+    }
     options.extra['metrics'] = MetricsContext(DateTime.now().toUtc());
-
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    if (response.requestOptions.extra['skipMetrics'] == true) {
+      handler.next(response);
+      return;
+    }
     _saveMetrics(response: response);
-
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (err.requestOptions.extra['skipMetrics'] == true) {
+      handler.next(err);
+      return;
+    }
     _saveMetrics(error: err);
-
     handler.next(err);
   }
 
