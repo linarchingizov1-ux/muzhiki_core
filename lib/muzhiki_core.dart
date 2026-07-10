@@ -12,6 +12,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/model/service_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/storage_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/app_version.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/support_route_event.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/repository/chat_repository_impl.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/usecase/chat_usecase.dart';

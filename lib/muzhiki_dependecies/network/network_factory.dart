@@ -16,6 +16,8 @@ import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
@@ -31,6 +33,8 @@ class NetworkFactory {
     required SecureTokenStorage tokenStorage,
     required PersistCookieJar cookieJar,
     required bool needMetricsHttp,
+    required TypeApp typeApp,
+    required AppInfoModel infoProject,
   }) async {
     await cookieJar.forceInit();
 
@@ -96,6 +100,8 @@ class NetworkFactory {
     final connectivityService = NetworkConnectivityService(Connectivity());
     await connectivityService.init();
     final metricsInterceptor = MetricsInterceptor(
+      typeApp: typeApp,
+      infoProject: infoProject,
       metricsStorage: metricsStorage,
       connectivityService: connectivityService,
     );

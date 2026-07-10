@@ -6,6 +6,8 @@ import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/requ
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
 
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 
 class MetricsContext {
   MetricsContext(this.startedAt) : stopwatch = Stopwatch()..start();
@@ -16,11 +18,15 @@ class MetricsContext {
 
 class MetricsInterceptor extends Interceptor {
   final RequestStorage metricsStorage;
+  final TypeApp typeApp;
+  final AppInfoModel infoProject;
   final NetworkConnectivityService connectivityService;
 
   const MetricsInterceptor({
     required this.metricsStorage,
     required this.connectivityService,
+    required this.typeApp,
+    required this.infoProject,
   });
 
   @override
@@ -86,6 +92,12 @@ class MetricsInterceptor extends Interceptor {
           response?.headers.value('x-request-id') ??
           error?.response?.headers.value('x-request-id'),
     );
-    unawaited(metricsStorage.saveMetrics(metrics: metric));
+    unawaited(
+      metricsStorage.saveMetrics(
+        metrics: metric,
+        typeApp: typeApp,
+        infoProject: infoProject,
+      ),
+    );
   }
 }

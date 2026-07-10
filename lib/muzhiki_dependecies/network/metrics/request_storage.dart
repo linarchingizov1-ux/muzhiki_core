@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_enum.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_batch.dart';
@@ -16,10 +18,14 @@ class RequestStorage {
 
   RequestStorage({required this.sharedPreferences, required this.authDio});
 
-  Future<void> saveMetrics({required RequestMetric metrics}) async {
+  Future<void> saveMetrics({
+    required RequestMetric metrics,
+    required TypeApp typeApp,
+    required AppInfoModel infoProject,
+  }) async {
     _metrics.add(metrics);
 
-    await sendMetrics();
+    await sendMetrics(typeApp: typeApp, infoProject: infoProject);
   }
 
   RequestPlatform get platform {
@@ -30,7 +36,10 @@ class RequestStorage {
     }
   }
 
-  Future<void> sendMetrics() async {
+  Future<void> sendMetrics({
+    required TypeApp typeApp,
+    required AppInfoModel infoProject,
+  }) async {
     if (_metrics.isEmpty) return;
 
     final batch = RequestBatch(
@@ -38,11 +47,11 @@ class RequestStorage {
 
       sessionId: _getSessionId(),
 
-      appName: 'business',
+      appName: typeApp.nameApp,
 
       platform: platform,
 
-      appVersion: '2.1.0',
+      appVersion: infoProject.version,
 
       mpid: null,
 
