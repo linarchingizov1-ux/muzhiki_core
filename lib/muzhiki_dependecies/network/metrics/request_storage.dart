@@ -20,8 +20,6 @@ class RequestStorage {
 
   final List<RequestMetric> _metrics = [];
 
-  int tryCount = 0;
-
   RequestStorage({required this.sharedPreferences, required this.authDio});
 
   Future<void> saveMetrics({
@@ -30,7 +28,6 @@ class RequestStorage {
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
-    if (tryCount > 3) return;
     _metrics.add(metrics);
     Talker().debug(_metrics);
     try {
@@ -41,8 +38,6 @@ class RequestStorage {
       );
     } on AppException catch (e) {
       BannerController.I.show(message: e.message);
-    } finally {
-      tryCount++;
     }
   }
 

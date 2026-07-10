@@ -17,6 +17,8 @@ class MetricsContext {
   final Stopwatch stopwatch;
 }
 
+int tryCount = 0;
+
 class MetricsInterceptor extends Interceptor {
   final RequestStorage metricsStorage;
   final TypeApp typeApp;
@@ -54,6 +56,7 @@ class MetricsInterceptor extends Interceptor {
   }
 
   void _saveMetrics({Response? response, DioException? error}) {
+    if (tryCount > 3) return;
     final request = response?.requestOptions ?? error?.requestOptions;
 
     if (request == null) return;
@@ -103,5 +106,6 @@ class MetricsInterceptor extends Interceptor {
         infoProject: infoProject,
       ),
     );
+    tryCount++;
   }
 }
