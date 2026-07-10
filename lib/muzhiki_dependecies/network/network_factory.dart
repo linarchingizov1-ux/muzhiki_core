@@ -90,7 +90,7 @@ class NetworkFactory {
               error.message == "Refresh token был отозван") {
             throw RevokeTokenException();
           }
-          return token ?? const AuthTokens(accessToken: "", refreshToken: "");
+          rethrow;
         }
       },
     );
@@ -99,6 +99,7 @@ class NetworkFactory {
       sharedPreferences: sharedPreferences,
       authDio: authDio,
     );
+    await metricsStorage.init();
     final connectivityService = NetworkConnectivityService(Connectivity());
     await connectivityService.init();
     final metricsInterceptor = MetricsInterceptor(

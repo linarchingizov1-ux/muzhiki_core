@@ -15,9 +15,8 @@ class MetricsContext {
 
   final DateTime startedAt;
   final Stopwatch stopwatch;
+  bool completed = false;
 }
-
-int tryCount = 0;
 
 class MetricsInterceptor extends Interceptor {
   final RequestStorage metricsStorage;
@@ -56,15 +55,14 @@ class MetricsInterceptor extends Interceptor {
   }
 
   void _saveMetrics({Response? response, DioException? error}) {
-    if (tryCount > 3) return;
     final request = response?.requestOptions ?? error?.requestOptions;
 
     if (request == null) return;
 
     final context = request.extra['metrics'] as MetricsContext?;
-
+    if (context?.completed ?? true) return;
     if (context == null) return;
-
+    context.completed = true;
     context.stopwatch.stop();
 
     final metric = RequestMetric(
@@ -98,14 +96,14 @@ class MetricsInterceptor extends Interceptor {
           response?.headers.value('x-request-id') ??
           error?.response?.headers.value('x-request-id'),
     );
+
     unawaited(
-      metricsStorage.saveMetrics(
+      metricsStorage.addMetrics(
         userSession: userSession,
         metrics: metric,
         typeApp: typeApp,
         infoProject: infoProject,
       ),
     );
-    tryCount++;
   }
 }
