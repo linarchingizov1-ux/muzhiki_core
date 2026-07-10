@@ -101,6 +101,7 @@ class RequestStorage {
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
+    int countTry = 0;
     if (_metrics.isEmpty) return;
     final userMpid = int.tryParse(userSession.user?.mpid ?? "");
 
@@ -129,13 +130,14 @@ class RequestStorage {
       await authDio.post(
         "https://metrics.dev.muzhiki.pro/metrics/client-network",
         data: batch,
-        options: Options(extra: {"skipMetrics": true, "skipRetry": true}),
+        options: Options(extra: {"count_try": countTry}),
       );
 
       _metrics.clear();
 
       await sharedPreferences.remove("metrics_data");
     } catch (e, st) {
+      countTry++;
       throw AppErrorMapper.I.map(e, st);
     }
   }

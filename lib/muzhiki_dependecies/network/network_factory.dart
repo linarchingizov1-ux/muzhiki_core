@@ -71,10 +71,11 @@ class NetworkFactory {
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
+        int countTry = 0;
         try {
           final response = await client.get(
             'https://auth.muzhiki.pro/api/v1/auth/refresh',
-            options: Options(extra: {"isRefreshReq": true}),
+            options: Options(extra: {"isRefresh": true, "count_try": countTry}),
           );
           final access = response.data['data']['access_token'] as String?;
           if (access == null ||
@@ -85,6 +86,7 @@ class NetworkFactory {
           }
           return AuthTokens(accessToken: access, refreshToken: "");
         } catch (e, st) {
+          countTry++;
           final error = AppErrorMapper.I.map(e, st);
           if (error.message == "Resresh-токен не найден в базе." ||
               error.message == "Токен уже использован ранее." ||
@@ -140,10 +142,9 @@ class NetworkFactory {
     authDio.interceptors.addAll([
       cookieManager,
       talkerInterceptor,
-
-      fresh,
-      cacheInterceptor,
       errorInterceptor,
+      cacheInterceptor,
+      fresh,
       if (needMetricsHttp) metricsInterceptor,
     ]);
 

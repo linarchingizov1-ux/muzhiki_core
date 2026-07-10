@@ -1,22 +1,19 @@
 import 'package:dio/dio.dart';
-import 'package:muzhiki_core/muzhiki_core.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 
 class AppErrorInterceptor extends Interceptor {
   AppErrorInterceptor();
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (err.requestOptions.extra['skipRetry'] == true) {
-      handler.next(err);
+    final isRefresh = (err.requestOptions.extra['isRefresh'] as bool?) ?? false;
+    final tryReq = (err.requestOptions.extra['count_try'] as int?) ?? 0;
+    if (isRefresh) {
       return;
     }
-
-    if (err.requestOptions.extra['isRefreshReq'] == true) {
-      final mapped = AppErrorMapper.I.map(err);
-      MuzhikiDependencies.I.banner.show(message: mapped.message);
+    if (tryReq > 3) {
+      return;
+    } else {
+      handler.next(err);
     }
-
-    handler.next(err);
   }
 }
