@@ -10,8 +10,11 @@ import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
@@ -22,8 +25,10 @@ class NetworkFactory {
     required bool showReqHeaders,
     required Talker talker,
     required HiveCacheStore store,
+    required SharedPreferences sharedPreferences,
     required SecureTokenStorage tokenStorage,
     required PersistCookieJar cookieJar,
+    required bool needMetricsHttp,
   }) async {
     await cookieJar.forceInit();
 
@@ -81,6 +86,13 @@ class NetworkFactory {
       },
     );
     final cookieManager = CookieManager(cookieJar);
+    final metricsStorage = RequestStorage(
+      sharedPreferences: sharedPreferences,
+      authDio: authDio,
+    );
+    final metricsInterceptor = MetricsInterceptor(
+      metricsStorage: metricsStorage,
+    );
     final talkerInterceptor = TalkerDioLogger(
       talker: talker,
       settings: TalkerDioLoggerSettings(
@@ -107,6 +119,7 @@ class NetworkFactory {
     refreshDio.interceptors.addAll([cookieManager, talkerInterceptor]);
 
     authDio.interceptors.addAll([
+      if (needMetricsHttp) metricsInterceptor,
       cookieManager,
       talkerInterceptor,
 

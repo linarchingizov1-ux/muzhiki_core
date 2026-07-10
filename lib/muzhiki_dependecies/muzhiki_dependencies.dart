@@ -14,6 +14,7 @@ class MuzhikiDependencies {
     bool enableTalker = true,
     bool getRoles = false,
     bool showReqHeaders = false,
+    required bool needMetricsHttp,
     required TypeApp typeApp,
   }) async {
     final directory = await Future.microtask(
@@ -36,6 +37,8 @@ class MuzhikiDependencies {
       storage: FileStorage(pathCoockies),
     );
     final network = await NetworkFactory.create(
+      sharedPreferences: sharedPreferences,
+      needMetricsHttp: needMetricsHttp,
       showReqHeaders: showReqHeaders,
       cookieJar: cookie,
       enableTalker: enableTalker,
