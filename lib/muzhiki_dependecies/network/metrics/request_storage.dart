@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_enum.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,7 +27,11 @@ class RequestStorage {
   }) async {
     _metrics.add(metrics);
 
-    await sendMetrics(typeApp: typeApp, infoProject: infoProject);
+    try {
+      await sendMetrics(typeApp: typeApp, infoProject: infoProject);
+    } on AppException catch (e) {
+      BannerController.I.show(message: e.message);
+    }
   }
 
   RequestPlatform get platform {
