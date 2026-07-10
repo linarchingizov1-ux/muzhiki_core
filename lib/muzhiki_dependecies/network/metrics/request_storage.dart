@@ -57,10 +57,21 @@ class RequestStorage {
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
-    _metrics.add(metrics);
-    await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
-    if (showTalkerMetricsHttp) {
-      talker.debug('''
+    try {
+      if (_metrics.length == batchSize) {
+        await sendMetrics(
+          typeApp: typeApp,
+          infoProject: infoProject,
+          userSession: userSession,
+        );
+      } else if (_metrics.length > batchSize) {
+        _metrics.clear();
+        await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
+      } else {
+        _metrics.add(metrics);
+        await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
+        if (showTalkerMetricsHttp) {
+          talker.debug('''
 📊 Метрики сохранены локально
 
 Кол-во метрик: ${_metrics.length}
@@ -68,15 +79,7 @@ class RequestStorage {
 Последний запрос:
 ${const JsonEncoder.withIndent('  ').convert(metrics.toJson())}
 ''');
-    }
-
-    try {
-      if (_metrics.length >= batchSize) {
-        await sendMetrics(
-          typeApp: typeApp,
-          infoProject: infoProject,
-          userSession: userSession,
-        );
+        }
       }
     } on AppException catch (e) {
       talker.error("Ошибка отправки метрик:\n${e.debugMessage}");
