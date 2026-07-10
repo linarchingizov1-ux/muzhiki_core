@@ -10,7 +10,6 @@ import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/extension/type_network_extension.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
@@ -97,7 +96,7 @@ class NetworkFactory {
     await connectivityService.init();
     final metricsInterceptor = MetricsInterceptor(
       metricsStorage: metricsStorage,
-      networkType: networkType,
+      connectivityService: connectivityService,
     );
     final talkerInterceptor = TalkerDioLogger(
       talker: talker,
