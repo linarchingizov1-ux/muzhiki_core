@@ -62,6 +62,7 @@ class NetworkFactory {
     );
     final refreshDio = Dio(baseOptions);
     final authDio = Dio(baseOptions);
+    final metricsDio = Dio(baseOptions);
     final errorInterceptor = AppErrorInterceptor();
     final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
 
@@ -106,7 +107,7 @@ class NetworkFactory {
     final metricsStorage = RequestStorage(
       showTalkerMetricsHttp: showTalkerMetricsHttp,
       sharedPreferences: sharedPreferences,
-      authDio: authDio,
+      authDio: metricsDio,
     );
     await metricsStorage.init();
     final connectivityService = NetworkConnectivityService(Connectivity());
@@ -143,7 +144,7 @@ class NetworkFactory {
       ),
     );
     refreshDio.interceptors.addAll([cookieManager, talkerInterceptor]);
-
+    metricsDio.interceptors.addAll([talkerInterceptor]);
     authDio.interceptors.addAll([
       cookieManager,
       talkerInterceptor,

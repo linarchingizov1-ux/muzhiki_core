@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -19,6 +20,7 @@ class RequestStorage {
   final List<RequestMetric> _metrics = [];
 
   static const int batchSize = 10;
+  DateTime? _lastFailedSend;
   bool _isSending = false;
 
   Talker get talker => Talker();
@@ -57,11 +59,13 @@ class RequestStorage {
       talker.debug('📊 Добавлена метрика. Всего накоплено: ${_metrics.length}');
     }
 
-    if (_metrics.length >= batchSize) {
-      await sendMetrics(
-        typeApp: typeApp,
-        infoProject: infoProject,
-        userSession: userSession,
+    if (!_isSending && _metrics.length >= batchSize) {
+      unawaited(
+        sendMetrics(
+          typeApp: typeApp,
+          infoProject: infoProject,
+          userSession: userSession,
+        ),
       );
     }
   }
@@ -76,7 +80,11 @@ class RequestStorage {
   }) async {
     if (_isSending || _metrics.isEmpty) return;
     _isSending = true;
-
+    if (_lastFailedSend != null &&
+        DateTime.now().difference(_lastFailedSend!) <
+            const Duration(minutes: 1)) {
+      return;
+    }
     final List<RequestMetric> batchItems = _metrics.take(batchSize).toList();
     final userMpid = int.tryParse(userSession.user?.mpid ?? "");
 
@@ -123,6 +131,7 @@ class RequestStorage {
         if (attempt == 3) {
           talker.error("❌ Не удалось отправить батч метрик после 3 попыток.");
           _isSending = false;
+          _lastFailedSend = DateTime.now();
           return;
         }
         await Future.delayed(const Duration(milliseconds: 1500));
