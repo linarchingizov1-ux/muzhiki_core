@@ -15,6 +15,7 @@ class MuzhikiDependencies {
     bool getRoles = false,
     bool showReqHeaders = false,
     required bool needMetricsHttp,
+    required bool showTalkerMetricsHttp,
     required TypeApp typeApp,
   }) async {
     final directory = await Future.microtask(
@@ -40,6 +41,7 @@ class MuzhikiDependencies {
     final infoProject = await AppInfoService.I.info;
     final UserSession userSession = UserSession(sharedPreferences);
     final network = await NetworkFactory.create(
+      showTalkerMetricsHttp: showTalkerMetricsHttp,
       userSession: userSession,
       typeApp: typeApp,
       infoProject: infoProject,

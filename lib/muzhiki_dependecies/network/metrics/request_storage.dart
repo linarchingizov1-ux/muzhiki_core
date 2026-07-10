@@ -16,6 +16,7 @@ import 'package:talker/talker.dart';
 
 class RequestStorage {
   final Dio authDio;
+  final bool showTalkerMetricsHttp;
   final SharedPreferences sharedPreferences;
 
   final List<RequestMetric> _metrics = [];
@@ -34,7 +35,11 @@ class RequestStorage {
     ),
   );
 
-  RequestStorage({required this.sharedPreferences, required this.authDio});
+  RequestStorage({
+    required this.sharedPreferences,
+    required this.authDio,
+    required this.showTalkerMetricsHttp,
+  });
 
   Future<void> init() async {
     final data = sharedPreferences.getString("metrics_data");
@@ -54,7 +59,8 @@ class RequestStorage {
   }) async {
     _metrics.add(metrics);
     await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
-    talker.debug('''
+    if (showTalkerMetricsHttp) {
+      talker.debug('''
 📊 Метрики сохранены локально
 
 Кол-во метрик: ${_metrics.length}
@@ -62,6 +68,8 @@ class RequestStorage {
 Последний запрос:
 ${const JsonEncoder.withIndent('  ').convert(metrics.toJson())}
 ''');
+    }
+
     try {
       if (_metrics.length >= batchSize) {
         await sendMetrics(
@@ -106,9 +114,12 @@ ${const JsonEncoder.withIndent('  ').convert(metrics.toJson())}
 
       requests: List.of(_metrics),
     ).toJson();
-    talker.debug(
-      "Отправляем RequestBatch\n${const JsonEncoder.withIndent('  ').convert(batch)}",
-    );
+    if (showTalkerMetricsHttp) {
+      talker.debug(
+        "Отправляем RequestBatch\n${const JsonEncoder.withIndent('  ').convert(batch)}",
+      );
+    }
+
     try {
       await authDio.post(
         "https://metrics.dev.muzhiki.pro/metrics/client-network",

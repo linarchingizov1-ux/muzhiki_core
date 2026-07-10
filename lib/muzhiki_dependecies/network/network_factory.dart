@@ -34,6 +34,7 @@ class NetworkFactory {
     required SecureTokenStorage tokenStorage,
     required PersistCookieJar cookieJar,
     required bool needMetricsHttp,
+    required bool showTalkerMetricsHttp,
     required UserSession userSession,
     required TypeApp typeApp,
     required AppInfoModel infoProject,
@@ -96,6 +97,7 @@ class NetworkFactory {
     );
     final cookieManager = CookieManager(cookieJar);
     final metricsStorage = RequestStorage(
+      showTalkerMetricsHttp: showTalkerMetricsHttp,
       sharedPreferences: sharedPreferences,
       authDio: authDio,
     );
@@ -103,6 +105,7 @@ class NetworkFactory {
     final connectivityService = NetworkConnectivityService(Connectivity());
     await connectivityService.init();
     final metricsInterceptor = MetricsInterceptor(
+      showTalkerMetricsHttp: showTalkerMetricsHttp,
       userSession: userSession,
       typeApp: typeApp,
       infoProject: infoProject,

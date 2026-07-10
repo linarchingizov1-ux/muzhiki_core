@@ -22,6 +22,7 @@ class MetricsInterceptor extends Interceptor {
   final RequestStorage metricsStorage;
   final TypeApp typeApp;
   final UserSession userSession;
+  final bool showTalkerMetricsHttp;
   final AppInfoModel infoProject;
   final NetworkConnectivityService connectivityService;
 
@@ -31,6 +32,7 @@ class MetricsInterceptor extends Interceptor {
     required this.typeApp,
     required this.infoProject,
     required this.userSession,
+    required this.showTalkerMetricsHttp,
   });
 
   @override
