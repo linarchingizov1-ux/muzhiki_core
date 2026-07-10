@@ -67,6 +67,11 @@ class RequestStorage {
       } else if (_metrics.length > batchSize) {
         _metrics.clear();
         await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
+        talker.debug('''
+📊 Удалили метрики, их больше 10 ? ${_metrics.length > batchSize}
+
+Кол-во метрик: ${_metrics.length} 
+''');
       } else {
         _metrics.add(metrics);
         await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
