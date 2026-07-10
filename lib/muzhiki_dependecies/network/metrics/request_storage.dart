@@ -135,6 +135,10 @@ class RequestStorage {
           return;
         }
         await Future.delayed(const Duration(milliseconds: 1500));
+      } finally {
+        if (_metrics.length >= batchSize) {
+          await sharedPreferences.remove("metrics_data");
+        }
       }
     }
   }
