@@ -77,12 +77,9 @@ class RequestStorage {
         await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
         if (showTalkerMetricsHttp) {
           talker.debug('''
-📊 Метрики сохранены локально
+📊 Добавили новые метрики !
 
 Кол-во метрик: ${_metrics.length}
-
-Последний запрос:
-${const JsonEncoder.withIndent('  ').convert(metrics.toJson())}
 ''');
         }
       }
