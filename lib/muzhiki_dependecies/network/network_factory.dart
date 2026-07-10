@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
@@ -9,9 +10,11 @@ import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/extension/type_network_extension.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -90,8 +93,11 @@ class NetworkFactory {
       sharedPreferences: sharedPreferences,
       authDio: authDio,
     );
+    final connectivityService = NetworkConnectivityService(Connectivity());
+    await connectivityService.init();
     final metricsInterceptor = MetricsInterceptor(
       metricsStorage: metricsStorage,
+      networkType: networkType,
     );
     final talkerInterceptor = TalkerDioLogger(
       talker: talker,
