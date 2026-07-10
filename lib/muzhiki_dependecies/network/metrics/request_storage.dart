@@ -67,6 +67,9 @@ class RequestStorage {
           userSession: userSession,
         ),
       );
+    } else {
+      _metrics.clear();
+      await sharedPreferences.remove("metrics_data");
     }
   }
 
