@@ -6,6 +6,10 @@ class UserSession {
   final SharedPreferences sharedPreferences;
   UserSession(this.sharedPreferences);
 
+  UserModel? _user;
+
+  UserModel? get user => _user;
+
   Future<void> clearRoles() async {}
 
   Future<void> clearUserSession() async {
@@ -13,6 +17,7 @@ class UserSession {
   }
 
   Future<void> saveUserSession(UserModel user) async {
+    _user = user;
     final userJson = jsonEncode(user.toJson());
 
     await sharedPreferences.setString('user_session', userJson);
@@ -26,6 +31,8 @@ class UserSession {
     }
 
     final legacyUser = _restoreLegacyUser();
+
+    _user = legacyUser;
 
     if (legacyUser != null) {
       await saveUserSession(legacyUser);
@@ -48,8 +55,8 @@ class UserSession {
   Future<void> saveUserJson(Map<String, dynamic> userJson) async {
     final data = sharedPreferences.getString('user_session');
     if (data == null) return;
-    UserModel user;
-    user = UserModel.fromJson(jsonDecode(data));
+    UserModel userChanged;
+    userChanged = UserModel.fromJson(jsonDecode(data));
 
     final fullName = (userJson['full_name'] ?? '').toString();
 
@@ -70,7 +77,7 @@ class UserSession {
       lastName = parts.sublist(1).join(' ');
     }
 
-    user = user.copyWith(
+    userChanged = userChanged.copyWith(
       firstName: firstName,
       lastName: lastName,
       mpid: userJson['id'].toString(),
@@ -78,7 +85,8 @@ class UserSession {
       isFake: userJson['is_fake'] ?? false,
       phone: userJson['phone'] ?? '',
     );
-    saveUserSession(user);
+    _user = user;
+    saveUserSession(userChanged);
   }
 
   UserModel? _restoreLegacyUser() {

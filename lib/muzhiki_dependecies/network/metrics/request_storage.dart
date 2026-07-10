@@ -7,10 +7,12 @@ import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/requ
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_batch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_metric.dart';
+import 'package:talker/talker.dart';
 
 class RequestStorage {
   final Dio authDio;
@@ -21,14 +23,19 @@ class RequestStorage {
   RequestStorage({required this.sharedPreferences, required this.authDio});
 
   Future<void> saveMetrics({
+    required UserSession userSession,
     required RequestMetric metrics,
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
     _metrics.add(metrics);
-
+    Talker().debug(_metrics);
     try {
-      await sendMetrics(typeApp: typeApp, infoProject: infoProject);
+      await sendMetrics(
+        typeApp: typeApp,
+        infoProject: infoProject,
+        userSession: userSession,
+      );
     } on AppException catch (e) {
       BannerController.I.show(message: e.message);
     }
@@ -43,10 +50,12 @@ class RequestStorage {
   }
 
   Future<void> sendMetrics({
+    required UserSession userSession,
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
     if (_metrics.isEmpty) return;
+    final userMpid = int.parse(userSession.user?.mpid ?? "");
 
     final batch = RequestBatch(
       batchTimestamp: DateTime.now().toUtc(),
@@ -59,15 +68,15 @@ class RequestStorage {
 
       appVersion: infoProject.version,
 
-      mpid: null,
+      mpid: userMpid,
 
       requests: List.of(_metrics),
-    );
-
+    ).toJson();
+    Talker().debug("Отправляем метрики\n\n$batch");
     try {
       await authDio.post(
         "https://metrics.dev.muzhiki.pro/metrics/client-network",
-        data: batch.toJson(),
+        data: batch,
       );
 
       _metrics.clear();

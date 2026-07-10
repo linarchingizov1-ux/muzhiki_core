@@ -38,7 +38,9 @@ class MuzhikiDependencies {
     );
     await InternetCheckNotifier.I.init();
     final infoProject = await AppInfoService.I.info;
+    final UserSession userSession = UserSession(sharedPreferences);
     final network = await NetworkFactory.create(
+      userSession: userSession,
       typeApp: typeApp,
       infoProject: infoProject,
       sharedPreferences: sharedPreferences,
@@ -50,7 +52,7 @@ class MuzhikiDependencies {
       store: hiveStore,
       tokenStorage: tokenStorage,
     );
-    final UserSession userSession = UserSession(sharedPreferences);
+
     final session = SessionApp(
       tokenStorage: tokenStorage,
       typeApp: typeApp,
