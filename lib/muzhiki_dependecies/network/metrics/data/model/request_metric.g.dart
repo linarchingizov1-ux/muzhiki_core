@@ -63,6 +63,10 @@ const _$RequestNetworkEnumMap = {
   RequestNetwork.wifi: 'wifi',
   RequestNetwork.cellular: 'cellular',
   RequestNetwork.ethernet: 'ethernet',
+  RequestNetwork.bluetooth: 'bluetooth',
+  RequestNetwork.vpn: 'vpn',
+  RequestNetwork.satellite: 'satellite',
+  RequestNetwork.other: 'other',
   RequestNetwork.none: 'none',
   RequestNetwork.unknown: 'unknown',
 };

@@ -54,6 +54,7 @@ class NetworkFactory {
     final authDio = Dio(baseOptions);
     final errorInterceptor = AppErrorInterceptor();
     final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
+
     final fresh = Fresh<AuthTokens>(
       tokenStorage: tokenStorage,
       httpClient: refreshDio,

@@ -36,6 +36,7 @@ class MuzhikiDependencies {
       ignoreExpires: true,
       storage: FileStorage(pathCoockies),
     );
+    await InternetCheckNotifier.I.init();
     final network = await NetworkFactory.create(
       sharedPreferences: sharedPreferences,
       needMetricsHttp: needMetricsHttp,

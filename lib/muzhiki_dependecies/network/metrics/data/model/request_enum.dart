@@ -56,30 +56,25 @@ enum RequestError {
 
 @JsonEnum(alwaysCreate: true)
 enum RequestNetwork {
-  @JsonValue('wifi')
-  wifi,
+  wifi('wifi'),
 
-  @JsonValue('cellular')
-  cellular,
+  cellular('cellular'),
 
-  @JsonValue('ethernet')
-  ethernet,
+  ethernet('ethernet'),
 
-  @JsonValue('bluetooth')
-  bluetooth,
+  bluetooth('bluetooth'),
 
-  @JsonValue('vpn')
-  vpn,
+  vpn('vpn'),
 
-  @JsonValue('satellite')
-  satellite,
+  satellite('satellite'),
 
-  @JsonValue('other')
-  other,
+  other('other'),
 
-  @JsonValue('none')
-  none,
+  none('none'),
 
-  @JsonValue('unknown')
-  unknown,
+  unknown('unknown');
+
+  final String jsonKey;
+
+  const RequestNetwork(this.jsonKey);
 }

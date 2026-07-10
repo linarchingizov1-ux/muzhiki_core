@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/extension/dio_error_extension.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_enum.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/extension/req_and_res_size_bytes.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_metric.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
 import 'dart:developer';
@@ -67,27 +67,23 @@ class MetricsInterceptor extends Interceptor {
           request.uri.path +
           (request.uri.hasQuery ? '?${request.uri.query}' : ''),
 
-      method: _parseMethod(request.method),
+      method: request.requestMethod,
 
       durationMs: context.stopwatch.elapsedMilliseconds,
 
       statusCode: response?.statusCode ?? error?.response?.statusCode,
 
-      success:
-          response != null &&
-          response.statusCode != null &&
-          response.statusCode! >= 200 &&
-          response.statusCode! < 300,
+      success: response.isSuccess,
 
       errorType: error?.requestError,
 
-      requestSizeBytes: null,
+      requestSizeBytes: request.requestSizeBytes,
 
-      responseSizeBytes: null,
+      responseSizeBytes: response.responseSizeBytes,
 
       networkType: connectivityService.currentType,
 
-      vpnActive: null,
+      vpnActive: InternetCheckNotifier.I.isVpnEnabled,
 
       requestId:
           response?.headers.value('x-request-id') ??
@@ -99,12 +95,5 @@ class MetricsInterceptor extends Interceptor {
 
     log("[МЕТРИКИ ДЛЯ БЭКА]\n\n$prettyJson");
     metricsStorage.saveMetrics(metrics: metric);
-  }
-
-  RequestMethod _parseMethod(String method) {
-    return RequestMethod.values.firstWhere(
-      (e) => e.name.toUpperCase() == method,
-      orElse: () => RequestMethod.get,
-    );
   }
 }
