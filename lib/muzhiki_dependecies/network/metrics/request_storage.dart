@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_metric.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:talker/talker.dart';
+import 'dart:developer';
 
 class RequestStorage {
   final Dio authDio;
@@ -20,8 +20,11 @@ class RequestStorage {
 
   Future<void> _postMetrics({required RequestMetric metrics}) async {
     try {
-      final metricsJson = jsonEncode(metrics);
-      Talker().debug(metricsJson);
+      final prettyJson = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(metrics.toJson());
+      log("Получили метрики запроса");
+      log(prettyJson);
 
       // final response = await authDio.post(
       //   "https://metrics.dev.muzhiki.pro/metrics/client-network",

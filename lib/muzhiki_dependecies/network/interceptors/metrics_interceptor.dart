@@ -1,8 +1,10 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/extension/dio_error_extension.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_enum.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_metric.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
+import 'dart:developer';
 
 class MetricsContext {
   MetricsContext(this.startedAt) : stopwatch = Stopwatch()..start();
@@ -21,7 +23,9 @@ class MetricsInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) async {
+    final result = await Connectivity().checkConnectivity();
+    log("[Тип соединения]\n$result");
     final request = response.requestOptions;
 
     final context = request.extra['metrics'] as MetricsContext;
