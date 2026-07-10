@@ -55,7 +55,7 @@ class RequestStorage {
     required AppInfoModel infoProject,
   }) async {
     if (_metrics.isEmpty) return;
-    final userMpid = int.parse(userSession.user?.mpid ?? "");
+    final userMpid = int.tryParse(userSession.user?.mpid ?? "");
 
     final batch = RequestBatch(
       batchTimestamp: DateTime.now().toUtc(),
