@@ -7,20 +7,26 @@ extension ConnectivityResultMapper on ConnectivityResult {
       case ConnectivityResult.wifi:
         return RequestNetwork.wifi;
 
-      case ConnectivityResult.ethernet:
-        return RequestNetwork.ethernet;
-
       case ConnectivityResult.mobile:
         return RequestNetwork.cellular;
 
-      case ConnectivityResult.none:
-        return RequestNetwork.none;
+      case ConnectivityResult.ethernet:
+        return RequestNetwork.ethernet;
 
       case ConnectivityResult.bluetooth:
+        return RequestNetwork.bluetooth;
+
       case ConnectivityResult.vpn:
+        return RequestNetwork.vpn;
+
       case ConnectivityResult.satellite:
+        return RequestNetwork.satellite;
+
       case ConnectivityResult.other:
-        return RequestNetwork.unknown;
+        return RequestNetwork.other;
+
+      case ConnectivityResult.none:
+        return RequestNetwork.none;
     }
   }
 }

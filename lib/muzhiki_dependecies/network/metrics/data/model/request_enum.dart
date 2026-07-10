@@ -65,6 +65,18 @@ enum RequestNetwork {
   @JsonValue('ethernet')
   ethernet,
 
+  @JsonValue('bluetooth')
+  bluetooth,
+
+  @JsonValue('vpn')
+  vpn,
+
+  @JsonValue('satellite')
+  satellite,
+
+  @JsonValue('other')
+  other,
+
   @JsonValue('none')
   none,
 
