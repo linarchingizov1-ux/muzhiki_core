@@ -124,6 +124,7 @@ ${const JsonEncoder.withIndent('  ').convert(metrics.toJson())}
       await authDio.post(
         "https://metrics.dev.muzhiki.pro/metrics/client-network",
         data: batch,
+        options: Options(extra: {"skipMetrics": true, "skipRetry": true}),
       );
 
       _metrics.clear();

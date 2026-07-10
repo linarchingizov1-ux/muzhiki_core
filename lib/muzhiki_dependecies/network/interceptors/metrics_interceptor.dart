@@ -62,8 +62,9 @@ class MetricsInterceptor extends Interceptor {
     if (request == null) return;
 
     final context = request.extra['metrics'] as MetricsContext?;
-    if (context?.completed ?? true) return;
+
     if (context == null) return;
+    if (context.completed) return;
     context.completed = true;
     context.stopwatch.stop();
 

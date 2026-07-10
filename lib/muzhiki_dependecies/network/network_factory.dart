@@ -91,7 +91,7 @@ class NetworkFactory {
               error.message == "Refresh token был отозван") {
             throw RevokeTokenException();
           }
-          rethrow;
+          throw error;
         }
       },
     );
@@ -138,13 +138,13 @@ class NetworkFactory {
     refreshDio.interceptors.addAll([cookieManager, talkerInterceptor]);
 
     authDio.interceptors.addAll([
-      if (needMetricsHttp) metricsInterceptor,
       cookieManager,
       talkerInterceptor,
 
-      errorInterceptor,
-      cacheInterceptor,
       fresh,
+      cacheInterceptor,
+      errorInterceptor,
+      if (needMetricsHttp) metricsInterceptor,
     ]);
 
     return NetworkModel(

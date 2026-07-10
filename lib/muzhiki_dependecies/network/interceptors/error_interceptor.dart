@@ -7,13 +7,16 @@ class AppErrorInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    final isRefreshRequest = err.requestOptions.extra['isRefreshReq'] ?? false;
-    if (isRefreshRequest) {
-      final mapped = AppErrorMapper.I.map(err);
-
-      MuzhikiDependencies.I.banner.show(message: mapped.message);
-    } else {
+    if (err.requestOptions.extra['skipRetry'] == true) {
       handler.next(err);
+      return;
     }
+
+    if (err.requestOptions.extra['isRefreshReq'] == true) {
+      final mapped = AppErrorMapper.I.map(err);
+      MuzhikiDependencies.I.banner.show(message: mapped.message);
+    }
+
+    handler.next(err);
   }
 }
