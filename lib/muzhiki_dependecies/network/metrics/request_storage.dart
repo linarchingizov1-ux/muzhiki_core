@@ -103,6 +103,7 @@ class RequestStorage {
   }) async {
     int countTry = 0;
     if (_metrics.isEmpty) return;
+    if (countTry > 3) return;
     final userMpid = int.tryParse(userSession.user?.mpid ?? "");
 
     final batch = RequestBatch(

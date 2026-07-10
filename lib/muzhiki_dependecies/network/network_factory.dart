@@ -9,6 +9,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
@@ -72,6 +73,10 @@ class NetworkFactory {
       },
       refreshToken: (token, client) async {
         int countTry = 0;
+
+        if (countTry > 3) {
+          throw AppException(message: "Кол-во попыток для ревреша больше 3");
+        }
         try {
           final response = await client.get(
             'https://auth.muzhiki.pro/api/v1/auth/refresh',
