@@ -6,10 +6,14 @@ class AppErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final isRefresh = (err.requestOptions.extra['isRefresh'] as bool?) ?? false;
-    if (isRefresh) {
-      return;
-    } else {
+    final skipMetrics =
+        (err.requestOptions.extra['skipMetrics'] as bool?) ?? false;
+
+    if (isRefresh || skipMetrics) {
       handler.next(err);
+      return;
     }
+
+    handler.next(err);
   }
 }

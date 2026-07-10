@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_enum.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
@@ -18,22 +16,12 @@ class RequestStorage {
   final Dio authDio;
   final bool showTalkerMetricsHttp;
   final SharedPreferences sharedPreferences;
-
   final List<RequestMetric> _metrics = [];
 
-  static const batchSize = 10;
+  static const int batchSize = 10;
+  bool _isSending = false;
 
-  Talker get talker => Talker(
-    settings: TalkerSettings(
-      enabled: true,
-      colors: {
-        TalkerKey.debug: AnsiPen()..green(),
-        TalkerKey.info: AnsiPen()..cyan(),
-        TalkerKey.warning: AnsiPen()..yellow(),
-        TalkerKey.error: AnsiPen()..red(),
-      },
-    ),
-  );
+  Talker get talker => Talker();
 
   RequestStorage({
     required this.sharedPreferences,
@@ -42,13 +30,14 @@ class RequestStorage {
   });
 
   Future<void> init() async {
-    final data = sharedPreferences.getString("metrics_data");
-
-    if (data == null) return;
-
-    final json = jsonDecode(data) as List;
-
-    _metrics.addAll(json.map((e) => RequestMetric.fromJson(e)));
+    try {
+      final data = sharedPreferences.getString("metrics_data");
+      if (data == null) return;
+      final json = jsonDecode(data) as List;
+      _metrics.addAll(json.map((e) => RequestMetric.fromJson(e)));
+    } catch (e) {
+      await sharedPreferences.remove("metrics_data");
+    }
   }
 
   Future<void> addMetrics({
@@ -57,93 +46,90 @@ class RequestStorage {
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
-    try {
-      if (_metrics.length == batchSize) {
-        await sendMetrics(
-          typeApp: typeApp,
-          infoProject: infoProject,
-          userSession: userSession,
-        );
-      } else if (_metrics.length > batchSize) {
-        _metrics.clear();
-        await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
-        talker.debug('''
-📊 Удалили метрики, их больше 10 ? ${_metrics.length > batchSize}
+    _metrics.add(metrics);
 
-Кол-во метрик: ${_metrics.length} 
-''');
-      } else {
-        _metrics.add(metrics);
-        await sharedPreferences.setString("metrics_data", jsonEncode(_metrics));
-        if (showTalkerMetricsHttp) {
-          talker.debug('''
-📊 Добавили новые метрики !
+    await sharedPreferences.setString(
+      "metrics_data",
+      jsonEncode(_metrics.map((e) => e.toJson()).toList()),
+    );
 
-Кол-во метрик: ${_metrics.length}
-''');
-        }
-      }
-    } on AppException catch (e) {
-      talker.error("Ошибка отправки метрик:\n${e.debugMessage}");
+    if (showTalkerMetricsHttp) {
+      talker.debug('📊 Добавлена метрика. Всего накоплено: ${_metrics.length}');
+    }
+
+    if (_metrics.length >= batchSize) {
+      await sendMetrics(
+        typeApp: typeApp,
+        infoProject: infoProject,
+        userSession: userSession,
+      );
     }
   }
 
-  RequestPlatform get platform {
-    if (Platform.isAndroid) {
-      return RequestPlatform.android;
-    } else {
-      return RequestPlatform.ios;
-    }
-  }
+  RequestPlatform get platform =>
+      Platform.isAndroid ? RequestPlatform.android : RequestPlatform.ios;
 
   Future<void> sendMetrics({
     required UserSession userSession,
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
-    int countTry = 0;
-    if (_metrics.isEmpty) return;
-    if (countTry > 3) return;
+    if (_isSending || _metrics.isEmpty) return;
+    _isSending = true;
+
+    final List<RequestMetric> batchItems = _metrics.take(batchSize).toList();
     final userMpid = int.tryParse(userSession.user?.mpid ?? "");
 
     final batch = RequestBatch(
       batchTimestamp: DateTime.now().toUtc(),
-
       sessionId: _getSessionId(),
-
       appName: typeApp.nameApp,
-
       platform: platform,
-
       appVersion: infoProject.version,
-
       mpid: userMpid,
-
-      requests: List.of(_metrics),
+      requests: batchItems,
     ).toJson();
+
     if (showTalkerMetricsHttp) {
-      talker.debug(
-        "Отправляем RequestBatch\n${const JsonEncoder.withIndent('  ').convert(batch)}",
-      );
+      talker.debug("📤 Отправка RequestBatch (размер: ${batchItems.length})");
     }
 
-    try {
-      await authDio.post(
-        "https://metrics.dev.muzhiki.pro/metrics/client-network",
-        data: batch,
-        options: Options(extra: {"count_try": countTry}),
-      );
+    for (int attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await authDio.post(
+          "https://metrics.dev.muzhiki.pro/metrics/client-network",
+          data: batch,
+          options: Options(extra: {"skipMetrics": true, "skipRetry": true}),
+        );
 
-      _metrics.clear();
+        _metrics.removeRange(0, batchItems.length);
+        await sharedPreferences.setString(
+          "metrics_data",
+          jsonEncode(_metrics.map((e) => e.toJson()).toList()),
+        );
 
-      await sharedPreferences.remove("metrics_data");
-    } catch (e, st) {
-      countTry++;
-      throw AppErrorMapper.I.map(e, st);
+        _isSending = false;
+
+        if (_metrics.length >= batchSize) {
+          await sendMetrics(
+            userSession: userSession,
+            typeApp: typeApp,
+            infoProject: infoProject,
+          );
+        }
+        return;
+      } catch (e) {
+        talker.warning("⚠️ Попытка отправки метрик $attempt из 3 провалилась.");
+        if (attempt == 3) {
+          talker.error("❌ Не удалось отправить батч метрик после 3 попыток.");
+          _isSending = false;
+          return;
+        }
+        await Future.delayed(const Duration(milliseconds: 1500));
+      }
     }
   }
 
-  String _getSessionId() {
-    return sharedPreferences.getString('metrics_session_id') ?? '';
-  }
+  String _getSessionId() =>
+      sharedPreferences.getString('metrics_session_id') ?? '';
 }

@@ -25,6 +25,8 @@ import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 
+int countTry = 0;
+
 class NetworkFactory {
   static Future<NetworkModel> create({
     required bool enableTalker,
@@ -72,8 +74,6 @@ class NetworkFactory {
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
-        int countTry = 0;
-
         if (countTry > 3) {
           throw AppException(message: "Кол-во попыток для ревреша больше 3");
         }
