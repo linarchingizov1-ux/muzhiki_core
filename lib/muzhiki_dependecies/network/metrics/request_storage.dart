@@ -136,9 +136,12 @@ class RequestStorage {
         }
         await Future.delayed(const Duration(milliseconds: 1500));
       } finally {
-        if (_metrics.length >= batchSize) {
-          await sharedPreferences.remove("metrics_data");
-        }
+        _metrics.removeRange(0, batchItems.length);
+        await sharedPreferences.setString(
+          "metrics_data",
+          jsonEncode(_metrics.map((e) => e.toJson()).toList()),
+        );
+        _isSending = false;
       }
     }
   }
