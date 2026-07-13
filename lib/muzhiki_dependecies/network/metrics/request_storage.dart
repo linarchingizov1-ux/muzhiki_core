@@ -100,7 +100,10 @@ class RequestStorage {
     ).toJson();
 
     final jsonString = jsonEncode(batch);
-    debugPrint(jsonString, wrapWidth: 1024);
+    const encoder = JsonEncoder.withIndent('  ');
+    final prettyJson = encoder.convert(batch);
+
+    printLong(prettyJson);
     for (int attempt = 1; attempt <= 3; attempt++) {
       try {
         await authDio.post(
