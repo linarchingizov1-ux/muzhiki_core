@@ -52,7 +52,7 @@ class _ChatViewState extends State<ChatView> {
       session: widget.session,
     );
     websocketApp.connect();
-    print(widget.extra);
+    print(widget.extra != SupportChatsEventWidgetsType.mobileWidgets);
     switch (widget.extra) {
       case SupportChatsEventWidgets event:
         if (event.type == SupportChatsEventWidgetsType.records) {
