@@ -24,6 +24,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
+import 'package:uuid/uuid.dart';
 
 int countTry = 0;
 
@@ -60,6 +61,8 @@ class NetworkFactory {
       receiveTimeout: const Duration(minutes: 5),
       headers: {HttpHeaders.contentTypeHeader: 'application/json'},
     );
+    final sessionId = Uuid().v4().replaceAll('-', '').substring(0, 8);
+    sharedPreferences.setString('metrics_session_id', sessionId);
     final refreshDio = Dio(baseOptions);
     final authDio = Dio(baseOptions);
     final metricsDio = Dio(baseOptions);
