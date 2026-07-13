@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/chat_websocket_state.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/websocket/extension/date_format.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
 
 class ChatBottomAreaTicketWidgets extends StatefulWidget {
@@ -58,7 +59,7 @@ class _ChatBottomAreaTicketWidgetsState
               Padding(
                 padding: EdgeInsets.only(top: 20.h),
                 child: Text(
-                  'Срок выполнения ${widget.state.socket!.deadline}',
+                  'Срок выполнения ${widget.state.socket!.deadline?.formatDate}',
                   style: TextStyle(
                     color: SupportColors.alertTextGrey,
                     height: 1.h,
