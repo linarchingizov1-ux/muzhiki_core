@@ -1,4 +1,4 @@
-enum SupportChatsEventWidgetsType { records, none }
+enum SupportChatsEventWidgetsType { records, mobileWidgets, none }
 
 class SupportChatsEventWidgets {
   final SupportChatsEventWidgetsType type;

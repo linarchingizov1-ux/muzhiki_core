@@ -79,7 +79,9 @@ class _ChatViewState extends State<ChatView> {
       value: SystemUiOverlayStyle.dark,
       child: PopScope(
         onPopInvokedWithResult: (didPop, result) {
-          widget.chatCubit.silenceRefresh();
+          if (widget.extra != SupportChatsEventWidgetsType.mobileWidgets) {
+            widget.chatCubit.silenceRefresh();
+          }
         },
         child: Scaffold(
           body: StreamBuilder(
