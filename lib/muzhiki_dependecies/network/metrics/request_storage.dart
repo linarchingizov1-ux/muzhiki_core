@@ -100,12 +100,6 @@ class RequestStorage {
 
     final jsonString = jsonEncode(batch);
 
-    if (showTalkerMetricsHttp) {
-      talker.debug(
-        "📤 Отправка RequestBatch \nразмер: ${batchItems.length} \nJSON: $jsonString",
-      );
-    }
-
     for (int attempt = 1; attempt <= 3; attempt++) {
       try {
         await authDio.post(

@@ -129,7 +129,7 @@ class NetworkFactory {
 
         printErrorMessage: true,
 
-        printRequestData: false,
+        printRequestData: showTalkerMetricsHttp ? true : false,
         printRequestExtra: false,
         printRequestHeaders: showReqHeaders,
 
@@ -144,7 +144,9 @@ class NetworkFactory {
       ),
     );
     refreshDio.interceptors.addAll([cookieManager, talkerInterceptor]);
-    metricsDio.interceptors.addAll([talkerInterceptor]);
+    metricsDio.interceptors.addAll([
+      if (showTalkerMetricsHttp) talkerInterceptor,
+    ]);
     authDio.interceptors.addAll([
       cookieManager,
       talkerInterceptor,
