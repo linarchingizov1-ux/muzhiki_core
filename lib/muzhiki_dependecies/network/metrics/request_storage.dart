@@ -136,7 +136,7 @@ class RequestStorage {
         }
         await Future.delayed(const Duration(milliseconds: 1500));
       } finally {
-        if (_metrics.isNotEmpty) _metrics.removeRange(0, batchItems.length);
+        if (_metrics.isNotEmpty) _metrics.clear();
         await sharedPreferences.setString(
           "metrics_data",
           jsonEncode(_metrics.map((e) => e.toJson()).toList()),
