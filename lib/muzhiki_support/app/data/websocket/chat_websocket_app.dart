@@ -48,7 +48,6 @@ class AppWebsocketChat extends WebSocketChat {
       },
     );
   }
-
   final int sessionChatId;
   final ChatUseCase chatUsecase;
   final SessionApp session;

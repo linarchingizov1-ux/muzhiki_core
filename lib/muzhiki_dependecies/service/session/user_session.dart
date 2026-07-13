@@ -27,7 +27,8 @@ class UserSession {
     final sessionData = sharedPreferences.getString('user_session');
 
     if (sessionData != null) {
-      return _restoreFromNewSession(sessionData);
+      _user = await _restoreFromNewSession(sessionData);
+      return _user;
     }
 
     final legacyUser = _restoreLegacyUser();
@@ -85,7 +86,6 @@ class UserSession {
       isFake: userJson['is_fake'] ?? false,
       phone: userJson['phone'] ?? '',
     );
-    _user = user;
     saveUserSession(userChanged);
   }
 
@@ -122,9 +122,11 @@ class UserSession {
       'selected_company_${user.mpid}',
     );
 
-    return user.copyWith(
+    final result = user.copyWith(
       isFirstAuth: isFirstAuth,
       selectedRolesCompany: companyId,
     );
+    _user = result;
+    return result;
   }
 }

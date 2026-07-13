@@ -132,9 +132,17 @@ class RequestStorage {
         }
         return;
       } catch (e) {
-        talker.warning("⚠️ Попытка отправки метрик $attempt из 3 провалилась.");
+        if (showTalkerMetricsHttp) {
+          talker.warning(
+            "⚠️ Попытка отправки метрик $attempt из 3 провалилась.",
+          );
+        }
+
         if (attempt == 3) {
-          talker.error("❌ Не удалось отправить батч метрик после 3 попыток.");
+          if (showTalkerMetricsHttp) {
+            talker.error("❌ Не удалось отправить батч метрик после 3 попыток.");
+          }
+
           _isSending = false;
           _lastFailedSend = DateTime.now();
           return;
