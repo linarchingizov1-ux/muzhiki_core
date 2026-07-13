@@ -40,13 +40,18 @@ class SupportView extends StatefulWidget {
   State<SupportView> createState() => _SupportViewState();
 }
 
-class _SupportViewState extends State<SupportView> {
+class _SupportViewState extends State<SupportView> with RouteAware {
   SessionRole? role;
 
   @override
   void initState() {
     super.initState();
     loadChats();
+  }
+
+  @override
+  void didPopNext() {
+    widget.chatCubit.silenceRefresh();
   }
 
   Future<void> loadChats() async {

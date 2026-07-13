@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/support_chats_event_widgets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
@@ -15,8 +14,6 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/state/attachments/attac
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
 
 String _startNewSessionText = 'Здравствуйте 👋!';
-
-Object? _chatViewExtra;
 
 class ChatView extends StatefulWidget {
   final ChatUseCase chatUseCase;
@@ -80,55 +77,44 @@ class _ChatViewState extends State<ChatView> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
-      child: PopScope(
-        canPop: true,
-        onPopInvokedWithResult: (didPop, result) {
-          if (didPop) return;
+      child: Scaffold(
+        body: StreamBuilder(
+          initialData: websocketApp.state,
+          stream: websocketApp.stream,
+          builder: (context, snapshot) {
+            return Stack(
+              children: [
+                ChatMessageWidgets(
+                  websocket: websocketApp,
+                  topInset: topInset,
+                  bottomInset: bottomInset,
+                  snapshot: snapshot,
+                  chatCubit: widget.chatCubit,
+                  directory: widget.directory,
+                ),
+                Positioned(
+                  left: 17.w,
+                  right: 17.w,
+                  top: topInset + 10.h,
+                  child: ChatHeaderWidgets(snapshot: snapshot),
+                ),
 
-          context.pop(true);
-        },
-        child: Scaffold(
-          body: StreamBuilder(
-            initialData: websocketApp.state,
-            stream: websocketApp.stream,
-            builder: (context, snapshot) {
-              return Stack(
-                children: [
-                  ChatMessageWidgets(
-                    websocket: websocketApp,
-                    topInset: topInset,
-                    bottomInset: bottomInset,
+                Positioned(
+                  left: 17.w,
+                  right: 17.w,
+                  bottom: bottomInset + 15.h,
+                  child: ChatBottomWidgets(
                     snapshot: snapshot,
-                    chatCubit: widget.chatCubit,
+                    attachmentsCubit: widget.attachmentsCubit,
+                    websocket: websocketApp,
+                    sessionId: widget.id,
+                    initMessage: _startNewSessionText,
                     directory: widget.directory,
                   ),
-                  Positioned(
-                    left: 17.w,
-                    right: 17.w,
-                    top: topInset + 10.h,
-                    child: ChatHeaderWidgets(
-                      snapshot: snapshot,
-                      chatViewExtra: _chatViewExtra,
-                    ),
-                  ),
-
-                  Positioned(
-                    left: 17.w,
-                    right: 17.w,
-                    bottom: bottomInset + 15.h,
-                    child: ChatBottomWidgets(
-                      snapshot: snapshot,
-                      attachmentsCubit: widget.attachmentsCubit,
-                      websocket: websocketApp,
-                      sessionId: widget.id,
-                      initMessage: _startNewSessionText,
-                      directory: widget.directory,
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

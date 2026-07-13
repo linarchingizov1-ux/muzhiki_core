@@ -14,9 +14,19 @@ class ChatCubit extends Cubit<ChatState> {
   final ChatUseCase chatUseCase;
   ChatCubit({required this.chatUseCase}) : super(const ChatState());
 
-  @override
-  void onError(Object error, StackTrace stackTrace) {
-    super.onError(error, stackTrace);
+  void silenceRefresh() async {
+    print("Тихо обновили чат");
+    final myChat = await chatUseCase.getMyChats(page: state.chatPage);
+    int channelId;
+    if (state.channelId != null) {
+      channelId = state.channelId!;
+    } else if (myChat.channels.isNotEmpty) {
+      channelId = myChat.channels.first.id;
+    } else {
+      channelId = 0;
+    }
+    final chats = myChat.chatsChannel(channelId: channelId);
+    emit(state.copyWith(myChat: myChat, chats: chats, channelId: channelId));
   }
 
   Future<void> getMyChats() async {
