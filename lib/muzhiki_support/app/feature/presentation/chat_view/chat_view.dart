@@ -41,7 +41,7 @@ class ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<ChatView> {
   late final AppWebsocketChat websocketApp;
-  late final SupportChatsEventWidgets chatsEventWidgets;
+  bool needUpdate = true;
 
   @override
   void initState() {
@@ -52,11 +52,14 @@ class _ChatViewState extends State<ChatView> {
       session: widget.session,
     );
     websocketApp.connect();
-    print(widget.extra != SupportChatsEventWidgetsType.mobileWidgets);
+
     switch (widget.extra) {
       case SupportChatsEventWidgets event:
         if (event.type == SupportChatsEventWidgetsType.records) {
           _startNewSessionText = event.label;
+        } else if (event.type == SupportChatsEventWidgetsType.mobileWidgets) {
+          needUpdate = false;
+          print(needUpdate);
         }
         break;
     }
@@ -80,7 +83,7 @@ class _ChatViewState extends State<ChatView> {
       value: SystemUiOverlayStyle.dark,
       child: PopScope(
         onPopInvokedWithResult: (didPop, result) {
-          if (widget.extra != SupportChatsEventWidgetsType.mobileWidgets) {
+          if (needUpdate) {
             widget.chatCubit.silenceRefresh();
           }
         },
