@@ -148,6 +148,16 @@ class RequestStorage {
     }
   }
 
+  void printLong(String text) {
+    const chunkSize = 1000;
+
+    for (var i = 0; i < text.length; i += chunkSize) {
+      final end = (i + chunkSize < text.length) ? i + chunkSize : text.length;
+
+      debugPrint(text.substring(i, end));
+    }
+  }
+
   String _getSessionId() =>
       sharedPreferences.getString('metrics_session_id') ?? '';
 }
