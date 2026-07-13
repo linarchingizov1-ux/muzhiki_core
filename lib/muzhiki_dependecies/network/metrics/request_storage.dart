@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/data/model/request_enum.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
@@ -99,7 +100,7 @@ class RequestStorage {
     ).toJson();
 
     final jsonString = jsonEncode(batch);
-
+    debugPrint(jsonString, wrapWidth: 1024);
     for (int attempt = 1; attempt <= 3; attempt++) {
       try {
         await authDio.post(

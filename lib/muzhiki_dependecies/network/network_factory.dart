@@ -129,7 +129,7 @@ class NetworkFactory {
 
         printErrorMessage: true,
 
-        printRequestData: showTalkerMetricsHttp ? true : false,
+        printRequestData: false,
         printRequestExtra: false,
         printRequestHeaders: showReqHeaders,
 
