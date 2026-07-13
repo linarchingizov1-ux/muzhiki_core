@@ -231,6 +231,8 @@ class AppWebsocketChat extends WebSocketChat {
 
       final event = map['event'];
 
+      print(event);
+
       switch (event) {
         case 'NewMessage':
           _handleNewMessage(map);

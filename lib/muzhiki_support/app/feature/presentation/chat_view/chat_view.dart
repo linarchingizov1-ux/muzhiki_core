@@ -59,7 +59,6 @@ class _ChatViewState extends State<ChatView> {
           _startNewSessionText = event.label;
         } else if (event.type == SupportChatsEventWidgetsType.mobileWidgets) {
           needUpdate = false;
-          print(needUpdate);
         }
         break;
     }
