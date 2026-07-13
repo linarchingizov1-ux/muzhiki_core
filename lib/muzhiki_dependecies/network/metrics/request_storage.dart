@@ -99,7 +99,9 @@ class RequestStorage {
     ).toJson();
 
     if (showTalkerMetricsHttp) {
-      talker.debug("📤 Отправка RequestBatch (размер: ${batchItems.length})");
+      talker.debug(
+        "📤 Отправка RequestBatch \nразмер: ${batchItems.length} \nJSON: $batch",
+      );
     }
 
     for (int attempt = 1; attempt <= 3; attempt++) {
