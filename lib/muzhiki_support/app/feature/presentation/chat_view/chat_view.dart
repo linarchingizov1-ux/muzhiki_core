@@ -77,44 +77,49 @@ class _ChatViewState extends State<ChatView> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
-      child: Scaffold(
-        body: StreamBuilder(
-          initialData: websocketApp.state,
-          stream: websocketApp.stream,
-          builder: (context, snapshot) {
-            return Stack(
-              children: [
-                ChatMessageWidgets(
-                  websocket: websocketApp,
-                  topInset: topInset,
-                  bottomInset: bottomInset,
-                  snapshot: snapshot,
-                  chatCubit: widget.chatCubit,
-                  directory: widget.directory,
-                ),
-                Positioned(
-                  left: 17.w,
-                  right: 17.w,
-                  top: topInset + 10.h,
-                  child: ChatHeaderWidgets(snapshot: snapshot),
-                ),
-
-                Positioned(
-                  left: 17.w,
-                  right: 17.w,
-                  bottom: bottomInset + 15.h,
-                  child: ChatBottomWidgets(
-                    snapshot: snapshot,
-                    attachmentsCubit: widget.attachmentsCubit,
+      child: PopScope(
+        onPopInvokedWithResult: (didPop, result) {
+          widget.chatCubit.silenceRefresh();
+        },
+        child: Scaffold(
+          body: StreamBuilder(
+            initialData: websocketApp.state,
+            stream: websocketApp.stream,
+            builder: (context, snapshot) {
+              return Stack(
+                children: [
+                  ChatMessageWidgets(
                     websocket: websocketApp,
-                    sessionId: widget.id,
-                    initMessage: _startNewSessionText,
+                    topInset: topInset,
+                    bottomInset: bottomInset,
+                    snapshot: snapshot,
+                    chatCubit: widget.chatCubit,
                     directory: widget.directory,
                   ),
-                ),
-              ],
-            );
-          },
+                  Positioned(
+                    left: 17.w,
+                    right: 17.w,
+                    top: topInset + 10.h,
+                    child: ChatHeaderWidgets(snapshot: snapshot),
+                  ),
+
+                  Positioned(
+                    left: 17.w,
+                    right: 17.w,
+                    bottom: bottomInset + 15.h,
+                    child: ChatBottomWidgets(
+                      snapshot: snapshot,
+                      attachmentsCubit: widget.attachmentsCubit,
+                      websocket: websocketApp,
+                      sessionId: widget.id,
+                      initMessage: _startNewSessionText,
+                      directory: widget.directory,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
