@@ -98,9 +98,11 @@ class RequestStorage {
       requests: batchItems,
     ).toJson();
 
+    final jsonString = jsonEncode(batch);
+
     if (showTalkerMetricsHttp) {
       talker.debug(
-        "📤 Отправка RequestBatch \nразмер: ${batchItems.length} \nJSON: $batch",
+        "📤 Отправка RequestBatch \nразмер: ${batchItems.length} \nJSON: $jsonString",
       );
     }
 
@@ -108,7 +110,7 @@ class RequestStorage {
       try {
         await authDio.post(
           "https://metrics.dev.muzhiki.pro/metrics/client-network",
-          data: batch,
+          data: jsonString,
           options: Options(extra: {"skipMetrics": true, "skipRetry": true}),
         );
 
