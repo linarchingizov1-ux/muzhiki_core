@@ -100,10 +100,13 @@ class RequestStorage {
     ).toJson();
 
     final jsonString = jsonEncode(batch);
-    const encoder = JsonEncoder.withIndent('  ');
-    final prettyJson = encoder.convert(batch);
+    if (showTalkerMetricsHttp) {
+      const encoder = JsonEncoder.withIndent('  ');
+      final prettyJson = encoder.convert(batch);
 
-    printLong(prettyJson);
+      printLong(prettyJson);
+    }
+
     for (int attempt = 1; attempt <= 3; attempt++) {
       try {
         await authDio.post(
