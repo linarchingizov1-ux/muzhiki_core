@@ -35,7 +35,11 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 17.w),
+      padding: EdgeInsets.only(
+        left: 17.w,
+        right: 17.w,
+        bottom: MediaQuery.viewPaddingOf(context).bottom + 8.w,
+      ),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(10.r),
