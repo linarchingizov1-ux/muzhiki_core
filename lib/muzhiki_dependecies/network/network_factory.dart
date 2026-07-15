@@ -160,6 +160,7 @@ class NetworkFactory {
     ]);
 
     return NetworkModel(
+      requestStorage: metricsStorage,
       uriLauncer: MuzhikiUrlLaunch.I,
       authDio: authDio,
       refreshDio: refreshDio,
