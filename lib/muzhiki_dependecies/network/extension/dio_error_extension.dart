@@ -28,6 +28,7 @@ extension DioExceptionMapper on DioException {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
+      case DioExceptionType.transformTimeout:
         return RequestError.timeout;
 
       case DioExceptionType.connectionError:
