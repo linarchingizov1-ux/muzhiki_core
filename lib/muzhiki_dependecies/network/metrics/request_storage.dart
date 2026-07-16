@@ -18,7 +18,7 @@ class RequestStorage {
   final Dio authDio;
   final bool showTalkerMetricsHttp;
   final SharedPreferences sharedPreferences;
-  final List<RequestMetric> metrics = [];
+  final List<RequestMetric> _metrics = [];
 
   static const int batchSize = 10;
   DateTime? _lastFailedSend;
@@ -34,10 +34,15 @@ class RequestStorage {
 
   Future<void> init() async {
     try {
+      final isFixed = sharedPreferences.getBool("fixErrorBool") ?? false;
+      if (!isFixed) {
+        await sharedPreferences.remove("metrics_data");
+        sharedPreferences.setBool("fixErrorBool", true);
+      }
       final data = sharedPreferences.getString("metrics_data");
       if (data == null) return;
       final json = jsonDecode(data) as List;
-      metrics.addAll(json.map((e) => RequestMetric.fromJson(e)));
+      _metrics.addAll(json.map((e) => RequestMetric.fromJson(e)));
     } catch (e) {
       await sharedPreferences.remove("metrics_data");
     }
@@ -49,20 +54,18 @@ class RequestStorage {
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
-    this.metrics.add(metrics);
+    _metrics.add(metrics);
 
     await sharedPreferences.setString(
       "metrics_data",
-      jsonEncode(this.metrics.map((e) => e.toJson()).toList()),
+      jsonEncode(_metrics.map((e) => e.toJson()).toList()),
     );
 
     if (showTalkerMetricsHttp) {
-      talker.debug(
-        '📊 Добавлена метрика. Всего накоплено: ${this.metrics.length}',
-      );
+      talker.debug('📊 Добавлена метрика. Всего накоплено: ${_metrics.length}');
     }
 
-    if (!_isSending && this.metrics.length >= batchSize) {
+    if (!_isSending && _metrics.length >= batchSize) {
       unawaited(
         sendMetrics(
           typeApp: typeApp,
@@ -81,14 +84,14 @@ class RequestStorage {
     required TypeApp typeApp,
     required AppInfoModel infoProject,
   }) async {
-    if (_isSending || metrics.isEmpty) return;
+    if (_isSending || _metrics.isEmpty) return;
     _isSending = true;
     if (_lastFailedSend != null &&
         DateTime.now().difference(_lastFailedSend!) <
             const Duration(minutes: 1)) {
       return;
     }
-    final List<RequestMetric> batchItems = metrics.take(batchSize).toList();
+    final List<RequestMetric> batchItems = _metrics.take(batchSize).toList();
     final userMpid = int.tryParse(userSession.user?.mpid ?? "");
 
     final batch = RequestBatch(
@@ -117,15 +120,15 @@ class RequestStorage {
           options: Options(extra: {"skipMetrics": true, "skipRetry": true}),
         );
 
-        metrics.removeRange(0, batchItems.length);
+        _metrics.removeRange(0, batchItems.length);
         await sharedPreferences.setString(
           "metrics_data",
-          jsonEncode(metrics.map((e) => e.toJson()).toList()),
+          jsonEncode(_metrics.map((e) => e.toJson()).toList()),
         );
 
         _isSending = false;
 
-        if (metrics.length >= batchSize) {
+        if (_metrics.length >= batchSize) {
           await sendMetrics(
             userSession: userSession,
             typeApp: typeApp,
@@ -151,10 +154,10 @@ class RequestStorage {
         }
         await Future.delayed(const Duration(milliseconds: 1500));
       } finally {
-        if (metrics.isNotEmpty) metrics.clear();
+        if (_metrics.isNotEmpty) _metrics.clear();
         await sharedPreferences.setString(
           "metrics_data",
-          jsonEncode(metrics.map((e) => e.toJson()).toList()),
+          jsonEncode(_metrics.map((e) => e.toJson()).toList()),
         );
         _isSending = false;
       }
