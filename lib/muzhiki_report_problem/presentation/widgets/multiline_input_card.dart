@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_config/colors/core_colors.dart';
 import 'package:muzhiki_core/muzhiki_config/fonts/core_fonts.dart';
 
-
-
 class MultilineInputCard extends StatelessWidget {
   final TextEditingController controller;
   final double minHeight;
@@ -41,40 +39,36 @@ class MultilineInputCard extends StatelessWidget {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Flexible(
-            child: TextField(
-              controller: controller,
-              enabled: enabled,
-              minLines: 1,
-              maxLines: maxLines,
-              maxLength: maxLength,
-              keyboardType: TextInputType.multiline,
-              style: TextStyle(
+          TextField(
+            controller: controller,
+            enabled: enabled,
+            minLines: 1,
+            maxLines: maxLines,
+            maxLength: maxLength,
+            keyboardType: TextInputType.multiline,
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: CoreFonts.medium,
+              color: CoreColors.black23,
+              height: 1.3,
+            ),
+            decoration: InputDecoration(
+              isDense: true,
+              counterText: '',
+              border: InputBorder.none,
+              hintText: hintText,
+              hintStyle: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: CoreFonts.medium,
-                color: CoreColors.black23,
+                color: CoreColors.greyText,
                 height: 1.3,
-              ),
-              decoration: InputDecoration(
-                isDense: true,
-                counterText: '',
-                border: InputBorder.none,
-                hintText: hintText,
-                hintStyle: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: CoreFonts.medium,
-                  color: CoreColors.greyText,
-                  height: 1.3,
-                ),
               ),
             ),
           ),
-          if (footer != null) ...[
-            SizedBox(height: 12.h),
-            footer!,
-          ],
+          if (footer != null) ...[SizedBox(height: 12.h), footer!],
         ],
       ),
     );
