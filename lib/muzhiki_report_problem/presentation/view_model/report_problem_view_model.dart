@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -228,6 +229,17 @@ class ReportProblemViewModel extends ChangeNotifier {
     submitError = null;
     notifyListeners();
     try {
+      log('🐞 bug_report.description: ${descriptionController.text.trim()}');
+      log('🐞 bug_report.mpid: $_mpid');
+      log('🐞 bug_report.occurred_at: $_occurredAt');
+      log('🐞 bug_report.app: $_app');
+      log('🐞 bug_report.device: ${await _device()}');
+      log('🐞 bug_report.connection: ${await _connection()}');
+      log('🐞 bug_report.console_logs: $_consoleLogs()');
+      log('🐞 bug_report.recent_requests: $_recentRequests()');
+      log('🐞 bug_report.screen: $_screenRoute()');
+      log('🐞 bug_report.screenshot: $screenshotPath');
+
       final payload = {
         'description': descriptionController.text.trim(),
         'mpid': _mpid,
@@ -240,15 +252,16 @@ class ReportProblemViewModel extends ChangeNotifier {
         'screen': _screenRoute(),
       };
 
-      final isSent = await _repository.sendBugReport(
-        payload: payload,
-        screenshotPath: screenshotPath,
-      );
+      // final isSent = await _repository.sendBugReport(
+      //   payload: payload,
+      //   screenshotPath: screenshotPath,
+      // );
 
-      if (!isSent) {
-        submitError = 'Не удалось отправить форму о проблеме';
-      }
-      isSubmitSuccess = isSent;
+      // if (!isSent) {
+      //   submitError = 'Не удалось отправить форму о проблеме';
+      // }
+      // isSubmitSuccess = isSent;
+      return;
     } on AppException catch (e) {
       submitError = e.message;
       isSubmitSuccess = false;
