@@ -60,6 +60,7 @@ class _MultilineInputCardState extends State<MultilineInputCard> {
           children: [
             TextField(
               controller: widget.controller,
+              focusNode: _focusNode,
               enabled: widget.enabled,
               minLines: 1,
               maxLines: widget.maxLines,
