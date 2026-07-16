@@ -6,6 +6,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
@@ -123,36 +124,32 @@ class NetworkFactory {
       metricsStorage: metricsStorage,
       connectivityService: connectivityService,
     );
-    final talkerInterceptor = TalkerDioLogger(
-      talker: talker,
-      settings: TalkerDioLoggerSettings(
-        enabled: enableTalker,
-        printErrorData: false,
-        printErrorHeaders: false,
-
-        printErrorMessage: true,
-
-        printRequestData: false,
-        printRequestExtra: false,
-        printRequestHeaders: showReqHeaders,
-
-        printResponseData: true,
-
-        printResponseHeaders: false,
-
-        printResponseMessage: false,
-
-        printResponseRedirects: false,
-        printResponseTime: false,
-      ),
-    );
-    refreshDio.interceptors.addAll([cookieManager, talkerInterceptor]);
+    final talkerInterceptor = !kReleaseMode
+        ? TalkerDioLogger(
+            talker: talker,
+            settings: TalkerDioLoggerSettings(
+              enabled: enableTalker,
+              printErrorData: false,
+              printErrorHeaders: false,
+              printErrorMessage: true,
+              printRequestData: false,
+              printRequestExtra: false,
+              printRequestHeaders: showReqHeaders,
+              printResponseData: true,
+              printResponseHeaders: false,
+              printResponseMessage: false,
+              printResponseRedirects: false,
+              printResponseTime: false,
+            ),
+          )
+        : null;
+    refreshDio.interceptors.addAll([cookieManager, ?talkerInterceptor]);
     metricsDio.interceptors.addAll([
-      if (showTalkerMetricsHttp) talkerInterceptor,
+      if (showTalkerMetricsHttp) ?talkerInterceptor,
     ]);
     authDio.interceptors.addAll([
       cookieManager,
-      talkerInterceptor,
+      ?talkerInterceptor,
       errorInterceptor,
       cacheInterceptor,
       fresh,
