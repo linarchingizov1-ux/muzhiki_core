@@ -11,6 +11,10 @@ class AppDialog {
     bool isDismissible = true,
     bool enableDrag = true,
     bool canPop = true,
+    Color backgroundColor = SupportColors.white,
+    BorderRadius? borderRadius,
+    EdgeInsetsGeometry? contentPadding,
+    EdgeInsetsGeometry? outerPadding,
   }) async {
     final context = MuzhikiDependencies.I.routerKey.currentContext;
     if (context == null) return null;
@@ -58,13 +62,13 @@ class AppDialog {
             canPop: canPop,
             child:
                 Padding(
-                      padding: EdgeInsets.all(8.r),
+                      padding: outerPadding ?? EdgeInsets.all(8.r),
                       child: Container(
                         width: double.infinity,
-                        padding: EdgeInsets.all(20.w),
+                        padding: contentPadding ?? EdgeInsets.all(20.w),
                         decoration: BoxDecoration(
-                          color: SupportColors.white,
-                          borderRadius: BorderRadius.circular(40.r),
+                          color: backgroundColor,
+                          borderRadius: borderRadius ?? BorderRadius.circular(40.r),
                         ),
                         child: child,
                       ),
