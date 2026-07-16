@@ -7,20 +7,13 @@ import 'package:talker/talker.dart';
 
 class ReportProblemConfig {
   final SessionApp session;
-
   final Talker talker;
-
   final AppInfoModel appInfo;
-
   final RequestStorage requestStorage;
-
   final BannerController bannerController;
-
   final Dio dio;
-
   final String appName;
-
-  final Map<String, dynamic> Function()? screenInfo;
+  final Map<String, dynamic> Function()? screenRoute;
 
   const ReportProblemConfig({
     required this.session,
@@ -30,6 +23,6 @@ class ReportProblemConfig {
     required this.bannerController,
     required this.dio,
     required this.appName,
-    this.screenInfo,
+    this.screenRoute,
   });
 }

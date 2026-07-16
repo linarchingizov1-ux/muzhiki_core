@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_core/muzhiki_config/colors/core_colors.dart';
-import 'package:muzhiki_core/muzhiki_config/fonts/core_fonts.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_fonts.dart';
 
 class MultilineInputCard extends StatefulWidget {
   final TextEditingController controller;
@@ -50,7 +50,7 @@ class _MultilineInputCardState extends State<MultilineInputCard> {
         ),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: CoreColors.white,
+          color: ReportProblemColors.white,
           borderRadius: BorderRadius.circular(21.r),
         ),
         child: Column(
@@ -68,8 +68,8 @@ class _MultilineInputCardState extends State<MultilineInputCard> {
               keyboardType: TextInputType.multiline,
               style: TextStyle(
                 fontSize: 15.sp,
-                fontWeight: CoreFonts.medium,
-                color: CoreColors.black23,
+                fontWeight: ReportProblemFonts.medium,
+                color: ReportProblemColors.black23,
                 height: 1.3,
               ),
               decoration: InputDecoration(
@@ -79,8 +79,8 @@ class _MultilineInputCardState extends State<MultilineInputCard> {
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
                   fontSize: 15.sp,
-                  fontWeight: CoreFonts.medium,
-                  color: CoreColors.greyText,
+                  fontWeight: ReportProblemFonts.medium,
+                  color: ReportProblemColors.greyText,
                   height: 1.3,
                 ),
               ),

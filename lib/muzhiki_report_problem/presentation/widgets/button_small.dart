@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:muzhiki_core/muzhiki_config/colors/core_colors.dart';
-import 'package:muzhiki_core/muzhiki_config/fonts/core_fonts.dart';
-
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_fonts.dart';
 
 enum SmallButtonMode { icon, standart }
 
@@ -29,9 +28,9 @@ class AppButtonSmall extends StatelessWidget {
     this.icon,
     required this.label,
     this.fontSize = 15,
-    this.fontWeight = CoreFonts.medium,
-    this.labelColor = CoreColors.black23,
-    this.backgroundColor = CoreColors.light,
+    this.fontWeight = ReportProblemFonts.medium,
+    this.labelColor = ReportProblemColors.black23,
+    this.backgroundColor = ReportProblemColors.light,
     this.radius = 30,
     this.labelPadding,
     this.onTap,
@@ -56,25 +55,25 @@ class AppButtonSmall extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius.r),
         onTap: onTap,
         child: Padding(
-          padding: labelPadding ??
+          padding:
+              labelPadding ??
               EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
           child: switch (mode) {
             SmallButtonMode.standart => text,
             SmallButtonMode.icon => Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null &&
-                      alignment == AlignmentButtonIcon.start) ...[
-                    icon!,
-                    SizedBox(width: 6.w),
-                  ],
-                  text,
-                  if (icon != null && alignment == AlignmentButtonIcon.end) ...[
-                    SizedBox(width: 6.w),
-                    icon!,
-                  ],
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null && alignment == AlignmentButtonIcon.start) ...[
+                  icon!,
+                  SizedBox(width: 6.w),
                 ],
-              ),
+                text,
+                if (icon != null && alignment == AlignmentButtonIcon.end) ...[
+                  SizedBox(width: 6.w),
+                  icon!,
+                ],
+              ],
+            ),
           },
         ),
       ),

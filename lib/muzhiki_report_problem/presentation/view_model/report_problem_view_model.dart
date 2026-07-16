@@ -6,7 +6,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_config.dart';
-import 'package:muzhiki_core/muzhiki_report_problem/domain/repository/bug_report_repository.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/domain/repository/report_problem_repository.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/service/network_signal_info_service.dart';
 import 'package:path/path.dart' as p;
 import 'package:talker/talker.dart';
@@ -14,13 +14,13 @@ import 'package:talker/talker.dart';
 class ReportProblemViewModel extends ChangeNotifier {
   ReportProblemViewModel({
     required this.config,
-    required BugReportRepository repository,
+    required ReportProblemRepository repository,
   }) : _repository = repository {
     descriptionController.addListener(notifyListeners);
   }
 
   final ReportProblemConfig config;
-  final BugReportRepository _repository;
+  final ReportProblemRepository _repository;
 
   bool isSubmitting = false;
   bool? isSubmitSuccess;
@@ -149,7 +149,7 @@ class ReportProblemViewModel extends ChangeNotifier {
   }
 
   Map<String, dynamic> _screenRoute() {
-    return config.screenInfo?.call() ??
+    return config.screenRoute?.call() ??
         {'route': null, 'name': null, 'previous_route': null};
   }
 

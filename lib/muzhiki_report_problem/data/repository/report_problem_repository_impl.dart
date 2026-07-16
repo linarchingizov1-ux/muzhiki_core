@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_path.dart';
-import 'package:muzhiki_core/muzhiki_report_problem/domain/repository/bug_report_repository.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/domain/repository/report_problem_repository.dart';
 
-class BugReportRepositoryImpl implements BugReportRepository {
-  BugReportRepositoryImpl(this._dio);
+class ReportProblemRepositoryImpl implements ReportProblemRepository {
+  ReportProblemRepositoryImpl(this._dio);
 
   final Dio _dio;
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_core/muzhiki_config/colors/core_colors.dart';
-import 'package:muzhiki_core/muzhiki_config/fonts/core_fonts.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_fonts.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
 
@@ -30,16 +30,16 @@ class SuccessDialog extends StatelessWidget {
           style: TextStyle(
             fontSize: 18.sp,
             height: 1.3,
-            fontWeight: CoreFonts.semiBold,
-            color: CoreColors.black23,
+            fontWeight: ReportProblemFonts.semiBold,
+            color: ReportProblemColors.black23,
           ),
         ),
         SizedBox(height: 27.h),
         AppButton(
           mode: ButtonMode.classic,
           label: 'Отлично',
-          backgroundColor: CoreColors.black23,
-          labelColor: CoreColors.white,
+          backgroundColor: ReportProblemColors.black23,
+          labelColor: ReportProblemColors.white,
           borderRadius: 23,
           onPressed: () => context.pop(),
         ),
