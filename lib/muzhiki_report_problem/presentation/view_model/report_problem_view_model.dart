@@ -78,6 +78,9 @@ class ReportProblemViewModel extends ChangeNotifier {
         // signal_strength dBm активной симкарты
         signalStrength = await NetworkSignalInfoService.cellularDbm();
       case 'wifi':
+        final sims = await NetworkSignalInfoService.simsInfo();
+        carrier = sims.map(_simLabel).join(' | ');
+        signalStrength = await NetworkSignalInfoService.cellularDbm();
         signalStrength = await NetworkSignalInfoService.wifiRssi();
     }
 
