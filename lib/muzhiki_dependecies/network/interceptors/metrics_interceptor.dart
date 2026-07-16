@@ -76,8 +76,6 @@ class MetricsInterceptor extends Interceptor {
     if (context.completed) return;
     context.completed = true;
     context.stopwatch.stop();
-    print("DATA TYPE: ${request.data.runtimeType}");
-    print("IS FORMDATA: ${request.data is FormData}");
     final metric = RequestMetric(
       startedAt: context.startedAt,
 
