@@ -46,13 +46,12 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
             MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
           ),
         ),
-        contentPadding: EdgeInsets.only(
+        outerPadding: EdgeInsets.only(
           left: 8.w,
           right: 8.w,
           top: 8.h,
           bottom: 20.h,
         ),
-        outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: MediaQuery.viewInsetsOf(context).bottom + 10.h),
         child: ReportProblemDialog(config: widget.config),
       );
     } finally {

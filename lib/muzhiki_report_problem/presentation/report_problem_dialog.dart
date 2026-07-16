@@ -62,12 +62,6 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
             MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
           ),
         ),
-        contentPadding: EdgeInsets.only(
-          left: 8.w,
-          right: 8.w,
-          top: 8.h,
-          bottom: 20.h,
-        ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
         child: const SuccessDialog(title: 'Форма отправлена'),
       );
@@ -82,12 +76,6 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
           bottom: Radius.circular(
             MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
           ),
-        ),
-        contentPadding: EdgeInsets.only(
-          left: 8.w,
-          right: 8.w,
-          top: 8.h,
-          bottom: 20.h,
         ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
         child: ErrorDialog(
@@ -110,231 +98,239 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Consumer<ReportProblemViewModel>(
           builder: (context, viewModel, child) => SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: AppButtonSmall(
-                    mode: SmallButtonMode.standart,
-                    label: 'Отменить',
-                    fontSize: 15,
-                    fontWeight: CoreFonts.medium,
-                    labelColor: CoreColors.alertTextGrey,
-                    backgroundColor: CoreColors.greyLight.withValues(
-                      alpha: 0.3,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: AppButtonSmall(
+                      mode: SmallButtonMode.standart,
+                      label: 'Отменить',
+                      fontSize: 15,
+                      fontWeight: CoreFonts.medium,
+                      labelColor: CoreColors.alertTextGrey,
+                      backgroundColor: CoreColors.greyLight.withValues(
+                        alpha: 0.3,
+                      ),
+                      labelPadding: EdgeInsets.symmetric(
+                        vertical: 5.h,
+                        horizontal: 15.w,
+                      ),
+                      onTap: () => context.pop(),
                     ),
-                    labelPadding: EdgeInsets.symmetric(
-                      vertical: 5.h,
-                      horizontal: 15.w,
+                  ),
+                  SizedBox(height: 21.h),
+                  Center(
+                    child: SvgPicture.asset(
+                      ReportProblemAssets.vibrateSVG,
+                      width: 122.r,
+                      height: 122.r,
                     ),
-                    onTap: () => context.pop(),
                   ),
-                ),
-                SizedBox(height: 21.h),
-                Center(
-                  child: SvgPicture.asset(
-                    ReportProblemAssets.vibrateSVG,
-                    width: 122.r,
-                    height: 122.r,
+                  SizedBox(height: 21.h),
+                  Text(
+                    'Сообщить о проблеме',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      height: 1.3,
+                      fontWeight: CoreFonts.semiBold,
+                      color: CoreColors.black23,
+                    ),
                   ),
-                ),
-                SizedBox(height: 21.h),
-                Text(
-                  'Сообщить о проблеме',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    height: 1.3,
-                    fontWeight: CoreFonts.semiBold,
-                    color: CoreColors.black23,
+                  SizedBox(height: 12.h),
+                  Text(
+                    'Это окно открылось потому что вы потрясли устройство',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: CoreFonts.medium,
+                      height: 1.3,
+                      color: CoreColors.alertTextGrey,
+                    ),
                   ),
-                ),
-                SizedBox(height: 12.h),
-                Text(
-                  'Это окно открылось потому что вы потрясли устройство',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: CoreFonts.medium,
-                    height: 1.3,
-                    color: CoreColors.alertTextGrey,
-                  ),
-                ),
-                SizedBox(height: 27.h),
-                MultilineInputCard(
-                  controller: viewModel.descriptionController,
-                  minHeight: 190,
-                  maxHeight: 400,
-                  maxLines: 10,
-                  maxLength: 5000,
-                  enabled: !viewModel.isSubmitting,
-                  hintText: 'Опишите проблему',
-                  footer: SizedBox(
-                    width: double.infinity,
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.end,
-                      children: [
-                        AppButtonSmall(
-                          mode: SmallButtonMode.icon,
-                          alignment: AlignmentButtonIcon.start,
-                          icon: SvgPicture.asset(
-                            ReportProblemAssets.screpka,
-                            width: 16.r,
-                            height: 16.r,
-                            colorFilter: const ColorFilter.mode(
-                              CoreColors.blood,
-                              BlendMode.srcIn,
+                  SizedBox(height: 27.h),
+                  MultilineInputCard(
+                    controller: viewModel.descriptionController,
+                    minHeight: 190,
+                    maxHeight: 400,
+                    maxLines: 10,
+                    maxLength: 5000,
+                    enabled: !viewModel.isSubmitting,
+                    hintText: 'Опишите проблему',
+                    footer: SizedBox(
+                      width: double.infinity,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.end,
+                        children: [
+                          AppButtonSmall(
+                            mode: SmallButtonMode.icon,
+                            alignment: AlignmentButtonIcon.start,
+                            icon: SvgPicture.asset(
+                              ReportProblemAssets.screpka,
+                              width: 16.r,
+                              height: 16.r,
+                              colorFilter: const ColorFilter.mode(
+                                CoreColors.blood,
+                                BlendMode.srcIn,
+                              ),
                             ),
+                            label: 'Добавить скриншот',
+                            fontSize: 15,
+                            fontWeight: CoreFonts.medium,
+                            labelColor: CoreColors.alertTextGrey,
+                            backgroundColor: CoreColors.appBackgroud,
+                            radius: 20,
+                            labelPadding: EdgeInsets.symmetric(
+                              vertical: 5.h,
+                              horizontal: 12.w,
+                            ),
+                            onTap: () async {
+                              if (viewModel.isSubmitting) return;
+                              final picked = await ImagePicker().pickImage(
+                                source: ImageSource.gallery,
+                              );
+                              if (picked == null) return;
+                              await viewModel.setScreenshot(picked.path);
+                            },
                           ),
-                          label: 'Добавить скриншот',
-                          fontSize: 15,
-                          fontWeight: CoreFonts.medium,
-                          labelColor: CoreColors.alertTextGrey,
-                          backgroundColor: CoreColors.appBackgroud,
-                          radius: 20,
-                          labelPadding: EdgeInsets.symmetric(
-                            vertical: 5.h,
-                            horizontal: 12.w,
-                          ),
-                          onTap: () async {
-                            if (viewModel.isSubmitting) return;
-                            final picked = await ImagePicker().pickImage(
-                              source: ImageSource.gallery,
-                            );
-                            if (picked == null) return;
-                            await viewModel.setScreenshot(picked.path);
-                          },
-                        ),
-                        if (viewModel.screenshotPath != null) ...[
-                          SizedBox(height: 10.w),
-                          SizedBox(
-                            width: 90.w,
-                            height: 90.h,
-                            child: Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: Hero(
-                                    tag: viewModel.screenshotPath!,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(21.r),
-                                      child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(
-                                            PageRouteBuilder(
-                                              opaque: false,
-                                              maintainState: true,
-                                              transitionDuration:
-                                                  const Duration(
-                                                    milliseconds: 350,
-                                                  ),
-                                              reverseTransitionDuration:
-                                                  const Duration(
-                                                    milliseconds: 350,
-                                                  ),
-                                              transitionsBuilder:
-                                                  (
-                                                    context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child,
-                                                  ) {
-                                                    return FadeTransition(
-                                                      opacity: CurvedAnimation(
-                                                        parent: animation,
-                                                        curve: Curves
-                                                            .easeInOutCubic,
-                                                      ),
-                                                      child: child,
-                                                    );
-                                                  },
-                                              pageBuilder:
-                                                  (
-                                                    context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                  ) {
-                                                    return PhotoViewerPage(
-                                                      images: [
-                                                        ViewerImageItem.filePath(
-                                                          viewModel
-                                                              .screenshotPath!,
+                          if (viewModel.screenshotPath != null) ...[
+                            SizedBox(height: 10.w),
+                            SizedBox(
+                              width: 90.w,
+                              height: 90.h,
+                              child: Stack(
+                                children: [
+                                  Positioned.fill(
+                                    child: Hero(
+                                      tag: viewModel.screenshotPath!,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          21.r,
+                                        ),
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              PageRouteBuilder(
+                                                opaque: false,
+                                                maintainState: true,
+                                                transitionDuration:
+                                                    const Duration(
+                                                      milliseconds: 350,
+                                                    ),
+                                                reverseTransitionDuration:
+                                                    const Duration(
+                                                      milliseconds: 350,
+                                                    ),
+                                                transitionsBuilder:
+                                                    (
+                                                      context,
+                                                      animation,
+                                                      secondaryAnimation,
+                                                      child,
+                                                    ) {
+                                                      return FadeTransition(
+                                                        opacity: CurvedAnimation(
+                                                          parent: animation,
+                                                          curve: Curves
+                                                              .easeInOutCubic,
                                                         ),
-                                                      ],
-                                                    );
-                                                  },
-                                            ),
-                                          );
-                                        },
-                                        child: Image.file(
-                                          File(viewModel.screenshotPath!),
-                                          fit: BoxFit.cover,
+                                                        child: child,
+                                                      );
+                                                    },
+                                                pageBuilder:
+                                                    (
+                                                      context,
+                                                      animation,
+                                                      secondaryAnimation,
+                                                    ) {
+                                                      return PhotoViewerPage(
+                                                        images: [
+                                                          ViewerImageItem.filePath(
+                                                            viewModel
+                                                                .screenshotPath!,
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                              ),
+                                            );
+                                          },
+                                          child: Image.file(
+                                            File(viewModel.screenshotPath!),
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-                                  right: 6.r,
-                                  top: 6.r,
-                                  child: InkWell(
-                                    onTap: () => viewModel.setScreenshot(null),
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      padding: EdgeInsets.all(6.r),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: CoreColors.black23.withValues(
-                                          alpha: 0.65,
+                                  Positioned(
+                                    right: 6.r,
+                                    top: 6.r,
+                                    child: InkWell(
+                                      onTap: () =>
+                                          viewModel.setScreenshot(null),
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        padding: EdgeInsets.all(6.r),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: CoreColors.black23.withValues(
+                                            alpha: 0.65,
+                                          ),
                                         ),
-                                      ),
-                                      child: SvgPicture.asset(
-                                        ReportProblemAssets.close,
-                                        width: 8.w,
-                                        height: 8.h,
-                                        colorFilter: const ColorFilter.mode(
-                                          CoreColors.white,
-                                          BlendMode.srcIn,
+                                        child: SvgPicture.asset(
+                                          ReportProblemAssets.close,
+                                          width: 8.w,
+                                          height: 8.h,
+                                          colorFilter: const ColorFilter.mode(
+                                            CoreColors.white,
+                                            BlendMode.srcIn,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 27.h),
-                Text(
-                  'Данные о вашем устройстве и действиях будут отправлены автоматически',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    height: 1.3,
-                    fontWeight: CoreFonts.medium,
-                    color: CoreColors.alertTextGrey,
+                  SizedBox(height: 27.h),
+                  Text(
+                    'Данные о вашем устройстве и действиях будут отправлены автоматически',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      height: 1.3,
+                      fontWeight: CoreFonts.medium,
+                      color: CoreColors.alertTextGrey,
+                    ),
                   ),
-                ),
-                SizedBox(height: 27.h),
-                AppButton(
-                  mode: ButtonMode.classic,
-                  label: viewModel.isSubmitSuccess == false
-                      ? 'Повторить'
-                      : 'Отправить',
-                  isLoading: viewModel.isSubmitting,
-                  backgroundColor: viewModel.isValid
-                      ? CoreColors.black23
-                      : CoreColors.light,
-                  labelColor: viewModel.isValid
-                      ? CoreColors.white
-                      : CoreColors.black23,
-                  borderRadius: 20,
-                  onPressed: viewModel.isValid ? () => _submit() : () {},
-                ),
-              ],
+                  SizedBox(height: 27.h),
+                  AppButton(
+                    mode: ButtonMode.classic,
+                    label: viewModel.isSubmitSuccess == false
+                        ? 'Повторить'
+                        : 'Отправить',
+                    isLoading: viewModel.isSubmitting,
+                    backgroundColor: viewModel.isValid
+                        ? CoreColors.black23
+                        : CoreColors.light,
+                    labelColor: viewModel.isValid
+                        ? CoreColors.white
+                        : CoreColors.black23,
+                    borderRadius: 20,
+                    onPressed: viewModel.isValid ? () => _submit() : () {},
+                  ),
+                ],
+              ),
             ),
           ),
         ),

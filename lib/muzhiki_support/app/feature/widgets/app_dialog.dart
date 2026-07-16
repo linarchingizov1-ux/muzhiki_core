@@ -13,7 +13,6 @@ class AppDialog {
     bool canPop = true,
     Color backgroundColor = SupportColors.white,
     BorderRadius? borderRadius,
-    EdgeInsetsGeometry? contentPadding,
     EdgeInsetsGeometry? outerPadding,
   }) async {
     final context = MuzhikiDependencies.I.routerKey.currentContext;
@@ -65,10 +64,11 @@ class AppDialog {
                       padding: outerPadding ?? EdgeInsets.all(8.r),
                       child: Container(
                         width: double.infinity,
-                        padding: contentPadding ?? EdgeInsets.all(20.w),
+                        padding: EdgeInsets.all(20.w),
                         decoration: BoxDecoration(
                           color: backgroundColor,
-                          borderRadius: borderRadius ?? BorderRadius.circular(40.r),
+                          borderRadius:
+                              borderRadius ?? BorderRadius.circular(40.r),
                         ),
                         child: child,
                       ),
