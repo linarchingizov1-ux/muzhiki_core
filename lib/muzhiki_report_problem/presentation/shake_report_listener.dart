@@ -52,7 +52,7 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
           top: 8.h,
           bottom: 20.h,
         ),
-        outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
+        outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: MediaQuery.viewInsetsOf(context).bottom + 10.h),
         child: ReportProblemDialog(config: widget.config),
       );
     } finally {
