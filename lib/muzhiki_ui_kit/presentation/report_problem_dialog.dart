@@ -314,20 +314,23 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                     ),
                   ),
                   SizedBox(height: 27.h),
-                  AppButton(
-                    mode: ButtonMode.classic,
-                    label: viewModel.isSubmitSuccess == false
-                        ? 'Повторить'
-                        : 'Отправить',
-                    isLoading: viewModel.isSubmitting,
-                    backgroundColor: viewModel.isValid
-                        ? CoreColors.black23
-                        : CoreColors.light,
-                    labelColor: viewModel.isValid
-                        ? CoreColors.white
-                        : CoreColors.black23,
-                    borderRadius: 20,
-                    onPressed: viewModel.isValid ? () => _submit() : () {},
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: AppButton(
+                      mode: ButtonMode.classic,
+                      label: viewModel.isSubmitSuccess == false
+                          ? 'Повторить'
+                          : 'Отправить',
+                      isLoading: viewModel.isSubmitting,
+                      backgroundColor: viewModel.isValid
+                          ? CoreColors.black23
+                          : CoreColors.light,
+                      labelColor: viewModel.isValid
+                          ? CoreColors.white
+                          : CoreColors.black23,
+                      borderRadius: 20,
+                      onPressed: viewModel.isValid ? () => _submit() : () {},
+                    ),
                   ),
                 ],
               ),
