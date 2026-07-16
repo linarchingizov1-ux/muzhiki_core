@@ -1,0 +1,31 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_path.dart';
+import 'package:muzhiki_core/muzhiki_ui_kit/domain/repository/bug_report_repository.dart';
+
+class BugReportRepositoryImpl implements BugReportRepository {
+  BugReportRepositoryImpl(this._dio);
+
+  final Dio _dio;
+
+  @override
+  Future<bool> sendBugReport({
+    required Map<String, dynamic> payload,
+    String? screenshotPath,
+  }) async {
+    final response = await _dio.post(
+      ReportProblemPath.bugReports,
+      data: FormData.fromMap({
+        'payload': MultipartFile.fromString(
+          jsonEncode(payload),
+          contentType: DioMediaType('application', 'json'),
+        ),
+        if (screenshotPath != null)
+          'screenshot': await MultipartFile.fromFile(screenshotPath),
+      }),
+    );
+
+    return response.data['success'] == true;
+  }
+}
