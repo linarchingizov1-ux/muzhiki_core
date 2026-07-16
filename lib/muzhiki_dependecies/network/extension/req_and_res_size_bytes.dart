@@ -32,28 +32,10 @@ extension DioRequestExtension on RequestOptions {
     if (data == null) return null;
 
     if (data is FormData) {
-      final formData = data as FormData;
-
-      int size = 0;
-
-      for (final field in formData.fields) {
-        size += utf8.encode(field.key).length;
-        size += utf8.encode(field.value).length;
-      }
-
-      for (final file in formData.files) {
-        size += utf8.encode(file.key).length;
-
-        final multipart = file.value;
-        if (multipart.length >= 0) {
-          size += multipart.length;
-        }
-      }
-
-      return size;
+      return null;
+    } else {
+      return utf8.encode(jsonEncode(data)).length;
     }
-
-    return utf8.encode(jsonEncode(data)).length;
   }
 
   RequestMethod get requestMethod {
