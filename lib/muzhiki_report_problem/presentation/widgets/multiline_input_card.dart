@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_config/colors/core_colors.dart';
 import 'package:muzhiki_core/muzhiki_config/fonts/core_fonts.dart';
 
-class MultilineInputCard extends StatelessWidget {
+class MultilineInputCard extends StatefulWidget {
   final TextEditingController controller;
   final double minHeight;
   final double maxHeight;
@@ -26,50 +26,70 @@ class MultilineInputCard extends StatelessWidget {
   });
 
   @override
+  State<MultilineInputCard> createState() => _MultilineInputCardState();
+}
+
+class _MultilineInputCardState extends State<MultilineInputCard> {
+  final _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: BoxConstraints(
-        minHeight: minHeight.h,
-        maxHeight: maxHeight.h,
-      ),
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: CoreColors.white,
-        borderRadius: BorderRadius.circular(21.r),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: controller,
-            enabled: enabled,
-            minLines: 1,
-            maxLines: maxLines,
-            maxLength: maxLength,
-            keyboardType: TextInputType.multiline,
-            style: TextStyle(
-              fontSize: 15.sp,
-              fontWeight: CoreFonts.medium,
-              color: CoreColors.black23,
-              height: 1.3,
-            ),
-            decoration: InputDecoration(
-              isDense: true,
-              counterText: '',
-              border: InputBorder.none,
-              hintText: hintText,
-              hintStyle: TextStyle(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: widget.enabled ? () => _focusNode.requestFocus() : null,
+      child: Container(
+        constraints: BoxConstraints(
+          minHeight: widget.minHeight.h,
+          maxHeight: widget.maxHeight.h,
+        ),
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: CoreColors.white,
+          borderRadius: BorderRadius.circular(21.r),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: widget.controller,
+              enabled: widget.enabled,
+              minLines: 1,
+              maxLines: widget.maxLines,
+              maxLength: widget.maxLength,
+              keyboardType: TextInputType.multiline,
+              style: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: CoreFonts.medium,
-                color: CoreColors.greyText,
+                color: CoreColors.black23,
                 height: 1.3,
               ),
+              decoration: InputDecoration(
+                isDense: true,
+                counterText: '',
+                border: InputBorder.none,
+                hintText: widget.hintText,
+                hintStyle: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: CoreFonts.medium,
+                  color: CoreColors.greyText,
+                  height: 1.3,
+                ),
+              ),
             ),
-          ),
-          if (footer != null) ...[SizedBox(height: 12.h), footer!],
-        ],
+            if (widget.footer != null) ...[
+              SizedBox(height: 12.h),
+              widget.footer!,
+            ],
+          ],
+        ),
       ),
     );
   }
