@@ -34,7 +34,7 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
     _detector = ShakeDetector.autoStart(
       minimumShakeCount: 2,
       shakeThresholdGravity: isIos ? 1.7 : 2.3,
-      shakeSlopTimeMS: isIos ? 100 : 300,
+      shakeSlopTimeMS: isIos ? 100 : 500,
       onPhoneShake: (_) => _openDialog(),
     );
   }
