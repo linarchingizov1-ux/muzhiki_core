@@ -243,10 +243,10 @@ class ReportProblemViewModel extends ChangeNotifier {
         'screen': _screenRoute(),
       };
 
-      final isSent = await _repository.sendBugReport(
-        payload: payload,
-        screenshotPath: screenshotPath,
-      );
+      // final isSent = await _repository.sendBugReport(
+      //   payload: payload,
+      //   screenshotPath: screenshotPath,
+      // );
 
       // if (!isSent) {
       //   submitError = 'Не удалось отправить форму о проблеме';
