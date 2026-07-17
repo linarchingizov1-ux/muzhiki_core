@@ -7,11 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:muzhiki_core/muzhiki_core.dart';
-import 'package:muzhiki_core/muzhiki_support/app/data/model/view_image_item_model.dart';
-import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
-import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/photo_view_widget.dart';
-import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_assets.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_config.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/data/repository/report_problem_repository_impl.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/presentation/view_model/report_problem_view_model.dart';
@@ -20,6 +17,9 @@ import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/button_
 import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/error_dialog.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/multiline_input_card.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/success_dialog.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/model/view_image_item_model.dart';
+import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
+import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/photo_view_widget.dart';
 import 'package:provider/provider.dart';
 
 class ReportProblemDialog extends StatefulWidget {
@@ -194,7 +194,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                 source: ImageSource.gallery,
                               );
                               if (picked == null) return;
-                              await viewModel.setScreenshot(picked.path);
+                              await viewModel.setScreenshot(picked);
                             },
                           ),
                           if (viewModel.screenshotPath != null) ...[

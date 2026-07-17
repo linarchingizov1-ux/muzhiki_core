@@ -23,7 +23,11 @@ class ReportProblemViewModel extends ChangeNotifier {
   bool? isSubmitSuccess;
   String? submitError;
 
+  final descriptionController = TextEditingController();
+
   File? _compressedScreenshot;
+
+  String? screenshotPath;
 
   static const _maxScreenshotBytes = 10 * 1024 * 1024;
 
@@ -167,29 +171,24 @@ class ReportProblemViewModel extends ChangeNotifier {
     null => 'info',
   };
 
-  final descriptionController = TextEditingController();
-
-  String? screenshotPath;
-
-  Future<void> setScreenshot(String? pickedPath) async {
+  Future<void> setScreenshot(XFile? pickedFile) async {
     await _deleteCompressedScreenshot();
 
-    if (pickedPath == null) {
+    if (pickedFile == null) {
       screenshotPath = null;
       notifyListeners();
       return;
     }
 
-    final source = File(pickedPath);
-
     final targetPath = path.join(
-      source.parent.path,
+      path.dirname(pickedFile.path),
       'bug_report_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
+
     XFile? compressed;
     try {
       compressed = await FlutterImageCompress.compressAndGetFile(
-        source.path,
+        pickedFile.path,
         targetPath,
         minWidth: 1920,
         minHeight: 1080,
@@ -200,34 +199,37 @@ class ReportProblemViewModel extends ChangeNotifier {
       compressed = null;
     }
 
-    final file = compressed == null ? source : File(compressed.path);
+    final compressedFile = compressed == null ? null : File(compressed.path);
+    final resultFile = compressed ?? pickedFile;
 
-    if (await file.length() > _maxScreenshotBytes) {
-      if (compressed != null && await file.exists()) {
-        await file.delete();
+    if (await resultFile.length() > _maxScreenshotBytes) {
+      if (compressedFile != null && await compressedFile.exists()) {
+        await compressedFile.delete();
       }
+
       screenshotPath = null;
       _compressedScreenshot = null;
       notifyListeners();
+
       config.bannerController.show(
         message: 'Файл не может весить больше 10 МБ',
       );
+
       return;
     }
 
-    screenshotPath = file.path;
-    _compressedScreenshot = compressed == null ? null : file;
+    screenshotPath = resultFile.path;
+    _compressedScreenshot = compressedFile;
     notifyListeners();
   }
 
   Future<void> _deleteCompressedScreenshot() async {
     final file = _compressedScreenshot;
+    _compressedScreenshot = null;
 
     if (file != null && await file.exists()) {
       await file.delete();
     }
-
-    _compressedScreenshot = null;
   }
 
   bool get isValid => descriptionController.text.trim().isNotEmpty;
