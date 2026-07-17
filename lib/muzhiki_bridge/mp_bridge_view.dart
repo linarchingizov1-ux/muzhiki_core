@@ -58,9 +58,6 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     if (widget.initialUrl.contains("bus-wa")) {
       Permission.camera.request();
     }
-    if (widget.initialUrl.contains("forms.yandex.ru")) {
-      print("ЭТО КОНКУРС ЗОЛОТЫ ЩПАТЕЛИ");
-    }
     bridgeAuthUsecase = BridgeAuthUsecase(
       repository: BridgeAuthRepositoryImpl(widget.session),
     );
