@@ -72,14 +72,8 @@ class ReportProblemViewModel extends ChangeNotifier {
           carrier = await NetworkSignalInfoService.carrierName();
         }
         // signal_strength dBm активной симкарты
-        carrier = sims.map(_simLabel).join(' | ');
-        carrier = await NetworkSignalInfoService.carrierName();
         signalStrength = await NetworkSignalInfoService.cellularDbm();
       case 'wifi':
-        final sims = await NetworkSignalInfoService.simsInfo();
-        carrier = sims.map(_simLabel).join(' | ');
-        carrier = await NetworkSignalInfoService.carrierName();
-        signalStrength = await NetworkSignalInfoService.cellularDbm();
         signalStrength = await NetworkSignalInfoService.wifiRssi();
     }
 
@@ -243,16 +237,15 @@ class ReportProblemViewModel extends ChangeNotifier {
         'screen': _screenRoute(),
       };
 
-      // final isSent = await _repository.sendBugReport(
-      //   payload: payload,
-      //   screenshotPath: screenshotPath,
-      // );
+      final isSent = await _repository.sendBugReport(
+        payload: payload,
+        screenshotPath: screenshotPath,
+      );
 
-      // if (!isSent) {
-      //   submitError = 'Не удалось отправить форму о проблеме';
-      // }
-      // isSubmitSuccess = isSent;
-      return;
+      if (!isSent) {
+        submitError = 'Не удалось отправить форму о проблеме';
+      }
+      isSubmitSuccess = isSent;
     } on AppException catch (e) {
       submitError = e.message;
       isSubmitSuccess = false;
