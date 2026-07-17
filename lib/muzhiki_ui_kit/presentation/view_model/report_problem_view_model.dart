@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/network_signal_info_service.dart';
 import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_config.dart';
 import 'package:muzhiki_core/muzhiki_ui_kit/domain/repository/bug_report_repository.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/network_signal_info_service.dart';
 import 'package:path/path.dart' as p;
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:talker/talker.dart';
 
 class ReportProblemViewModel extends ChangeNotifier {
@@ -72,8 +72,14 @@ class ReportProblemViewModel extends ChangeNotifier {
           carrier = await NetworkSignalInfoService.carrierName();
         }
         // signal_strength dBm активной симкарты
+        carrier = sims.map(_simLabel).join(' | ');
+        carrier = await NetworkSignalInfoService.carrierName();
         signalStrength = await NetworkSignalInfoService.cellularDbm();
       case 'wifi':
+        final sims = await NetworkSignalInfoService.simsInfo();
+        carrier = sims.map(_simLabel).join(' | ');
+        carrier = await NetworkSignalInfoService.carrierName();
+        signalStrength = await NetworkSignalInfoService.cellularDbm();
         signalStrength = await NetworkSignalInfoService.wifiRssi();
     }
 
@@ -242,10 +248,11 @@ class ReportProblemViewModel extends ChangeNotifier {
         screenshotPath: screenshotPath,
       );
 
-      if (!isSent) {
-        submitError = 'Не удалось отправить форму о проблеме';
-      }
-      isSubmitSuccess = isSent;
+      // if (!isSent) {
+      //   submitError = 'Не удалось отправить форму о проблеме';
+      // }
+      // isSubmitSuccess = isSent;
+      return;
     } on AppException catch (e) {
       submitError = e.message;
       isSubmitSuccess = false;
