@@ -6,8 +6,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_signal_info_service.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_config.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/domain/repository/report_problem_repository.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_config.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/domain/repository/report_problem_repository.dart';
 import 'package:path/path.dart' as path;
 import 'package:talker/talker.dart';
 
@@ -164,16 +164,16 @@ class ReportProblemViewModel extends ChangeNotifier {
 
   String? screenshotPath;
 
-  Future<void> setScreenshot(String? screenshotPath) async {
+  Future<void> setScreenshot(String? pickedPath) async {
     await _deleteCompressedScreenshot();
 
-    if (screenshotPath == null) {
+    if (pickedPath == null) {
       screenshotPath = null;
       notifyListeners();
       return;
     }
 
-    final source = File(screenshotPath);
+    final source = File(pickedPath);
 
     final targetPath = path.join(
       source.parent.path,

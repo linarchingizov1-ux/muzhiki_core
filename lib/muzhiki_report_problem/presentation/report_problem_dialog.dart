@@ -10,16 +10,16 @@ import 'package:muzhiki_core/muzhiki_core.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/view_image_item_model.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/photo_view_widget.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_colors.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_assets.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_config.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/data/repository/report_problem_repository_impl.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/presentation/view_model/report_problem_view_model.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/presentation/widgets/app_standart_dialog.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/presentation/widgets/button_small.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/presentation/widgets/error_dialog.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/presentation/widgets/multiline_input_card.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/presentation/widgets/success_dialog.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_assets.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_config.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/data/repository/report_problem_repository_impl.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/presentation/view_model/report_problem_view_model.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/app_standart_dialog.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/button_small.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/error_dialog.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/multiline_input_card.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/success_dialog.dart';
 import 'package:provider/provider.dart';
 
 class ReportProblemDialog extends StatefulWidget {

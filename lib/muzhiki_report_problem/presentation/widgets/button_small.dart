@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_colors.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
 
 enum SmallButtonMode { icon, standart }
 

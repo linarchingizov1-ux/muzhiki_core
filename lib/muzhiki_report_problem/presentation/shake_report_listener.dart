@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_core.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_colors.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_config.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/presentation/report_problem_dialog.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/presentation/widgets/app_standart_dialog.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_config.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/presentation/report_problem_dialog.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/app_standart_dialog.dart';
 import 'package:shake/shake.dart';
 
 class ShakeReportListener extends StatefulWidget {

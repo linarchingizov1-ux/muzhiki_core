@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_colors.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_assets.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_assets.dart';
 
 class SuccessDialog extends StatelessWidget {
   final String title;
