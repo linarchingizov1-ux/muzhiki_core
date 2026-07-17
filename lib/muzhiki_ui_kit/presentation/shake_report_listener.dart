@@ -29,7 +29,7 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
   void initState() {
     super.initState();
     _detector = ShakeDetector.autoStart(
-      minimumShakeCount: 2,
+      minimumShakeCount: 1,
       shakeThresholdGravity: 2,
       shakeCountResetTime: 1500,
       onPhoneShake: (_) => _openDialog(),
