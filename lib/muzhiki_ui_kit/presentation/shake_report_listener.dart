@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_core.dart';
@@ -28,10 +30,11 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
   @override
   void initState() {
     super.initState();
+    final isIos = Platform.isIOS;
     _detector = ShakeDetector.autoStart(
       minimumShakeCount: 2,
-      shakeThresholdGravity: 1.7,
-      shakeSlopTimeMS: 100,
+      shakeThresholdGravity: isIos ? 1.7 : 2,
+      shakeSlopTimeMS: isIos ? 100 : 300,
       onPhoneShake: (_) => _openDialog(),
     );
   }
