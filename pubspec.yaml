@@ -76,3 +76,9 @@ flutter:
     - assets/support/svg/
     - assets/support/png/
     - assets/report_problem/svg/
+    
+  plugin:
+    platforms:
+      android:
+        package: pro.muzhiki.muzhiki_core
+        pluginClass: NetworkInfoPlugin

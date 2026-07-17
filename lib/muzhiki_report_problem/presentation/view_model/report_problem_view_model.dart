@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_config.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/domain/repository/bug_report_repository.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/network_signal_info_service.dart';
-import 'package:path/path.dart' as p;
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/network_signal_info_service.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_config.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/domain/repository/report_problem_repository.dart';
+import 'package:path/path.dart' as path;
 import 'package:talker/talker.dart';
 
 class ReportProblemViewModel extends ChangeNotifier {
@@ -17,13 +17,17 @@ class ReportProblemViewModel extends ChangeNotifier {
   }
 
   final ReportProblemConfig config;
-  final BugReportRepository _repository;
+  final ReportProblemRepository _repository;
 
   bool isSubmitting = false;
   bool? isSubmitSuccess;
   String? submitError;
 
+  final descriptionController = TextEditingController();
+
   File? _compressedScreenshot;
+
+  String? screenshotPath;
 
   static const _maxScreenshotBytes = 10 * 1024 * 1024;
 
@@ -40,7 +44,12 @@ class ReportProblemViewModel extends ChangeNotifier {
 
   Future<Map<String, dynamic>> _device() async {
     final view = PlatformDispatcher.instance.views.first;
-    final timezone = await FlutterTimezone.getLocalTimezone();
+    TimezoneInfo? timezone;
+    try {
+      timezone = await FlutterTimezone.getLocalTimezone();
+    } catch (_) {
+      timezone = null;
+    }
 
     return {
       'platform': config.appInfo.platform,
@@ -50,7 +59,7 @@ class ReportProblemViewModel extends ChangeNotifier {
       'screen_width': view.physicalSize.width.round(),
       'screen_height': view.physicalSize.height.round(),
       'locale': PlatformDispatcher.instance.locale.toLanguageTag(),
-      'timezone': timezone.identifier,
+      'timezone': timezone?.identifier ?? DateTime.now().timeZoneName,
     };
   }
 
@@ -63,19 +72,21 @@ class ReportProblemViewModel extends ChangeNotifier {
     int? signalStrength;
     String? carrier;
 
-    switch (type) {
-      case 'cellular':
-        final sims = await NetworkSignalInfoService.simsInfo();
-        if (sims.isNotEmpty) {
-          carrier = sims.map(_simLabel).join(' | ');
-        } else {
-          carrier = await NetworkSignalInfoService.carrierName();
-        }
-        // signal_strength dBm активной симкарты
-        signalStrength = await NetworkSignalInfoService.cellularDbm();
-      case 'wifi':
-        signalStrength = await NetworkSignalInfoService.wifiRssi();
-    }
+    try {
+      switch (type) {
+        case 'cellular':
+          final sims = await NetworkSignalInfoService.simsInfo();
+          if (sims.isNotEmpty) {
+            carrier = sims.map(_simLabel).join(' | ');
+          } else {
+            carrier = await NetworkSignalInfoService.carrierName();
+          }
+          // signal_strength dBm активной симкарты
+          signalStrength = await NetworkSignalInfoService.cellularDbm();
+        case 'wifi':
+          signalStrength = await NetworkSignalInfoService.wifiRssi();
+      }
+    } catch (_) {}
 
     return {
       'type': type,
@@ -160,61 +171,65 @@ class ReportProblemViewModel extends ChangeNotifier {
     null => 'info',
   };
 
-  final descriptionController = TextEditingController();
-
-  String? screenshotPath;
-
-  Future<void> setScreenshot(String? path) async {
+  Future<void> setScreenshot(XFile? pickedFile) async {
     await _deleteCompressedScreenshot();
 
-    if (path == null) {
+    if (pickedFile == null) {
       screenshotPath = null;
       notifyListeners();
       return;
     }
 
-    final source = File(path);
-
-    final targetPath = p.join(
-      source.parent.path,
+    final targetPath = path.join(
+      path.dirname(pickedFile.path),
       'bug_report_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
 
-    final compressed = await FlutterImageCompress.compressAndGetFile(
-      source.path,
-      targetPath,
-      minWidth: 1920,
-      minHeight: 1080,
-      quality: 90,
-      format: CompressFormat.jpeg,
-    );
+    XFile? compressed;
+    try {
+      compressed = await FlutterImageCompress.compressAndGetFile(
+        pickedFile.path,
+        targetPath,
+        minWidth: 1920,
+        minHeight: 1080,
+        quality: 90,
+        format: CompressFormat.jpeg,
+      );
+    } catch (_) {
+      compressed = null;
+    }
 
-    final file = compressed == null ? source : File(compressed.path);
+    final compressedFile = compressed == null ? null : File(compressed.path);
+    final resultFile = compressed ?? pickedFile;
 
-    if (await file.length() > _maxScreenshotBytes) {
-      if (compressed != null && await file.exists()) {
-        await file.delete();
+    if (await resultFile.length() > _maxScreenshotBytes) {
+      if (compressedFile != null && await compressedFile.exists()) {
+        await compressedFile.delete();
       }
+
+      screenshotPath = null;
+      _compressedScreenshot = null;
+      notifyListeners();
 
       config.bannerController.show(
         message: 'Файл не может весить больше 10 МБ',
       );
+
       return;
     }
 
-    screenshotPath = file.path;
-    _compressedScreenshot = compressed == null ? null : file;
+    screenshotPath = resultFile.path;
+    _compressedScreenshot = compressedFile;
     notifyListeners();
   }
 
   Future<void> _deleteCompressedScreenshot() async {
     final file = _compressedScreenshot;
+    _compressedScreenshot = null;
 
     if (file != null && await file.exists()) {
       await file.delete();
     }
-
-    _compressedScreenshot = null;
   }
 
   bool get isValid => descriptionController.text.trim().isNotEmpty;

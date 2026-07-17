@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/core_colors.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/core_fonts.dart';
+import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_colors.dart';
 
 class ErrorDialog extends StatelessWidget {
   final String title;
@@ -30,8 +28,8 @@ class ErrorDialog extends StatelessWidget {
           style: TextStyle(
             fontSize: 18.sp,
             height: 1.3,
-            fontWeight: CoreFonts.semiBold,
-            color: CoreColors.black23,
+            fontWeight: FontWeight.w600,
+            color: ReportProblemColors.black23,
           ),
         ),
         if (description != null) ...[
@@ -42,8 +40,8 @@ class ErrorDialog extends StatelessWidget {
             style: TextStyle(
               fontSize: 15.sp,
               height: 1.3,
-              fontWeight: CoreFonts.medium,
-              color: CoreColors.alertTextGrey,
+              fontWeight: FontWeight.w500,
+              color: ReportProblemColors.alertTextGrey,
             ),
           ),
         ],
@@ -52,8 +50,8 @@ class ErrorDialog extends StatelessWidget {
           AppButton(
             mode: ButtonMode.classic,
             label: 'Повторить',
-            backgroundColor: CoreColors.black23,
-            labelColor: CoreColors.white,
+            backgroundColor: ReportProblemColors.black23,
+            labelColor: ReportProblemColors.white,
             borderRadius: 23,
             onPressed: () {
               context.pop();
@@ -65,8 +63,8 @@ class ErrorDialog extends StatelessWidget {
         AppButton(
           mode: ButtonMode.classic,
           label: 'Понятно',
-          backgroundColor: CoreColors.light,
-          labelColor: CoreColors.black23,
+          backgroundColor: ReportProblemColors.light,
+          labelColor: ReportProblemColors.black23,
           onPressed: () => context.pop(),
         ),
       ],
