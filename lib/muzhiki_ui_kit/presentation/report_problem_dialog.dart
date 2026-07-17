@@ -10,11 +10,10 @@ import 'package:muzhiki_core/muzhiki_core.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/view_image_item_model.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/photo_view_widget.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/core_colors.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/config/core_fonts.dart';
+import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_colors.dart';
 import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_assets.dart';
 import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_config.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/data/repository/bug_report_repository_impl.dart';
+import 'package:muzhiki_core/muzhiki_ui_kit/data/repository/report_problem_repository_impl.dart';
 import 'package:muzhiki_core/muzhiki_ui_kit/presentation/view_model/report_problem_view_model.dart';
 import 'package:muzhiki_core/muzhiki_ui_kit/presentation/widgets/app_standart_dialog.dart';
 import 'package:muzhiki_core/muzhiki_ui_kit/presentation/widgets/button_small.dart';
@@ -40,7 +39,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
     super.initState();
     viewModel = ReportProblemViewModel(
       config: widget.config,
-      repository: BugReportRepositoryImpl(widget.config.dio),
+      repository: ReportProblemRepositoryImpl(widget.config.dio),
     );
   }
 
@@ -55,7 +54,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
     if (!mounted) return;
     if (viewModel.isSubmitSuccess == true) {
       await AppStandartDialog.open(
-        backgroundColor: CoreColors.appBackgroud,
+        backgroundColor: ReportProblemColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
           bottom: Radius.circular(
@@ -70,7 +69,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
       context.pop();
     } else {
       await AppStandartDialog.open(
-        backgroundColor: CoreColors.appBackgroud,
+        backgroundColor: ReportProblemColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
           bottom: Radius.circular(
@@ -112,9 +111,9 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                       mode: SmallButtonMode.standart,
                       label: 'Отменить',
                       fontSize: 15,
-                      fontWeight: CoreFonts.medium,
-                      labelColor: CoreColors.alertTextGrey,
-                      backgroundColor: CoreColors.greyLight.withValues(
+                      fontWeight: FontWeight.w500,
+                      labelColor: ReportProblemColors.alertTextGrey,
+                      backgroundColor: ReportProblemColors.greyLight.withValues(
                         alpha: 0.3,
                       ),
                       labelPadding: EdgeInsets.symmetric(
@@ -138,8 +137,8 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                     style: TextStyle(
                       fontSize: 18.sp,
                       height: 1.3,
-                      fontWeight: CoreFonts.semiBold,
-                      color: CoreColors.black23,
+                      fontWeight: FontWeight.w600,
+                      color: ReportProblemColors.black23,
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -147,9 +146,9 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                     'Это окно открылось потому что вы потрясли устройство',
                     style: TextStyle(
                       fontSize: 15.sp,
-                      fontWeight: CoreFonts.medium,
+                      fontWeight: FontWeight.w500,
                       height: 1.3,
-                      color: CoreColors.alertTextGrey,
+                      color: ReportProblemColors.alertTextGrey,
                     ),
                   ),
                   SizedBox(height: 27.h),
@@ -175,15 +174,15 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                               width: 16.r,
                               height: 16.r,
                               colorFilter: const ColorFilter.mode(
-                                CoreColors.blood,
+                                ReportProblemColors.blood,
                                 BlendMode.srcIn,
                               ),
                             ),
                             label: 'Добавить скриншот',
                             fontSize: 15,
-                            fontWeight: CoreFonts.medium,
-                            labelColor: CoreColors.alertTextGrey,
-                            backgroundColor: CoreColors.appBackgroud,
+                            fontWeight: FontWeight.w500,
+                            labelColor: ReportProblemColors.alertTextGrey,
+                            backgroundColor: ReportProblemColors.appBackgroud,
                             radius: 20,
                             labelPadding: EdgeInsets.symmetric(
                               vertical: 5.h,
@@ -279,16 +278,15 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                         padding: EdgeInsets.all(6.r),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: CoreColors.black23.withValues(
-                                            alpha: 0.65,
-                                          ),
+                                          color: ReportProblemColors.black23
+                                              .withValues(alpha: 0.65),
                                         ),
                                         child: SvgPicture.asset(
                                           ReportProblemAssets.close,
                                           width: 8.w,
                                           height: 8.h,
                                           colorFilter: const ColorFilter.mode(
-                                            CoreColors.white,
+                                            ReportProblemColors.white,
                                             BlendMode.srcIn,
                                           ),
                                         ),
@@ -309,8 +307,8 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                     style: TextStyle(
                       fontSize: 15.sp,
                       height: 1.3,
-                      fontWeight: CoreFonts.medium,
-                      color: CoreColors.alertTextGrey,
+                      fontWeight: FontWeight.w500,
+                      color: ReportProblemColors.alertTextGrey,
                     ),
                   ),
                   SizedBox(height: 27.h),
@@ -323,11 +321,11 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                           : 'Отправить',
                       isLoading: viewModel.isSubmitting,
                       backgroundColor: viewModel.isValid
-                          ? CoreColors.black23
-                          : CoreColors.light,
+                          ? ReportProblemColors.black23
+                          : ReportProblemColors.light,
                       labelColor: viewModel.isValid
-                          ? CoreColors.white
-                          : CoreColors.black23,
+                          ? ReportProblemColors.white
+                          : ReportProblemColors.black23,
                       borderRadius: 20,
                       onPressed: viewModel.isValid ? () => _submit() : () {},
                     ),

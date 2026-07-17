@@ -7,8 +7,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_signal_info_service.dart';
 import 'package:muzhiki_core/muzhiki_ui_kit/config/report_problem_config.dart';
-import 'package:muzhiki_core/muzhiki_ui_kit/domain/repository/bug_report_repository.dart';
-import 'package:path/path.dart' as p;
+import 'package:muzhiki_core/muzhiki_ui_kit/domain/repository/report_problem_repository.dart';
+import 'package:path/path.dart' as path;
 import 'package:talker/talker.dart';
 
 class ReportProblemViewModel extends ChangeNotifier {
@@ -17,7 +17,7 @@ class ReportProblemViewModel extends ChangeNotifier {
   }
 
   final ReportProblemConfig config;
-  final BugReportRepository _repository;
+  final ReportProblemRepository _repository;
 
   bool isSubmitting = false;
   bool? isSubmitSuccess;
@@ -164,30 +164,34 @@ class ReportProblemViewModel extends ChangeNotifier {
 
   String? screenshotPath;
 
-  Future<void> setScreenshot(String? path) async {
+  Future<void> setScreenshot(String? screenshotPath) async {
     await _deleteCompressedScreenshot();
 
-    if (path == null) {
+    if (screenshotPath == null) {
       screenshotPath = null;
       notifyListeners();
       return;
     }
 
-    final source = File(path);
+    final source = File(screenshotPath);
 
-    final targetPath = p.join(
+    final targetPath = path.join(
       source.parent.path,
       'bug_report_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
-
-    final compressed = await FlutterImageCompress.compressAndGetFile(
-      source.path,
-      targetPath,
-      minWidth: 1920,
-      minHeight: 1080,
-      quality: 90,
-      format: CompressFormat.jpeg,
-    );
+    XFile? compressed;
+    try {
+      compressed = await FlutterImageCompress.compressAndGetFile(
+        source.path,
+        targetPath,
+        minWidth: 1920,
+        minHeight: 1080,
+        quality: 90,
+        format: CompressFormat.jpeg,
+      );
+    } catch (_) {
+      compressed = null;
+    }
 
     final file = compressed == null ? source : File(compressed.path);
 
@@ -195,7 +199,9 @@ class ReportProblemViewModel extends ChangeNotifier {
       if (compressed != null && await file.exists()) {
         await file.delete();
       }
-
+      screenshotPath = null;
+      _compressedScreenshot = null;
+      notifyListeners();
       config.bannerController.show(
         message: 'Файл не может весить больше 10 МБ',
       );
