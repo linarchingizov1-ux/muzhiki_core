@@ -40,7 +40,12 @@ class ReportProblemViewModel extends ChangeNotifier {
 
   Future<Map<String, dynamic>> _device() async {
     final view = PlatformDispatcher.instance.views.first;
-    final timezone = await FlutterTimezone.getLocalTimezone();
+    TimezoneInfo? timezone;
+    try {
+      timezone = await FlutterTimezone.getLocalTimezone();
+    } catch (_) {
+      timezone = null;
+    }
 
     return {
       'platform': config.appInfo.platform,
@@ -50,7 +55,7 @@ class ReportProblemViewModel extends ChangeNotifier {
       'screen_width': view.physicalSize.width.round(),
       'screen_height': view.physicalSize.height.round(),
       'locale': PlatformDispatcher.instance.locale.toLanguageTag(),
-      'timezone': timezone.identifier,
+      'timezone': timezone?.identifier ?? DateTime.now().timeZoneName,
     };
   }
 
@@ -63,19 +68,21 @@ class ReportProblemViewModel extends ChangeNotifier {
     int? signalStrength;
     String? carrier;
 
-    switch (type) {
-      case 'cellular':
-        final sims = await NetworkSignalInfoService.simsInfo();
-        if (sims.isNotEmpty) {
-          carrier = sims.map(_simLabel).join(' | ');
-        } else {
-          carrier = await NetworkSignalInfoService.carrierName();
-        }
-        // signal_strength dBm активной симкарты
-        signalStrength = await NetworkSignalInfoService.cellularDbm();
-      case 'wifi':
-        signalStrength = await NetworkSignalInfoService.wifiRssi();
-    }
+    try {
+      switch (type) {
+        case 'cellular':
+          final sims = await NetworkSignalInfoService.simsInfo();
+          if (sims.isNotEmpty) {
+            carrier = sims.map(_simLabel).join(' | ');
+          } else {
+            carrier = await NetworkSignalInfoService.carrierName();
+          }
+          // signal_strength dBm активной симкарты
+          signalStrength = await NetworkSignalInfoService.cellularDbm();
+        case 'wifi':
+          signalStrength = await NetworkSignalInfoService.wifiRssi();
+      }
+    } catch (_) {}
 
     return {
       'type': type,
