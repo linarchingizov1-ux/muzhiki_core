@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
-import 'package:muzhiki_core/muzhiki_core.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/extension/roles_company.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_roles.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart';
@@ -193,13 +193,13 @@ class SessionApp extends ChangeNotifier {
             )
             .timeout(const Duration(minutes: 15));
       } on TimeoutException {
-        MuzhikiDependencies.I.banner.show(message: 'Время авторизации вышло');
+        BannerController.I.show(message: 'Время авторизации вышло');
         yield AuthState.error;
         return;
       } catch (e, st) {
         final error = AppErrorMapper.I.map(e, st);
         if (error.message != "Авторизация отменена пользователем.") {
-          MuzhikiDependencies.I.banner.show(message: error.message);
+          BannerController.I.show(message: error.message);
         }
         yield AuthState.error;
         return;
@@ -231,14 +231,14 @@ class SessionApp extends ChangeNotifier {
 
               roles = RolesModel.fromJson(rolesData.data["data"]);
             } catch (e) {
-              MuzhikiDependencies.I.banner.show(
+              BannerController.I.show(
                 message: 'Ошибка при получении роли пользователя',
               );
             }
           }
 
           if (token == null || token.isEmpty) {
-            MuzhikiDependencies.I.banner.show(message: 'Авторизация отклонена');
+            BannerController.I.show(message: 'Авторизация отклонена');
             yield AuthState.error;
             return;
           }
@@ -319,11 +319,11 @@ class SessionApp extends ChangeNotifier {
           yield AuthState.success;
         } catch (e, st) {
           final error = AppErrorMapper.I.map(e, st);
-          MuzhikiDependencies.I.banner.show(message: error.message);
+          BannerController.I.show(message: error.message);
           yield AuthState.error;
         }
       } else {
-        MuzhikiDependencies.I.banner.show(
+        BannerController.I.show(
           message:
               'Авторизация отклонена: auth_code или code_verifier отсутствует',
         );
@@ -331,7 +331,7 @@ class SessionApp extends ChangeNotifier {
       }
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      MuzhikiDependencies.I.banner.show(message: error.message);
+      BannerController.I.show(message: error.message);
       yield AuthState.error;
     }
   }
@@ -387,7 +387,7 @@ class SessionApp extends ChangeNotifier {
       );
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      MuzhikiDependencies.I.banner.show(message: error.message);
+      BannerController.I.show(message: error.message);
     } finally {
       firebaseRemoveFCM?.call();
       cleareSession();
@@ -402,7 +402,7 @@ class SessionApp extends ChangeNotifier {
       hiveStore.clean();
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      MuzhikiDependencies.I.banner.show(message: error.message);
+      BannerController.I.show(message: error.message);
       hiveStore.delete('dio_cache');
     }
   }

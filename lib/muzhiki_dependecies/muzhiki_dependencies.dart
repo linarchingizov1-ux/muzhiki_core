@@ -6,7 +6,7 @@ class MuzhikiDependencies {
   final _rootKey = GlobalKey<NavigatorState>();
   GlobalKey<NavigatorState> get routerKey => _rootKey;
 
-  BannerController get banner => BannerController.I;
+  // BannerController get banner => BannerController.I;
   ScreenRadius? divesRadius;
   late bool _isUninstalling;
 
