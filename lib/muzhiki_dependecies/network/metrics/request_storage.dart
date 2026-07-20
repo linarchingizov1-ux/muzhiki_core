@@ -56,11 +56,10 @@ class RequestStorage {
     required AppInfoModel infoProject,
   }) async {
     this.metrics.add(metrics);
-
-    await sharedPreferences.setString(
-      "metrics_data",
-      jsonEncode(this.metrics.map((e) => e.toJson()).toList()),
+    final cacheString = await Isolate.run(
+      () => jsonEncode(this.metrics.map((e) => e.toJson()).toList()),
     );
+    await sharedPreferences.setString("metrics_data", cacheString);
 
     if (showTalkerMetricsHttp) {
       talker.debug(
@@ -126,10 +125,10 @@ class RequestStorage {
         );
 
         metrics.removeRange(0, batchItems.length);
-        await sharedPreferences.setString(
-          "metrics_data",
-          jsonEncode(metrics.map((e) => e.toJson()).toList()),
+        final cacheString = await Isolate.run(
+          () => jsonEncode(metrics.map((e) => e.toJson()).toList()),
         );
+        await sharedPreferences.setString("metrics_data", cacheString);
 
         _isSending = false;
 
@@ -160,10 +159,10 @@ class RequestStorage {
         await Future.delayed(const Duration(milliseconds: 1500));
       } finally {
         if (metrics.isNotEmpty) metrics.clear();
-        await sharedPreferences.setString(
-          "metrics_data",
-          jsonEncode(metrics.map((e) => e.toJson()).toList()),
+        final cacheString = await Isolate.run(
+          () => jsonEncode(metrics.map((e) => e.toJson()).toList()),
         );
+        await sharedPreferences.setString("metrics_data", cacheString);
         _isSending = false;
       }
     }
