@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -104,9 +105,11 @@ class RequestStorage {
       appVersion: infoProject.version,
       mpid: userMpid,
       requests: batchItems,
-    ).toJson();
+    );
 
-    final jsonString = jsonEncode(batch);
+    final jsonString = await Isolate.run(() {
+      return jsonEncode(batch.toJson());
+    });
     if (showTalkerMetricsHttp) {
       const encoder = JsonEncoder.withIndent('  ');
       final prettyJson = encoder.convert(batch);
