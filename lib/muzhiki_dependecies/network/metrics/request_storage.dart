@@ -56,9 +56,11 @@ class RequestStorage {
     required AppInfoModel infoProject,
   }) async {
     this.metrics.add(metrics);
-    final cacheString = await Isolate.run(
-      () => jsonEncode(this.metrics.map((e) => e.toJson()).toList()),
-    );
+    final List<Map<String, dynamic>> rawMetricsList = this.metrics
+        .map((e) => e.toJson())
+        .toList();
+
+    final cacheString = await Isolate.run(() => jsonEncode(rawMetricsList));
     await sharedPreferences.setString("metrics_data", cacheString);
 
     if (showTalkerMetricsHttp) {
@@ -88,11 +90,14 @@ class RequestStorage {
   }) async {
     if (_isSending || metrics.isEmpty) return;
     _isSending = true;
+
     if (_lastFailedSend != null &&
         DateTime.now().difference(_lastFailedSend!) <
             const Duration(minutes: 1)) {
+      _isSending = false;
       return;
     }
+
     final List<RequestMetric> batchItems = metrics.take(batchSize).toList();
     final userMpid = int.tryParse(userSession.user?.mpid ?? "");
 
@@ -106,13 +111,15 @@ class RequestStorage {
       requests: batchItems,
     );
 
-    final jsonString = await Isolate.run(() {
-      return jsonEncode(batch.toJson());
-    });
-    if (showTalkerMetricsHttp) {
-      const encoder = JsonEncoder.withIndent('  ');
-      final prettyJson = encoder.convert(batch);
+    final Map<String, dynamic> batchJson = batch.toJson();
 
+    final jsonString = await Isolate.run(() => jsonEncode(batchJson));
+
+    if (showTalkerMetricsHttp) {
+      final prettyJson = await Isolate.run(() {
+        const encoder = JsonEncoder.withIndent('  ');
+        return encoder.convert(batchJson);
+      });
       printLong(prettyJson);
     }
 
@@ -125,9 +132,12 @@ class RequestStorage {
         );
 
         metrics.removeRange(0, batchItems.length);
-        final cacheString = await Isolate.run(
-          () => jsonEncode(metrics.map((e) => e.toJson()).toList()),
-        );
+
+        final List<Map<String, dynamic>> metricsToCache = metrics
+            .map((e) => e.toJson())
+            .toList();
+
+        final cacheString = await Isolate.run(() => jsonEncode(metricsToCache));
         await sharedPreferences.setString("metrics_data", cacheString);
 
         _isSending = false;
@@ -157,23 +167,14 @@ class RequestStorage {
           return;
         }
         await Future.delayed(const Duration(milliseconds: 1500));
-      } finally {
-        if (metrics.isNotEmpty) metrics.clear();
-        final cacheString = await Isolate.run(
-          () => jsonEncode(metrics.map((e) => e.toJson()).toList()),
-        );
-        await sharedPreferences.setString("metrics_data", cacheString);
-        _isSending = false;
       }
     }
   }
 
   void printLong(String text) {
     const chunkSize = 1000;
-
     for (var i = 0; i < text.length; i += chunkSize) {
       final end = (i + chunkSize < text.length) ? i + chunkSize : text.length;
-
       debugPrint(text.substring(i, end));
     }
   }
