@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -28,7 +29,7 @@ class AppErrorMapper {
           message:
               "На устройстве не найдено приложение для открытия ссылки\nРекомендуем установить Chrome либо Firefox",
           originalError: error.platformErrorDetails,
-          stackTrace: StackTrace.current,
+          stackTrace: stackTrace,
         );
       }
       return AppException(
@@ -144,6 +145,51 @@ class AppErrorMapper {
         stackTrace: stackTrace,
       );
     }
+    if (error is StateError) {
+      return AppException(
+        message: 'Некорректное состояние приложения.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is UnsupportedError) {
+      return AppException(
+        message: 'Операция не поддерживается.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    if (error is TimeoutException) {
+      return AppException(
+        message: 'Превышено время ожидания.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+    if (error is FileSystemException) {
+      if (error is PathNotFoundException) {
+        return AppException(
+          message: 'Файл не найден.',
+          originalError: error,
+          stackTrace: stackTrace,
+        );
+      }
+
+      return AppException(
+        message: 'Ошибка доступа к файлу.',
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
+    if (error is PathNotFoundException) {
+      return AppException(
+        message: "Файла несуществует",
+        originalError: error,
+        stackTrace: stackTrace,
+      );
+    }
 
     return AppException(
       message: 'Произошла неизвестная ошибка.',
@@ -231,7 +277,7 @@ class PhotoErrorMapper {
 
     if (error is PhotoSetIdNotReturnedException) {
       return AppException(
-        message: 'Сервер не вернул id фотосета.',
+        message: 'При отправке фотосета возникли проблемы...',
         originalError: error,
         stackTrace: stackTrace,
       );
@@ -281,7 +327,9 @@ class DioErrorMapper {
 
     if (e.type == DioExceptionType.badResponse) {
       final message = _mapStatusCode(statusCode, data);
-      final unsuccessUserSupportApp = e.response?.statusCode == 404;
+      final unsuccessUserSupportApp =
+          e.response?.statusCode == 401 && message.contains("не найден") ||
+          message.contains("не найдена");
       final isFakeUser = e.response?.statusCode == 403;
 
       if (unsuccessUserSupportApp) {
@@ -365,7 +413,7 @@ class DioErrorMapper {
       }
 
       return AppNetworkException(
-        message: 'Неизвестная ошибка сети. ${e.error?.runtimeType} ${e.error}.',
+        message: 'Не удалось связаться с сервером. Попробуйте ещё раз.',
         statusCode: statusCode,
         originalError: e,
       );
