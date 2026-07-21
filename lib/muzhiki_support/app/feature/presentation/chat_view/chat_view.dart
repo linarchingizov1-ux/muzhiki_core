@@ -48,10 +48,18 @@ class _ChatViewState extends State<ChatView> {
     super.initState();
     websocketApp = AppWebsocketChat(
       sessionChatId: widget.id,
+      channelId: widget.chatCubit.state.channelId,
       chatUsecase: widget.chatUseCase,
       session: widget.session,
     );
-    websocketApp.connect();
+
+    if (websocketApp.isDraft) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        websocketApp.emitDraft();
+      });
+    } else {
+      websocketApp.connect();
+    }
 
     switch (widget.extra) {
       case SupportChatsEventWidgets event:
@@ -82,7 +90,9 @@ class _ChatViewState extends State<ChatView> {
       value: SystemUiOverlayStyle.dark,
       child: PopScope(
         onPopInvokedWithResult: (didPop, result) {
-          if (needUpdate) {
+          if (needUpdate ||
+              (widget.id == AppWebsocketChat.draftSessionId &&
+                  !websocketApp.isDraft)) {
             widget.chatCubit.silenceRefresh();
           }
         },
@@ -116,7 +126,6 @@ class _ChatViewState extends State<ChatView> {
                       snapshot: snapshot,
                       attachmentsCubit: widget.attachmentsCubit,
                       websocket: websocketApp,
-                      sessionId: widget.id,
                       initMessage: _startNewSessionText,
                       directory: widget.directory,
                     ),

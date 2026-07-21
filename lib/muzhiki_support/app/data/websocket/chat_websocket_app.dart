@@ -39,6 +39,7 @@ class AppWebsocketChat extends WebSocketChat {
     required this.sessionChatId,
     required this.chatUsecase,
     required this.session,
+    this.channelId,
   }) {
     _listener = AppLifecycleListener(
       onShow: () async {
@@ -49,7 +50,11 @@ class AppWebsocketChat extends WebSocketChat {
       },
     );
   }
-  final int sessionChatId;
+
+  static const int draftSessionId = 0;
+
+  int sessionChatId;
+  final int? channelId;
   final ChatUseCase chatUsecase;
   final SessionApp session;
 
@@ -74,12 +79,51 @@ class AppWebsocketChat extends WebSocketChat {
 
   final UuidV4 uuidService = UuidV4();
 
+  bool get isDraft => sessionChatId == draftSessionId;
+
+  bool get isConnected => _channel != null;
+
   void _emit(WebSocketChatState Function(WebSocketChatState state) updater) {
     if (_controller.isClosed) return;
 
     _state = updater(_state);
 
     _controller.add(_state);
+  }
+
+  void emitDraft() => _emit(
+    (s) => s.copyWith(
+      messages: [],
+      didSendInitialMessage: true,
+      socket: SocketConnectionModel(
+        id: 0,
+        chatId: 0,
+        channelId: 0,
+        type: ChatType.session,
+        status: SocketConnectionChatStatus.open,
+        canWrite: true,
+        createdAt: DateTime.now(),
+        title: 'Новое обращение',
+      ),
+    ),
+  );
+
+  Future<bool> createSessionAndConnect() async {
+    if (isDraft) {
+      if (channelId == null) return false;
+      try {
+        sessionChatId = await chatUsecase.createSession(channelId: channelId!);
+      } catch (e, st) {
+        _handleError(e, st, showBanner: true);
+        return false;
+      }
+    }
+
+    if (_channel == null) {
+      await connect();
+    }
+
+    return _channel != null;
   }
 
   @override
@@ -212,6 +256,7 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   Future<void> _resumeWS() async {
+    if (isDraft) return;
     if (_channel == null && !_isConnecting) {
       await connect();
     }
