@@ -1,27 +1,34 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class AppBannerWidgets extends StatefulWidget {
+enum BannerType { standart, glasses }
+
+class AppBannerWidget extends StatefulWidget {
   final String message;
+  final String title;
+  final BannerType type;
   final VoidCallback onDismiss;
   final Duration duration;
   final Color color;
 
-  const AppBannerWidgets({
+  const AppBannerWidget({
     super.key,
     required this.message,
     required this.onDismiss,
     required this.duration,
+    this.type = BannerType.standart,
+    this.title = '',
     this.color = Colors.grey,
   });
 
   @override
-  State<AppBannerWidgets> createState() => _AppBannerWidgetsState();
+  State<AppBannerWidget> createState() => _AppBannerWidgetState();
 }
 
-class _AppBannerWidgetsState extends State<AppBannerWidgets>
+class _AppBannerWidgetState extends State<AppBannerWidget>
     with TickerProviderStateMixin {
   late AnimationController animationController;
   late Animation<double> animationTranslate;
@@ -125,6 +132,15 @@ class _AppBannerWidgetsState extends State<AppBannerWidgets>
     super.dispose();
   }
 
+  Widget get card {
+    switch (widget.type) {
+      case BannerType.standart:
+        return _DefaultBannerCard(message: widget.message, color: widget.color);
+      case BannerType.glasses:
+        return _GlassesBannerCard(title: widget.title, message: widget.message);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -186,29 +202,98 @@ class _AppBannerWidgetsState extends State<AppBannerWidgets>
                 },
               );
             },
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-              decoration: BoxDecoration(
-                color: widget.color.withValues(alpha: 0.95),
-                borderRadius: BorderRadius.circular(18.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+            child: card,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DefaultBannerCard extends StatelessWidget {
+  final String message;
+  final Color color;
+
+  const _DefaultBannerCard({required this.message, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Text(
+        message,
+        maxLines: 4,
+        style: TextStyle(
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
+
+class _GlassesBannerCard extends StatelessWidget {
+  final String title;
+  final String message;
+
+  const _GlassesBannerCard({required this.title, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 14.w, vertical: 19.h),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15.r),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10.7, sigmaY: 10.7),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 13.h),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(15.r),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                    color: Colors.white,
                   ),
-                ],
-              ),
-              child: Text(
-                widget.message,
-                maxLines: 4,
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
                 ),
-              ),
+                SizedBox(height: 2.h),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    height: 1.4,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

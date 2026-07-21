@@ -65,6 +65,7 @@ class _MultilineInputCardState extends State<MultilineInputCard> {
               maxLines: widget.maxLines,
               maxLength: widget.maxLength,
               keyboardType: TextInputType.multiline,
+              cursorColor: ReportProblemColors.alertTextGrey,
               style: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
