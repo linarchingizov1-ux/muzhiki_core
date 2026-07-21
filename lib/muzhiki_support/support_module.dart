@@ -72,6 +72,21 @@ class SupportModule {
         },
       ),
       GoRoute(
+        path: routeConstant.chatDraft,
+        name: routeConstant.chatDraft,
+        builder: (context, state) {
+          return ChatView(
+            id: null,
+            extra: state.extra,
+            chatUseCase: chatUseCase,
+            session: config.session,
+            attachmentsCubit: attachmentsCubit,
+            chatCubit: chatCubit,
+            directory: config.directory,
+          );
+        },
+      ),
+      GoRoute(
         path: routeConstant.chat,
         name: routeConstant.chat,
         builder: (context, state) {

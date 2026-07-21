@@ -10,7 +10,6 @@ import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_route_constant.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/support_route_event.dart';
-import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/main_view/widgets/sliver_chat_container_widget.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/main_view/widgets/sliver_choi_widget.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/main_view/widgets/sliver_home_appbar_widget.dart';
@@ -70,8 +69,7 @@ class _SupportViewState extends State<SupportView> {
         if (mounted) {
           context.pushNamed(
             extra: supportChatsEventWidgets,
-            SupportRouteConstant.I.chat,
-            pathParameters: {'id': AppWebsocketChat.draftSessionId.toString()},
+            SupportRouteConstant.I.chatDraft,
           );
         }
         break;
@@ -101,13 +99,8 @@ class _SupportViewState extends State<SupportView> {
               builder: (context, state) {
                 if (state.chatStatus == StateStatus.success) {
                   return InkWell(
-                    onTap: () => context.pushNamed(
-                      SupportRouteConstant.I.chat,
-                      pathParameters: {
-                        'id': AppWebsocketChat.draftSessionId.toString(),
-                      },
-                    ),
-
+                    onTap: () =>
+                        context.pushNamed(SupportRouteConstant.I.chatDraft),
                     child: Container(
                       height: 55.w,
                       width: 55.w,

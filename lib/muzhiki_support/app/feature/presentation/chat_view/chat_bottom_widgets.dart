@@ -107,7 +107,7 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
                 }
 
                 await widget.websocket.sendMessage(
-                  sessionId: widget.websocket.sessionChatId,
+                  sessionId: widget.websocket.sessionChatId!,
                   text: text,
                   attachments: uuidFile,
                 );

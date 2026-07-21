@@ -21,7 +21,7 @@ class ChatView extends StatefulWidget {
   final Directory directory;
   final SessionApp session;
   final AttachmentsCubit attachmentsCubit;
-  final int id;
+  final int? id;
   final Object? extra;
 
   const ChatView({
@@ -90,9 +90,7 @@ class _ChatViewState extends State<ChatView> {
       value: SystemUiOverlayStyle.dark,
       child: PopScope(
         onPopInvokedWithResult: (didPop, result) {
-          if (needUpdate ||
-              (widget.id == AppWebsocketChat.draftSessionId &&
-                  !websocketApp.isDraft)) {
+          if (needUpdate || (widget.id == null && !websocketApp.isDraft)) {
             widget.chatCubit.silenceRefresh();
           }
         },
