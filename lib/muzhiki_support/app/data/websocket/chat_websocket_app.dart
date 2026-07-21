@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
@@ -372,7 +373,7 @@ class AppWebsocketChat extends WebSocketChat {
     }
 
     _lastBannerTime = now;
-    BannerController.I.show(message: mapped.message);
+    BannerController.I.showError(error: mapped, message: mapped.message);
   }
 
   @override
@@ -390,10 +391,10 @@ class AppWebsocketChat extends WebSocketChat {
       }
     } catch (e, st) {
       if (e is AppException) {
-        BannerController.I.show(message: e.message);
+        BannerController.I.showError(error: e, message: e.message);
       } else {
         final error = AppErrorMapper.I.map(e, st);
-        BannerController.I.show(message: error.message);
+        BannerController.I.showError(error: error, message: error.message);
       }
     }
   }
@@ -411,10 +412,10 @@ class AppWebsocketChat extends WebSocketChat {
       }
     } catch (e, st) {
       if (e is AppException) {
-        BannerController.I.show(message: e.message);
+        BannerController.I.showError(error: e, message: e.message);
       } else {
         final error = AppErrorMapper.I.map(e, st);
-        BannerController.I.show(message: error.message);
+        BannerController.I.showError(error: error, message: error.message);
       }
     }
   }

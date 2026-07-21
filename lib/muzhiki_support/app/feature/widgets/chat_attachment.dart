@@ -1,5 +1,11 @@
 import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
@@ -12,14 +18,9 @@ import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_a
 import 'package:muzhiki_core/muzhiki_support/app/extension/websocket_extension.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/photo_view_widget.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class ChatAttachment extends StatelessWidget {
   final ChatCubit chatCubit;
@@ -372,7 +373,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
       progress.value = 0.0;
 
       final error = AppErrorMapper.I.map(e, st);
-      BannerController.I.show(message: error.message);
+      BannerController.I.showError(error: error, message: error.message);
     }
   }
 

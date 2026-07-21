@@ -16,6 +16,13 @@ extension DioExceptionX on DioException {
       type == DioExceptionType.receiveTimeout ||
       type == DioExceptionType.badCertificate;
 
+  bool get isConnectionProblem {
+    final error = requestError;
+    return error == RequestError.timeout ||
+        error == RequestError.connection ||
+        error == RequestError.dns;
+  }
+
   bool get isAuthError {
     final code = response?.statusCode;
     return code == 401 || code == 419;

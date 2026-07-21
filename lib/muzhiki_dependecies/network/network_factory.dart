@@ -15,9 +15,10 @@ import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_e
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/network_problem_service.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
@@ -67,7 +68,11 @@ class NetworkFactory {
     final refreshDio = Dio(baseOptions);
     final authDio = Dio(baseOptions);
     final metricsDio = Dio(baseOptions);
-    final errorInterceptor = AppErrorInterceptor();
+    final errorInterceptor = AppErrorInterceptor(
+      networkIssueService: NetworkProblemService(
+        sharedPreferences: sharedPreferences,
+      ),
+    );
     final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
 
     final fresh = Fresh<AuthTokens>(

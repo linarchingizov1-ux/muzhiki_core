@@ -47,7 +47,7 @@ class MuzhikiUrlLaunch {
         throw AppErrorMapper.I.map(e, st);
       } else {
         final error = AppErrorMapper.I.map(e, st);
-        BannerController.I.show(message: error.message);
+        BannerController.I.showError(error: error, message: error.message);
       }
     }
   }
@@ -57,7 +57,7 @@ class MuzhikiUrlLaunch {
       await closeCustomTabs();
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      BannerController.I.show(message: error.message);
+      BannerController.I.showError(error: error, message: error.message);
     }
   }
 }

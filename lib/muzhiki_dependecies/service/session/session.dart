@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -199,7 +200,7 @@ class SessionApp extends ChangeNotifier {
       } catch (e, st) {
         final error = AppErrorMapper.I.map(e, st);
         if (error.message != "Авторизация отменена пользователем.") {
-          BannerController.I.show(message: error.message);
+          BannerController.I.showError(error: error, message: error.message);
         }
         yield AuthState.error;
         return;
@@ -230,8 +231,10 @@ class SessionApp extends ChangeNotifier {
               );
 
               roles = RolesModel.fromJson(rolesData.data["data"]);
-            } catch (e) {
-              BannerController.I.show(
+            } catch (e, st) {
+              final error = AppErrorMapper.I.map(e, st);
+              BannerController.I.showError(
+                error: error,
                 message: 'Ошибка при получении роли пользователя',
               );
             }
@@ -319,7 +322,7 @@ class SessionApp extends ChangeNotifier {
           yield AuthState.success;
         } catch (e, st) {
           final error = AppErrorMapper.I.map(e, st);
-          BannerController.I.show(message: error.message);
+          BannerController.I.showError(error: error, message: error.message);
           yield AuthState.error;
         }
       } else {
@@ -331,7 +334,7 @@ class SessionApp extends ChangeNotifier {
       }
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      BannerController.I.show(message: error.message);
+      BannerController.I.showError(error: error, message: error.message);
       yield AuthState.error;
     }
   }
@@ -387,7 +390,7 @@ class SessionApp extends ChangeNotifier {
       );
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      BannerController.I.show(message: error.message);
+      BannerController.I.showError(error: error, message: error.message);
     } finally {
       firebaseRemoveFCM?.call();
       cleareSession();
@@ -402,7 +405,7 @@ class SessionApp extends ChangeNotifier {
       hiveStore.clean();
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      BannerController.I.show(message: error.message);
+      BannerController.I.showError(error: error, message: error.message);
       hiveStore.delete('dio_cache');
     }
   }
