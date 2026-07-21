@@ -91,7 +91,7 @@ class AppWebsocketChat extends WebSocketChat {
     _controller.add(_state);
   }
 
-  void emitDraft() => _emit(
+  void openDraftChat() => _emit(
     (s) => s.copyWith(
       messages: [],
       didSendInitialMessage: true,

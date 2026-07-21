@@ -55,7 +55,7 @@ class _ChatViewState extends State<ChatView> {
 
     if (websocketApp.isDraft) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        websocketApp.emitDraft();
+        websocketApp.openDraftChat();
       });
     } else {
       websocketApp.connect();
