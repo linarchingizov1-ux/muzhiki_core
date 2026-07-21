@@ -108,25 +108,25 @@ class AppWebsocketChat extends WebSocketChat {
     ),
   );
 
-  Future<bool> createSessionAndConnect() async {
-    if (_isCreating) return false;
+  Future<int?> createSessionAndConnect() async {
+    if (_isCreating) return null;
     _isCreating = true;
     try {
       if (isDraft) {
-        if (channelId == null) return false;
+        if (channelId == null) return null;
         try {
           sessionChatId = await chatUsecase.createSession(
             channelId: channelId!,
           );
         } catch (e, st) {
           _handleError(e, st, showBanner: true);
-          return false;
+          return null;
         }
       }
       if (_channel == null) {
         await connect();
       }
-      return _channel != null;
+      return _channel != null ? sessionChatId : null;
     } finally {
       _isCreating = false;
     }
@@ -134,7 +134,7 @@ class AppWebsocketChat extends WebSocketChat {
 
   @override
   Future<void> connect() async {
-    if (_isConnecting || _channel != null) return;
+    if (sessionChatId == null || _isConnecting || _channel != null) return;
 
     _isConnecting = true;
 
@@ -307,6 +307,7 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   void _handleNewMessage(Map<String, dynamic> json) {
+    if (sessionChatId == null) return;
     final socketMessage = NewMessageModel.fromJson(json);
 
     final message = MessageModel(
@@ -329,6 +330,7 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   Future<void> _handleSessionClosed(dynamic map) async {
+    if (sessionChatId == null) return;
     await readMessage(sessionId: sessionChatId!);
 
     _markClosed(map);
