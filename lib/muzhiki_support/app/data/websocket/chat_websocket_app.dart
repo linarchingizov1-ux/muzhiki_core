@@ -343,7 +343,6 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   void _markClosed(dynamic map) {
-    print("Пришел евент ${map['event']}");
     final socket = _state.socket;
 
     if (socket == null) return;

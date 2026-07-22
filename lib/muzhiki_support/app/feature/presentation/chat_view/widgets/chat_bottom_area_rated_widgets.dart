@@ -41,6 +41,18 @@ class _ChatBottomAreaRatedWidgetsState
     }
   }
 
+  void setStateFlutterShit({
+    required BuildContext context,
+    required dynamic state,
+    required dynamic value,
+  }) {
+    if (context.mounted) {
+      setState(() {
+        state = value;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -79,9 +91,14 @@ class _ChatBottomAreaRatedWidgetsState
                   return Expanded(
                     child: InkWell(
                       onTap: () {
-                        setState(() {
-                          selectedStar = index + 1;
-                        });
+                        setStateFlutterShit(
+                          context: context,
+                          state: selectedStar,
+                          value: index + 1,
+                        );
+                        // setState(() {
+                        //   selectedStar = index + 1;
+                        // });
                       },
                       child: Padding(
                         key: ValueKey('$index and $selectedStar'),
@@ -115,18 +132,31 @@ class _ChatBottomAreaRatedWidgetsState
                         if (selectedStar == 0 && widget.state.socket == null) {
                           return;
                         }
-                        setState(() {
-                          isLoadingReview = true;
-                        });
+                        setStateFlutterShit(
+                          context: context,
+                          state: isLoadingReview,
+                          value: true,
+                        );
+                        // setState(() {
+                        //   isLoadingReview = true;
+                        // });
                         widget.webSocketApp
                             .reviewChat(
                               sessionId: widget.state.socket!.id,
                               score: selectedStar,
                             )
                             .then((_) {
-                              setState(() {
-                                isLoadingReview = false;
-                              });
+                              if (context.mounted) {
+                                setStateFlutterShit(
+                                  context: context,
+                                  state: isLoadingReview,
+                                  value: false,
+                                );
+                              }
+
+                              // setState(() {
+                              //   isLoadingReview = false;
+                              // });
                             });
                       },
                       label: 'Оценить',
@@ -159,15 +189,27 @@ class _ChatBottomAreaRatedWidgetsState
                       if (selectedStar == 0 && widget.state.socket == null) {
                         return;
                       }
-                      setState(() {
-                        isLoadingReopen = true;
-                      });
+                      setStateFlutterShit(
+                        context: context,
+                        state: isLoadingReopen,
+                        value: true,
+                      );
+                      // setState(() {
+                      //   isLoadingReopen = true;
+                      // });
                       widget.webSocketApp
                           .reopenWebChat(sessionId: widget.state.socket!.id)
                           .then((_) {
-                            setState(() {
-                              isLoadingReopen = false;
-                            });
+                            if (context.mounted) {
+                              setStateFlutterShit(
+                                context: context,
+                                state: isLoadingReopen,
+                                value: false,
+                              );
+                            }
+                            // setState(() {
+                            //   isLoadingReopen = false;
+                            // });
                           });
                     },
                     label: 'Вопрос не решён',
