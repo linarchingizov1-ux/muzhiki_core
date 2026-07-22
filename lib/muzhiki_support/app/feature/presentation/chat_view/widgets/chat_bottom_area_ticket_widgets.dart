@@ -65,33 +65,36 @@ class _ChatBottomAreaTicketWidgetsState
 
               if (widget.state.socket != null &&
                   widget.state.socket!.deadline != null)
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 7.h,
-                    horizontal: 10.w,
-                  ),
-                  decoration: BoxDecoration(
-                    color: SupportColors.light,
-                    borderRadius: BorderRadius.circular(42.r),
-                  ),
-                  child: Text.rich(
-                    TextSpan(
-                      text: "Дедлайн  ",
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                        color: SupportColors.alertTextGrey,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: widget.state.socket!.deadline?.formatDate,
-                          style: TextStyle(color: SupportColors.black17),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 28.h),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 7.h,
+                      horizontal: 10.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: SupportColors.light,
+                      borderRadius: BorderRadius.circular(42.r),
+                    ),
+                    child: Text.rich(
+                      TextSpan(
+                        text: "Дедлайн  ",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: SupportColors.alertTextGrey,
                         ),
-                      ],
+                        children: [
+                          TextSpan(
+                            text: widget.state.socket!.deadline?.formatDate,
+                            style: TextStyle(color: SupportColors.black17),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              SizedBox(height: 28.h),
+
               Text(
                 'После решения задачи вам придет уведомление',
                 style: TextStyle(
