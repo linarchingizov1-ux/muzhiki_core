@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:muzhiki_core/muzhiki_report_problem/config/report_problem_config
 import 'package:muzhiki_core/muzhiki_report_problem/presentation/report_problem_dialog.dart';
 import 'package:muzhiki_core/muzhiki_report_problem/presentation/widgets/app_standart_dialog.dart';
 import 'package:shake/shake.dart';
+import 'package:vibration/vibration.dart';
 
 class ShakeReportListener extends StatefulWidget {
   final ReportProblemConfig config;
@@ -33,8 +35,8 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
     final isIos = Platform.isIOS;
     _detector = ShakeDetector.autoStart(
       minimumShakeCount: 2,
-      shakeThresholdGravity: isIos ? 1.7 : 2.3,
-      shakeSlopTimeMS: isIos ? 200 : 500,
+      shakeThresholdGravity: isIos ? 1.7 : 2,
+      shakeSlopTimeMS: isIos ? 200 : 400,
       onPhoneShake: (_) => _openDialog(),
     );
   }
@@ -42,6 +44,11 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
   Future<void> _openDialog() async {
     if (_isDialogOpen) return;
     _isDialogOpen = true;
+    if (await Vibration.hasVibrator()) {
+      unawaited(
+        Vibration.vibrate(duration: 100, amplitude: 200, sharpness: 0.7),
+      );
+    }
     try {
       await AppStandartDialog.open<void>(
         backgroundColor: ReportProblemColors.appBackgroud,
