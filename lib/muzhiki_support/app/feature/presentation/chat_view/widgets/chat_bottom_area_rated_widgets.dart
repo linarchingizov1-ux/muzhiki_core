@@ -41,18 +41,6 @@ class _ChatBottomAreaRatedWidgetsState
     }
   }
 
-  void setStateFlutterShit({
-    required BuildContext context,
-    required dynamic state,
-    required dynamic value,
-  }) {
-    if (context.mounted) {
-      setState(() {
-        state = value;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -91,14 +79,11 @@ class _ChatBottomAreaRatedWidgetsState
                   return Expanded(
                     child: InkWell(
                       onTap: () {
-                        setStateFlutterShit(
-                          context: context,
-                          state: selectedStar,
-                          value: index + 1,
-                        );
-                        // setState(() {
-                        //   selectedStar = index + 1;
-                        // });
+                        if (context.mounted) {
+                          setState(() {
+                            selectedStar = index + 1;
+                          });
+                        }
                       },
                       child: Padding(
                         key: ValueKey('$index and $selectedStar'),
@@ -132,14 +117,13 @@ class _ChatBottomAreaRatedWidgetsState
                         if (selectedStar == 0 && widget.state.socket == null) {
                           return;
                         }
-                        setStateFlutterShit(
-                          context: context,
-                          state: isLoadingReview,
-                          value: true,
-                        );
-                        // setState(() {
-                        //   isLoadingReview = true;
-                        // });
+
+                        if (context.mounted) {
+                          setState(() {
+                            isLoadingReview = true;
+                          });
+                        }
+
                         widget.webSocketApp
                             .reviewChat(
                               sessionId: widget.state.socket!.id,
@@ -147,16 +131,10 @@ class _ChatBottomAreaRatedWidgetsState
                             )
                             .then((_) {
                               if (context.mounted) {
-                                setStateFlutterShit(
-                                  context: context,
-                                  state: isLoadingReview,
-                                  value: false,
-                                );
+                                setState(() {
+                                  isLoadingReview = false;
+                                });
                               }
-
-                              // setState(() {
-                              //   isLoadingReview = false;
-                              // });
                             });
                       },
                       label: 'Оценить',
@@ -189,27 +167,20 @@ class _ChatBottomAreaRatedWidgetsState
                       if (selectedStar == 0 && widget.state.socket == null) {
                         return;
                       }
-                      setStateFlutterShit(
-                        context: context,
-                        state: isLoadingReopen,
-                        value: true,
-                      );
-                      // setState(() {
-                      //   isLoadingReopen = true;
-                      // });
+
+                      if (context.mounted) {
+                        setState(() {
+                          isLoadingReopen = true;
+                        });
+                      }
                       widget.webSocketApp
                           .reopenWebChat(sessionId: widget.state.socket!.id)
                           .then((_) {
                             if (context.mounted) {
-                              setStateFlutterShit(
-                                context: context,
-                                state: isLoadingReopen,
-                                value: false,
-                              );
+                              setState(() {
+                                isLoadingReopen = false;
+                              });
                             }
-                            // setState(() {
-                            //   isLoadingReopen = false;
-                            // });
                           });
                     },
                     label: 'Вопрос не решён',
