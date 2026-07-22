@@ -32,7 +32,7 @@ class _ChatBottomAreaTicketWidgetsState
       top: false,
       bottom: Platform.isIOS ? false : true,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+        padding: EdgeInsets.only(left: 17.w, right: 17.h, bottom: 10.h),
         child: Container(
           padding: EdgeInsets.all(10.r),
           decoration: BoxDecoration(
