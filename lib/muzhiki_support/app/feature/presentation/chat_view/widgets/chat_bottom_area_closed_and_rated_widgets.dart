@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
@@ -34,56 +36,56 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 17.w,
-        right: 17.w,
-        bottom: MediaQuery.viewPaddingOf(context).bottom + 8.w,
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(10.r),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18.r),
-          color: SupportColors.white,
-        ),
-        child: Column(
-          spacing: 24.h,
-          crossAxisAlignment: !hideReopenButton
-              ? CrossAxisAlignment.start
-              : CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Обращение закрыто',
-              style: TextStyle(
-                height: 1.h,
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
+    return SafeArea(
+      top: false,
+      bottom: Platform.isIOS ? false : true,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(10.r),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18.r),
+            color: SupportColors.white,
+          ),
+          child: Column(
+            spacing: 24.h,
+            crossAxisAlignment: !hideReopenButton
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Обращение закрыто',
+                style: TextStyle(
+                  height: 1.h,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            if (!hideReopenButton)
-              AppButton(
-                height: 43,
-                isLoading: isLoadingReopen,
-                backgroundColor: SupportColors.light,
-                progressColor: SupportColors.black17,
-                labelColor: SupportColors.black17,
-                mode: ButtonMode.rounded,
-                onPressed: () {
-                  setState(() {
-                    isLoadingReopen = true;
-                  });
-                  widget.webSocketApp
-                      .reopenWebChat(sessionId: widget.state.socket!.id)
-                      .then((_) {
-                        setState(() {
-                          isLoadingReopen = false;
+              if (!hideReopenButton)
+                AppButton(
+                  height: 43,
+                  isLoading: isLoadingReopen,
+                  backgroundColor: SupportColors.light,
+                  progressColor: SupportColors.black17,
+                  labelColor: SupportColors.black17,
+                  mode: ButtonMode.rounded,
+                  onPressed: () {
+                    setState(() {
+                      isLoadingReopen = true;
+                    });
+                    widget.webSocketApp
+                        .reopenWebChat(sessionId: widget.state.socket!.id)
+                        .then((_) {
+                          setState(() {
+                            isLoadingReopen = false;
+                          });
                         });
-                      });
-                },
-                label: 'Вопрос не решён',
-              ),
-          ],
+                  },
+                  label: 'Вопрос не решён',
+                ),
+            ],
+          ),
         ),
       ),
     );
