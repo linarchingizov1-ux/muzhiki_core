@@ -34,7 +34,7 @@ class _ChatBottomAreaTicketWidgetsState
       child: Padding(
         padding: EdgeInsets.only(left: 17.w, right: 17.h, bottom: 10.h),
         child: Container(
-          padding: EdgeInsets.all(10.r),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.r),
             color: SupportColors.white,
