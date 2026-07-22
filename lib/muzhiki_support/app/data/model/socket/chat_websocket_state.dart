@@ -141,7 +141,7 @@ class WebSocketChatState {
 
   String? get operatorAvatar => socket?.avatar;
 
-  String? get createdAt => socket?.createdAt.formatDate;
+  String? get createdAt => socket?.createdAt?.formatDate;
 
   String get stringStatus {
     if (status == SocketConnectionChatStatus.close) {
@@ -151,6 +151,10 @@ class WebSocketChatState {
     if (status == SocketConnectionChatStatus.work ||
         status == SocketConnectionChatStatus.open) {
       return 'В работе';
+    }
+
+    if (status == SocketConnectionChatStatus.inital) {
+      return "";
     }
 
     return 'Ожидает вашего ответа';

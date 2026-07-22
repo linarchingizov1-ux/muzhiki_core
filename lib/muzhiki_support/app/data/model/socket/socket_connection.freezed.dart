@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$SocketConnectionModel {
 
  int get id; ChatType get type;@JsonKey(name: 'chat_id') int get chatId;@JsonKey(readValue: readAvatar) String? get avatar;// @JsonKey(name: 'deadline', fromJson: fromJsonDate)
- DateTime? get deadline; List<MessageModel> get messages; SocketConnectionChatStatus get status;@JsonKey(name: 'can_write') bool get canWrite;@JsonKey(name: 'created_at', fromJson: fromJsonDate) DateTime get createdAt; String get title;@JsonKey(name: 'channel_id') int get channelId;@JsonKey(name: 'rated') bool get isRated;
+ DateTime? get deadline; List<MessageModel> get messages; SocketConnectionChatStatus get status;@JsonKey(name: 'can_write') bool get canWrite;@JsonKey(name: 'created_at', fromJson: fromJsonDate) DateTime? get createdAt; String get title;@JsonKey(name: 'channel_id') int get channelId;@JsonKey(name: 'rated') bool get isRated;
 /// Create a copy of SocketConnectionModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $SocketConnectionModelCopyWith<$Res>  {
   factory $SocketConnectionModelCopyWith(SocketConnectionModel value, $Res Function(SocketConnectionModel) _then) = _$SocketConnectionModelCopyWithImpl;
 @useResult
 $Res call({
- int id, ChatType type,@JsonKey(name: 'chat_id') int chatId,@JsonKey(readValue: readAvatar) String? avatar, DateTime? deadline, List<MessageModel> messages, SocketConnectionChatStatus status,@JsonKey(name: 'can_write') bool canWrite,@JsonKey(name: 'created_at', fromJson: fromJsonDate) DateTime createdAt, String title,@JsonKey(name: 'channel_id') int channelId,@JsonKey(name: 'rated') bool isRated
+ int id, ChatType type,@JsonKey(name: 'chat_id') int chatId,@JsonKey(readValue: readAvatar) String? avatar, DateTime? deadline, List<MessageModel> messages, SocketConnectionChatStatus status,@JsonKey(name: 'can_write') bool canWrite,@JsonKey(name: 'created_at', fromJson: fromJsonDate) DateTime? createdAt, String title,@JsonKey(name: 'channel_id') int channelId,@JsonKey(name: 'rated') bool isRated
 });
 
 
@@ -66,7 +66,7 @@ class _$SocketConnectionModelCopyWithImpl<$Res>
 
 /// Create a copy of SocketConnectionModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? type = null,Object? chatId = null,Object? avatar = freezed,Object? deadline = freezed,Object? messages = null,Object? status = null,Object? canWrite = null,Object? createdAt = null,Object? title = null,Object? channelId = null,Object? isRated = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? type = null,Object? chatId = null,Object? avatar = freezed,Object? deadline = freezed,Object? messages = null,Object? status = null,Object? canWrite = null,Object? createdAt = freezed,Object? title = null,Object? channelId = null,Object? isRated = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
@@ -76,8 +76,8 @@ as String?,deadline: freezed == deadline ? _self.deadline : deadline // ignore: 
 as DateTime?,messages: null == messages ? _self.messages : messages // ignore: cast_nullable_to_non_nullable
 as List<MessageModel>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as SocketConnectionChatStatus,canWrite: null == canWrite ? _self.canWrite : canWrite // ignore: cast_nullable_to_non_nullable
-as bool,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as bool,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,channelId: null == channelId ? _self.channelId : channelId // ignore: cast_nullable_to_non_nullable
 as int,isRated: null == isRated ? _self.isRated : isRated // ignore: cast_nullable_to_non_nullable
 as bool,
@@ -165,7 +165,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  ChatType type, @JsonKey(name: 'chat_id')  int chatId, @JsonKey(readValue: readAvatar)  String? avatar,  DateTime? deadline,  List<MessageModel> messages,  SocketConnectionChatStatus status, @JsonKey(name: 'can_write')  bool canWrite, @JsonKey(name: 'created_at', fromJson: fromJsonDate)  DateTime createdAt,  String title, @JsonKey(name: 'channel_id')  int channelId, @JsonKey(name: 'rated')  bool isRated)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  ChatType type, @JsonKey(name: 'chat_id')  int chatId, @JsonKey(readValue: readAvatar)  String? avatar,  DateTime? deadline,  List<MessageModel> messages,  SocketConnectionChatStatus status, @JsonKey(name: 'can_write')  bool canWrite, @JsonKey(name: 'created_at', fromJson: fromJsonDate)  DateTime? createdAt,  String title, @JsonKey(name: 'channel_id')  int channelId, @JsonKey(name: 'rated')  bool isRated)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SocketConnectionModel() when $default != null:
 return $default(_that.id,_that.type,_that.chatId,_that.avatar,_that.deadline,_that.messages,_that.status,_that.canWrite,_that.createdAt,_that.title,_that.channelId,_that.isRated);case _:
@@ -186,7 +186,7 @@ return $default(_that.id,_that.type,_that.chatId,_that.avatar,_that.deadline,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  ChatType type, @JsonKey(name: 'chat_id')  int chatId, @JsonKey(readValue: readAvatar)  String? avatar,  DateTime? deadline,  List<MessageModel> messages,  SocketConnectionChatStatus status, @JsonKey(name: 'can_write')  bool canWrite, @JsonKey(name: 'created_at', fromJson: fromJsonDate)  DateTime createdAt,  String title, @JsonKey(name: 'channel_id')  int channelId, @JsonKey(name: 'rated')  bool isRated)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  ChatType type, @JsonKey(name: 'chat_id')  int chatId, @JsonKey(readValue: readAvatar)  String? avatar,  DateTime? deadline,  List<MessageModel> messages,  SocketConnectionChatStatus status, @JsonKey(name: 'can_write')  bool canWrite, @JsonKey(name: 'created_at', fromJson: fromJsonDate)  DateTime? createdAt,  String title, @JsonKey(name: 'channel_id')  int channelId, @JsonKey(name: 'rated')  bool isRated)  $default,) {final _that = this;
 switch (_that) {
 case _SocketConnectionModel():
 return $default(_that.id,_that.type,_that.chatId,_that.avatar,_that.deadline,_that.messages,_that.status,_that.canWrite,_that.createdAt,_that.title,_that.channelId,_that.isRated);case _:
@@ -206,7 +206,7 @@ return $default(_that.id,_that.type,_that.chatId,_that.avatar,_that.deadline,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  ChatType type, @JsonKey(name: 'chat_id')  int chatId, @JsonKey(readValue: readAvatar)  String? avatar,  DateTime? deadline,  List<MessageModel> messages,  SocketConnectionChatStatus status, @JsonKey(name: 'can_write')  bool canWrite, @JsonKey(name: 'created_at', fromJson: fromJsonDate)  DateTime createdAt,  String title, @JsonKey(name: 'channel_id')  int channelId, @JsonKey(name: 'rated')  bool isRated)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  ChatType type, @JsonKey(name: 'chat_id')  int chatId, @JsonKey(readValue: readAvatar)  String? avatar,  DateTime? deadline,  List<MessageModel> messages,  SocketConnectionChatStatus status, @JsonKey(name: 'can_write')  bool canWrite, @JsonKey(name: 'created_at', fromJson: fromJsonDate)  DateTime? createdAt,  String title, @JsonKey(name: 'channel_id')  int channelId, @JsonKey(name: 'rated')  bool isRated)?  $default,) {final _that = this;
 switch (_that) {
 case _SocketConnectionModel() when $default != null:
 return $default(_that.id,_that.type,_that.chatId,_that.avatar,_that.deadline,_that.messages,_that.status,_that.canWrite,_that.createdAt,_that.title,_that.channelId,_that.isRated);case _:
@@ -221,7 +221,7 @@ return $default(_that.id,_that.type,_that.chatId,_that.avatar,_that.deadline,_th
 @JsonSerializable()
 
 class _SocketConnectionModel implements SocketConnectionModel {
-  const _SocketConnectionModel({required this.id, required this.type, @JsonKey(name: 'chat_id') required this.chatId, @JsonKey(readValue: readAvatar) this.avatar, this.deadline, final  List<MessageModel> messages = const [], required this.status, @JsonKey(name: 'can_write') required this.canWrite, @JsonKey(name: 'created_at', fromJson: fromJsonDate) required this.createdAt, required this.title, @JsonKey(name: 'channel_id') required this.channelId, @JsonKey(name: 'rated') this.isRated = false}): _messages = messages;
+  const _SocketConnectionModel({required this.id, required this.type, @JsonKey(name: 'chat_id') required this.chatId, @JsonKey(readValue: readAvatar) this.avatar, this.deadline, final  List<MessageModel> messages = const [], required this.status, @JsonKey(name: 'can_write') required this.canWrite, @JsonKey(name: 'created_at', fromJson: fromJsonDate) this.createdAt, required this.title, @JsonKey(name: 'channel_id') required this.channelId, @JsonKey(name: 'rated') this.isRated = false}): _messages = messages;
   factory _SocketConnectionModel.fromJson(Map<String, dynamic> json) => _$SocketConnectionModelFromJson(json);
 
 @override final  int id;
@@ -239,7 +239,7 @@ class _SocketConnectionModel implements SocketConnectionModel {
 
 @override final  SocketConnectionChatStatus status;
 @override@JsonKey(name: 'can_write') final  bool canWrite;
-@override@JsonKey(name: 'created_at', fromJson: fromJsonDate) final  DateTime createdAt;
+@override@JsonKey(name: 'created_at', fromJson: fromJsonDate) final  DateTime? createdAt;
 @override final  String title;
 @override@JsonKey(name: 'channel_id') final  int channelId;
 @override@JsonKey(name: 'rated') final  bool isRated;
@@ -277,7 +277,7 @@ abstract mixin class _$SocketConnectionModelCopyWith<$Res> implements $SocketCon
   factory _$SocketConnectionModelCopyWith(_SocketConnectionModel value, $Res Function(_SocketConnectionModel) _then) = __$SocketConnectionModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id, ChatType type,@JsonKey(name: 'chat_id') int chatId,@JsonKey(readValue: readAvatar) String? avatar, DateTime? deadline, List<MessageModel> messages, SocketConnectionChatStatus status,@JsonKey(name: 'can_write') bool canWrite,@JsonKey(name: 'created_at', fromJson: fromJsonDate) DateTime createdAt, String title,@JsonKey(name: 'channel_id') int channelId,@JsonKey(name: 'rated') bool isRated
+ int id, ChatType type,@JsonKey(name: 'chat_id') int chatId,@JsonKey(readValue: readAvatar) String? avatar, DateTime? deadline, List<MessageModel> messages, SocketConnectionChatStatus status,@JsonKey(name: 'can_write') bool canWrite,@JsonKey(name: 'created_at', fromJson: fromJsonDate) DateTime? createdAt, String title,@JsonKey(name: 'channel_id') int channelId,@JsonKey(name: 'rated') bool isRated
 });
 
 
@@ -294,7 +294,7 @@ class __$SocketConnectionModelCopyWithImpl<$Res>
 
 /// Create a copy of SocketConnectionModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? chatId = null,Object? avatar = freezed,Object? deadline = freezed,Object? messages = null,Object? status = null,Object? canWrite = null,Object? createdAt = null,Object? title = null,Object? channelId = null,Object? isRated = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? chatId = null,Object? avatar = freezed,Object? deadline = freezed,Object? messages = null,Object? status = null,Object? canWrite = null,Object? createdAt = freezed,Object? title = null,Object? channelId = null,Object? isRated = null,}) {
   return _then(_SocketConnectionModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
@@ -304,8 +304,8 @@ as String?,deadline: freezed == deadline ? _self.deadline : deadline // ignore: 
 as DateTime?,messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
 as List<MessageModel>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as SocketConnectionChatStatus,canWrite: null == canWrite ? _self.canWrite : canWrite // ignore: cast_nullable_to_non_nullable
-as bool,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as bool,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,channelId: null == channelId ? _self.channelId : channelId // ignore: cast_nullable_to_non_nullable
 as int,isRated: null == isRated ? _self.isRated : isRated // ignore: cast_nullable_to_non_nullable
 as bool,

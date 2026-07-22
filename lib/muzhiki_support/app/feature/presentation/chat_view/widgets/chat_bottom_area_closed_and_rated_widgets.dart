@@ -31,7 +31,11 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
   void initState() {
     super.initState();
     final createdAt = widget.state.socket!.createdAt;
-    hideReopenButton = DateTime.now().difference(createdAt).inDays >= 1;
+    if (createdAt != null) {
+      hideReopenButton = DateTime.now().difference(createdAt).inDays >= 1;
+    } else {
+      hideReopenButton = true;
+    }
   }
 
   @override

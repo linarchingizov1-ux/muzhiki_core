@@ -35,7 +35,11 @@ class _ChatBottomAreaRatedWidgetsState
   void initState() {
     super.initState();
     final createdAt = widget.state.socket!.createdAt;
-    hideReopenButton = DateTime.now().difference(createdAt).inDays >= 1;
+    if (createdAt != null) {
+      hideReopenButton = DateTime.now().difference(createdAt).inDays >= 1;
+    } else {
+      hideReopenButton = true;
+    }
   }
 
   @override
@@ -87,32 +91,11 @@ class _ChatBottomAreaRatedWidgetsState
                           height: 40.r,
                           width: 40.r,
                           child: Center(
-                            child:
-                                Image.asset(
-                                      isSelected
-                                          ? SupportAssets.I.png.starEnable
-                                          : SupportAssets.I.png.starDisable,
-                                    )
-                                    .animate(target: isSelected ? 1 : 0)
-                                    .shimmer(duration: 500.ms, delay: 80.ms)
-                                    .shake(
-                                      duration: 180.ms,
-                                      delay: 80.ms,
-                                      offset: const Offset(2, 0),
-                                    )
-                                    .then()
-                                    .moveY(
-                                      begin: 0,
-                                      end: -3,
-                                      duration: 120.ms,
-                                      curve: Curves.easeOut,
-                                    )
-                                    .moveY(
-                                      begin: -3,
-                                      end: 0,
-                                      duration: 120.ms,
-                                      curve: Curves.easeIn,
-                                    ),
+                            child: Image.asset(
+                              isSelected
+                                  ? SupportAssets.I.png.starEnable
+                                  : SupportAssets.I.png.starDisable,
+                            ),
                           ),
                         ),
                       ),

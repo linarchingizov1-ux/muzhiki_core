@@ -100,10 +100,9 @@ class AppWebsocketChat extends WebSocketChat {
         chatId: 0,
         channelId: 0,
         type: ChatType.session,
-        status: SocketConnectionChatStatus.open,
+        status: SocketConnectionChatStatus.inital,
         canWrite: true,
-        createdAt: DateTime.now(),
-        title: 'Новое обращение',
+        title: 'Черновик',
       ),
     ),
   );
@@ -169,8 +168,6 @@ class AppWebsocketChat extends WebSocketChat {
       _isConnecting = false;
       _channel = channel;
 
-      // PushManager.instance.offPush();
-
       _subscription?.cancel();
       _subscription = channel.stream.listen(
         _onSocketData,
@@ -202,7 +199,6 @@ class AppWebsocketChat extends WebSocketChat {
 
   @override
   Future<void> dispose() async {
-    // PushManager.instance.onPush();
     await disconnect();
 
     await _controller.close();
@@ -281,8 +277,6 @@ class AppWebsocketChat extends WebSocketChat {
       final map = jsonDecode(raw) as Map<String, dynamic>;
 
       final event = map['event'];
-
-      print(event);
 
       switch (event) {
         case 'NewMessage':

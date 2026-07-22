@@ -20,6 +20,7 @@ enum SocketConnectionChatStatus {
   @JsonValue('waiting')
   wait,
   activeTicket,
+  inital,
 }
 
 @freezed
@@ -28,39 +29,29 @@ abstract class SocketConnectionModel with _$SocketConnectionModel {
     required int id,
     required ChatType type,
 
-    @JsonKey(name: 'chat_id')
-    required int chatId,
+    @JsonKey(name: 'chat_id') required int chatId,
 
-    @JsonKey(readValue: readAvatar)
-    String? avatar,
+    @JsonKey(readValue: readAvatar) String? avatar,
 
     // @JsonKey(name: 'deadline', fromJson: fromJsonDate)
     DateTime? deadline,
 
-    @Default([])
-    List<MessageModel> messages,
+    @Default([]) List<MessageModel> messages,
 
     required SocketConnectionChatStatus status,
 
-    @JsonKey(name: 'can_write')
-    required bool canWrite,
+    @JsonKey(name: 'can_write') required bool canWrite,
 
-    @JsonKey(name: 'created_at', fromJson: fromJsonDate)
-    required DateTime createdAt,
+    @JsonKey(name: 'created_at', fromJson: fromJsonDate) DateTime? createdAt,
 
     required String title,
 
-    @JsonKey(name: 'channel_id')
-    required int channelId,
+    @JsonKey(name: 'channel_id') required int channelId,
 
-    @JsonKey(name: 'rated')
-    @Default(false)
-    bool isRated,
+    @JsonKey(name: 'rated') @Default(false) bool isRated,
   }) = _SocketConnectionModel;
 
-  factory SocketConnectionModel.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory SocketConnectionModel.fromJson(Map<String, dynamic> json) =>
       _$SocketConnectionModelFromJson(json);
 }
 

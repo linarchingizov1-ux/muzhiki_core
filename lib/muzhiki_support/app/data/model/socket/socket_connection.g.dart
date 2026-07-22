@@ -87,7 +87,7 @@ Map<String, dynamic> _$SocketConnectionModelToJson(
   'messages': instance.messages,
   'status': _$SocketConnectionChatStatusEnumMap[instance.status]!,
   'can_write': instance.canWrite,
-  'created_at': instance.createdAt.toIso8601String(),
+  'created_at': instance.createdAt?.toIso8601String(),
   'title': instance.title,
   'channel_id': instance.channelId,
   'rated': instance.isRated,
@@ -104,4 +104,5 @@ const _$SocketConnectionChatStatusEnumMap = {
   SocketConnectionChatStatus.open: 'Открыт',
   SocketConnectionChatStatus.wait: 'waiting',
   SocketConnectionChatStatus.activeTicket: 'activeTicket',
+  SocketConnectionChatStatus.inital: 'inital',
 };
