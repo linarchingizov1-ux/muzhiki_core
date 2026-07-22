@@ -15,7 +15,6 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_r
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/user.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:talker/talker.dart';
 
 enum AuthState { init, load, inBrows, success, error }
 
@@ -159,7 +158,6 @@ class SessionApp extends ChangeNotifier {
   void refreshSession() async => await fresh.refreshToken();
 
   Stream<AuthState> loginSession({String path = '/'}) async* {
-    final talker = Talker();
     await MuzhikiUrlLaunch.I.close();
     yield AuthState.init;
     try {
@@ -171,9 +169,6 @@ class SessionApp extends ChangeNotifier {
       AuthorizationResponse? authResponse;
 
       yield AuthState.inBrows;
-      talker.debug(
-        "До ответа сервера есть ли допуск к информатору ? ${user?.isAllowedAccessInformator}",
-      );
       try {
         final authUrl = Uri.https('id2.muzhiki.pro', path).toString();
 
@@ -205,9 +200,7 @@ class SessionApp extends ChangeNotifier {
         yield AuthState.error;
         return;
       }
-      talker.debug(
-        "После сервера есть ли допуск к информатору ? ${user?.isAllowedAccessInformator}",
-      );
+
       final code = authResponse.authorizationAdditionalParameters!['auth_code'];
       final codeVerifier = authResponse.codeVerifier;
 
@@ -273,14 +266,9 @@ class SessionApp extends ChangeNotifier {
 
           String? selectedCompany = savedCompanyId;
           bool allowedInformator = false;
-          talker.debug(
-            "Когда обменяли на токен и только объявили allowedInformator есть доступ к информатору ? $allowedInformator",
-          );
           if (roles != null) {
-            talker.debug("Есть роли, смотрим допуск");
             allowedInformator = roles.info.accessAllowedInformator;
             final companies = roles.info.getCompaniesByRole(roles.currentRole);
-            talker.debug("Есть доступ к информатору ? $allowedInformator");
             final hasSavedCompany = companies.any(
               (c) => c.id == savedCompanyId,
             );
@@ -291,9 +279,6 @@ class SessionApp extends ChangeNotifier {
                   : null;
             }
           }
-          talker.debug(
-            "Есть доступ к информатору когда мы вышли в roles != null проверки ? $allowedInformator",
-          );
           final isFirstAuth = sharedPreferences.getBool('first_auth');
           final user = UserModel(
             isAllowedAccessInformator: allowedInformator,
