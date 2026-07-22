@@ -4,7 +4,13 @@ import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/extension/date_format.dart';
 
-enum ChatFooterState { chat, closedNeedRating, closedRated, ticketActive }
+enum ChatFooterState {
+  chat,
+  closedNeedRating,
+  closedRated,
+  ticketActive,
+  initial,
+}
 
 class WebSocketChatState {
   final List<MessageModel> messages;

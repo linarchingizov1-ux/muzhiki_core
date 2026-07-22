@@ -16,6 +16,10 @@ extension SocketConnectionUiX on SocketConnectionModel {
       return ChatFooterState.chat;
     }
 
+    if (status == SocketConnectionChatStatus.inital) {
+      return ChatFooterState.initial;
+    }
+
     if (isRated) {
       return ChatFooterState.closedRated;
     }

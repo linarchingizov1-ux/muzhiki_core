@@ -115,7 +115,7 @@ class ChatMessageWidgets extends StatelessWidget {
                         webSocketApp: websocket,
                         state: snapshot.data!,
                       );
-                    case ChatFooterState.chat:
+                    case ChatFooterState.chat || ChatFooterState.initial:
                       return const SizedBox.shrink();
                   }
                 },

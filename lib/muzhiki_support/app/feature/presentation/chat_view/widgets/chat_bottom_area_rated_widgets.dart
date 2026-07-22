@@ -28,7 +28,6 @@ class _ChatBottomAreaRatedWidgetsState
   int selectedStar = 0;
   bool isLoadingReview = false;
   bool isLoadingReopen = false;
-  late DateTime createdAt;
   bool hideReopenButton = false;
 
   @override
