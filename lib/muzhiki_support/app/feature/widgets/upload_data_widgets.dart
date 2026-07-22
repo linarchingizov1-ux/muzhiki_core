@@ -96,7 +96,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
       setState(() {});
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      BannerController.I.show(message: error.message);
+      BannerController.I.showError(error: error, message: error.message);
     }
   }
 

@@ -5,5 +5,6 @@ class SupportRouteConstant {
   final videoView = '/video-view';
   final informator = '/informator';
   final chat = '/chat/:id';
+  final chatDraft = '/chat/draft';
   final photoView = '/photo-view';
 }

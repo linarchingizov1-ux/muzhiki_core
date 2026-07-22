@@ -76,6 +76,7 @@ flutter:
     - assets/support/svg/
     - assets/support/png/
     - assets/report_problem/svg/
+    - assets/network_problem/svg/
     
   plugin:
     platforms:

@@ -14,7 +14,6 @@ class ChatBottomWidgets extends StatefulWidget {
   final AttachmentsCubit attachmentsCubit;
   final Directory directory;
   final AppWebsocketChat websocket;
-  final int sessionId;
   final String initMessage;
   final AsyncSnapshot<WebSocketChatState> snapshot;
   const ChatBottomWidgets({
@@ -22,7 +21,6 @@ class ChatBottomWidgets extends StatefulWidget {
     required this.directory,
     required this.attachmentsCubit,
     required this.websocket,
-    required this.sessionId,
     required this.snapshot,
     required this.initMessage,
   });
@@ -102,8 +100,16 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
                     .toSet()
                     .toList();
 
+                int? sessionId = widget.websocket.sessionChatId;
+
+                if (widget.websocket.isDraft || !widget.websocket.isConnected) {
+                  sessionId = await widget.websocket.createSessionAndConnect();
+                }
+
+                if (sessionId == null) return;
+
                 await widget.websocket.sendMessage(
-                  sessionId: widget.sessionId,
+                  sessionId: sessionId,
                   text: text,
                   attachments: uuidFile,
                 );

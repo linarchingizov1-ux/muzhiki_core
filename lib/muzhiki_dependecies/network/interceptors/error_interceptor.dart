@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/network_problem_service.dart';
 
 class AppErrorInterceptor extends Interceptor {
-  AppErrorInterceptor();
+  AppErrorInterceptor({this.networkIssueService});
+
+  final NetworkProblemService? networkIssueService;
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
@@ -14,6 +17,7 @@ class AppErrorInterceptor extends Interceptor {
       return;
     }
 
+    networkIssueService?.onRequestError(err);
     handler.next(err);
   }
 }

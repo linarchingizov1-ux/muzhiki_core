@@ -16,8 +16,8 @@ import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 import 'package:video_compress/video_compress.dart';
 
-part 'attachments_state.dart';
 part 'attachments_cubit.freezed.dart';
+part 'attachments_state.dart';
 
 class AttachmentsCubit extends Cubit<AttachmentsState> {
   final Dio dio;
@@ -142,7 +142,8 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
         } catch (e, st) {
           final error = AppErrorMapper.I.map(e, st);
           final fileSizeMb = (fileSize / 1024 / 1024).toStringAsFixed(2);
-          BannerController.I.show(
+          BannerController.I.showError(
+            error: error,
             message:
                 '${error.message}\nФайл: ${file.name}\nРазмер файла: $fileSizeMb байт',
           );
@@ -156,7 +157,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
       emit(state.copyWith(stage: AttachmentProcessStage.idle));
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
-      BannerController.I.show(message: error.message);
+      BannerController.I.showError(error: error, message: error.message);
       emit(state.copyWith(stage: AttachmentProcessStage.error));
       emit(state.copyWith(stage: AttachmentProcessStage.idle));
     }
