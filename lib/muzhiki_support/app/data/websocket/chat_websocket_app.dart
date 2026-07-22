@@ -278,8 +278,6 @@ class AppWebsocketChat extends WebSocketChat {
 
       final event = map['event'];
 
-      print("Пришел эвент: $event");
-
       switch (event) {
         case 'NewMessage':
           _handleNewMessage(map);
@@ -345,16 +343,17 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   void _markClosed(dynamic map) {
+    print("Пришел евент ${map['event']}");
     final socket = _state.socket;
 
     if (socket == null) return;
 
     final payload = map['payload'] as Map<String, dynamic>?;
-
+    print("payload:  ${map['payload']}");
     if (payload == null) return;
 
     final ticket = payload['ticket'] as Map<String, dynamic>?;
-
+    print("Это тикет ? - ${ticket != null}\n$ticket");
     final isRated = payload['rated'] ?? false;
 
     ChatType type = socket.type;
@@ -374,10 +373,13 @@ class AppWebsocketChat extends WebSocketChat {
         deadline = formatIsoDate;
       }
       title = ticket['title'] ?? socket.title;
-
+      print("title тикета:  ${ticket['status']}");
       id = ticket['id'] ?? socket.id;
-
+      print("ID тикета:  ${ticket['status']}");
       status = _mapTicketStatus(ticket['status']);
+      print("Статус тикета:  ${ticket['status']}");
+    } else {
+      print("Нет ticket");
     }
 
     final updated = socket.copyWith(
@@ -389,7 +391,7 @@ class AppWebsocketChat extends WebSocketChat {
       status: status,
       canWrite: false,
     );
-
+    print("Обновили состояние сокета\n\n$updated");
     _emit((s) => s.copyWith(socket: updated));
   }
 
