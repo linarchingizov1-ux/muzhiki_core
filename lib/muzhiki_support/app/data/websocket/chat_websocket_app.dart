@@ -278,6 +278,8 @@ class AppWebsocketChat extends WebSocketChat {
 
       final event = map['event'];
 
+      print("Пришел эвент: $event");
+
       switch (event) {
         case 'NewMessage':
           _handleNewMessage(map);
