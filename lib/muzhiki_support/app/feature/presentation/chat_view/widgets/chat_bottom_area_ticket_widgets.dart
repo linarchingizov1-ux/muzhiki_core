@@ -104,8 +104,9 @@ class _ChatBottomAreaTicketWidgetsState
               SizedBox(height: 12.h),
               AppButton(
                 isLoading: isLoadingReopen,
-                height: 43,
+                height: 48,
                 backgroundColor: SupportColors.light,
+                labelWeight: FontWeight.w700,
                 progressColor: SupportColors.alertTextGrey,
                 labelColor: SupportColors.alertTextGrey,
                 mode: ButtonMode.rounded,
