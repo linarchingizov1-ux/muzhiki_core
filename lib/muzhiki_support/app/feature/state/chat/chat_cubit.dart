@@ -7,8 +7,8 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connec
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/extension/chat_extension.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/usecase/chat_usecase.dart';
 
-part 'chat_state.dart';
 part 'chat_cubit.freezed.dart';
+part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
   final ChatUseCase chatUseCase;
@@ -104,52 +104,6 @@ class ChatCubit extends Cubit<ChatState> {
         state.copyWith(
           chatStatus: StateStatus.success,
           messageChat: message.messages,
-        ),
-      );
-    } catch (e, st) {
-      addError(AppErrorMapper.I.map(e, st), st);
-
-      emit(state.copyWith(chatStatus: StateStatus.success));
-    }
-  }
-
-  Future<void> createSession({Function(int sessionId)? action}) async {
-    if (state.chatStatus != StateStatus.success) {
-      return;
-    }
-    if (state.channelId == null) return;
-
-    try {
-      emit(state.copyWith(chatStatus: StateStatus.loading));
-
-      final sessionId = await chatUseCase.createSession(
-        channelId: state.channelId!,
-      );
-
-      final socketConnection = await chatUseCase.getMessageChat(
-        sessionId: sessionId,
-      );
-
-      action?.call(sessionId);
-
-      final myChats = await chatUseCase.getMyChats(page: state.chatPage);
-
-      int channelId;
-      if (state.channelId != null) {
-        channelId = state.channelId!;
-      } else if (myChats.channels.isNotEmpty) {
-        channelId = myChats.channels.first.id;
-      } else {
-        channelId = 0;
-      }
-
-      final chats = myChats.chatsChannel(channelId: channelId);
-
-      emit(
-        state.copyWith(
-          chatStatus: StateStatus.success,
-          socketConnection: socketConnection,
-          chats: chats,
         ),
       );
     } catch (e, st) {

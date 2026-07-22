@@ -6,7 +6,6 @@ abstract class ChatState with _$ChatState {
     @Default(null) MyChatModel? myChat,
     @Default(1) int chatPage,
     @Default([]) List<MessageModel> messageChat,
-    SocketConnectionModel? socketConnection,
     @Default(0) int selectedChannels,
     int? channelId,
     @Default([]) List<ChatModel> chats,

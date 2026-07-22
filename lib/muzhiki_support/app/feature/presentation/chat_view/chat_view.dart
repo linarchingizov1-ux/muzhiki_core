@@ -21,7 +21,7 @@ class ChatView extends StatefulWidget {
   final Directory directory;
   final SessionApp session;
   final AttachmentsCubit attachmentsCubit;
-  final int id;
+  final int? id;
   final Object? extra;
 
   const ChatView({
@@ -48,10 +48,18 @@ class _ChatViewState extends State<ChatView> {
     super.initState();
     websocketApp = AppWebsocketChat(
       sessionChatId: widget.id,
+      channelId: widget.chatCubit.state.channelId,
       chatUsecase: widget.chatUseCase,
       session: widget.session,
     );
-    websocketApp.connect();
+
+    if (websocketApp.isDraft) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        websocketApp.openDraftChat();
+      });
+    } else {
+      websocketApp.connect();
+    }
 
     switch (widget.extra) {
       case SupportChatsEventWidgets event:
@@ -82,7 +90,7 @@ class _ChatViewState extends State<ChatView> {
       value: SystemUiOverlayStyle.dark,
       child: PopScope(
         onPopInvokedWithResult: (didPop, result) {
-          if (needUpdate) {
+          if (needUpdate || (widget.id == null && !websocketApp.isDraft)) {
             widget.chatCubit.silenceRefresh();
           }
         },
@@ -116,7 +124,6 @@ class _ChatViewState extends State<ChatView> {
                       snapshot: snapshot,
                       attachmentsCubit: widget.attachmentsCubit,
                       websocket: websocketApp,
-                      sessionId: widget.id,
                       initMessage: _startNewSessionText,
                       directory: widget.directory,
                     ),

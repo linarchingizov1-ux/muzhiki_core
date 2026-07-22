@@ -66,17 +66,12 @@ class _SupportViewState extends State<SupportView> {
         break;
 
       case SupportCreateSession(:final supportChatsEventWidgets):
-        widget.chatCubit.createSession(
-          action: (sessionId) {
-            if (mounted) {
-              context.pushNamed(
-                extra: supportChatsEventWidgets,
-                SupportRouteConstant.I.chat,
-                pathParameters: {'id': sessionId.toString()},
-              );
-            }
-          },
-        );
+        if (mounted) {
+          context.pushNamed(
+            extra: supportChatsEventWidgets,
+            SupportRouteConstant.I.chatDraft,
+          );
+        }
         break;
       case SupportOpenInformator(:final initalURL):
         if (mounted) {
@@ -104,16 +99,8 @@ class _SupportViewState extends State<SupportView> {
               builder: (context, state) {
                 if (state.chatStatus == StateStatus.success) {
                   return InkWell(
-                    onTap: () {
-                      widget.chatCubit.createSession(
-                        action: (sessionId) {
-                          context.pushNamed(
-                            SupportRouteConstant.I.chat,
-                            pathParameters: {'id': sessionId.toString()},
-                          );
-                        },
-                      );
-                    },
+                    onTap: () =>
+                        context.pushNamed(SupportRouteConstant.I.chatDraft),
                     child: Container(
                       height: 55.w,
                       width: 55.w,

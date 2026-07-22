@@ -39,6 +39,7 @@ class AppWebsocketChat extends WebSocketChat {
     required this.sessionChatId,
     required this.chatUsecase,
     required this.session,
+    this.channelId,
   }) {
     _listener = AppLifecycleListener(
       onShow: () async {
@@ -49,7 +50,9 @@ class AppWebsocketChat extends WebSocketChat {
       },
     );
   }
-  final int sessionChatId;
+
+  int? sessionChatId;
+  final int? channelId;
   final ChatUseCase chatUsecase;
   final SessionApp session;
 
@@ -74,6 +77,12 @@ class AppWebsocketChat extends WebSocketChat {
 
   final UuidV4 uuidService = UuidV4();
 
+  bool get isDraft => sessionChatId == null;
+
+  bool get isConnected => _channel != null;
+
+  bool _isCreating = false;
+
   void _emit(WebSocketChatState Function(WebSocketChatState state) updater) {
     if (_controller.isClosed) return;
 
@@ -82,15 +91,56 @@ class AppWebsocketChat extends WebSocketChat {
     _controller.add(_state);
   }
 
+  void openDraftChat() => _emit(
+    (s) => s.copyWith(
+      messages: [],
+      didSendInitialMessage: true,
+      socket: SocketConnectionModel(
+        id: 0,
+        chatId: 0,
+        channelId: 0,
+        type: ChatType.session,
+        status: SocketConnectionChatStatus.open,
+        canWrite: true,
+        createdAt: DateTime.now(),
+        title: 'Новое обращение',
+      ),
+    ),
+  );
+
+  Future<int?> createSessionAndConnect() async {
+    if (_isCreating) return null;
+    _isCreating = true;
+    try {
+      if (isDraft) {
+        if (channelId == null) return null;
+        try {
+          sessionChatId = await chatUsecase.createSession(
+            channelId: channelId!,
+          );
+        } catch (e, st) {
+          _handleError(e, st, showBanner: true);
+          return null;
+        }
+      }
+      if (_channel == null) {
+        await connect();
+      }
+      return _channel != null ? sessionChatId : null;
+    } finally {
+      _isCreating = false;
+    }
+  }
+
   @override
   Future<void> connect() async {
-    if (_isConnecting || _channel != null) return;
+    if (sessionChatId == null || _isConnecting || _channel != null) return;
 
     _isConnecting = true;
 
     try {
       final socketConnection = await chatUsecase.getMessageChat(
-        sessionId: sessionChatId,
+        sessionId: sessionChatId!,
       );
 
       final messages = List<MessageModel>.from(
@@ -129,7 +179,7 @@ class AppWebsocketChat extends WebSocketChat {
       );
 
       await _sendInitialMessageIfNeeded();
-      await readMessage(sessionId: sessionChatId);
+      await readMessage(sessionId: sessionChatId!);
     } catch (e, st) {
       _handleError(e, st, showBanner: true);
     } finally {
@@ -212,6 +262,7 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   Future<void> _resumeWS() async {
+    if (isDraft) return;
     if (_channel == null && !_isConnecting) {
       await connect();
     }
@@ -256,6 +307,7 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   void _handleNewMessage(Map<String, dynamic> json) {
+    if (sessionChatId == null) return;
     final socketMessage = NewMessageModel.fromJson(json);
 
     final message = MessageModel(
@@ -274,11 +326,12 @@ class AppWebsocketChat extends WebSocketChat {
 
     _emit((s) => s.copyWith(messages: [message, ...s.messages]));
 
-    unawaited(readMessage(sessionId: sessionChatId));
+    unawaited(readMessage(sessionId: sessionChatId!));
   }
 
   Future<void> _handleSessionClosed(dynamic map) async {
-    await readMessage(sessionId: sessionChatId);
+    if (sessionChatId == null) return;
+    await readMessage(sessionId: sessionChatId!);
 
     _markClosed(map);
 
