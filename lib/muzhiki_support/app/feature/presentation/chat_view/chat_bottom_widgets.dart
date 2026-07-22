@@ -59,7 +59,8 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
     if (socket == null) {
       return const SizedBox.shrink();
     }
-    if (socket.footerState == ChatFooterState.chat) {
+    if (socket.footerState == ChatFooterState.chat ||
+        socket.footerState == ChatFooterState.initial) {
       return BlocProvider.value(
         value: widget.attachmentsCubit,
         child: BlocBuilder<AttachmentsCubit, AttachmentsState>(
