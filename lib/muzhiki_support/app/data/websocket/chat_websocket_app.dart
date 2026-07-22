@@ -372,9 +372,9 @@ class AppWebsocketChat extends WebSocketChat {
         deadline = formatIsoDate;
       }
       title = ticket['title'] ?? socket.title;
-      print("title тикета:  ${ticket['status']}");
+      print("title тикета:  ${ticket['title']}");
       id = ticket['id'] ?? socket.id;
-      print("ID тикета:  ${ticket['status']}");
+      print("ID тикета:  ${ticket['id']}");
       status = _mapTicketStatus(ticket['status']);
       print("Статус тикета:  ${ticket['status']}");
     } else {
