@@ -277,7 +277,7 @@ class AppWebsocketChat extends WebSocketChat {
       final map = jsonDecode(raw) as Map<String, dynamic>;
 
       final event = map['event'];
-
+      print("Пришел event $event");
       switch (event) {
         case 'NewMessage':
           _handleNewMessage(map);
