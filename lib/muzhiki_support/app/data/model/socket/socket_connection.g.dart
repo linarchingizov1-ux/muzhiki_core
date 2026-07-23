@@ -26,13 +26,31 @@ const _$ChatAttachmentTypeEnumMap = {
   ChatAttachmentType.document: 'document',
 };
 
+_OperatorModel _$OperatorModelFromJson(Map<String, dynamic> json) =>
+    _OperatorModel(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      avatar: json['avatar'] as String?,
+    );
+
+Map<String, dynamic> _$OperatorModelToJson(_OperatorModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'avatar': instance.avatar,
+    };
+
 _SocketConnectionModel _$SocketConnectionModelFromJson(
   Map<String, dynamic> json,
 ) => _SocketConnectionModel(
   id: (json['id'] as num).toInt(),
   type: $enumDecode(_$ChatTypeEnumMap, json['type']),
   chatId: (json['chat_id'] as num).toInt(),
-  avatar: readAvatar(json, 'avatar') as String?,
+  operators:
+      (json['operator'] as List<dynamic>?)
+          ?.map((e) => OperatorModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
   deadline: json['deadline'] == null
       ? null
       : DateTime.parse(json['deadline'] as String),
@@ -55,7 +73,7 @@ Map<String, dynamic> _$SocketConnectionModelToJson(
   'id': instance.id,
   'type': _$ChatTypeEnumMap[instance.type]!,
   'chat_id': instance.chatId,
-  'avatar': instance.avatar,
+  'operator': instance.operators,
   'deadline': instance.deadline?.toIso8601String(),
   'messages': instance.messages,
   'status': _$SocketConnectionChatStatusEnumMap[instance.status]!,

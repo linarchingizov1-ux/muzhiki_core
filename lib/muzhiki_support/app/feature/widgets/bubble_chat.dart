@@ -49,7 +49,6 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
             !widget.isMe &&
             widget.mess.avatar != null &&
             widget.mess.avatar!.isNotEmpty;
-        print("Это оператор и есть аватарка ? $showAvatar");
         return Row(
           spacing: 6.w,
           mainAxisSize: MainAxisSize.min,
@@ -58,9 +57,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
               ? MainAxisAlignment.end
               : MainAxisAlignment.start,
           children: [
-            if (!widget.isMe &&
-                widget.mess.avatar != null &&
-                widget.mess.avatar!.isNotEmpty)
+            if (showAvatar)
               CircleAvatar(
                 radius: 28.r,
                 child: ClipOval(

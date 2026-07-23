@@ -26,6 +26,18 @@ enum SocketConnectionChatStatus {
 }
 
 @freezed
+abstract class OperatorModel with _$OperatorModel {
+  const factory OperatorModel({
+    required int id,
+    required String name,
+    String? avatar,
+  }) = _OperatorModel;
+
+  factory OperatorModel.fromJson(Map<String, dynamic> json) =>
+      _$OperatorModelFromJson(json);
+}
+
+@freezed
 abstract class SocketConnectionModel with _$SocketConnectionModel {
   const factory SocketConnectionModel({
     required int id,
@@ -33,9 +45,8 @@ abstract class SocketConnectionModel with _$SocketConnectionModel {
 
     @JsonKey(name: 'chat_id') required int chatId,
 
-    @JsonKey(readValue: readAvatar) String? avatar,
+    @JsonKey(name: 'operator') @Default([]) List<OperatorModel> operators,
 
-    // @JsonKey(name: 'deadline', fromJson: fromJsonDate)
     DateTime? deadline,
 
     @Default([]) List<MessageModel> messages,

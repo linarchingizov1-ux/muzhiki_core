@@ -145,7 +145,7 @@ class WebSocketChatState {
 
   String? get title => socket?.title;
 
-  String? get operatorAvatar => socket?.avatar;
+  String? get operatorAvatar => socket?.operators.firstOrNull?.avatar;
 
   String? get createdAt => socket?.createdAt?.formatDate;
 
