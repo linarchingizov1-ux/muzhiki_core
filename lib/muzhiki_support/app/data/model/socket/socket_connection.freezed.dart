@@ -592,7 +592,7 @@ as bool,
 /// @nodoc
 mixin _$MessageModel {
 
- String get id;@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? get createdAt; MessageStatus? get status; String get text; MessageType get type; String? get avatar;@JsonKey(name: 'operator_name') String? get name; List<AttachmentsModel> get attachments;
+ String get id;@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? get createdAt; MessageStatus? get status; String get text; MessageType get type;@JsonKey(name: 'operator_name') String? get name; List<AttachmentsModel> get attachments;
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -605,16 +605,16 @@ $MessageModelCopyWith<MessageModel> get copyWith => _$MessageModelCopyWithImpl<M
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.attachments, attachments));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.attachments, attachments));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,createdAt,status,text,type,avatar,name,const DeepCollectionEquality().hash(attachments));
+int get hashCode => Object.hash(runtimeType,id,createdAt,status,text,type,name,const DeepCollectionEquality().hash(attachments));
 
 @override
 String toString() {
-  return 'MessageModel(id: $id, createdAt: $createdAt, status: $status, text: $text, type: $type, avatar: $avatar, name: $name, attachments: $attachments)';
+  return 'MessageModel(id: $id, createdAt: $createdAt, status: $status, text: $text, type: $type, name: $name, attachments: $attachments)';
 }
 
 
@@ -625,7 +625,7 @@ abstract mixin class $MessageModelCopyWith<$Res>  {
   factory $MessageModelCopyWith(MessageModel value, $Res Function(MessageModel) _then) = _$MessageModelCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus? status, String text, MessageType type, String? avatar,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
+ String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus? status, String text, MessageType type,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
 });
 
 
@@ -642,15 +642,14 @@ class _$MessageModelCopyWithImpl<$Res>
 
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdAt = freezed,Object? status = freezed,Object? text = null,Object? type = null,Object? avatar = freezed,Object? name = freezed,Object? attachments = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdAt = freezed,Object? status = freezed,Object? text = null,Object? type = null,Object? name = freezed,Object? attachments = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as MessageStatus?,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as MessageType,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
-as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as MessageType,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,attachments: null == attachments ? _self.attachments : attachments // ignore: cast_nullable_to_non_nullable
 as List<AttachmentsModel>,
   ));
@@ -737,10 +736,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type,  String? avatar, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MessageModel() when $default != null:
-return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.avatar,_that.name,_that.attachments);case _:
+return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.name,_that.attachments);case _:
   return orElse();
 
 }
@@ -758,10 +757,10 @@ return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type,  String? avatar, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)  $default,) {final _that = this;
 switch (_that) {
 case _MessageModel():
-return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.avatar,_that.name,_that.attachments);case _:
+return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.name,_that.attachments);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -778,10 +777,10 @@ return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type,  String? avatar, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,) {final _that = this;
 switch (_that) {
 case _MessageModel() when $default != null:
-return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.avatar,_that.name,_that.attachments);case _:
+return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.name,_that.attachments);case _:
   return null;
 
 }
@@ -793,7 +792,7 @@ return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_tha
 @JsonSerializable()
 
 class _MessageModel implements MessageModel {
-  const _MessageModel({required this.id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate) this.createdAt, this.status, required this.text, this.type = MessageType.client, this.avatar, @JsonKey(name: 'operator_name') this.name, final  List<AttachmentsModel> attachments = const []}): _attachments = attachments;
+  const _MessageModel({required this.id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate) this.createdAt, this.status, required this.text, this.type = MessageType.client, @JsonKey(name: 'operator_name') this.name, final  List<AttachmentsModel> attachments = const []}): _attachments = attachments;
   factory _MessageModel.fromJson(Map<String, dynamic> json) => _$MessageModelFromJson(json);
 
 @override final  String id;
@@ -801,7 +800,6 @@ class _MessageModel implements MessageModel {
 @override final  MessageStatus? status;
 @override final  String text;
 @override@JsonKey() final  MessageType type;
-@override final  String? avatar;
 @override@JsonKey(name: 'operator_name') final  String? name;
  final  List<AttachmentsModel> _attachments;
 @override@JsonKey() List<AttachmentsModel> get attachments {
@@ -824,16 +822,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other._attachments, _attachments));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other._attachments, _attachments));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,createdAt,status,text,type,avatar,name,const DeepCollectionEquality().hash(_attachments));
+int get hashCode => Object.hash(runtimeType,id,createdAt,status,text,type,name,const DeepCollectionEquality().hash(_attachments));
 
 @override
 String toString() {
-  return 'MessageModel(id: $id, createdAt: $createdAt, status: $status, text: $text, type: $type, avatar: $avatar, name: $name, attachments: $attachments)';
+  return 'MessageModel(id: $id, createdAt: $createdAt, status: $status, text: $text, type: $type, name: $name, attachments: $attachments)';
 }
 
 
@@ -844,7 +842,7 @@ abstract mixin class _$MessageModelCopyWith<$Res> implements $MessageModelCopyWi
   factory _$MessageModelCopyWith(_MessageModel value, $Res Function(_MessageModel) _then) = __$MessageModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus? status, String text, MessageType type, String? avatar,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
+ String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus? status, String text, MessageType type,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
 });
 
 
@@ -861,15 +859,14 @@ class __$MessageModelCopyWithImpl<$Res>
 
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdAt = freezed,Object? status = freezed,Object? text = null,Object? type = null,Object? avatar = freezed,Object? name = freezed,Object? attachments = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdAt = freezed,Object? status = freezed,Object? text = null,Object? type = null,Object? name = freezed,Object? attachments = null,}) {
   return _then(_MessageModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as MessageStatus?,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as MessageType,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
-as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as MessageType,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,attachments: null == attachments ? _self._attachments : attachments // ignore: cast_nullable_to_non_nullable
 as List<AttachmentsModel>,
   ));

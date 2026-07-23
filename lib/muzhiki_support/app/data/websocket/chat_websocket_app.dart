@@ -326,7 +326,6 @@ class AppWebsocketChat extends WebSocketChat {
     final socketMessage = NewMessageModel.fromJson(json);
 
     final message = MessageModel(
-      avatar: _state.socket?.operators.firstOrNull?.avatar,
       name: socketMessage.payload.operatorName,
       id: socketMessage.payload.id,
       createdAt: socketMessage.payload.createdAu,

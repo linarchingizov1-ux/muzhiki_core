@@ -68,24 +68,6 @@ abstract class SocketConnectionModel with _$SocketConnectionModel {
       _$SocketConnectionModelFromJson(json);
 }
 
-Object? readAvatar(Map json, String key) {
-  final operators = json['operator'];
-
-  if (operators is List && operators.isNotEmpty) {
-    final first = operators.first;
-
-    if (first is Map<String, dynamic>) {
-      return first['avatar'];
-    }
-
-    if (first is Map) {
-      return first['avatar'];
-    }
-  }
-
-  return null;
-}
-
 DateTime fromJsonDate(String value) {
   return DateTime.parse(value).toLocal();
 }
@@ -109,8 +91,6 @@ abstract class MessageModel with _$MessageModel {
     required String text,
 
     @Default(MessageType.client) MessageType type,
-
-    String? avatar,
 
     @JsonKey(name: 'operator_name') String? name,
 

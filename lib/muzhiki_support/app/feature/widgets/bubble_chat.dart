@@ -46,9 +46,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
     return LayoutBuilder(
       builder: (context, constrained) {
         final bool showAvatar =
-            !widget.isMe &&
-            widget.mess.avatar != null &&
-            widget.mess.avatar!.isNotEmpty;
+            !widget.isMe && widget.avatar != null && widget.avatar!.isNotEmpty;
         return Row(
           spacing: 6.w,
           mainAxisSize: MainAxisSize.min,
@@ -59,10 +57,10 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
           children: [
             if (showAvatar)
               CircleAvatar(
-                radius: 28.r,
+                radius: 22.r,
                 child: ClipOval(
                   child: CachedNetworkImage(
-                    imageUrl: widget.mess.avatar!,
+                    imageUrl: widget.avatar!,
                     width: 56.r,
                     height: 56.r,
                     fit: BoxFit.cover,

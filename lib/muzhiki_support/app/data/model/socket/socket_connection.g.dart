@@ -107,7 +107,6 @@ _MessageModel _$MessageModelFromJson(Map<String, dynamic> json) =>
       type:
           $enumDecodeNullable(_$MessageTypeEnumMap, json['type']) ??
           MessageType.client,
-      avatar: json['avatar'] as String?,
       name: json['operator_name'] as String?,
       attachments:
           (json['attachments'] as List<dynamic>?)
@@ -123,7 +122,6 @@ Map<String, dynamic> _$MessageModelToJson(_MessageModel instance) =>
       'status': _$MessageStatusEnumMap[instance.status],
       'text': instance.text,
       'type': _$MessageTypeEnumMap[instance.type]!,
-      'avatar': instance.avatar,
       'operator_name': instance.name,
       'attachments': instance.attachments,
     };
