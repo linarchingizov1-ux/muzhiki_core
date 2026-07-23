@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:flutter/widgets.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
@@ -206,12 +207,15 @@ class AppWebsocketChat extends WebSocketChat {
     _listener.dispose();
   }
 
+  Talker get talker => Talker();
+
   @override
   Future<void> sendMessage({
     required int sessionId,
     required String text,
     List<String> attachments = const [],
   }) async {
+    talker.debug("Отправляем сообщение");
     if (!_state.canWrite) return;
 
     final trimmed = text.trim();
@@ -221,22 +225,31 @@ class AppWebsocketChat extends WebSocketChat {
     }
 
     final uuid = uuidService.generate();
+    talker.debug("Генерируем uuid $uuid");
+    final Map<String, dynamic> mess = {
+      'Event': 'NewMessage',
+      'Payload': {
+        "MessageUUID": uuid,
+        'SenderId': 2,
+        'SessionId': sessionId,
+        'Text': trimmed,
+        'Attachments': attachments,
+      },
+    };
+    talker.debug("Создали map $mess и отправили в изолят");
+    final decodeMessage = await Isolate.run(() => jsonEncode(mess));
 
     try {
-      _channel?.sink.add(
-        jsonEncode({
-          'Event': 'NewMessage',
-          'Payload': {
-            "MessageUUID": uuid,
-            'SenderId': 2,
-            'SessionId': sessionId,
-            'Text': trimmed,
-            'Attachments': attachments,
-          },
-        }),
-      );
+      _channel?.sink.add(decodeMessage);
+      talker.debug("Отправили сообщение в сокет");
       if (state.didSendInitialMessage) {
-        _emit((s) => s.copyWith(didSendInitialMessage: false));
+        _emit((s) {
+          final newEmit = s.copyWith(didSendInitialMessage: false);
+          talker.debug(
+            "Переключили didSendInitialMessage на ${newEmit.didSendInitialMessage}",
+          );
+          return newEmit;
+        });
       }
     } catch (e, st) {
       _handleError(e, st, showBanner: true);
@@ -277,7 +290,6 @@ class AppWebsocketChat extends WebSocketChat {
       final map = jsonDecode(raw) as Map<String, dynamic>;
 
       final event = map['event'];
-      print("Пришел event $event");
       switch (event) {
         case 'NewMessage':
           _handleNewMessage(map);
@@ -302,8 +314,11 @@ class AppWebsocketChat extends WebSocketChat {
 
   void _handleNewMessage(Map<String, dynamic> json) {
     if (sessionChatId == null) return;
+    talker.debug("Получили евент нового сообщения");
     final socketMessage = NewMessageModel.fromJson(json);
-
+    talker.debug(
+      "Делаем [FromJson] модели NewMessageModel\nБыло: $json\nСтало: $socketMessage",
+    );
     final message = MessageModel(
       avatar: _state.socket?.avatar,
       name: socketMessage.payload.operatorName,
@@ -317,9 +332,9 @@ class AppWebsocketChat extends WebSocketChat {
     final exists = _state.messages.any((e) => e.id == message.id);
 
     if (exists) return;
-
+    talker.debug("Добавляем сообщение в массив");
     _emit((s) => s.copyWith(messages: [message, ...s.messages]));
-
+    talker.debug("Читаем соощения и помечаем сразу как прочитанные");
     unawaited(readMessage(sessionId: sessionChatId!));
   }
 
@@ -348,11 +363,9 @@ class AppWebsocketChat extends WebSocketChat {
     if (socket == null) return;
 
     final payload = map['payload'] as Map<String, dynamic>?;
-    print("payload:  ${map['payload']}");
     if (payload == null) return;
 
     final ticket = payload['ticket'] as Map<String, dynamic>?;
-    print("Это тикет ? - ${ticket != null}\n$ticket");
     final isRated = payload['rated'] ?? false;
 
     ChatType type = socket.type;
@@ -372,13 +385,8 @@ class AppWebsocketChat extends WebSocketChat {
         deadline = formatIsoDate;
       }
       title = ticket['title'] ?? socket.title;
-      print("title тикета:  ${ticket['title']}");
       id = ticket['id'] ?? socket.id;
-      print("ID тикета:  ${ticket['id']}");
       status = _mapTicketStatus(ticket['status']);
-      print("Статус тикета:  ${ticket['status']}");
-    } else {
-      print("Нет ticket");
     }
 
     final updated = socket.copyWith(
@@ -390,7 +398,6 @@ class AppWebsocketChat extends WebSocketChat {
       status: status,
       canWrite: false,
     );
-    print("Обновили состояние сокета\n\n$updated");
     _emit((s) => s.copyWith(socket: updated));
   }
 

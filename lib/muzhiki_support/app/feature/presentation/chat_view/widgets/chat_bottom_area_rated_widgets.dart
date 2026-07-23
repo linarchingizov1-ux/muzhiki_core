@@ -51,7 +51,7 @@ class _ChatBottomAreaRatedWidgetsState
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(30.r),
             color: SupportColors.white,
           ),
           child: Column(
@@ -157,11 +157,12 @@ class _ChatBottomAreaRatedWidgetsState
                 Padding(
                   padding: EdgeInsets.only(top: 9.h),
                   child: AppButton(
-                    height: 43,
+                    height: 48,
+                    labelWeight: FontWeight.w700,
                     isLoading: isLoadingReopen,
                     backgroundColor: SupportColors.light,
                     progressColor: SupportColors.black17,
-                    labelColor: SupportColors.black17,
+                    labelColor: SupportColors.alertTextGrey,
                     mode: ButtonMode.rounded,
                     onPressed: () {
                       if (selectedStar == 0 && widget.state.socket == null) {

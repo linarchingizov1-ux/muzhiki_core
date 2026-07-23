@@ -10,6 +10,8 @@ enum ChatType {
   session,
 }
 
+enum MessageStatus { sending, sent, failed }
+
 enum SocketConnectionChatStatus {
   @JsonValue('Закрыт')
   close,
@@ -89,6 +91,7 @@ class MessageModel {
   final String id;
   @JsonKey(name: 'created_at', fromJson: _fromJsonDate)
   final DateTime? createdAt;
+  final MessageStatus status;
   final String text;
   final MessageType type;
   final String? avatar;
@@ -97,11 +100,12 @@ class MessageModel {
   final List<AttachmentsModel> attachments;
   const MessageModel({
     this.avatar,
-    required this.name,
+    this.name,
     required this.id,
+    this.status = MessageStatus.sending,
     this.createdAt,
     required this.text,
-    required this.type,
+    this.type = MessageType.client,
     this.attachments = const [],
   });
 
@@ -113,6 +117,14 @@ class MessageModel {
       _$MessageModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$MessageModelToJson(this);
+
+  MessageModel copyWith(MessageStatus? status, String? id, String? text) {
+    return MessageModel(
+      status: status ?? this.status,
+      id: id ?? this.id,
+      text: text ?? this.text,
+    );
+  }
 }
 
 @JsonSerializable()

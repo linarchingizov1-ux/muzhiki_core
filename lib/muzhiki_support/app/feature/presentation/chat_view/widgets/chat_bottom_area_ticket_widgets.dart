@@ -63,37 +63,28 @@ class _ChatBottomAreaTicketWidgetsState
               ),
               SizedBox(height: 16.h),
 
-              if (widget.state.socket != null &&
-                  widget.state.socket!.deadline != null)
-                Padding(
-                  padding: EdgeInsets.only(bottom: 28.h),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 7.h,
-                      horizontal: 10.w,
-                    ),
-                    decoration: BoxDecoration(
-                      color: SupportColors.light,
-                      borderRadius: BorderRadius.circular(42.r),
-                    ),
-                    child: Text.rich(
-                      TextSpan(
-                        text: "Дедлайн  ",
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                          color: SupportColors.alertTextGrey,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: widget.state.socket!.deadline?.formatDate,
-                            style: TextStyle(color: SupportColors.black17),
-                          ),
-                        ],
+              Padding(
+                padding: EdgeInsets.only(bottom: 28.h),
+                child: Column(
+                  spacing: 7.h,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.state.socket != null &&
+                        widget.state.socket!.id != 0)
+                      _InformationTablo(
+                        "Номер задачи",
+                        widget.state.socket!.id.toString(),
                       ),
-                    ),
-                  ),
+                    if (widget.state.socket != null &&
+                        widget.state.socket!.deadline != null)
+                      _InformationTablo(
+                        "Дедлайн",
+                        widget.state.socket!.deadline!.formatDate,
+                      ),
+                  ],
                 ),
+              ),
 
               Text(
                 'После решения задачи вам придет уведомление',
@@ -136,6 +127,38 @@ class _ChatBottomAreaTicketWidgetsState
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InformationTablo extends StatelessWidget {
+  final String title, label;
+  const _InformationTablo(this.title, this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 10.w),
+      decoration: BoxDecoration(
+        color: SupportColors.light,
+        borderRadius: BorderRadius.circular(42.r),
+      ),
+      child: Text.rich(
+        TextSpan(
+          text: "$title  ",
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
+            color: SupportColors.alertTextGrey,
+          ),
+          children: [
+            TextSpan(
+              text: label,
+              style: TextStyle(color: SupportColors.black17),
+            ),
+          ],
         ),
       ),
     );

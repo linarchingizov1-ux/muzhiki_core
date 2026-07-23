@@ -87,39 +87,30 @@ class ChatMessageWidgets extends StatelessWidget {
             ),
           ),
           if (snapshot.data != null && snapshot.data!.socket != null)
-            SafeArea(
-              top: false,
-              bottom:
-                  snapshot.data != null &&
-                      snapshot.data!.socket != null &&
-                      snapshot.data!.socket!.footerState == ChatFooterState.chat
-                  ? false
-                  : true,
-              child: Builder(
-                builder: (context) {
-                  switch (snapshot.data!.socket!.footerState) {
-                    case ChatFooterState.closedNeedRating:
-                      return ChatBottomAreaRatedWidgets(
-                        webSocketApp: websocket,
-                        state: snapshot.data!,
-                      );
+            Builder(
+              builder: (context) {
+                switch (snapshot.data!.socket!.footerState) {
+                  case ChatFooterState.closedNeedRating:
+                    return ChatBottomAreaRatedWidgets(
+                      webSocketApp: websocket,
+                      state: snapshot.data!,
+                    );
 
-                    case ChatFooterState.closedRated:
-                      return ChatBottomAreaClosedAndRatedWidgets(
-                        webSocketApp: websocket,
-                        state: snapshot.data!,
-                      );
+                  case ChatFooterState.closedRated:
+                    return ChatBottomAreaClosedAndRatedWidgets(
+                      webSocketApp: websocket,
+                      state: snapshot.data!,
+                    );
 
-                    case ChatFooterState.ticketActive:
-                      return ChatBottomAreaTicketWidgets(
-                        webSocketApp: websocket,
-                        state: snapshot.data!,
-                      );
-                    case ChatFooterState.chat || ChatFooterState.initial:
-                      return const SizedBox.shrink();
-                  }
-                },
-              ),
+                  case ChatFooterState.ticketActive:
+                    return ChatBottomAreaTicketWidgets(
+                      webSocketApp: websocket,
+                      state: snapshot.data!,
+                    );
+                  case ChatFooterState.chat || ChatFooterState.initial:
+                    return const SizedBox.shrink();
+                }
+              },
             ),
         ],
       ),
