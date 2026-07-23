@@ -105,6 +105,12 @@ class AppWebsocketChat extends WebSocketChat {
   );
 
   Future<int?> createSessionAndConnect() async {
+    talker.debug(
+      'createSessionAndConnect: '
+      'sessionChatId=$sessionChatId '
+      'isDraft=$isDraft '
+      'channelId=$channelId',
+    );
     if (_isCreating) return null;
     _isCreating = true;
     try {
