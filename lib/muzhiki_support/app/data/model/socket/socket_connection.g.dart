@@ -6,33 +6,6 @@ part of 'socket_connection.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MessageModel _$MessageModelFromJson(Map<String, dynamic> json) => MessageModel(
-  avatar: json['avatar'] as String?,
-  name: json['operator_name'] as String?,
-  id: json['id'] as String,
-  createdAt: MessageModel._fromJsonDate(json['created_at'] as String),
-  text: json['text'] as String,
-  type: $enumDecode(_$MessageTypeEnumMap, json['type']),
-  attachments:
-      (json['attachments'] as List<dynamic>?)
-          ?.map((e) => AttachmentsModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-);
-
-Map<String, dynamic> _$MessageModelToJson(MessageModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'text': instance.text,
-      'type': _$MessageTypeEnumMap[instance.type]!,
-      'avatar': instance.avatar,
-      'operator_name': instance.name,
-      'attachments': instance.attachments,
-    };
-
-const _$MessageTypeEnumMap = {MessageType.operator: 2, MessageType.client: 1};
-
 AttachmentsModel _$AttachmentsModelFromJson(Map<String, dynamic> json) =>
     AttachmentsModel(
       type: $enumDecode(_$ChatAttachmentTypeEnumMap, json['type']),
@@ -106,3 +79,43 @@ const _$SocketConnectionChatStatusEnumMap = {
   SocketConnectionChatStatus.activeTicket: 'activeTicket',
   SocketConnectionChatStatus.inital: 'inital',
 };
+
+_MessageModel _$MessageModelFromJson(Map<String, dynamic> json) =>
+    _MessageModel(
+      id: json['id'] as String,
+      createdAt: _fromJsonDate(json['created_at'] as String),
+      status:
+          $enumDecodeNullable(_$MessageStatusEnumMap, json['status']) ??
+          MessageStatus.sending,
+      text: json['text'] as String,
+      type:
+          $enumDecodeNullable(_$MessageTypeEnumMap, json['type']) ??
+          MessageType.client,
+      avatar: json['avatar'] as String?,
+      name: json['operator_name'] as String?,
+      attachments:
+          (json['attachments'] as List<dynamic>?)
+              ?.map((e) => AttachmentsModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$MessageModelToJson(_MessageModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'status': _$MessageStatusEnumMap[instance.status]!,
+      'text': instance.text,
+      'type': _$MessageTypeEnumMap[instance.type]!,
+      'avatar': instance.avatar,
+      'operator_name': instance.name,
+      'attachments': instance.attachments,
+    };
+
+const _$MessageStatusEnumMap = {
+  MessageStatus.sending: 'sending',
+  MessageStatus.sent: 'sent',
+  MessageStatus.failed: 'failed',
+};
+
+const _$MessageTypeEnumMap = {MessageType.operator: 2, MessageType.client: 1};

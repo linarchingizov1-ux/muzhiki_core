@@ -224,6 +224,16 @@ class AppWebsocketChat extends WebSocketChat {
     }
 
     final uuid = uuidService.generate();
+    final message = MessageModel(
+      id: uuid,
+      status: MessageStatus.sending,
+      createdAt: DateTime.now(),
+      text: trimmed,
+      type: MessageType.client,
+      name: null,
+      avatar: null,
+    );
+    _emit((s) => s.copyWith(messages: [message, ...s.messages]));
     talker.debug("Генерируем uuid $uuid");
     final Map<String, dynamic> mess = {
       'Event': 'NewMessage',
@@ -313,11 +323,17 @@ class AppWebsocketChat extends WebSocketChat {
 
   void _handleNewMessage(Map<String, dynamic> json) {
     if (sessionChatId == null) return;
+
     talker.debug("Получили евент нового сообщения");
+
     final socketMessage = NewMessageModel.fromJson(json);
+
     talker.debug(
-      "Делаем [FromJson] модели NewMessageModel\nБыло: $json\nСтало: $socketMessage",
+      "Делаем [FromJson] модели NewMessageModel\n"
+      "Было: $json\n"
+      "Стало: $socketMessage",
     );
+
     final message = MessageModel(
       avatar: _state.socket?.avatar,
       name: socketMessage.payload.operatorName,
@@ -328,12 +344,22 @@ class AppWebsocketChat extends WebSocketChat {
       attachments: socketMessage.payload.attachments,
     );
 
-    final exists = _state.messages.any((e) => e.id == message.id);
+    final index = _state.messages.indexWhere((e) => e.id == message.id);
 
-    if (exists) return;
-    talker.debug("Добавляем сообщение в массив");
-    _emit((s) => s.copyWith(messages: [message, ...s.messages]));
-    talker.debug("Читаем соощения и помечаем сразу как прочитанные");
+    if (index != -1) {
+      final list = [..._state.messages];
+
+      list[index] = message.copyWith(status: MessageStatus.sent);
+
+      _emit((s) => s.copyWith(messages: list));
+    } else {
+      talker.debug("Добавляем сообщение в массив");
+
+      _emit((s) => s.copyWith(messages: [message, ...s.messages]));
+    }
+
+    talker.debug("Читаем сообщения и помечаем сразу как прочитанные");
+
     unawaited(readMessage(sessionId: sessionChatId!));
   }
 

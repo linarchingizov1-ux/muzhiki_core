@@ -315,4 +315,294 @@ as bool,
 
 }
 
+
+/// @nodoc
+mixin _$MessageModel {
+
+ String get id;@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? get createdAt; MessageStatus get status; String get text; MessageType get type; String? get avatar;@JsonKey(name: 'operator_name') String? get name; List<AttachmentsModel> get attachments;
+/// Create a copy of MessageModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MessageModelCopyWith<MessageModel> get copyWith => _$MessageModelCopyWithImpl<MessageModel>(this as MessageModel, _$identity);
+
+  /// Serializes this MessageModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.attachments, attachments));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,createdAt,status,text,type,avatar,name,const DeepCollectionEquality().hash(attachments));
+
+@override
+String toString() {
+  return 'MessageModel(id: $id, createdAt: $createdAt, status: $status, text: $text, type: $type, avatar: $avatar, name: $name, attachments: $attachments)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MessageModelCopyWith<$Res>  {
+  factory $MessageModelCopyWith(MessageModel value, $Res Function(MessageModel) _then) = _$MessageModelCopyWithImpl;
+@useResult
+$Res call({
+ String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus status, String text, MessageType type, String? avatar,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
+});
+
+
+
+
+}
+/// @nodoc
+class _$MessageModelCopyWithImpl<$Res>
+    implements $MessageModelCopyWith<$Res> {
+  _$MessageModelCopyWithImpl(this._self, this._then);
+
+  final MessageModel _self;
+  final $Res Function(MessageModel) _then;
+
+/// Create a copy of MessageModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdAt = freezed,Object? status = null,Object? text = null,Object? type = null,Object? avatar = freezed,Object? name = freezed,Object? attachments = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MessageStatus,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as MessageType,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String?,attachments: null == attachments ? _self.attachments : attachments // ignore: cast_nullable_to_non_nullable
+as List<AttachmentsModel>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [MessageModel].
+extension MessageModelPatterns on MessageModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _MessageModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _MessageModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _MessageModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _MessageModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _MessageModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _MessageModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus status,  String text,  MessageType type,  String? avatar, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _MessageModel() when $default != null:
+return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.avatar,_that.name,_that.attachments);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus status,  String text,  MessageType type,  String? avatar, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)  $default,) {final _that = this;
+switch (_that) {
+case _MessageModel():
+return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.avatar,_that.name,_that.attachments);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus status,  String text,  MessageType type,  String? avatar, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,) {final _that = this;
+switch (_that) {
+case _MessageModel() when $default != null:
+return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.avatar,_that.name,_that.attachments);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _MessageModel implements MessageModel {
+  const _MessageModel({required this.id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate) this.createdAt, this.status = MessageStatus.sending, required this.text, this.type = MessageType.client, this.avatar, @JsonKey(name: 'operator_name') this.name, final  List<AttachmentsModel> attachments = const []}): _attachments = attachments;
+  factory _MessageModel.fromJson(Map<String, dynamic> json) => _$MessageModelFromJson(json);
+
+@override final  String id;
+@override@JsonKey(name: 'created_at', fromJson: _fromJsonDate) final  DateTime? createdAt;
+@override@JsonKey() final  MessageStatus status;
+@override final  String text;
+@override@JsonKey() final  MessageType type;
+@override final  String? avatar;
+@override@JsonKey(name: 'operator_name') final  String? name;
+ final  List<AttachmentsModel> _attachments;
+@override@JsonKey() List<AttachmentsModel> get attachments {
+  if (_attachments is EqualUnmodifiableListView) return _attachments;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_attachments);
+}
+
+
+/// Create a copy of MessageModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MessageModelCopyWith<_MessageModel> get copyWith => __$MessageModelCopyWithImpl<_MessageModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MessageModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other._attachments, _attachments));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,createdAt,status,text,type,avatar,name,const DeepCollectionEquality().hash(_attachments));
+
+@override
+String toString() {
+  return 'MessageModel(id: $id, createdAt: $createdAt, status: $status, text: $text, type: $type, avatar: $avatar, name: $name, attachments: $attachments)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MessageModelCopyWith<$Res> implements $MessageModelCopyWith<$Res> {
+  factory _$MessageModelCopyWith(_MessageModel value, $Res Function(_MessageModel) _then) = __$MessageModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus status, String text, MessageType type, String? avatar,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
+});
+
+
+
+
+}
+/// @nodoc
+class __$MessageModelCopyWithImpl<$Res>
+    implements _$MessageModelCopyWith<$Res> {
+  __$MessageModelCopyWithImpl(this._self, this._then);
+
+  final _MessageModel _self;
+  final $Res Function(_MessageModel) _then;
+
+/// Create a copy of MessageModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdAt = freezed,Object? status = null,Object? text = null,Object? type = null,Object? avatar = freezed,Object? name = freezed,Object? attachments = null,}) {
+  return _then(_MessageModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MessageStatus,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as MessageType,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String?,attachments: null == attachments ? _self._attachments : attachments // ignore: cast_nullable_to_non_nullable
+as List<AttachmentsModel>,
+  ));
+}
+
+
+}
+
 // dart format on

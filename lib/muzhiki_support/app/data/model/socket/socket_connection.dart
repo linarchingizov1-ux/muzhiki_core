@@ -86,45 +86,32 @@ enum MessageType {
   client,
 }
 
-@JsonSerializable()
-class MessageModel {
-  final String id;
-  @JsonKey(name: 'created_at', fromJson: _fromJsonDate)
-  final DateTime? createdAt;
-  final MessageStatus status;
-  final String text;
-  final MessageType type;
-  final String? avatar;
-  @JsonKey(name: 'operator_name')
-  final String? name;
-  final List<AttachmentsModel> attachments;
-  const MessageModel({
-    this.avatar,
-    this.name,
-    required this.id,
-    this.status = MessageStatus.sending,
-    this.createdAt,
-    required this.text,
-    this.type = MessageType.client,
-    this.attachments = const [],
-  });
+@freezed
+abstract class MessageModel with _$MessageModel {
+  const factory MessageModel({
+    required String id,
 
-  static DateTime _fromJsonDate(String value) {
-    return DateTime.parse(value).toLocal();
-  }
+    @JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt,
+
+    @Default(MessageStatus.sending) MessageStatus status,
+
+    required String text,
+
+    @Default(MessageType.client) MessageType type,
+
+    String? avatar,
+
+    @JsonKey(name: 'operator_name') String? name,
+
+    @Default([]) List<AttachmentsModel> attachments,
+  }) = _MessageModel;
 
   factory MessageModel.fromJson(Map<String, dynamic> json) =>
       _$MessageModelFromJson(json);
+}
 
-  Map<String, dynamic> toJson() => _$MessageModelToJson(this);
-
-  MessageModel copyWith(MessageStatus? status, String? id, String? text) {
-    return MessageModel(
-      status: status ?? this.status,
-      id: id ?? this.id,
-      text: text ?? this.text,
-    );
-  }
+DateTime _fromJsonDate(String value) {
+  return DateTime.parse(value).toLocal();
 }
 
 @JsonSerializable()
