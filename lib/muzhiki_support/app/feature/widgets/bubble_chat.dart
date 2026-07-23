@@ -64,6 +64,8 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                           imageUrl: widget.avatar!,
                           width: 44.r,
                           height: 44.r,
+                          memCacheHeight: 44,
+                          memCacheWidth: 44,
                           fit: BoxFit.cover,
                           placeholder: (_, __) => Shimmer.fromColors(
                             baseColor: Colors.grey.shade300,
