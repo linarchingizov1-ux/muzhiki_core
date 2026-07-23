@@ -93,7 +93,7 @@ abstract class MessageModel with _$MessageModel {
 
     @JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt,
 
-    @Default(MessageStatus.sending) MessageStatus status,
+    MessageStatus? status,
 
     required String text,
 

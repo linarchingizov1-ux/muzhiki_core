@@ -118,7 +118,8 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              if (widget.mess.status == MessageStatus.sending)
+                              if (widget.mess.status != null &&
+                                  widget.mess.status == MessageStatus.sending)
                                 Icon(
                                       Icons.schedule_rounded,
                                       size: 16.r,

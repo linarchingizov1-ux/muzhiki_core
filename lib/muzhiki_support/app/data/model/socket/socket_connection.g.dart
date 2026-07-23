@@ -84,9 +84,7 @@ _MessageModel _$MessageModelFromJson(Map<String, dynamic> json) =>
     _MessageModel(
       id: json['id'] as String,
       createdAt: _fromJsonDate(json['created_at'] as String),
-      status:
-          $enumDecodeNullable(_$MessageStatusEnumMap, json['status']) ??
-          MessageStatus.sending,
+      status: $enumDecodeNullable(_$MessageStatusEnumMap, json['status']),
       text: json['text'] as String,
       type:
           $enumDecodeNullable(_$MessageTypeEnumMap, json['type']) ??
@@ -104,7 +102,7 @@ Map<String, dynamic> _$MessageModelToJson(_MessageModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'created_at': instance.createdAt?.toIso8601String(),
-      'status': _$MessageStatusEnumMap[instance.status]!,
+      'status': _$MessageStatusEnumMap[instance.status],
       'text': instance.text,
       'type': _$MessageTypeEnumMap[instance.type]!,
       'avatar': instance.avatar,
