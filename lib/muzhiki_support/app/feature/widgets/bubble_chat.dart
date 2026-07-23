@@ -45,6 +45,11 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constrained) {
+        final bool showAvatar =
+            !widget.isMe &&
+            widget.mess.avatar != null &&
+            widget.mess.avatar!.isNotEmpty;
+        print("Это оператор и есть аватарка ? $showAvatar");
         return Row(
           spacing: 6.w,
           mainAxisSize: MainAxisSize.min,
