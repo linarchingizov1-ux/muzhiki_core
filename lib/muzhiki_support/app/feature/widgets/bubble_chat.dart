@@ -46,8 +46,6 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constrained) {
-        final bool showAvatar =
-            !widget.isMe && widget.avatar != null && widget.avatar!.isNotEmpty;
         return Row(
           spacing: 6.w,
           mainAxisSize: MainAxisSize.min,
@@ -56,37 +54,36 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
               ? MainAxisAlignment.end
               : MainAxisAlignment.start,
           children: [
-            if (showAvatar)
+            if (!widget.isMe)
               CircleAvatar(
                 radius: 22.r,
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: widget.avatar!,
-                    width: 56.r,
-                    height: 56.r,
-                    fit: BoxFit.cover,
-                    errorWidget: (_, _, _) => const Icon(Icons.person),
-
-                    placeholder: (_, _) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
-                      child: Container(
-                        width: 56.r,
-                        height: 56.r,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.person,
-                          size: 20.r,
-                          color: Colors.grey,
+                child: widget.avatar == null || widget.avatar!.isEmpty
+                    ? Icon(Icons.person, size: 20.r, color: Colors.grey)
+                    : ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: widget.avatar!,
+                          width: 44.r,
+                          height: 44.r,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Shimmer.fromColors(
+                            baseColor: Colors.grey.shade300,
+                            highlightColor: Colors.grey.shade100,
+                            child: Container(
+                              width: 44.r,
+                              height: 44.r,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (_, __, ___) => Icon(
+                            Icons.person,
+                            size: 20.r,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
               ),
             Container(
               constraints: BoxConstraints(
