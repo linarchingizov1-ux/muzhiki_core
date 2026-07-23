@@ -189,7 +189,6 @@ class AppWebsocketChat extends WebSocketChat {
       );
 
       await _sendPendingMessages();
-      await _sendInitialMessageIfNeeded();
       await readMessage(sessionId: sessionChatId!);
     } catch (e, st) {
       _handleError(e, st, showBanner: true);
@@ -244,12 +243,18 @@ class AppWebsocketChat extends WebSocketChat {
     final local = MessageModel(
       id: uuid,
       text: trimmed,
+
       status: MessageStatus.sending,
       createdAt: DateTime.now(),
       attachments: const [],
     );
 
-    _emit((s) => s.copyWith(messages: [local, ...s.messages]));
+    _emit(
+      (s) => s.copyWith(
+        messages: [local, ...s.messages],
+        didSendInitialMessage: false,
+      ),
+    );
     if (!isConnected) {
       await createSessionAndConnect();
 
@@ -428,22 +433,6 @@ class AppWebsocketChat extends WebSocketChat {
       canWrite: false,
     );
     _emit((s) => s.copyWith(socket: updated));
-  }
-
-  Future<void> _sendInitialMessageIfNeeded() async {
-    if (_state.messages.isNotEmpty) {
-      return;
-    }
-
-    if (_state.didSendInitialMessage) {
-      return;
-    }
-
-    if (!_state.canWrite) {
-      return;
-    }
-
-    _emit((s) => s.copyWith(didSendInitialMessage: true));
   }
 
   void _handleError(Object e, StackTrace st, {required bool showBanner}) {
