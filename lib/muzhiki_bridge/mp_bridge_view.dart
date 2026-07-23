@@ -71,6 +71,7 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
         ? "${widget.initialUrl}/${widget.masterAudit!.first}/audits/${widget.masterAudit!.last}?native_app=true&show_header=${widget.showAppBar}"
         : "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}";
     final url = Uri.parse(urlParse);
+    print("Пришла ссылка в BRIDGE: $url");
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.loadRequest(url);
     });
