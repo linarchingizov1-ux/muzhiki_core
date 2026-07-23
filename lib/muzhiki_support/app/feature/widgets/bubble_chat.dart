@@ -11,6 +11,7 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connec
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/chat_attachment.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ChatMessageBubble extends StatefulWidget {
   final AppWebsocketChat websocketChat;
@@ -64,7 +65,26 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                     width: 56.r,
                     height: 56.r,
                     fit: BoxFit.cover,
-                    errorWidget: (_, __, ___) => const Icon(Icons.person),
+                    errorWidget: (_, _, _) => const Icon(Icons.person),
+
+                    placeholder: (_, _) => Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        width: 56.r,
+                        height: 56.r,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.person,
+                          size: 20.r,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
