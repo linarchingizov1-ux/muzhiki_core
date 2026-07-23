@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -101,13 +102,14 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
                     .toSet()
                     .toList();
 
-                await widget.websocket.sendMessage(
-                  text: text,
-                  attachments: uuidFile,
+                unawaited(
+                  widget.websocket.sendMessage(
+                    text: text,
+                    attachments: uuidFile,
+                  ),
                 );
 
                 widget.attachmentsCubit.clear();
-
                 textEditingController.clear();
               },
             );
