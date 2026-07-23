@@ -323,7 +323,7 @@ class AppWebsocketChat extends WebSocketChat {
     if (sessionChatId == null) return;
 
     talker.debug("Получили евент нового сообщения");
-
+    talker.debug("Что мы получили в сообщениях ? $json");
     final socketMessage = NewMessageModel.fromJson(json);
 
     talker.debug(
