@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -45,12 +46,28 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
     return LayoutBuilder(
       builder: (context, constrained) {
         return Row(
+          spacing: 6.w,
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: widget.isMe
               ? MainAxisAlignment.end
               : MainAxisAlignment.start,
           children: [
+            if (!widget.isMe &&
+                widget.mess.avatar != null &&
+                widget.mess.avatar!.isNotEmpty)
+              CircleAvatar(
+                radius: 28.r,
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: widget.mess.avatar!,
+                    width: 56.r,
+                    height: 56.r,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, __, ___) => const Icon(Icons.person),
+                  ),
+                ),
+              ),
             Container(
               constraints: BoxConstraints(
                 maxWidth: constrained.maxWidth * 0.75,
