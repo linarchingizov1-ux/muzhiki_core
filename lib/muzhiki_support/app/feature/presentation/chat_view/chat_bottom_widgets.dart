@@ -46,11 +46,21 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
 
   @override
   Widget build(BuildContext context) {
-    final socket = widget.snapshot.data?.socket;
-    final showFooter =
-        socket?.footerState == ChatFooterState.chat ||
-        socket?.footerState == ChatFooterState.initial;
-    if (showFooter) {
+    if (widget.snapshot.connectionState != ConnectionState.active) {
+      return const SizedBox.shrink();
+    }
+
+    if (widget.snapshot.data!.didSendInitialMessage &&
+        textEditingController.text.isEmpty) {
+      textEditingController.text = widget.initMessage;
+    }
+    final socket = widget.snapshot.data!.socket;
+
+    if (socket == null) {
+      return const SizedBox.shrink();
+    }
+    if (socket.footerState == ChatFooterState.chat ||
+        socket.footerState == ChatFooterState.initial) {
       return BlocProvider.value(
         value: widget.attachmentsCubit,
         child: BlocBuilder<AttachmentsCubit, AttachmentsState>(
@@ -91,7 +101,10 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
                     .toSet()
                     .toList();
 
-                widget.websocket.sendMessage(text: text, attachments: uuidFile);
+                await widget.websocket.sendMessage(
+                  text: text,
+                  attachments: uuidFile,
+                );
 
                 widget.attachmentsCubit.clear();
 

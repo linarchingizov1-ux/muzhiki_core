@@ -35,6 +35,9 @@ class ChatMessageWidgets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasFooter =
+        snapshot.data?.socket?.footerState == ChatFooterState.chat ||
+        snapshot.data?.socket?.footerState == ChatFooterState.initial;
     return InkWell(
       onTap: () {
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
@@ -52,11 +55,7 @@ class ChatMessageWidgets extends StatelessWidget {
                 top: topInset + 80.h,
                 left: 17.w,
                 right: 17.w,
-                bottom:
-                    snapshot.data != null &&
-                        snapshot.data!.socket != null &&
-                        snapshot.data!.socket!.footerState ==
-                            ChatFooterState.chat
+                bottom: hasFooter
                     ? MediaQuery.paddingOf(context).bottom + 65.h + 16.h
                     : 16.h,
               ),
