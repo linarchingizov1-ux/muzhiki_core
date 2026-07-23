@@ -8,6 +8,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_c
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/chat_websocket_state.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/message/new_message.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/message/pending_message.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/usecase/chat_usecase.dart';
 import 'package:talker/talker.dart';
@@ -21,11 +22,7 @@ abstract class WebSocketChat {
 
   Future<void> dispose();
 
-  Future<void> sendMessage({
-    required int sessionId,
-    required String text,
-    List<String> attachments,
-  });
+  Future<void> sendMessage({required String text, List<String> attachments});
 
   Future<void> reopenWebChat({required int sessionId});
 
@@ -80,8 +77,8 @@ class AppWebsocketChat extends WebSocketChat {
   bool get isDraft => sessionChatId == null;
 
   bool get isConnected => _channel != null;
-
   bool _isCreating = false;
+  final List<PendingMessage> _pendingMessages = [];
 
   void _emit(WebSocketChatState Function(WebSocketChatState state) updater) {
     if (_controller.isClosed) return;
@@ -210,11 +207,9 @@ class AppWebsocketChat extends WebSocketChat {
 
   @override
   Future<void> sendMessage({
-    required int sessionId,
     required String text,
     List<String> attachments = const [],
   }) async {
-    talker.debug("Отправляем сообщение");
     if (!_state.canWrite) return;
 
     final trimmed = text.trim();
@@ -224,44 +219,47 @@ class AppWebsocketChat extends WebSocketChat {
     }
 
     final uuid = uuidService.generate();
-    final message = MessageModel(
+
+    _pendingMessages.add(
+      PendingMessage(uuid: uuid, text: trimmed, attachments: attachments),
+    );
+
+    final local = MessageModel(
       id: uuid,
+      text: trimmed,
       status: MessageStatus.sending,
       createdAt: DateTime.now(),
-      text: trimmed,
-      type: MessageType.client,
-      name: null,
-      avatar: null,
+      attachments: const [],
     );
-    _emit((s) => s.copyWith(messages: [message, ...s.messages]));
-    talker.debug("Генерируем uuid $uuid");
-    final Map<String, dynamic> mess = {
-      'Event': 'NewMessage',
-      'Payload': {
-        "MessageUUID": uuid,
-        'SenderId': 2,
-        'SessionId': sessionId,
-        'Text': trimmed,
-        'Attachments': attachments,
-      },
-    };
-    talker.debug("Создали map $mess и отправили в изолят");
-    final decodeMessage = jsonEncode(mess);
 
-    try {
-      _channel?.sink.add(decodeMessage);
-      talker.debug("Отправили сообщение в сокет");
-      if (state.didSendInitialMessage) {
-        _emit((s) {
-          final newEmit = s.copyWith(didSendInitialMessage: false);
-          talker.debug(
-            "Переключили didSendInitialMessage на ${newEmit.didSendInitialMessage}",
-          );
-          return newEmit;
-        });
-      }
-    } catch (e, st) {
-      _handleError(e, st, showBanner: true);
+    _emit((s) => s.copyWith(messages: [local, ...s.messages]));
+
+    if (!isConnected) {
+      unawaited(createSessionAndConnect());
+      return;
+    }
+
+    unawaited(_sendPendingMessages());
+  }
+
+  Future<void> _sendPendingMessages() async {
+    if (_channel == null) return;
+
+    while (_pendingMessages.isNotEmpty) {
+      final pending = _pendingMessages.removeAt(0);
+
+      _channel!.sink.add(
+        jsonEncode({
+          'Event': 'NewMessage',
+          'Payload': {
+            'MessageUUID': pending.uuid,
+            'SenderId': 2,
+            'SessionId': sessionChatId,
+            'Text': pending.text,
+            'Attachments': pending.attachments,
+          },
+        }),
+      );
     }
   }
 

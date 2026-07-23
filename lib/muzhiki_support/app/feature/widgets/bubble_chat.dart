@@ -107,6 +107,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                         child: Align(
                           alignment: Alignment.bottomRight,
                           child: Row(
+                            spacing: 5.w,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
@@ -118,21 +119,30 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              if (widget.mess.status != null &&
-                                  widget.mess.status == MessageStatus.sending)
-                                Icon(
-                                      Icons.schedule_rounded,
-                                      size: 16.r,
-                                      color: Colors.grey,
-                                    )
-                                    .animate(
-                                      onPlay: (controller) =>
-                                          controller.repeat(),
-                                    )
-                                    .rotate(
-                                      duration: 1.seconds,
-                                      curve: Curves.linear,
-                                    ),
+                              if (widget.mess.status != null)
+                                switch (widget.mess.status) {
+                                  (MessageStatus.sending) =>
+                                    Icon(
+                                          Icons.schedule_rounded,
+                                          size: 16.r,
+                                          color: SupportColors.grey,
+                                        )
+                                        .animate(
+                                          onPlay: (controller) =>
+                                              controller.repeat(),
+                                        )
+                                        .rotate(
+                                          duration: 1.seconds,
+                                          curve: Curves.linear,
+                                        ),
+                                  (MessageStatus.failed) => Icon(
+                                    Icons.close,
+                                    size: 16.r,
+                                    color: SupportColors.blood,
+                                  ),
+                                  MessageStatus.sent ||
+                                  null => const SizedBox.shrink(),
+                                },
                             ],
                           ),
                         ),

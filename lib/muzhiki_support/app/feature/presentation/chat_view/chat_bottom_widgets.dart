@@ -101,16 +101,7 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
                     .toSet()
                     .toList();
 
-                int? sessionId = widget.websocket.sessionChatId;
-
-                if (widget.websocket.isDraft || !widget.websocket.isConnected) {
-                  sessionId = await widget.websocket.createSessionAndConnect();
-                }
-
-                if (sessionId == null) return;
-
                 await widget.websocket.sendMessage(
-                  sessionId: sessionId,
                   text: text,
                   attachments: uuidFile,
                 );
