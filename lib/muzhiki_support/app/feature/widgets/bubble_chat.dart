@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
@@ -105,14 +106,33 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                         padding: EdgeInsets.only(left: 11.w, right: 11.w),
                         child: Align(
                           alignment: Alignment.bottomRight,
-                          child: Text(
-                            widget.messageDate,
-                            style: TextStyle(
-                              height: 2.h,
-                              color: SupportColors.grey,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w400,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                widget.messageDate,
+                                style: TextStyle(
+                                  height: 2.h,
+                                  color: SupportColors.grey,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              if (widget.mess.status == MessageStatus.sending)
+                                Icon(
+                                      Icons.schedule_rounded,
+                                      size: 16.r,
+                                      color: Colors.grey,
+                                    )
+                                    .animate(
+                                      onPlay: (controller) =>
+                                          controller.repeat(),
+                                    )
+                                    .rotate(
+                                      duration: 1.seconds,
+                                      curve: Curves.linear,
+                                    ),
+                            ],
                           ),
                         ),
                       ),
