@@ -16,5 +16,5 @@ class BridgeAuthUsecase {
 
   void dispose() => repository.dispose();
 
-  void seedSession() => repository.seedSession();
+  Future<void> seedSession() => repository.seedSession();
 }

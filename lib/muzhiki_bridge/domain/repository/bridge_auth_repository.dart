@@ -11,5 +11,5 @@ abstract class BridgeAuthRepository {
 
   void dispose();
 
-  void seedSession();
+  Future<void> seedSession();
 }

@@ -72,9 +72,7 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
         : "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}";
     final url = Uri.parse(urlParse);
     print("Пришла ссылка в BRIDGE: $url");
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller.loadRequest(url);
-    });
+    _controller.loadRequest(url);
   }
 
   @override
@@ -173,12 +171,13 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
                 await _ensureBridgeInjected();
               },
               onPageFinished: (url) async {
+                await _ensureBridgeInjected();
+                await bridgeAuthUsecase.seedSession();
                 if (mounted) {
                   setState(() {
                     isLoading = false;
                   });
                 }
-                await _ensureBridgeInjected();
               },
               onWebResourceError: (error) {
                 setState(() {

@@ -56,6 +56,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
           children: [
             if (!widget.isMe)
               CircleAvatar(
+                backgroundColor: SupportColors.white,
                 radius: 22.r,
                 child: widget.avatar == null || widget.avatar!.isEmpty
                     ? Icon(Icons.person, size: 20.r, color: Colors.grey)
