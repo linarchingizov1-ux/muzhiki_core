@@ -50,38 +50,60 @@ class _SupportViewState extends State<SupportView> {
   }
 
   Future<void> loadChats() async {
-    await widget.chatCubit.getMyChats();
+    // Получаем уникальный ID текущего экземпляра виджета
+    final widgetId = identityHashCode(this);
 
+    print("[LOG_CHAT] >>> loadChats() запущен в виджете ID: $widgetId");
+    print(
+      "[LOG_CHAT] Текущий action: ${widget.action.runtimeType}, mounted: $mounted",
+    );
+
+    try {
+      print("[LOG_CHAT] Начинаем загрузку getMyChats()...");
+      await widget.chatCubit.getMyChats();
+      print("[LOG_CHAT] getMyChats() успешно завершен. mounted: $mounted");
+    } catch (e, stack) {
+      print("[LOG_CHAT] Ошибка в getMyChats(): $e\n$stack");
+    }
+
+    if (!mounted) {
+      print(
+        "[LOG_CHAT] !!! Виджет ID $widgetId уже размонтирован (not mounted). Прерываем навигацию.",
+      );
+      return;
+    }
+
+    print("[LOG_CHAT] Обработка action: ${widget.action.runtimeType}");
     switch (widget.action) {
       case SupportNone():
+        print("[LOG_CHAT] Экшен: SupportNone. Ничего не делаем.");
         break;
 
       case SupportOpenChat(:final sessionId):
-        if (mounted) {
-          context.pushNamed(
-            SupportRouteConstant.I.chat,
-            pathParameters: {'id': sessionId},
-          );
-        }
+        print("[LOG_CHAT] Навигация в Chat. ID сессии: $sessionId");
+        context.pushNamed(
+          SupportRouteConstant.I.chat,
+          pathParameters: {'id': sessionId},
+        );
         break;
 
       case SupportCreateSession(:final supportChatsEventWidgets):
-        if (mounted) {
-          context.pushNamed(
-            extra: supportChatsEventWidgets,
-            SupportRouteConstant.I.chatDraft,
-          );
-        }
+        print("[LOG_CHAT] Навигация в ChatDraft (создание сессии)");
+        context.pushNamed(
+          extra: supportChatsEventWidgets,
+          SupportRouteConstant.I.chatDraft,
+        );
         break;
+
       case SupportOpenInformator(:final initalURL):
-        if (mounted) {
-          context.pushNamed(
-            SupportRouteConstant.I.informator,
-            queryParameters: {"initialUrl": initalURL},
-          );
-        }
+        print("[LOG_CHAT] НАВИГАЦИЯ В INFORMATOR! URL: $initalURL");
+        context.pushNamed(
+          SupportRouteConstant.I.informator,
+          queryParameters: {"initialUrl": initalURL},
+        );
         break;
     }
+    print("[LOG_CHAT] <<< loadChats() завершил работу в виджете ID: $widgetId");
   }
 
   @override
