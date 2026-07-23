@@ -173,6 +173,7 @@ class AppWebsocketChat extends WebSocketChat {
         onDone: () {},
       );
 
+      await _sendPendingMessages();
       await _sendInitialMessageIfNeeded();
       await readMessage(sessionId: sessionChatId!);
     } catch (e, st) {
@@ -234,13 +235,15 @@ class AppWebsocketChat extends WebSocketChat {
     );
 
     _emit((s) => s.copyWith(messages: [local, ...s.messages]));
-
     if (!isConnected) {
-      unawaited(createSessionAndConnect());
-      return;
+      await createSessionAndConnect();
+
+      if (!isConnected) {
+        return;
+      }
     }
 
-    unawaited(_sendPendingMessages());
+    await _sendPendingMessages();
   }
 
   Future<void> _sendPendingMessages() async {
