@@ -64,7 +64,6 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     _sessionUpdates = bridgeAuthUsecase.sessionUpdates;
     _controller = _buildController();
     _listenSessionUpdates();
-    bridgeAuthUsecase.seedSession();
     final urlParse = widget.companyId != null
         ? "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
         : widget.masterAudit != null && widget.masterAudit!.isNotEmpty
