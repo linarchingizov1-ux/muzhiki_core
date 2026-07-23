@@ -150,7 +150,16 @@ class AppWebsocketChat extends WebSocketChat {
       talker.debug(
         "После подключения получили модель списка сообщений $messages",
       );
-      _emit((s) => s.copyWith(socket: socketConnection, messages: messages));
+      _emit((s) {
+        final pendingLocal = s.messages
+            .where((m) => m.status == MessageStatus.sending)
+            .toList();
+
+        return s.copyWith(
+          socket: socketConnection,
+          messages: [...pendingLocal, ...messages],
+        );
+      });
 
       final token = await session.fresh.token;
       if (token?.accessToken == null) {
@@ -305,7 +314,7 @@ class AppWebsocketChat extends WebSocketChat {
 
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
-
+      talker.debug("ПОЛУЧИЛИ В СОКЕТЕ $raw");
       final event = map['event'];
       switch (event) {
         case 'NewMessage':
