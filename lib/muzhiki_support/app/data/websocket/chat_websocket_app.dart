@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'package:flutter/widgets.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
@@ -237,7 +236,7 @@ class AppWebsocketChat extends WebSocketChat {
       },
     };
     talker.debug("Создали map $mess и отправили в изолят");
-    final decodeMessage = await Isolate.run(() => jsonEncode(mess));
+    final decodeMessage = jsonEncode(mess);
 
     try {
       _channel?.sink.add(decodeMessage);
