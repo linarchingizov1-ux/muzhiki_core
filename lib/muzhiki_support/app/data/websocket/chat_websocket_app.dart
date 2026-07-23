@@ -138,11 +138,12 @@ class AppWebsocketChat extends WebSocketChat {
       final socketConnection = await chatUsecase.getMessageChat(
         sessionId: sessionChatId!,
       );
-
       final messages = List<MessageModel>.from(
         (socketConnection.messages).reversed,
       );
-
+      talker.debug(
+        "После подключения получили модель списка сообщений $messages",
+      );
       _emit((s) => s.copyWith(socket: socketConnection, messages: messages));
 
       final token = await session.fresh.token;
@@ -322,15 +323,7 @@ class AppWebsocketChat extends WebSocketChat {
   void _handleNewMessage(Map<String, dynamic> json) {
     if (sessionChatId == null) return;
 
-    talker.debug("Получили евент нового сообщения");
-    talker.debug("Что мы получили в сообщениях ? $json");
     final socketMessage = NewMessageModel.fromJson(json);
-
-    talker.debug(
-      "Делаем [FromJson] модели NewMessageModel\n"
-      "Было: $json\n"
-      "Стало: $socketMessage",
-    );
 
     final message = MessageModel(
       avatar: _state.socket?.avatar,
@@ -351,12 +344,8 @@ class AppWebsocketChat extends WebSocketChat {
 
       _emit((s) => s.copyWith(messages: list));
     } else {
-      talker.debug("Добавляем сообщение в массив");
-
       _emit((s) => s.copyWith(messages: [message, ...s.messages]));
     }
-
-    talker.debug("Читаем сообщения и помечаем сразу как прочитанные");
 
     unawaited(readMessage(sessionId: sessionChatId!));
   }
@@ -442,7 +431,6 @@ class AppWebsocketChat extends WebSocketChat {
 
   void _handleError(Object e, StackTrace st, {required bool showBanner}) {
     final mapped = AppErrorMapper.I.map(e, st);
-    Talker().error(e, st);
     if (!showBanner) return;
 
     final now = DateTime.now();
