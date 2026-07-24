@@ -73,8 +73,9 @@ class NetworkFactory {
       ),
     );
     final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
-    final refreshManager = RefreshManager();
+    final refreshManager = RefreshManager(talker: talker);
     final authInterceptor = AuthInterceptor(
+      talker: talker,
       tokenStorage: tokenStorage,
       refreshManager: refreshManager,
     );
