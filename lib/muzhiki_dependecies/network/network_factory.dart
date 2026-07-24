@@ -9,7 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
@@ -61,23 +60,16 @@ class NetworkFactory {
         return {'Authorization': 'Bearer ${token.accessToken}'};
       },
       shouldRefresh: (response) {
-        final data = response?.data;
+        final options = response?.requestOptions;
 
-        if (data is Map<String, dynamic>) {
-          final error = data['error'];
-          final isTokenInvalid =
-              error == 'Токен не валиден' ||
-              error == "Требуется авторизация" ||
-              error == "Invalid token";
-
-          talker.warning(
-            'Ошибка авторизации ? $isTokenInvalid\nОшибка: $error',
-          );
-
-          return isTokenInvalid;
+        if (options?.extra['isRefresh'] == true) {
+          talker.debug('[Fresh] Skip refresh request');
+          return false;
         }
 
-        return false;
+        final code = response?.statusCode;
+
+        return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
         bool showIsBackendProblem = false;
