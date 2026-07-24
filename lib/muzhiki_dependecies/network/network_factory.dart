@@ -10,13 +10,14 @@ import 'package:flutter/foundation.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/auth_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_problem_service.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/refresh_manager.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
@@ -27,8 +28,6 @@ import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 import 'package:uuid/uuid.dart';
-
-int countTry = 0;
 
 class NetworkFactory {
   static Future<NetworkModel> create({
@@ -74,7 +73,11 @@ class NetworkFactory {
       ),
     );
     final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
-
+    final refreshManager = RefreshManager();
+    final authInterceptor = AuthInterceptor(
+      tokenStorage: tokenStorage,
+      refreshManager: refreshManager,
+    );
     final fresh = Fresh<AuthTokens>(
       tokenStorage: tokenStorage,
       httpClient: refreshDio,
@@ -84,13 +87,11 @@ class NetworkFactory {
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
-        if (countTry > 3) {
-          throw AppException(message: "Кол-во попыток для ревреша больше 3");
-        }
+        refreshManager.start();
         try {
           final response = await client.get(
             'https://auth.muzhiki.pro/api/v1/auth/refresh',
-            options: Options(extra: {"isRefresh": true, "count_try": countTry}),
+            options: Options(extra: {"isRefresh": true}),
           );
           final access = response.data['data']['access_token'] as String?;
           if (access == null ||
@@ -99,9 +100,10 @@ class NetworkFactory {
               response.data["error"] == "Refresh token был отозван") {
             throw RevokeTokenException();
           }
+          refreshManager.success();
           return AuthTokens(accessToken: access, refreshToken: "");
         } catch (e, st) {
-          countTry++;
+          refreshManager.error(e, st);
           final error = AppErrorMapper.I.map(e, st);
           if (error.message == "Resresh-токен не найден в базе." ||
               error.message == "Токен уже использован ранее." ||
@@ -148,12 +150,17 @@ class NetworkFactory {
             ),
           )
         : null;
-    refreshDio.interceptors.addAll([cookieManager, ?talkerInterceptor]);
+    refreshDio.interceptors.addAll([
+      cookieManager,
+      authInterceptor,
+      ?talkerInterceptor,
+    ]);
     metricsDio.interceptors.addAll([
       if (showTalkerMetricsHttp) ?talkerInterceptor,
     ]);
     authDio.interceptors.addAll([
       cookieManager,
+      authInterceptor,
       ?talkerInterceptor,
       errorInterceptor,
       cacheInterceptor,
