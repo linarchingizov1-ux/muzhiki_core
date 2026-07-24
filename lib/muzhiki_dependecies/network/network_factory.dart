@@ -113,7 +113,7 @@ class NetworkFactory {
               await Future.delayed(delay);
 
               continue;
-            } else if (attempt >= maxAttempts) {
+            } else {
               throw AppException(
                 message: "Сервисы временно недоступны\nПопробуйте позже",
               );
