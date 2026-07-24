@@ -91,7 +91,7 @@ class NetworkFactory {
         refreshManager.start();
         try {
           final response = await client.get(
-            'https://auth.muzhiki.pro/api/v1/auth/refresh',
+            'https://auth.muzhiki.pro/api/v1/auth/refreshTEST',
             options: Options(extra: {"isRefresh": true}),
           );
           final access = response.data['data']['access_token'] as String?;
