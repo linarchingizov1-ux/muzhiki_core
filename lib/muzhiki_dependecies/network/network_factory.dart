@@ -55,7 +55,11 @@ class NetworkFactory {
     final fresh = Fresh<AuthTokens>(
       tokenStorage: tokenStorage,
       httpClient: refreshDio,
-      tokenHeader: (token) => {'Authorization': 'Bearer ${token.accessToken}'},
+      tokenHeader: (token) {
+        talker.warning('Токен в заголовок: ${token.accessToken}');
+
+        return {'Authorization': 'Bearer ${token.accessToken}'};
+      },
       shouldRefresh: (response) {
         final data = response?.data;
 
@@ -151,10 +155,11 @@ class NetworkFactory {
       if (showTalkerMetricsHttp) ?talkerInterceptor,
     ]);
     authDio.interceptors.addAll([
+      fresh,
       // cookieManager,
       ?talkerInterceptor,
       // errorInterceptor,
-      fresh,
+
       // if (needMetricsHttp) metricsInterceptor,
     ]);
 
