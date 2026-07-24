@@ -10,14 +10,13 @@ import 'package:flutter/foundation.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/auth_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_problem_service.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/refresh_manager.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
@@ -73,12 +72,7 @@ class NetworkFactory {
       ),
     );
     final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
-    final refreshManager = RefreshManager(talker: talker);
-    final authInterceptor = AuthInterceptor(
-      talker: talker,
-      tokenStorage: tokenStorage,
-      refreshManager: refreshManager,
-    );
+
     final fresh = Fresh<AuthTokens>(
       tokenStorage: tokenStorage,
       httpClient: refreshDio,
@@ -88,31 +82,43 @@ class NetworkFactory {
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
-        refreshManager.start();
-        try {
-          final response = await client.get(
-            'https://auth.muzhiki.pro/api/v1/auth/refreshTEST',
-            options: Options(extra: {"isRefresh": true}),
-          );
-          final access = response.data['data']['access_token'] as String?;
-          if (access == null ||
-              response.data["error"] == "Токен уже использован ранее." ||
-              response.data["error"] == "Resresh-токен не найден в базе." ||
-              response.data["error"] == "Refresh token был отозван") {
-            throw RevokeTokenException();
+        const maxAttempts = 5;
+        const delay = Duration(seconds: 5);
+
+        for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+          try {
+            final response = await client.get(
+              'https://auth.muzhiki.pro/api/v1/auth/refreshTEST',
+              options: Options(extra: {"isRefresh": true}),
+            );
+
+            final access = response.data['data']['access_token'] as String;
+
+            return AuthTokens(accessToken: access, refreshToken: "");
+          } catch (e, st) {
+            final error = AppErrorMapper.I.map(e, st);
+
+            if (error.message == "Resresh-токен не найден в базе." ||
+                error.message == "Токен уже использован ранее." ||
+                error.message == "Refresh token был отозван") {
+              throw RevokeTokenException();
+            }
+
+            if (attempt < maxAttempts) {
+              talker.warning(
+                '[Refresh] ошибка ревреша ${error.message}. Повторная попытка через ${delay.inSeconds}s',
+              );
+
+              await Future.delayed(delay);
+
+              continue;
+            }
           }
-          refreshManager.finish();
-          return AuthTokens(accessToken: access, refreshToken: "");
-        } catch (e, st) {
-          refreshManager.finish(error: e, stackTrace: st);
-          final error = AppErrorMapper.I.map(e, st);
-          if (error.message == "Resresh-токен не найден в базе." ||
-              error.message == "Токен уже использован ранее." ||
-              error.message == "Refresh token был отозван") {
-            throw RevokeTokenException();
-          }
-          throw error;
         }
+
+        throw AppException(
+          message: "Сервисы временно недоступны\nПопробуйте позже",
+        );
       },
     );
     final cookieManager = CookieManager(cookieJar);
@@ -151,17 +157,12 @@ class NetworkFactory {
             ),
           )
         : null;
-    refreshDio.interceptors.addAll([
-      cookieManager,
-      authInterceptor,
-      ?talkerInterceptor,
-    ]);
+    refreshDio.interceptors.addAll([cookieManager, ?talkerInterceptor]);
     metricsDio.interceptors.addAll([
       if (showTalkerMetricsHttp) ?talkerInterceptor,
     ]);
     authDio.interceptors.addAll([
       cookieManager,
-      authInterceptor,
       ?talkerInterceptor,
       errorInterceptor,
       cacheInterceptor,
