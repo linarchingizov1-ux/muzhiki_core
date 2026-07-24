@@ -20,11 +20,7 @@ class AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     try {
-      talker.debug(
-        '[AuthInterceptor] onRequest ${options.method} ${options.uri}',
-      );
-
-      if (options.extra["isRefresh"] != true && refreshManager.isRefreshing) {
+      if (options.extra["isRefresh"] == true && refreshManager.isRefreshing) {
         talker.debug(
           '[AuthInterceptor] ⏳ Ожидание refresh перед ${options.method} ${options.uri}',
         );
