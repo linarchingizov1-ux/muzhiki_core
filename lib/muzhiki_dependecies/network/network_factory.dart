@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fresh_dio/fresh_dio.dart';
@@ -12,10 +11,8 @@ import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/model/network_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_exception.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/error_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/interceptors/metrics_interceptor.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/network_problem_service.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
@@ -44,18 +41,6 @@ class NetworkFactory {
     required AppInfoModel infoProject,
   }) async {
     await cookieJar.forceInit();
-
-    final cacheOptions = CacheOptions(
-      store: store,
-      policy: CachePolicy.refreshForceCache,
-      hitCacheOnErrorCodes: [500],
-      hitCacheOnNetworkFailure: true,
-      maxStale: const Duration(days: 7),
-      priority: CachePriority.normal,
-      cipher: null,
-      keyBuilder: CacheOptions.defaultCacheKeyBuilder,
-      allowPostMethod: false,
-    );
     final baseOptions = BaseOptions(
       connectTimeout: const Duration(minutes: 5),
       receiveTimeout: const Duration(minutes: 5),
@@ -66,12 +51,6 @@ class NetworkFactory {
     final refreshDio = Dio(baseOptions);
     final authDio = Dio(baseOptions);
     final metricsDio = Dio(baseOptions);
-    final errorInterceptor = AppErrorInterceptor(
-      networkIssueService: NetworkProblemService(
-        sharedPreferences: sharedPreferences,
-      ),
-    );
-    final cacheInterceptor = DioCacheInterceptor(options: cacheOptions);
 
     final fresh = Fresh<AuthTokens>(
       tokenStorage: tokenStorage,
@@ -167,12 +146,11 @@ class NetworkFactory {
       if (showTalkerMetricsHttp) ?talkerInterceptor,
     ]);
     authDio.interceptors.addAll([
-      cookieManager,
+      // cookieManager,
       ?talkerInterceptor,
       // errorInterceptor,
-      cacheInterceptor,
       fresh,
-      if (needMetricsHttp) metricsInterceptor,
+      // if (needMetricsHttp) metricsInterceptor,
     ]);
 
     return NetworkModel(
