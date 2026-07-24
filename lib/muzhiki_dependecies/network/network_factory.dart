@@ -65,7 +65,10 @@ class NetworkFactory {
 
         if (data is Map<String, dynamic>) {
           final error = data['error'];
-          final isTokenInvalid = error == 'Токен не валиден';
+          final isTokenInvalid =
+              error == 'Токен не валиден' ||
+              error == "Требуется авторизация" ||
+              error == "Invalid token";
 
           talker.warning(
             'Ошибка авторизации ? $isTokenInvalid\nОшибка: $error',
