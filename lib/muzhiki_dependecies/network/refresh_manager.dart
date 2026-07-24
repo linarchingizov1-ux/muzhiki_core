@@ -5,24 +5,26 @@ class RefreshManager {
 
   bool get isRefreshing => _completer != null;
 
-  Future<void> waitIfRefreshing() async {
-    final completer = _completer;
-    if (completer != null) {
-      await completer.future;
-    }
+  Future<void> waitIfRefreshing() {
+    return _completer?.future ?? Future.value();
   }
 
   void start() {
     _completer ??= Completer<void>();
   }
 
-  void success() {
-    _completer?.complete();
-    _completer = null;
-  }
+  void finish({Object? error, StackTrace? stackTrace}) {
+    final completer = _completer;
+    if (completer == null) return;
 
-  void error(Object error, StackTrace stackTrace) {
-    _completer?.completeError(error, stackTrace);
     _completer = null;
+
+    if (completer.isCompleted) return;
+
+    if (error != null) {
+      completer.completeError(error, stackTrace ?? StackTrace.current);
+    } else {
+      completer.complete();
+    }
   }
 }

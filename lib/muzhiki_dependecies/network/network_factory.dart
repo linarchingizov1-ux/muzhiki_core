@@ -100,10 +100,10 @@ class NetworkFactory {
               response.data["error"] == "Refresh token был отозван") {
             throw RevokeTokenException();
           }
-          refreshManager.success();
+          refreshManager.finish();
           return AuthTokens(accessToken: access, refreshToken: "");
         } catch (e, st) {
-          refreshManager.error(e, st);
+          refreshManager.finish(error: e, stackTrace: st);
           final error = AppErrorMapper.I.map(e, st);
           if (error.message == "Resresh-токен не найден в базе." ||
               error.message == "Токен уже использован ранее." ||
