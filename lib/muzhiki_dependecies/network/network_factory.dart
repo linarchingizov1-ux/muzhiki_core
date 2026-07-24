@@ -80,7 +80,7 @@ class NetworkFactory {
           talker.debug("Попытка ревреша $attempt");
           try {
             final response = await client.get(
-              'https://auth.muzhiki.pro/api/v1/auth/refresh',
+              'https://auth.muzhiki.pro/api/v1/auth/refreshs',
               options: Options(extra: {"isRefresh": true}),
             );
 
