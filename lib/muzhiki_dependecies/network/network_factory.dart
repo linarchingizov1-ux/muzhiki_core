@@ -57,13 +57,17 @@ class NetworkFactory {
       httpClient: refreshDio,
       tokenHeader: (token) => {'Authorization': 'Bearer ${token.accessToken}'},
       shouldRefresh: (response) {
-        final code = response?.statusCode;
         final data = response?.data;
+
         if (data is Map<String, dynamic>) {
-          talker.warning("Получили ошибку от бэка ${data['error']}");
-          // return data['error'] == 'token_expired';
+          final error = data['error'];
+
+          talker.warning('Ошибка авторизации: $error');
+
+          return error == 'Токен не валиден';
         }
-        return code == 401 || code == 419;
+
+        return false;
       },
       refreshToken: (token, client) async {
         const maxAttempts = 5;
@@ -97,10 +101,9 @@ class NetworkFactory {
               await Future.delayed(delay);
 
               continue;
+            } else {
+              throw Exception("Сервисы временно недоступны\nПопробуйте позже");
             }
-            // else {
-            //   throw Exception("Сервисы временно недоступны\nПопробуйте позже");
-            // }
           }
         }
 
