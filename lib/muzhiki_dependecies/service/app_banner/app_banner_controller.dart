@@ -41,6 +41,8 @@ class BannerController {
     _isShowing = true;
 
     final overlay = MuzhikiDependencies.I.routerKey.currentState?.overlay;
+    print('Overlay: $overlay');
+    print('Navigator: ${MuzhikiDependencies.I.routerKey.currentState}');
     if (overlay == null) return;
 
     _entry?.remove();
