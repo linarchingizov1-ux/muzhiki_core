@@ -58,6 +58,11 @@ class NetworkFactory {
       tokenHeader: (token) => {'Authorization': 'Bearer ${token.accessToken}'},
       shouldRefresh: (response) {
         final code = response?.statusCode;
+        final data = response?.data;
+        if (data is Map<String, dynamic>) {
+          talker.warning("Получили ошибку от бэка ${data['error']}");
+          // return data['error'] == 'token_expired';
+        }
         return code == 401 || code == 419;
       },
       refreshToken: (token, client) async {
@@ -92,17 +97,14 @@ class NetworkFactory {
               await Future.delayed(delay);
 
               continue;
-            } else {
-              throw AppException(
-                message: "Сервисы временно недоступны\nПопробуйте позже",
-              );
             }
+            // else {
+            //   throw Exception("Сервисы временно недоступны\nПопробуйте позже");
+            // }
           }
         }
 
-        throw AppException(
-          message: "Сервисы временно недоступны\nПопробуйте позже",
-        );
+        throw Exception("Сервисы временно недоступны\nПопробуйте позже");
       },
     );
     final cookieManager = CookieManager(cookieJar);
