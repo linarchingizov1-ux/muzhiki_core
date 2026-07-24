@@ -24,6 +24,8 @@ import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 import 'package:uuid/uuid.dart';
 
+bool showIsBackendProblem = false;
+
 class NetworkFactory {
   static Future<NetworkModel> create({
     required bool enableTalker,
@@ -60,19 +62,18 @@ class NetworkFactory {
         return {'Authorization': 'Bearer ${token.accessToken}'};
       },
       shouldRefresh: (response) {
-        final options = response?.requestOptions;
+        final code = response?.statusCode;
 
-        if (options?.extra['isRefresh'] == true) {
-          talker.debug('[Fresh] Skip refresh request');
+        final isAuthError = code == 401 || code == 419;
+
+        if (isAuthError && showIsBackendProblem) {
+          talker.warning('[Fresh] Refresh остановлен: backend problem');
           return false;
         }
 
-        final code = response?.statusCode;
-
-        return code == 401 || code == 419;
+        return isAuthError;
       },
       refreshToken: (token, client) async {
-        bool showIsBackendProblem = false;
         const maxAttempts = 5;
         const delay = Duration(seconds: 5);
 
@@ -86,7 +87,10 @@ class NetworkFactory {
 
             final access = response.data['data']['access_token'] as String;
 
-            return AuthTokens(accessToken: access, refreshToken: "");
+            return AuthTokens(
+              accessToken: access,
+              refreshToken: token?.refreshToken ?? "",
+            );
           } catch (e, st) {
             final error = AppErrorMapper.I.map(e, st);
 
@@ -110,9 +114,7 @@ class NetworkFactory {
             }
           }
         }
-        if (showIsBackendProblem) {
-          talker.debug("Вот тут показывает диалог что проблемы с бэком");
-        }
+        talker.debug("Вышли из цикла и делаем Exception");
         throw Exception("Сервисы временно недоступны\nПопробуйте позже");
       },
     );
