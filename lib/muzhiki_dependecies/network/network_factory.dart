@@ -168,9 +168,9 @@ class NetworkFactory {
       fresh,
       // cookieManager,
       ?talkerInterceptor,
-      // errorInterceptor,
 
-      // if (needMetricsHttp) metricsInterceptor,
+      // errorInterceptor,
+      if (needMetricsHttp) metricsInterceptor,
     ]);
 
     return NetworkModel(
