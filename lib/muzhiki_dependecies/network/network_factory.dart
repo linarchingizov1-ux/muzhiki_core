@@ -86,6 +86,7 @@ class NetworkFactory {
         const delay = Duration(seconds: 5);
 
         for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+          talker.debug("Попытка ревреша $attempt");
           try {
             final response = await client.get(
               'https://auth.muzhiki.pro/api/v1/auth/refreshTEST',
