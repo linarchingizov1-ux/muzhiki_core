@@ -169,7 +169,7 @@ class NetworkFactory {
     authDio.interceptors.addAll([
       cookieManager,
       ?talkerInterceptor,
-      errorInterceptor,
+      // errorInterceptor,
       cacheInterceptor,
       fresh,
       if (needMetricsHttp) metricsInterceptor,
