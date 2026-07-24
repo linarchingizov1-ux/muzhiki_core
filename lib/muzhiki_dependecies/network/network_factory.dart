@@ -15,6 +15,7 @@ import 'package:muzhiki_core/muzhiki_dependecies/network/metrics/request_storage
 import 'package:muzhiki_core/muzhiki_dependecies/network/network_type_service.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/token_storage.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_version/model/app_info_model.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/user_session.dart';
@@ -68,6 +69,9 @@ class NetworkFactory {
 
         if (isAuthError && showIsBackendProblem) {
           talker.warning('[Fresh] Refresh остановлен: backend problem');
+          BannerController.I.show(
+            message: "Сервисы временно недоступны\nПопробуйте позже",
+          );
           return false;
         }
 
@@ -115,7 +119,10 @@ class NetworkFactory {
           }
         }
         talker.debug("Вышли из цикла и делаем Exception");
-        throw Exception("Сервисы временно недоступны\nПопробуйте позже");
+        return AuthTokens(
+          accessToken: token?.accessToken ?? "",
+          refreshToken: token?.refreshToken ?? "",
+        );
       },
     );
     final cookieManager = CookieManager(cookieJar);
@@ -160,10 +167,7 @@ class NetworkFactory {
     ]);
     authDio.interceptors.addAll([
       fresh,
-      // cookieManager,
       ?talkerInterceptor,
-
-      // errorInterceptor,
       if (needMetricsHttp) metricsInterceptor,
     ]);
 
