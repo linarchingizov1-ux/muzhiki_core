@@ -65,15 +65,19 @@ class NetworkFactory {
 
         if (data is Map<String, dynamic>) {
           final error = data['error'];
+          final isTokenInvalid = error == 'Токен не валиден';
 
-          talker.warning('Ошибка авторизации: $error');
+          talker.warning(
+            'Ошибка авторизации ? $isTokenInvalid\nОшибка: $error',
+          );
 
-          return error == 'Токен не валиден';
+          return isTokenInvalid;
         }
 
         return false;
       },
       refreshToken: (token, client) async {
+        bool showIsBackendProblem = false;
         const maxAttempts = 5;
         const delay = Duration(seconds: 5);
 
@@ -81,7 +85,7 @@ class NetworkFactory {
           talker.debug("Попытка ревреша $attempt");
           try {
             final response = await client.get(
-              'https://auth.muzhiki.pro/api/v1/auth/refreshTEST',
+              'https://auth.muzhiki.pro/api/v1/auth/refresh',
               options: Options(extra: {"isRefresh": true}),
             );
 
@@ -106,11 +110,14 @@ class NetworkFactory {
 
               continue;
             } else {
-              throw Exception("Сервисы временно недоступны\nПопробуйте позже");
+              showIsBackendProblem = true;
+              break;
             }
           }
         }
-
+        if (showIsBackendProblem) {
+          talker.debug("Вот тут показывает диалог что проблемы с бэком");
+        }
         throw Exception("Сервисы временно недоступны\nПопробуйте позже");
       },
     );
