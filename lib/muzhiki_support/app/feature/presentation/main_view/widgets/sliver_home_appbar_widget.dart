@@ -37,9 +37,12 @@ class SliverHomeAppbarWidget extends StatelessWidget {
           centerTitle: false,
           pinned: true,
           floating: true,
-          title: Text(
-            'Мои чаты',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+          title: Padding(
+            padding: EdgeInsets.only(left: canPop ? 20.w : 0),
+            child: Text(
+              'Мои чаты',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+            ),
           ),
           automaticallyImplyLeading: canPop,
           leading: canPop
@@ -49,7 +52,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
                 )
               : null,
           leadingWidth: 40.w,
-          titleSpacing: canPop ? 25.w : 0,
+          titleSpacing: 0,
         ),
       );
     }
