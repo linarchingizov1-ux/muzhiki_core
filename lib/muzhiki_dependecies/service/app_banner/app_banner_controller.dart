@@ -54,7 +54,7 @@ class BannerController {
         title: title ?? '',
         message: message,
         duration: duration,
-        onDismiss: () => _entry?.remove,
+        onDismiss: remove,
       ),
     );
 
