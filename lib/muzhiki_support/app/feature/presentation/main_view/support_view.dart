@@ -20,6 +20,7 @@ class SupportView extends StatefulWidget {
   final String homeRoute, profileRoute;
   final ChatCubit chatCubit;
   final SessionApp? sessionApp;
+  final bool canPop;
   final void Function()? firebaseRemoveFCM;
   final bool showInformator;
   final SupportAction action;
@@ -31,6 +32,7 @@ class SupportView extends StatefulWidget {
     required this.chatCubit,
     required this.firebaseRemoveFCM,
     required this.action,
+    this.canPop = false,
     required this.homeRoute,
     this.showInformator = false,
     required this.profileRoute,
@@ -50,37 +52,19 @@ class _SupportViewState extends State<SupportView> {
   }
 
   Future<void> loadChats() async {
-    // Получаем уникальный ID текущего экземпляра виджета
-    final widgetId = identityHashCode(this);
-
-    print("[LOG_CHAT] >>> loadChats() запущен в виджете ID: $widgetId");
-    print(
-      "[LOG_CHAT] Текущий action: ${widget.action.runtimeType}, mounted: $mounted",
-    );
-
     try {
-      print("[LOG_CHAT] Начинаем загрузку getMyChats()...");
       await widget.chatCubit.getMyChats();
-      print("[LOG_CHAT] getMyChats() успешно завершен. mounted: $mounted");
-    } catch (e, stack) {
-      print("[LOG_CHAT] Ошибка в getMyChats(): $e\n$stack");
-    }
+    } catch (_) {}
 
     if (!mounted) {
-      print(
-        "[LOG_CHAT] !!! Виджет ID $widgetId уже размонтирован (not mounted). Прерываем навигацию.",
-      );
       return;
     }
 
-    print("[LOG_CHAT] Обработка action: ${widget.action.runtimeType}");
     switch (widget.action) {
       case SupportNone():
-        print("[LOG_CHAT] Экшен: SupportNone. Ничего не делаем.");
         break;
 
       case SupportOpenChat(:final sessionId):
-        print("[LOG_CHAT] Навигация в Chat. ID сессии: $sessionId");
         context.pushNamed(
           SupportRouteConstant.I.chat,
           pathParameters: {'id': sessionId},
@@ -88,7 +72,6 @@ class _SupportViewState extends State<SupportView> {
         break;
 
       case SupportCreateSession(:final supportChatsEventWidgets):
-        print("[LOG_CHAT] Навигация в ChatDraft (создание сессии)");
         context.pushNamed(
           extra: supportChatsEventWidgets,
           SupportRouteConstant.I.chatDraft,
@@ -96,14 +79,12 @@ class _SupportViewState extends State<SupportView> {
         break;
 
       case SupportOpenInformator(:final initalURL):
-        print("[LOG_CHAT] НАВИГАЦИЯ В INFORMATOR! URL: $initalURL");
         context.pushNamed(
           SupportRouteConstant.I.informator,
           queryParameters: {"initialUrl": initalURL},
         );
         break;
     }
-    print("[LOG_CHAT] <<< loadChats() завершил работу в виджете ID: $widgetId");
   }
 
   @override
@@ -149,6 +130,7 @@ class _SupportViewState extends State<SupportView> {
           body: CustomScrollView(
             slivers: [
               SliverHomeAppbarWidget(
+                canPop: widget.canPop,
                 typeApp: widget.typeApp,
                 sessionApp: widget.sessionApp,
                 firebaseRemoveFCM: widget.firebaseRemoveFCM,

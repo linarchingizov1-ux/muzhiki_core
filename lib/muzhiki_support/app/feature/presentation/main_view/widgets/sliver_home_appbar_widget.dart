@@ -7,9 +7,11 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/appbar_main/app
 class SliverHomeAppbarWidget extends StatelessWidget {
   final TypeApp typeApp;
   final SessionApp? sessionApp;
+  final bool canPop;
   final Function()? firebaseRemoveFCM;
   const SliverHomeAppbarWidget({
     super.key,
+    required this.canPop,
     required this.typeApp,
     this.sessionApp,
     this.firebaseRemoveFCM,
@@ -39,10 +41,13 @@ class SliverHomeAppbarWidget extends StatelessWidget {
             'Мои чаты',
             style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
           ),
-          leading: InkWell(
-            onTap: context.pop,
-            child: Icon(Icons.arrow_back_ios_new_rounded, size: 20.r),
-          ),
+          automaticallyImplyLeading: canPop,
+          leading: canPop
+              ? InkWell(
+                  onTap: context.pop,
+                  child: Icon(Icons.arrow_back_ios_new_rounded, size: 20.r),
+                )
+              : null,
           leadingWidth: 40.w,
           titleSpacing: 0,
         ),
