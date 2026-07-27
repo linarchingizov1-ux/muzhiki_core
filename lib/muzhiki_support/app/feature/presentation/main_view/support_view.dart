@@ -34,7 +34,7 @@ class SupportView extends StatefulWidget {
     required this.action,
     this.canPop = false,
     required this.homeRoute,
-    this.showInformator = false,
+    this.showInformator = true,
     required this.profileRoute,
   });
 
