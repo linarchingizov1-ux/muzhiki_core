@@ -32,9 +32,9 @@ class SupportView extends StatefulWidget {
     required this.chatCubit,
     required this.firebaseRemoveFCM,
     required this.action,
-    this.canPop = false,
+    this.canPop = true,
     required this.homeRoute,
-    this.showInformator = true,
+    this.showInformator = false,
     required this.profileRoute,
   });
 
