@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class IOSPressButton extends StatefulWidget {
-  const IOSPressButton({
+class CircleButton extends StatefulWidget {
+  const CircleButton({
     required this.onTap,
     super.key,
     this.svgAsset,
@@ -25,10 +25,10 @@ class IOSPressButton extends StatefulWidget {
   final Color? backgroundColor;
 
   @override
-  State<IOSPressButton> createState() => _IOSPressButtonState();
+  State<CircleButton> createState() => _CircleButtonState();
 }
 
-class _IOSPressButtonState extends State<IOSPressButton>
+class _CircleButtonState extends State<CircleButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
