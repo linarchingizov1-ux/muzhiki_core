@@ -50,7 +50,7 @@ class _CircleButtonState extends State<CircleButton>
       value: 0.0,
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutCubic,
