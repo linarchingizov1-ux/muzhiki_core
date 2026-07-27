@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:muzhiki_core/muzhiki_ui/circle_button.dart';
+import 'package:muzhiki_core/muzhiki_ui/buttons/circle_button.dart';
 
 abstract final class MuzhikiUi {
   static final buttons = MuzhikiButtons._();
@@ -13,8 +13,8 @@ final class MuzhikiButtons {
     IconData? icon,
     Widget? child,
     required VoidCallback onTap,
-    required double size,
-    required double iconSize,
+    double size = 40,
+    double iconSize = 16,
     Color? backgroundColor,
   }) {
     return CircleButton(

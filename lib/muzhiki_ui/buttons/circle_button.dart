@@ -9,13 +9,15 @@ class CircleButton extends StatefulWidget {
     super.key,
     this.svgAsset,
     this.icon,
-    this.size = 40,
-    this.iconSize = 16,
+    required this.size,
+    required this.iconSize,
     this.child,
+    this.isGlasses = false,
     this.backgroundColor,
   });
 
   final String? svgAsset;
+  final bool isGlasses;
   final IconData? icon;
   final VoidCallback onTap;
   final Widget? child;
@@ -105,7 +107,7 @@ class _CircleButtonState extends State<CircleButton>
 
     _controller
       ..stop()
-      ..value = 1.0;
+      ..value = 0.0;
   }
 
   void _onTapDown(TapDownDetails details) {
