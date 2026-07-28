@@ -323,15 +323,17 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
         widget.url,
         path,
         onReceiveProgress: (received, total) {
-          if (total > 0 && mounted) {
+          if (total > 0 && totalFileSize != total) {
             setState(() => totalFileSize = total);
           }
         },
       );
 
-      isDownloadsFile = true;
+      if (!mounted) return;
+
+      setState(() => isDownloadsFile = true);
     } catch (e, st) {
-      talker.error('Произошла ошибка при скачивании файла: $e', e, st);
+      talker.error('Ошибка скачивания файла: $e, $st');
     }
   }
 
@@ -372,65 +374,56 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: openReadFile,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22.r),
-          color: SupportColors.white,
-        ),
-        child: Row(
-          spacing: 5.w,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 35.r),
-              child: SvgPicture.asset(
-                SupportAssets.I.svg.file,
-                width: 35.r,
-                height: 35.r,
-                colorFilter: ColorFilter.mode(
-                  SupportColors.grey,
-                  BlendMode.srcIn,
-                ),
+      onTap: isDownloadsFile ? openReadFile : downloads,
+      child: Row(
+        spacing: 5.w,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 35.r),
+            child: SvgPicture.asset(
+              SupportAssets.I.svg.file,
+              width: 35.r,
+              height: 35.r,
+              colorFilter: ColorFilter.mode(
+                SupportColors.grey,
+                BlendMode.srcIn,
               ),
             ),
-            SizedBox(
-              width: 80.w,
-              child: Stack(
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      text: '${widget.fileName}\n',
-                      style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: fileSizeText,
-                          style: TextStyle(
-                            color: SupportColors.grey,
-                            fontSize: 10.sp,
-                          ),
+          ),
+          SizedBox(
+            width: 100.w,
+            child: Stack(
+              children: [
+                Text.rich(
+                  TextSpan(
+                    text: '${widget.fileName}\n',
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: fileSizeText.isEmpty ? "0" : fileSizeText,
+                        style: TextStyle(
+                          color: SupportColors.grey,
+                          fontSize: 10.sp,
                         ),
-                      ],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (isOpenFile)
-                    Positioned.fill(
-                      child: Center(
-                        child: CircularProgressIndicator.adaptive(),
                       ),
-                    ),
-                ],
-              ),
+                    ],
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (isOpenFile)
+                  Positioned.fill(
+                    child: Center(child: CircularProgressIndicator.adaptive()),
+                  ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

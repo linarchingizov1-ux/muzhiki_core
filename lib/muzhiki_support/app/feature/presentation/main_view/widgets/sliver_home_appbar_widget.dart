@@ -39,23 +39,26 @@ class SliverHomeAppbarWidget extends StatelessWidget {
           centerTitle: false,
           pinned: true,
           floating: true,
-          title: Text(
-            'Мои чаты',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+          title: Row(
+            spacing: 10.w,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (canPop)
+                MuzhikiUi.buttons.circle(
+                  size: 40,
+                  iconSize: 16,
+                  backgroundColor: SupportColors.alertTextGrey,
+                  onTap: context.pop,
+                  icon: Icons.arrow_back_ios_new,
+                ),
+              Text(
+                'Мои чаты',
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
           automaticallyImplyLeading: canPop,
-          leading: canPop
-              ? Padding(
-                  padding: EdgeInsets.only(right: 10.w),
-                  child: MuzhikiUi.buttons.circle(
-                    size: 40,
-                    iconSize: 16,
-                    backgroundColor: SupportColors.alertTextGrey,
-                    onTap: context.pop,
-                    icon: Icons.arrow_back_ios_new,
-                  ),
-                )
-              : null,
+          leading: null,
           leadingWidth: 40.w,
           titleSpacing: canPop ? 0 : 25.w,
         ),
