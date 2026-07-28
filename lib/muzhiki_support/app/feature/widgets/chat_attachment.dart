@@ -306,10 +306,11 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   }
 
   Future<void> _init() async {
-    isDownloadsFile = await File(path).exists();
+    final file = File(path);
+    isDownloadsFile = await file.exists();
 
     if (isDownloadsFile) {
-      totalFileSize = await File(path).length();
+      totalFileSize = await file.length();
     }
 
     if (mounted) setState(() {});
@@ -323,15 +324,20 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
         widget.url,
         path,
         onReceiveProgress: (received, total) {
-          if (total > 0 && totalFileSize != total) {
+          if (total > 0 && mounted) {
             setState(() => totalFileSize = total);
           }
         },
       );
 
+      final file = File(path);
+
       if (!mounted) return;
 
-      setState(() => isDownloadsFile = true);
+      setState(() {
+        isDownloadsFile = true;
+        totalFileSize = file.lengthSync();
+      });
     } catch (e, st) {
       talker.error('Ошибка скачивания файла: $e, $st');
     }
@@ -342,6 +348,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
     if (!isDownloadsFile) {
       await downloads();
+      return;
     }
 
     if (!mounted) return;
@@ -374,7 +381,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isDownloadsFile ? openReadFile : downloads,
+      onTap: openReadFile,
       child: Row(
         spacing: 5.w,
         mainAxisSize: MainAxisSize.min,
