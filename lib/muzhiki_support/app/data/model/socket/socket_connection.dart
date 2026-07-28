@@ -107,6 +107,7 @@ DateTime _fromJsonDate(String value) {
 
 @JsonSerializable()
 class AttachmentsModel {
+  @ChatAttachmentTypeConverter()
   final ChatAttachmentType type;
   final String url;
   final String? name;
@@ -126,4 +127,40 @@ enum ChatAttachmentType {
   video,
   @JsonValue('document')
   document,
+}
+
+class ChatAttachmentTypeConverter
+    implements JsonConverter<ChatAttachmentType, String> {
+  const ChatAttachmentTypeConverter();
+
+  @override
+  ChatAttachmentType fromJson(String value) {
+    switch (value) {
+      case 'photo':
+        return ChatAttachmentType.photo;
+
+      case 'video':
+        return ChatAttachmentType.video;
+
+      case 'document':
+      case 'file':
+        return ChatAttachmentType.document;
+    }
+
+    throw ArgumentError('Unknown ChatAttachmentType: $value');
+  }
+
+  @override
+  String toJson(ChatAttachmentType value) {
+    switch (value) {
+      case ChatAttachmentType.photo:
+        return 'photo';
+
+      case ChatAttachmentType.video:
+        return 'video';
+
+      case ChatAttachmentType.document:
+        return 'document';
+    }
+  }
 }

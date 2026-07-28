@@ -8,23 +8,19 @@ part of 'socket_connection.dart';
 
 AttachmentsModel _$AttachmentsModelFromJson(Map<String, dynamic> json) =>
     AttachmentsModel(
-      type: $enumDecode(_$ChatAttachmentTypeEnumMap, json['type']),
+      type: const ChatAttachmentTypeConverter().fromJson(
+        json['type'] as String,
+      ),
       url: json['url'] as String,
       name: json['name'] as String?,
     );
 
 Map<String, dynamic> _$AttachmentsModelToJson(AttachmentsModel instance) =>
     <String, dynamic>{
-      'type': _$ChatAttachmentTypeEnumMap[instance.type]!,
+      'type': const ChatAttachmentTypeConverter().toJson(instance.type),
       'url': instance.url,
       'name': instance.name,
     };
-
-const _$ChatAttachmentTypeEnumMap = {
-  ChatAttachmentType.photo: 'photo',
-  ChatAttachmentType.video: 'video',
-  ChatAttachmentType.document: 'document',
-};
 
 _OperatorModel _$OperatorModelFromJson(Map<String, dynamic> json) =>
     _OperatorModel(
