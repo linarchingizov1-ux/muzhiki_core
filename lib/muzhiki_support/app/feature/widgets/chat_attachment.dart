@@ -20,6 +20,8 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.d
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/photo_view_widget.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:talker/talker.dart';
+import 'package:uuid/v4.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class ChatAttachment extends StatelessWidget {
@@ -284,100 +286,63 @@ class _DocumentAttachment extends StatefulWidget {
 }
 
 class _DocumentAttachmentState extends State<_DocumentAttachment> {
-  // bool _downloading = false;
-  // bool _opening = false;
-  // bool _downloaded = false;
-  // double _progress = 0;
+  String uuidFile = "";
+  String path = "";
+  int totalFileSize = 0;
+  bool isDownloadsFile = false;
+  bool isOpenFile = false;
+  final downloadsClient = Dio();
+  final uuid = UuidV4();
+  final talker = Talker();
 
-  // String get _fileName => widget.url.split('/').last.split('?').first;
+  @override
+  void initState() {
+    super.initState();
+    uuidFile = uuid.generate();
+    path = "${widget.directory.path}/$uuidFile";
+    File(path)
+        .exists()
+        .then((found) {
+          isDownloadsFile = found;
+          setState(() {});
+        })
+        .onError((e, st) {
+          talker.error("Ошибка при поиске файла в директории: $e, $st");
+        });
+  }
 
-  // String get _path => '${widget.directory.path}/$_fileName';
+  void downloads() {
+    if (isDownloadsFile) return;
+    try {
+      downloadsClient.download(
+        widget.url,
+        path,
+        onReceiveProgress: (received, total) {
+          if (totalFileSize == 0) {
+            setState(() => totalFileSize = total);
+          }
+          if (total <= 0) return;
+          talker.debug(
+            'Скачано: ${(received / total * 100).toStringAsFixed(0)}%',
+          );
+        },
+      );
+    } catch (e, st) {
+      talker.error("Произошла ошибка при скачивании файла $e, $st");
+    }
+  }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _checkFile();
-  // }
-
-  // Future<void> _checkFile() async {
-  //   final exists = await File(_path).exists();
-
-  //   if (mounted) {
-  //     setState(() => _downloaded = exists);
-  //   }
-  // }
-
-  // Future<void> _download() async {
-  //   if (_downloading || _opening) return;
-
-  //   final file = File(_path);
-
-  //   if (await file.exists()) {
-  //     setState(() => _downloaded = true);
-  //     return _open();
-  //   }
-
-  //   setState(() {
-  //     _downloading = true;
-  //     _downloaded = false;
-  //     _progress = 0;
-  //   });
-
-  //   try {
-  //     await Dio().download(
-  //       widget.url,
-  //       _path,
-  //       onReceiveProgress: (received, total) {
-  //         if (total > 0 && mounted) {
-  //           setState(() => _progress = received / total);
-  //         }
-  //       },
-  //     );
-
-  //     if (!mounted) return;
-
-  //     setState(() {
-  //       _downloading = false;
-  //       _downloaded = true;
-  //       _progress = 1;
-  //     });
-
-  //     await _open();
-  //   } catch (e, st) {
-  //     if (!mounted) return;
-
-  //     setState(() {
-  //       _downloading = false;
-  //       _downloaded = false;
-  //       _progress = 0;
-  //     });
-
-  //     final error = AppErrorMapper.I.map(e, st);
-  //     BannerController.I.showError(error: error, message: error.message);
-  //   }
-  // }
-
-  // Future<void> _open() async {
-  //   if (_opening) return;
-
-  //   setState(() => _opening = true);
-
-  //   final result = await OpenFilex.open(_path);
-
-  //   if (!mounted) return;
-
-  //   setState(() => _opening = false);
-
-  //   if (result.type == ResultType.noAppToOpen) {
-  //     BannerController.I.show(
-  //       message: 'На устройстве нет приложения для открытия этого файла',
-  //     );
-  //   }
-  // }
+  void openReadFile() async {
+    if (isOpenFile) return;
+    setState(() => isOpenFile = true);
+    final result = await OpenFilex.open(path);
+    talker.debug("Результат открытия файла: ${result.type}");
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 5.w,
       mainAxisSize: MainAxisSize.min,
       children: [
         ConstrainedBox(
@@ -399,7 +364,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
             ),
             children: [
               TextSpan(
-                text: "106kb",
+                text: "$totalFileSize",
                 style: TextStyle(color: SupportColors.grey, fontSize: 10.sp),
               ),
             ],
