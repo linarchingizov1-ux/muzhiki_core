@@ -409,8 +409,12 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
                 if (isOpenFile)
                   Positioned.fill(
                     child: Center(
-                      child: CircularProgressIndicator.adaptive(
-                        backgroundColor: Colors.red,
+                      child: SizedBox(
+                        width: 35.r,
+                        height: 35.r,
+                        child: CircularProgressIndicator.adaptive(
+                          backgroundColor: SupportColors.white,
+                        ),
                       ),
                     ),
                   ),
