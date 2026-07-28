@@ -410,7 +410,9 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
                           if (isDownloadsFile) ' • Загружен',
                         ].join(),
                         style: TextStyle(
-                          color: SupportColors.grey,
+                          color: isDownloadsFile
+                              ? SupportColors.green
+                              : SupportColors.darkGrey,
                           fontSize: 10.sp,
                         ),
                       ),
