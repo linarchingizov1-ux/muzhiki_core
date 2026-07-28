@@ -307,11 +307,13 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   }
 
   Future<void> _init() async {
+    talker.debug("Размер файла до его поиска $totalFileSize");
     final file = File(path);
     isDownloadsFile = await file.exists();
 
     if (isDownloadsFile) {
       totalFileSize = await file.length();
+      talker.debug("Размер файла после его поиска $totalFileSize");
     }
 
     if (mounted) setState(() {});
@@ -395,30 +397,14 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(maxHeight: 35.r),
-            child: Stack(
-              children: [
-                SvgPicture.asset(
-                  SupportAssets.I.svg.file,
-                  width: 35.r,
-                  height: 35.r,
-                  colorFilter: ColorFilter.mode(
-                    SupportColors.grey,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                if (isOpenFile)
-                  Positioned.fill(
-                    child: Center(
-                      child: SizedBox(
-                        width: 35.r,
-                        height: 35.r,
-                        child: CircularProgressIndicator.adaptive(
-                          backgroundColor: SupportColors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+            child: SvgPicture.asset(
+              SupportAssets.I.svg.file,
+              width: 35.r,
+              height: 35.r,
+              colorFilter: ColorFilter.mode(
+                SupportColors.grey,
+                BlendMode.srcIn,
+              ),
             ),
           ),
           SizedBox(
