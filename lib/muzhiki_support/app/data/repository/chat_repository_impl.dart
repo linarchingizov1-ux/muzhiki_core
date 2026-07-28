@@ -5,6 +5,7 @@ import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_path.da
 import 'package:muzhiki_core/muzhiki_support/app/data/model/my_chat.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/repository/chat_repository.dart';
+import 'package:talker/talker.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
   final Dio dio;
@@ -52,6 +53,7 @@ class ChatRepositoryImpl implements ChatRepository {
 
       return data;
     } catch (e, st) {
+      Talker().error(e, st);
       throw AppErrorMapper.I.map(e, st);
     }
   }

@@ -428,7 +428,6 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   void _handleError(Object e, StackTrace st, {required bool showBanner}) {
-    talker.error(e, st);
     final mapped = AppErrorMapper.I.map(e, st);
     if (!showBanner) return;
 
