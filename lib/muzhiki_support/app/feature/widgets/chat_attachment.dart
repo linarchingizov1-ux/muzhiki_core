@@ -348,7 +348,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
     final result = await OpenFilex.open(path);
 
-    if (mounted) {
+    if (mounted && result.type == ResultType.done) {
       setState(() => isOpenFile = false);
     }
 
@@ -373,47 +373,64 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: openReadFile,
-      child: Row(
-        spacing: 5.w,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: 35.r),
-            child: SvgPicture.asset(
-              SupportAssets.I.svg.file,
-              width: 35.r,
-              height: 35.r,
-              colorFilter: ColorFilter.mode(
-                SupportColors.grey,
-                BlendMode.srcIn,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22.r),
+          color: SupportColors.white,
+        ),
+        child: Row(
+          spacing: 5.w,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 35.r),
+              child: SvgPicture.asset(
+                SupportAssets.I.svg.file,
+                width: 35.r,
+                height: 35.r,
+                colorFilter: ColorFilter.mode(
+                  SupportColors.grey,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            width: 80.w,
-            child: Text.rich(
-              TextSpan(
-                text: '${widget.fileName}\n',
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
-                ),
+            SizedBox(
+              width: 80.w,
+              child: Stack(
                 children: [
-                  TextSpan(
-                    text: fileSizeText,
-                    style: TextStyle(
-                      color: SupportColors.grey,
-                      fontSize: 10.sp,
+                  Text.rich(
+                    TextSpan(
+                      text: '${widget.fileName}\n',
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: fileSizeText,
+                          style: TextStyle(
+                            color: SupportColors.grey,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                      ],
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                  if (isOpenFile)
+                    Positioned.fill(
+                      child: Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                    ),
                 ],
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
