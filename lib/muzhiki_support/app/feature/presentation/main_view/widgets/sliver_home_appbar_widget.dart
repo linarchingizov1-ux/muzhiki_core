@@ -45,16 +45,19 @@ class SliverHomeAppbarWidget extends StatelessWidget {
           ),
           automaticallyImplyLeading: canPop,
           leading: canPop
-              ? MuzhikiUi.buttons.circle(
-                  size: 40,
-                  iconSize: 16,
-                  backgroundColor: SupportColors.alertTextGrey,
-                  onTap: context.pop,
-                  icon: Icons.arrow_back_ios_new,
+              ? Padding(
+                  padding: EdgeInsets.only(right: 10.w),
+                  child: MuzhikiUi.buttons.circle(
+                    size: 40,
+                    iconSize: 16,
+                    backgroundColor: SupportColors.alertTextGrey,
+                    onTap: context.pop,
+                    icon: Icons.arrow_back_ios_new,
+                  ),
                 )
               : null,
           leadingWidth: 40.w,
-          titleSpacing: canPop ? 0 : 100.w,
+          titleSpacing: canPop ? 0 : 25.w,
         ),
       );
     }

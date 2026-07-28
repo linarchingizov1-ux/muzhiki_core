@@ -301,7 +301,7 @@ class _BubbleAttachment extends StatelessWidget {
               spacing: 5.w,
               children: List.generate(attachments.length, (index) {
                 return SizedBox(
-                  width: 77.w,
+                  // width: 77.w,
                   height: 77.w,
                   child: ChatAttachment(
                     attachment: attachments[index],
