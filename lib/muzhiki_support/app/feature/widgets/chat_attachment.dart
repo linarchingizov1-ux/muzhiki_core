@@ -308,47 +308,51 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   Future<void> _init() async {
     isDownloadsFile = await File(path).exists();
 
-    try {
-      final response = await downloadsClient.head(widget.url);
-
-      totalFileSize =
-          int.tryParse(
-            response.headers.value(Headers.contentLengthHeader) ?? '',
-          ) ??
-          0;
-    } catch (e, st) {
-      talker.error('Ошибка получения размера файла: $e, $st');
+    if (isDownloadsFile) {
+      totalFileSize = await File(path).length();
     }
 
     if (mounted) setState(() {});
   }
 
-  void downloads() {
+  Future<void> downloads() async {
     if (isDownloadsFile) return;
+
     try {
-      downloadsClient.download(
+      await downloadsClient.download(
         widget.url,
         path,
         onReceiveProgress: (received, total) {
-          if (totalFileSize == 0) {
+          if (total > 0 && mounted) {
             setState(() => totalFileSize = total);
           }
-          if (total <= 0) return;
-          talker.debug(
-            'Скачано: ${(received / total * 100).toStringAsFixed(0)}%',
-          );
         },
       );
+
+      isDownloadsFile = true;
     } catch (e, st) {
-      talker.error("Произошла ошибка при скачивании файла $e, $st");
+      talker.error('Произошла ошибка при скачивании файла: $e', e, st);
     }
   }
 
-  void openReadFile() async {
+  Future<void> openReadFile() async {
     if (isOpenFile) return;
+
+    if (!isDownloadsFile) {
+      await downloads();
+    }
+
+    if (!mounted) return;
+
     setState(() => isOpenFile = true);
+
     final result = await OpenFilex.open(path);
-    talker.debug("Результат открытия файла: ${result.type}");
+
+    if (mounted) {
+      setState(() => isOpenFile = false);
+    }
+
+    talker.debug('Результат открытия файла: ${result.type}');
   }
 
   String get fileSizeText {
@@ -386,7 +390,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
             ),
           ),
           SizedBox(
-            width: 180.w,
+            width: 80.w,
             child: Text.rich(
               TextSpan(
                 text: '${widget.fileName}\n',
@@ -405,7 +409,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
                   ),
                 ],
               ),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
