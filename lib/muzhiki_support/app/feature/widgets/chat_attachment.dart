@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_route_constant.dart';
@@ -359,6 +360,12 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
     if (mounted && result.type == ResultType.done) {
       setState(() => isOpenFile = false);
+    }
+    if (mounted && result.type == ResultType.noAppToOpen) {
+      setState(() => isOpenFile = false);
+      BannerController.I.show(
+        message: "На устройстве нет приложения для открытия этого файла",
+      );
     }
 
     talker.debug('Результат открытия файла: ${result.type}');
