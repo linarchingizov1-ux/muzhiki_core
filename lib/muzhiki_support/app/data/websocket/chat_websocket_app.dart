@@ -38,6 +38,11 @@ class AppWebsocketChat extends WebSocketChat {
     required this.session,
     this.channelId,
   }) {
+    talker.debug(
+      '🟢 AppWebsocketChat CREATED '
+      'instance=${identityHashCode(this)} '
+      'session=$sessionChatId',
+    );
     _listener = AppLifecycleListener(
       onShow: () async {
         await _resumeWS();
