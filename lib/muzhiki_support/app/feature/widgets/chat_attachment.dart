@@ -7,8 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
-import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_route_constant.dart';
@@ -61,6 +59,7 @@ class ChatAttachment extends StatelessWidget {
               );
             case ChatAttachmentType.document:
               return _DocumentAttachment(
+                fileName: attachment.name ?? "Файл",
                 url: attachment.url,
                 directory: directory,
               );
@@ -276,17 +275,21 @@ class _VideoAttachmentState extends State<_VideoAttachment> {
 }
 
 class _DocumentAttachment extends StatefulWidget {
-  const _DocumentAttachment({required this.url, required this.directory});
+  const _DocumentAttachment({
+    required this.url,
+    required this.directory,
+    required this.fileName,
+  });
 
   final Directory directory;
   final String url;
+  final String fileName;
 
   @override
   State<_DocumentAttachment> createState() => _DocumentAttachmentState();
 }
 
 class _DocumentAttachmentState extends State<_DocumentAttachment> {
-  String uuidFile = "";
   String path = "";
   int totalFileSize = 0;
   bool isDownloadsFile = false;
@@ -298,8 +301,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   @override
   void initState() {
     super.initState();
-    uuidFile = uuid.generate();
-    path = "${widget.directory.path}/$uuidFile";
+    path = "${widget.directory.path}/${widget.fileName}";
     File(path)
         .exists()
         .then((found) {
@@ -341,36 +343,42 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      spacing: 5.w,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: 35.r),
-          child: SvgPicture.asset(
-            SupportAssets.I.svg.file,
-            width: 35.r,
-            height: 35.r,
-            colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
-          ),
-        ),
-        Text.rich(
-          TextSpan(
-            text: "Имя файла\n",
-            style: TextStyle(
-              color: Colors.blueAccent,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w700,
-            ),
-            children: [
-              TextSpan(
-                text: "$totalFileSize",
-                style: TextStyle(color: SupportColors.grey, fontSize: 10.sp),
+    return GestureDetector(
+      onTap: openReadFile,
+      child: Row(
+        spacing: 5.w,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 35.r),
+            child: SvgPicture.asset(
+              SupportAssets.I.svg.file,
+              width: 35.r,
+              height: 35.r,
+              colorFilter: ColorFilter.mode(
+                SupportColors.grey,
+                BlendMode.srcIn,
               ),
-            ],
+            ),
           ),
-        ),
-      ],
+          Text.rich(
+            TextSpan(
+              text: "${widget.fileName}\n",
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w700,
+              ),
+              children: [
+                TextSpan(
+                  text: "$totalFileSize",
+                  style: TextStyle(color: SupportColors.grey, fontSize: 10.sp),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
