@@ -284,159 +284,112 @@ class _DocumentAttachment extends StatefulWidget {
 }
 
 class _DocumentAttachmentState extends State<_DocumentAttachment> {
-  bool _downloading = false;
-  bool _opening = false;
-  bool _downloaded = false;
-  double _progress = 0;
+  // bool _downloading = false;
+  // bool _opening = false;
+  // bool _downloaded = false;
+  // double _progress = 0;
 
-  String get _fileName => widget.url.split('/').last.split('?').first;
+  // String get _fileName => widget.url.split('/').last.split('?').first;
 
-  String get _path => '${widget.directory.path}/$_fileName';
+  // String get _path => '${widget.directory.path}/$_fileName';
 
-  @override
-  void initState() {
-    super.initState();
-    _checkFile();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _checkFile();
+  // }
 
-  Future<void> _checkFile() async {
-    final exists = await File(_path).exists();
+  // Future<void> _checkFile() async {
+  //   final exists = await File(_path).exists();
 
-    if (mounted) {
-      setState(() => _downloaded = exists);
-    }
-  }
+  //   if (mounted) {
+  //     setState(() => _downloaded = exists);
+  //   }
+  // }
 
-  Future<void> _download() async {
-    if (_downloading || _opening) return;
+  // Future<void> _download() async {
+  //   if (_downloading || _opening) return;
 
-    final file = File(_path);
+  //   final file = File(_path);
 
-    if (await file.exists()) {
-      setState(() => _downloaded = true);
-      return _open();
-    }
+  //   if (await file.exists()) {
+  //     setState(() => _downloaded = true);
+  //     return _open();
+  //   }
 
-    setState(() {
-      _downloading = true;
-      _downloaded = false;
-      _progress = 0;
-    });
+  //   setState(() {
+  //     _downloading = true;
+  //     _downloaded = false;
+  //     _progress = 0;
+  //   });
 
-    try {
-      await Dio().download(
-        widget.url,
-        _path,
-        onReceiveProgress: (received, total) {
-          if (total > 0 && mounted) {
-            setState(() => _progress = received / total);
-          }
-        },
-      );
+  //   try {
+  //     await Dio().download(
+  //       widget.url,
+  //       _path,
+  //       onReceiveProgress: (received, total) {
+  //         if (total > 0 && mounted) {
+  //           setState(() => _progress = received / total);
+  //         }
+  //       },
+  //     );
 
-      if (!mounted) return;
+  //     if (!mounted) return;
 
-      setState(() {
-        _downloading = false;
-        _downloaded = true;
-        _progress = 1;
-      });
+  //     setState(() {
+  //       _downloading = false;
+  //       _downloaded = true;
+  //       _progress = 1;
+  //     });
 
-      await _open();
-    } catch (e, st) {
-      if (!mounted) return;
+  //     await _open();
+  //   } catch (e, st) {
+  //     if (!mounted) return;
 
-      setState(() {
-        _downloading = false;
-        _downloaded = false;
-        _progress = 0;
-      });
+  //     setState(() {
+  //       _downloading = false;
+  //       _downloaded = false;
+  //       _progress = 0;
+  //     });
 
-      final error = AppErrorMapper.I.map(e, st);
-      BannerController.I.showError(error: error, message: error.message);
-    }
-  }
+  //     final error = AppErrorMapper.I.map(e, st);
+  //     BannerController.I.showError(error: error, message: error.message);
+  //   }
+  // }
 
-  Future<void> _open() async {
-    if (_opening) return;
+  // Future<void> _open() async {
+  //   if (_opening) return;
 
-    setState(() => _opening = true);
+  //   setState(() => _opening = true);
 
-    final result = await OpenFilex.open(_path);
+  //   final result = await OpenFilex.open(_path);
 
-    if (!mounted) return;
+  //   if (!mounted) return;
 
-    setState(() => _opening = false);
+  //   setState(() => _opening = false);
 
-    if (result.type == ResultType.noAppToOpen) {
-      BannerController.I.show(
-        message: 'На устройстве нет приложения для открытия этого файла',
-      );
-    }
-  }
+  //   if (result.type == ResultType.noAppToOpen) {
+  //     BannerController.I.show(
+  //       message: 'На устройстве нет приложения для открытия этого файла',
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final busy = _downloading || _opening;
-
-    return InkWell(
-      onTap: busy ? null : _download,
-      child: Container(
-        width: 77.w,
-        height: 77.w,
-        padding: EdgeInsets.all(8.r),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.r),
-          color: SupportColors.light,
-        ),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Center(
-                child: SvgPicture.asset(
-                  SupportAssets.I.svg.file,
-                  width: 25.w,
-                  height: 25.w,
-                  colorFilter: ColorFilter.mode(
-                    SupportColors.grey,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(right: 0, bottom: 0, child: _buildStatus()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatus() {
-    if (_downloading) {
-      return TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: _progress),
-        duration: const Duration(milliseconds: 300),
-        builder: (_, value, __) => Text(
-          '${(value * 100).round()}%',
-          style: TextStyle(fontSize: 8.sp, color: SupportColors.grey),
-        ),
-      );
-    }
-
-    if (_downloaded || _opening) {
-      return const SizedBox.shrink();
-    }
-
     return Container(
-      padding: EdgeInsets.all(2.r),
+      width: 35.r,
+      height: 35.r,
+      padding: EdgeInsets.all(8.r),
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: SupportColors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12.r),
+        color: SupportColors.light,
       ),
-      child: Icon(
-        Icons.file_download_outlined,
-        size: 15.r,
-        color: SupportColors.grey,
+      child: SvgPicture.asset(
+        SupportAssets.I.svg.file,
+        width: 25.w,
+        height: 25.w,
+        colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
       ),
     );
   }

@@ -11,7 +11,6 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/message/new_m
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/message/pending_message.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/usecase/chat_usecase.dart';
-import 'package:talker/talker.dart';
 import 'package:uuid/v4.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -211,8 +210,6 @@ class AppWebsocketChat extends WebSocketChat {
     _listener.dispose();
   }
 
-  Talker get talker => Talker();
-
   @override
   Future<void> sendMessage({
     required String text,
@@ -311,7 +308,6 @@ class AppWebsocketChat extends WebSocketChat {
 
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
-      talker.debug("ПОЛУЧИЛИ В СОКЕТЕ $raw");
       final event = map['event'];
       switch (event) {
         case 'NewMessage':
