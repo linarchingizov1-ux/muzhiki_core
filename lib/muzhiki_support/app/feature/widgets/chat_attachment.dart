@@ -395,51 +395,55 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(maxHeight: 35.r),
-            child: SvgPicture.asset(
-              SupportAssets.I.svg.file,
-              width: 35.r,
-              height: 35.r,
-              colorFilter: ColorFilter.mode(
-                SupportColors.grey,
-                BlendMode.srcIn,
-              ),
+            child: Stack(
+              children: [
+                SvgPicture.asset(
+                  SupportAssets.I.svg.file,
+                  width: 35.r,
+                  height: 35.r,
+                  colorFilter: ColorFilter.mode(
+                    SupportColors.grey,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                if (isOpenFile)
+                  Positioned.fill(
+                    child: Center(
+                      child: CircularProgressIndicator.adaptive(
+                        backgroundColor: Colors.red,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
           SizedBox(
             width: 100.w,
-            child: Stack(
-              children: [
-                Text.rich(
-                  TextSpan(
-                    text: '${widget.fileName}\n',
-                    style: TextStyle(
-                      color: Colors.blueAccent,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: [
-                          if (fileSizeText.isNotEmpty) fileSizeText,
-                          if (isDownloadsFile) ' • Загружен',
-                        ].join(),
-                        style: TextStyle(
-                          color: isDownloadsFile
-                              ? SupportColors.green
-                              : SupportColors.darkGrey,
-                          fontSize: 10.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+            child: Text.rich(
+              TextSpan(
+                text: '${widget.fileName}\n',
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w700,
                 ),
-                if (isOpenFile)
-                  Positioned.fill(
-                    child: Center(child: CircularProgressIndicator.adaptive()),
+                children: [
+                  TextSpan(
+                    text: [
+                      if (fileSizeText.isNotEmpty) fileSizeText,
+                      if (isDownloadsFile) ' • Загружен',
+                    ].join(),
+                    style: TextStyle(
+                      color: isDownloadsFile
+                          ? SupportColors.green
+                          : SupportColors.darkGrey,
+                      fontSize: 10.sp,
+                    ),
                   ),
-              ],
+                ],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
