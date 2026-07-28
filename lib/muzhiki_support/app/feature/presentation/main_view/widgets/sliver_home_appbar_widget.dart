@@ -54,7 +54,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
                 )
               : null,
           leadingWidth: 40.w,
-          titleSpacing: canPop ? 0 : 20.w,
+          titleSpacing: canPop ? 0 : 40.w,
         ),
       );
     }

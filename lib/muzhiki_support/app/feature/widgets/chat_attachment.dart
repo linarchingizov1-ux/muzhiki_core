@@ -377,11 +377,27 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      SupportAssets.I.svg.file,
-      width: 25.w,
-      height: 25.w,
-      colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 35.r, maxHeight: 35.r),
+          child: SvgPicture.asset(
+            SupportAssets.I.svg.file,
+            width: 35.r,
+            height: 35.r,
+            colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
+          ),
+        ),
+        Text(
+          "Имя файла",
+          style: TextStyle(
+            color: Colors.blueAccent,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
     );
   }
 }
