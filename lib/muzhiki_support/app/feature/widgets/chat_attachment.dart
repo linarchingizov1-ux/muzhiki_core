@@ -408,31 +408,30 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
           ),
           SizedBox(
             width: 100.w,
-            child: Text.rich(
-              TextSpan(
-                text: '${widget.fileName}\n',
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-                children: [
-                  TextSpan(
-                    text: [
-                      if (fileSizeText.isNotEmpty) fileSizeText,
-                      if (isDownloadsFile) ' • Загружен',
-                    ].join(),
-                    style: TextStyle(
-                      color: isDownloadsFile
-                          ? SupportColors.green
-                          : SupportColors.darkGrey,
-                      fontSize: 10.sp,
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.fileName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
                   ),
-                ],
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  fileSizeText.isEmpty ? 'Определяем размер...' : fileSizeText,
+                  style: TextStyle(
+                    color: isDownloadsFile
+                        ? SupportColors.green
+                        : SupportColors.darkGrey,
+                    fontSize: 10.sp,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
