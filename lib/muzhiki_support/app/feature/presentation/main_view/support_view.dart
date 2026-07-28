@@ -103,6 +103,7 @@ class _SupportViewState extends State<SupportView> {
               builder: (context, state) {
                 if (state.chatStatus == StateStatus.success) {
                   return MuzhikiUi.buttons.circle(
+                    backgroundColor: SupportColors.blood,
                     size: 55,
                     svgAsset: SupportAssets.I.svg.add,
                     iconSize: 15,
