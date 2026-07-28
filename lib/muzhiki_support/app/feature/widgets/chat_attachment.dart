@@ -274,82 +274,62 @@ class _VideoAttachmentState extends State<_VideoAttachment> {
 }
 
 class _DocumentAttachment extends StatefulWidget {
+  const _DocumentAttachment({required this.url, required this.directory});
+
   final Directory directory;
   final String url;
-
-  const _DocumentAttachment({required this.url, required this.directory});
 
   @override
   State<_DocumentAttachment> createState() => _DocumentAttachmentState();
 }
 
 class _DocumentAttachmentState extends State<_DocumentAttachment> {
-  final ValueNotifier<double> progress = ValueNotifier<double>(0.0);
+  bool _downloading = false;
+  bool _opening = false;
+  bool _downloaded = false;
+  double _progress = 0;
 
-  bool isDownloading = false;
-  bool isDownloaded = false;
-  bool isOpening = false;
+  String get _fileName => widget.url.split('/').last.split('?').first;
+
+  String get _path => '${widget.directory.path}/$_fileName';
 
   @override
   void initState() {
     super.initState();
-    _checkIfFileExists();
+    _checkFile();
   }
 
-  @override
-  void dispose() {
-    progress.dispose();
-    super.dispose();
+  Future<void> _checkFile() async {
+    final exists = await File(_path).exists();
+
+    if (mounted) {
+      setState(() => _downloaded = exists);
+    }
   }
 
-  String get _fileName => widget.url.split('/').last.split('?').first;
+  Future<void> _download() async {
+    if (_downloading || _opening) return;
 
-  String get _path {
-    final dir = widget.directory;
-    return '${dir.path}/$_fileName';
-  }
-
-  Future<void> _checkIfFileExists() async {
     final file = File(_path);
-    final exists = await file.exists();
-
-    if (!mounted) return;
-
-    setState(() {
-      isDownloaded = exists;
-    });
-  }
-
-  Future<void> downloadFile() async {
-    if (isDownloading || isOpening) return;
-
-    final path = _path;
-    final file = File(path);
 
     if (await file.exists()) {
-      setState(() {
-        isDownloaded = true;
-      });
-      await _openFile(path);
-      return;
+      setState(() => _downloaded = true);
+      return _open();
     }
 
+    setState(() {
+      _downloading = true;
+      _downloaded = false;
+      _progress = 0;
+    });
+
     try {
-      setState(() {
-        isDownloading = true;
-        isDownloaded = false;
-      });
-
-      progress.value = 0.0;
-
-      final dio = Dio();
-
-      await dio.download(
+      await Dio().download(
         widget.url,
-        path,
+        _path,
         onReceiveProgress: (received, total) {
-          if (total > 0) {
-            progress.value = received / total;
+          if (total > 0 && mounted) {
+            setState(() => _progress = received / total);
           }
         },
       );
@@ -357,57 +337,53 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
       if (!mounted) return;
 
       setState(() {
-        isDownloading = false;
-        isDownloaded = true;
+        _downloading = false;
+        _downloaded = true;
+        _progress = 1;
       });
 
-      await _openFile(path);
+      await _open();
     } catch (e, st) {
       if (!mounted) return;
 
       setState(() {
-        isDownloading = false;
-        isDownloaded = false;
+        _downloading = false;
+        _downloaded = false;
+        _progress = 0;
       });
-
-      progress.value = 0.0;
 
       final error = AppErrorMapper.I.map(e, st);
       BannerController.I.showError(error: error, message: error.message);
     }
   }
 
-  Future<void> _openFile(String path) async {
-    if (isOpening) return;
+  Future<void> _open() async {
+    if (_opening) return;
 
-    setState(() {
-      isOpening = true;
-    });
+    setState(() => _opening = true);
 
-    final result = await OpenFilex.open(path);
+    final result = await OpenFilex.open(_path);
+
+    if (!mounted) return;
+
+    setState(() => _opening = false);
 
     if (result.type == ResultType.noAppToOpen) {
       BannerController.I.show(
         message: 'На устройстве нет приложения для открытия этого файла',
       );
     }
-
-    if (!mounted) return;
-
-    setState(() {
-      isOpening = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isBusy = isDownloading || isOpening;
+    final busy = _downloading || _opening;
 
     return InkWell(
-      onTap: isBusy ? null : downloadFile,
+      onTap: busy ? null : _download,
       child: Container(
-        height: 77.w,
         width: 77.w,
+        height: 77.w,
         padding: EdgeInsets.all(8.r),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.r),
@@ -418,9 +394,9 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
             Positioned.fill(
               child: Center(
                 child: SvgPicture.asset(
+                  SupportAssets.I.svg.file,
                   width: 25.w,
                   height: 25.w,
-                  SupportAssets.I.svg.file,
                   colorFilter: ColorFilter.mode(
                     SupportColors.grey,
                     BlendMode.srcIn,
@@ -428,43 +404,39 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
                 ),
               ),
             ),
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: ValueListenableBuilder<double>(
-                valueListenable: progress,
-                builder: (context, value, child) {
-                  if (isDownloading) {
-                    return Text(
-                      '${(value * 100).toStringAsFixed(0)}%',
-                      style: TextStyle(
-                        fontSize: 8.sp,
-                        color: SupportColors.grey,
-                      ),
-                    );
-                  }
-
-                  if (isDownloaded || isOpening) {
-                    return SizedBox.shrink();
-                  }
-
-                  return Container(
-                    padding: EdgeInsets.all(2.r),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: SupportColors.white.withValues(alpha: 0.5),
-                    ),
-                    child: Icon(
-                      Icons.file_download_outlined,
-                      size: 15.r,
-                      color: SupportColors.grey,
-                    ),
-                  );
-                },
-              ),
-            ),
+            Positioned(right: 0, bottom: 0, child: _buildStatus()),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatus() {
+    if (_downloading) {
+      return TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: _progress),
+        duration: const Duration(milliseconds: 300),
+        builder: (_, value, __) => Text(
+          '${(value * 100).round()}%',
+          style: TextStyle(fontSize: 8.sp, color: SupportColors.grey),
+        ),
+      );
+    }
+
+    if (_downloaded || _opening) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: EdgeInsets.all(2.r),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: SupportColors.white.withValues(alpha: 0.5),
+      ),
+      child: Icon(
+        Icons.file_download_outlined,
+        size: 15.r,
+        color: SupportColors.grey,
       ),
     );
   }

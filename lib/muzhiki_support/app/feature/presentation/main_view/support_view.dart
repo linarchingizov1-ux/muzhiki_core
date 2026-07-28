@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/model/session_roles.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
@@ -111,26 +109,6 @@ class _SupportViewState extends State<SupportView> {
                       context.pushNamed(SupportRouteConstant.I.chatDraft);
                     },
                   );
-                  // return InkWell(
-                  //   onTap: () =>
-                  //       context.pushNamed(SupportRouteConstant.I.chatDraft),
-                  //   child: Container(
-                  //     height: 55.w,
-                  //     width: 55.w,
-                  //     padding: EdgeInsets.all(12.r),
-                  //     decoration: BoxDecoration(
-                  //       shape: BoxShape.circle,
-                  //       color: SupportColors.blood,
-                  //     ),
-                  //     child: Center(
-                  //       child: SvgPicture.asset(
-                  //         height: 15.w,
-                  //         width: 15.w,
-                  //         SupportAssets.I.svg.add,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // );
                 } else {
                   return const SizedBox.shrink();
                 }

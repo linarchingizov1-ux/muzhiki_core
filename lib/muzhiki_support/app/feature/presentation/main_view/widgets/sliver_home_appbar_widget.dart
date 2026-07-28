@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/appbar_main/appbar_main.dart';
+import 'package:muzhiki_core/muzhiki_ui/muzhiki_ui.dart';
 
 class SliverHomeAppbarWidget extends StatelessWidget {
   final TypeApp typeApp;
@@ -43,9 +45,12 @@ class SliverHomeAppbarWidget extends StatelessWidget {
           ),
           automaticallyImplyLeading: canPop,
           leading: canPop
-              ? InkWell(
+              ? MuzhikiUi.buttons.circle(
+                  size: 40,
+                  iconSize: 16,
+                  backgroundColor: SupportColors.alertTextGrey,
                   onTap: context.pop,
-                  child: Icon(Icons.arrow_back_ios_new_rounded, size: 20.r),
+                  icon: Icons.arrow_back_ios_new,
                 )
               : null,
           leadingWidth: 40.w,

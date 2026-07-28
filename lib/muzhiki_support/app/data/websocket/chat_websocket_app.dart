@@ -136,8 +136,7 @@ class AppWebsocketChat extends WebSocketChat {
 
     try {
       final socketConnection = await chatUsecase.getMessageChat(
-        // sessionId: sessionChatId!,
-        sessionId: 148125,
+        sessionId: sessionChatId!,
       );
       final messages = List<MessageModel>.from(
         (socketConnection.messages).reversed,
