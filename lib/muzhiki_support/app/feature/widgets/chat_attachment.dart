@@ -301,16 +301,26 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   @override
   void initState() {
     super.initState();
-    path = "${widget.directory.path}/${widget.fileName}";
-    File(path)
-        .exists()
-        .then((found) {
-          isDownloadsFile = found;
-          setState(() {});
-        })
-        .onError((e, st) {
-          talker.error("Ошибка при поиске файла в директории: $e, $st");
-        });
+    path = '${widget.directory.path}/${widget.fileName}';
+    _init();
+  }
+
+  Future<void> _init() async {
+    isDownloadsFile = await File(path).exists();
+
+    try {
+      final response = await downloadsClient.head(widget.url);
+
+      totalFileSize =
+          int.tryParse(
+            response.headers.value(Headers.contentLengthHeader) ?? '',
+          ) ??
+          0;
+    } catch (e, st) {
+      talker.error('Ошибка получения размера файла: $e, $st');
+    }
+
+    if (mounted) setState(() {});
   }
 
   void downloads() {
@@ -341,6 +351,20 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
     talker.debug("Результат открытия файла: ${result.type}");
   }
 
+  String get fileSizeText {
+    if (totalFileSize <= 0) return '';
+
+    if (totalFileSize < 1024) {
+      return '$totalFileSize Б';
+    }
+
+    if (totalFileSize < 1024 * 1024) {
+      return '${(totalFileSize / 1024).toStringAsFixed(1)} КБ';
+    }
+
+    return '${(totalFileSize / 1024 / 1024).toStringAsFixed(1)} МБ';
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -361,20 +385,28 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
               ),
             ),
           ),
-          Text.rich(
-            TextSpan(
-              text: "${widget.fileName}\n",
-              style: TextStyle(
-                color: Colors.blueAccent,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w700,
-              ),
-              children: [
-                TextSpan(
-                  text: "$totalFileSize",
-                  style: TextStyle(color: SupportColors.grey, fontSize: 10.sp),
+          SizedBox(
+            width: 180.w,
+            child: Text.rich(
+              TextSpan(
+                text: '${widget.fileName}\n',
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
+                children: [
+                  TextSpan(
+                    text: fileSizeText,
+                    style: TextStyle(
+                      color: SupportColors.grey,
+                      fontSize: 10.sp,
+                    ),
+                  ),
+                ],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
