@@ -57,8 +57,6 @@ class NetworkFactory {
       tokenStorage: tokenStorage,
       httpClient: refreshDio,
       tokenHeader: (token) {
-        talker.warning('Токен в заголовок: ${token.accessToken}');
-
         return {'Authorization': 'Bearer ${token.accessToken}'};
       },
       shouldRefresh: (response) {
@@ -67,7 +65,6 @@ class NetworkFactory {
         final isAuthError = code == 401 || code == 419;
 
         if (isAuthError && showIsBackendProblem) {
-          talker.warning('[Fresh] Refresh остановлен: backend problem');
           return false;
         }
 
@@ -78,7 +75,6 @@ class NetworkFactory {
         const delay = Duration(seconds: 5);
 
         for (var attempt = 1; attempt <= maxAttempts; attempt++) {
-          talker.debug("Попытка ревреша $attempt");
           try {
             final response = await client.get(
               'https://auth.muzhiki.pro/api/v1/auth/refresh',
@@ -101,10 +97,6 @@ class NetworkFactory {
             }
 
             if (attempt < maxAttempts) {
-              talker.warning(
-                '[Refresh] ошибка ревреша ${error.message}. Повторная попытка через ${delay.inSeconds}s',
-              );
-
               await Future.delayed(delay);
 
               continue;
@@ -114,7 +106,6 @@ class NetworkFactory {
             }
           }
         }
-        talker.debug("Вышли из цикла и делаем Exception");
         return AuthTokens(
           accessToken: token?.accessToken ?? "",
           refreshToken: token?.refreshToken ?? "",
