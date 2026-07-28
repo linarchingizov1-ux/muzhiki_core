@@ -38,11 +38,6 @@ class AppWebsocketChat extends WebSocketChat {
     required this.session,
     this.channelId,
   }) {
-    talker.debug(
-      '🟢 AppWebsocketChat CREATED '
-      'instance=${identityHashCode(this)} '
-      'session=$sessionChatId',
-    );
     _listener = AppLifecycleListener(
       onShow: () async {
         await _resumeWS();
@@ -110,12 +105,6 @@ class AppWebsocketChat extends WebSocketChat {
   );
 
   Future<int?> createSessionAndConnect() async {
-    talker.debug(
-      'createSessionAndConnect: '
-      'sessionChatId=$sessionChatId '
-      'isDraft=$isDraft '
-      'channelId=$channelId',
-    );
     if (_isCreating) return null;
     _isCreating = true;
     try {
@@ -152,9 +141,7 @@ class AppWebsocketChat extends WebSocketChat {
       final messages = List<MessageModel>.from(
         (socketConnection.messages).reversed,
       );
-      talker.debug(
-        "После подключения получили модель списка сообщений $messages",
-      );
+
       _emit((s) {
         final pendingLocal = s.messages
             .where((m) => m.status == MessageStatus.sending)
@@ -441,6 +428,7 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   void _handleError(Object e, StackTrace st, {required bool showBanner}) {
+    talker.error(e, st);
     final mapped = AppErrorMapper.I.map(e, st);
     if (!showBanner) return;
 
