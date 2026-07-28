@@ -377,20 +377,11 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 35.r,
-      height: 35.r,
-      padding: EdgeInsets.all(8.r),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.r),
-        color: SupportColors.light,
-      ),
-      child: SvgPicture.asset(
-        SupportAssets.I.svg.file,
-        width: 25.w,
-        height: 25.w,
-        colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
-      ),
+    return SvgPicture.asset(
+      SupportAssets.I.svg.file,
+      width: 25.w,
+      height: 25.w,
+      colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
     );
   }
 }
