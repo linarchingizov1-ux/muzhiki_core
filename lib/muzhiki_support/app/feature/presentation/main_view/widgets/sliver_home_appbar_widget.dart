@@ -44,12 +44,15 @@ class SliverHomeAppbarWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (canPop)
-                MuzhikiUi.buttons.circle(
-                  size: 40,
-                  iconSize: 16,
-                  backgroundColor: SupportColors.alertTextGrey,
-                  onTap: context.pop,
-                  icon: Icons.arrow_back_ios_new,
+                Padding(
+                  padding: EdgeInsets.only(left: 17.w),
+                  child: MuzhikiUi.buttons.circle(
+                    size: 40,
+                    iconSize: 16,
+                    backgroundColor: SupportColors.alertTextGrey,
+                    onTap: context.pop,
+                    icon: Icons.arrow_back_ios_new,
+                  ),
                 ),
               Text(
                 'Мои чаты',
@@ -60,7 +63,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
           automaticallyImplyLeading: false,
           leading: null,
           leadingWidth: 40.w,
-          titleSpacing: canPop ? 0 : 50.w,
+          titleSpacing: canPop ? 0 : 25.w,
         ),
       );
     }
