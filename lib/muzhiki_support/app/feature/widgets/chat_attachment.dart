@@ -405,7 +405,10 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
                     ),
                     children: [
                       TextSpan(
-                        text: fileSizeText.isEmpty ? "0" : fileSizeText,
+                        text: [
+                          if (fileSizeText.isNotEmpty) fileSizeText,
+                          if (isDownloadsFile) ' • Загружен',
+                        ].join(),
                         style: TextStyle(
                           color: SupportColors.grey,
                           fontSize: 10.sp,
@@ -413,7 +416,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
                       ),
                     ],
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (isOpenFile)
