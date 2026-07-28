@@ -381,7 +381,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
       mainAxisSize: MainAxisSize.min,
       children: [
         ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 35.r, maxHeight: 35.r),
+          constraints: BoxConstraints(maxHeight: 35.r),
           child: SvgPicture.asset(
             SupportAssets.I.svg.file,
             width: 35.r,
@@ -389,12 +389,20 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
             colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
           ),
         ),
-        Text(
-          "Имя файла",
-          style: TextStyle(
-            color: Colors.blueAccent,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w700,
+        Text.rich(
+          TextSpan(
+            text: "Имя файла\n",
+            style: TextStyle(
+              color: Colors.blueAccent,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w700,
+            ),
+            children: [
+              TextSpan(
+                text: "106kb",
+                style: TextStyle(color: SupportColors.grey, fontSize: 10.sp),
+              ),
+            ],
           ),
         ),
       ],
