@@ -60,9 +60,7 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                   targetAnchor: Alignment.bottomCenter,
                   followerAnchor: Alignment.topCenter,
 
-                  offset: layerCircleButton.leader != null
-                      ? layerCircleButton.leader!.offset
-                      : Offset(0, -8.r),
+                  offset: Offset(0, -8.r),
 
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
