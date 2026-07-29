@@ -9,6 +9,7 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/chat_websocke
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/button.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/circle.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/skelet.dart';
+import 'package:muzhiki_core/muzhiki_ui/muzhiki_ui.dart';
 
 class ChatHeaderWidgets extends StatelessWidget {
   final AsyncSnapshot<WebSocketChatState> snapshot;
@@ -30,17 +31,23 @@ class ChatHeaderWidgets extends StatelessWidget {
           ),
           child: Row(
             children: [
-              AppButton(
+              MuzhikiUi.buttons.circle(
+                onTap: () => context.pop(true),
+                size: 44,
                 backgroundColor: SupportColors.black1,
-                assetIcon: SupportAssets.I.svg.arrowBack,
-                width: 44,
-                height: 44,
-                mode: ButtonMode.circle,
-                onPressed: () {
-                  context.pop(true);
-                },
+                svgAsset: SupportAssets.I.svg.arrowBack,
               ),
 
+              // AppButton(
+              //   backgroundColor: SupportColors.black1,
+              //   assetIcon: SupportAssets.I.svg.arrowBack,
+              //   width: 44,
+              //   height: 44,
+              //   mode: ButtonMode.circle,
+              //   onPressed: () {
+              //     context.pop(true);
+              //   },
+              // ),
               SizedBox(width: 10.w),
 
               Expanded(
