@@ -50,6 +50,7 @@ class ChatHeaderWidgets extends StatelessWidget {
                         child: Text(
                           snapshot.data!.title!,
                           style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w600,
                             color: SupportColors.white,
@@ -72,6 +73,7 @@ class ChatHeaderWidgets extends StatelessWidget {
                               Text(
                                 snapshot.data!.stringStatus,
                                 style: TextStyle(
+                                  fontFamily: 'Manrope',
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w400,
                                   color: SupportColors.white,
@@ -83,6 +85,7 @@ class ChatHeaderWidgets extends StatelessWidget {
                             Text(
                               snapshot.data!.createdAt!,
                               style: TextStyle(
+                                fontFamily: 'Manrope',
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w400,
                                 color: SupportColors.white,

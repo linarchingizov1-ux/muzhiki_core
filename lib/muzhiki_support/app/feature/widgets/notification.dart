@@ -20,6 +20,7 @@ class NotificationWidgets extends StatelessWidget {
           child: Text(
             count.toString(),
             style: TextStyle(
+              fontFamily: 'Manrope',
               letterSpacing: 0,
               wordSpacing: 0,
               height: 1.h,

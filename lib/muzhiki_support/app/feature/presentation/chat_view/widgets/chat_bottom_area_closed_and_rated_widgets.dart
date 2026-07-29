@@ -61,6 +61,7 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
               Text(
                 'Обращение закрыто',
                 style: TextStyle(
+                  fontFamily: 'Manrope',
                   height: 1.h,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,

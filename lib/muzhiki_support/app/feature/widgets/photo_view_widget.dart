@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/view_image_item_model.dart';
+import 'package:muzhiki_core/muzhiki_ui/muzhiki_ui.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
@@ -225,25 +226,16 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
+                        MuzhikiUi.buttons.circle(
+                          size: 45,
+                          iconSize: 20,
                           onTap: _close,
-                          child: Container(
-                            height: 45.h,
-                            width: 45.h,
-                            padding: EdgeInsets.all(5.r),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: SupportColors.black1.withValues(
-                                alpha: 0.65,
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 20,
-                            ),
+                          icon: Icons.close,
+                          backgroundColor: SupportColors.black1.withValues(
+                            alpha: 0.65,
                           ),
                         ),
+
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
@@ -256,6 +248,7 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
                           child: Text(
                             '${_currentIndex + 1} / ${widget.images.length}',
                             style: const TextStyle(
+                              fontFamily: 'Manrope',
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
@@ -299,7 +292,7 @@ class _ZoomableImageLayer extends StatelessWidget {
               return const Center(
                 child: Text(
                   'Не удалось загрузить изображение',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(fontFamily: 'Manrope', color: Colors.white),
                 ),
               );
             },

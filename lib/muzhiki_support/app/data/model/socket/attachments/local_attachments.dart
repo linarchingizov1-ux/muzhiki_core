@@ -12,6 +12,7 @@ abstract class LocalAttachmentsModel with _$LocalAttachmentsModel {
     required String id,
     required ChatAttachmentType type,
     required String path,
+    required String fileName,
     @Default(true) bool isLoading,
   }) = _LocalAttachmentViewItem;
 
@@ -22,7 +23,7 @@ abstract class LocalAttachmentsModel with _$LocalAttachmentsModel {
   }) = _RemoteAttachmentViewItem;
 
   bool get isLocal =>
-      maybeWhen(local: (_, __, ___, ____) => true, orElse: () => false);
+      maybeWhen(local: (_, _, _, _, _) => true, orElse: () => false);
 
   bool get isRemote =>
       maybeWhen(remote: (_, __, ___) => true, orElse: () => false);

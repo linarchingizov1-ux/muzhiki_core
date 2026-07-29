@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/extension/chat_extension.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/choice.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SliverChoiWidget extends StatelessWidget {
   final ChatCubit chatCubit;
@@ -20,23 +21,29 @@ class SliverChoiWidget extends StatelessWidget {
               return SliverToBoxAdapter(
                 child: SizedBox(
                   height: 40.h,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    separatorBuilder: (context, index) => SizedBox(width: 5.w),
-                    itemCount: 2,
-                    padding: EdgeInsets.symmetric(horizontal: 17.w),
-                    itemBuilder: (context, i) {
-                      return ChoiceWidgets(
-                        isLoading: true,
-                        newMessage: 0,
-                        onSelected: (v) {},
-                        isSelected: i == 0,
-                        label: 'Чат поддержки $i',
-                      );
-                    },
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(width: 5.w),
+                      itemCount: 2,
+                      padding: EdgeInsets.symmetric(horizontal: 17.w),
+                      itemBuilder: (context, i) {
+                        return Container(
+                          width: 80.w,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(21.h),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               );
+
             case StateStatus.fail:
               return SliverToBoxAdapter();
             case StateStatus.success:
@@ -47,27 +54,34 @@ class SliverChoiWidget extends StatelessWidget {
                 automaticallyImplyLeading: false,
                 primary: false,
                 forceMaterialTransparency: true,
-                stretchTriggerOffset: 40.h,
-                pinned: true,
+                pinned: false,
+                floating: true,
                 stretch: false,
                 elevation: 0,
                 scrolledUnderElevation: 0,
+
+                titleSpacing: 0,
+
                 title: SizedBox(
                   height: 40.h,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    separatorBuilder: (context, index) => SizedBox(width: 5.w),
+                    padding: EdgeInsets.symmetric(horizontal: 17.w),
+                    separatorBuilder: (_, _) => SizedBox(width: 5.w),
                     itemCount: state.myChat!.channels.length,
-                    padding: EdgeInsets.zero,
                     itemBuilder: (context, i) {
                       final channel = state.myChat!.channels[i];
+
                       return ChoiceWidgets(
                         newMessage: state.myChat!.chats.unreadByChannel(
                           channel.id,
                         ),
-                        onSelected: (v) => context
-                            .read<ChatCubit>()
-                            .selecteChannel(index: i, channelId: channel.id),
+                        onSelected: (v) {
+                          context.read<ChatCubit>().selecteChannel(
+                            index: i,
+                            channelId: channel.id,
+                          );
+                        },
                         isSelected: i == state.selectedChannels,
                         label: channel.name,
                       );

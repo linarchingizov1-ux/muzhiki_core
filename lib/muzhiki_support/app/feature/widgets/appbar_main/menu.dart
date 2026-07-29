@@ -19,6 +19,7 @@ class SupportAppBarMenu extends StatelessWidget {
         Text(
           'Добро пожаловать!',
           style: TextStyle(
+            fontFamily: 'Manrope',
             color: SupportColors.grey,
             height: 1.5.h,
             fontSize: 11.sp,
@@ -29,6 +30,7 @@ class SupportAppBarMenu extends StatelessWidget {
           Text(
             sessionApp.user!.username,
             style: TextStyle(
+              fontFamily: 'Manrope',
               color: SupportColors.appBackgroud,
               fontSize: 12.sp,
               height: 1.h,
@@ -122,6 +124,7 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
+                      fontFamily: 'Manrope',
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                       color: SupportColors.appBackgroud,
@@ -131,6 +134,7 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
                   Text(
                     description,
                     style: TextStyle(
+                      fontFamily: 'Manrope',
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
                       color: SupportColors.greyText,

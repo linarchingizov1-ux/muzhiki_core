@@ -5,7 +5,6 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
@@ -75,6 +74,40 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
           isCheckingFile = false;
         });
       }
+    }
+  }
+
+  String get fileExtension {
+    return p.extension(widget.fileName).toLowerCase().replaceFirst('.', '');
+  }
+
+  String get fileIcon {
+    switch (fileExtension) {
+      case 'pdf':
+        return SupportAssets.I.png.pdf;
+
+      case 'doc':
+      case 'docx':
+        return SupportAssets.I.png.doc;
+
+      case 'xls':
+      case 'xlsx':
+        return SupportAssets.I.png.xls;
+
+      case 'ppt':
+      case 'pptx':
+        return SupportAssets.I.png.ppt;
+
+      case 'zip':
+      case 'rar':
+      case '7z':
+        return SupportAssets.I.png.zip;
+
+      case 'txt':
+        return SupportAssets.I.png.txt;
+
+      default:
+        return SupportAssets.I.png.file;
     }
   }
 
@@ -209,14 +242,13 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(maxHeight: 35.r),
-            child: SvgPicture.asset(
-              SupportAssets.I.svg.file,
-              width: 35.r,
-              height: 35.r,
-              colorFilter: ColorFilter.mode(
-                SupportColors.grey,
-                BlendMode.srcIn,
+            child: Container(
+              padding: EdgeInsets.all(5.r),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.r),
+                color: SupportColors.white,
               ),
+              child: Image.asset(width: 25.r, height: 25.r, fileIcon),
             ),
           ),
           SizedBox(
@@ -230,6 +262,7 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
+                    fontFamily: 'Manrope',
                     color: Colors.blueAccent,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w700,
@@ -239,9 +272,11 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
                 Text(
                   fileStatusText,
                   style: TextStyle(
-                    color: isDownloadsFile
-                        ? SupportColors.black1
-                        : SupportColors.darkGrey,
+                    fontFamily: 'Manrope',
+                    fontWeight: isDownloadsFile
+                        ? FontWeight.w600
+                        : FontWeight.w800,
+                    color: isDownloadsFile ? SupportColors.black1 : Colors.blue,
                     fontSize: 10.sp,
                   ),
                 ),

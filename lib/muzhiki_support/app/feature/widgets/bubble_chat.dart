@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/attachment_uuid_service.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
@@ -44,153 +45,163 @@ class ChatMessageBubble extends StatefulWidget {
 class _ChatMessageBubbleState extends State<ChatMessageBubble> {
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constrained) {
-        return Row(
-          spacing: 6.w,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: widget.isMe
-              ? MainAxisAlignment.end
-              : MainAxisAlignment.start,
-          children: [
-            if (!widget.isMe)
-              CircleAvatar(
-                backgroundColor: SupportColors.white,
-                radius: 22.r,
-                child: widget.avatar == null || widget.avatar!.isEmpty
-                    ? Icon(Icons.person, size: 20.r, color: Colors.grey)
-                    : ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: widget.avatar!,
-                          width: 44.r,
-                          height: 44.r,
-                          memCacheHeight: 44,
-                          memCacheWidth: 44,
-                          fit: BoxFit.cover,
-                          placeholder: (_, _) => Shimmer.fromColors(
-                            baseColor: Colors.grey.shade300,
-                            highlightColor: Colors.grey.shade100,
-                            child: Container(
-                              width: 44.r,
-                              height: 44.r,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
+    return TextSelectionTheme(
+      data: TextSelectionThemeData(
+        selectionColor: const Color(0xFF2AABEE).withValues(alpha: 0.25),
+        selectionHandleColor: const Color(0xFF2AABEE),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constrained) {
+          return Row(
+            spacing: 6.w,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: widget.isMe
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
+            children: [
+              if (!widget.isMe)
+                CircleAvatar(
+                  backgroundColor: SupportColors.white,
+                  radius: 22.r,
+                  child: widget.avatar == null || widget.avatar!.isEmpty
+                      ? Icon(Icons.person, size: 20.r, color: Colors.grey)
+                      : ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: widget.avatar!,
+                            width: 44.r,
+                            height: 44.r,
+                            memCacheHeight: 44,
+                            memCacheWidth: 44,
+                            fit: BoxFit.cover,
+                            placeholder: (_, _) => Shimmer.fromColors(
+                              baseColor: Colors.grey.shade300,
+                              highlightColor: Colors.grey.shade100,
+                              child: Container(
+                                width: 44.r,
+                                height: 44.r,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                          ),
-                          errorWidget: (_, _, _) => Icon(
-                            Icons.person,
-                            size: 20.r,
-                            color: Colors.grey,
+                            errorWidget: (_, _, _) => Icon(
+                              Icons.person,
+                              size: 20.r,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
-                      ),
-              ),
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: constrained.maxWidth * 0.75,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                color: widget.isMe ? SupportColors.light : SupportColors.white,
-              ),
-              child: IntrinsicWidth(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: 11.w,
-                        right: 11.w,
-                        top: 5.h,
-                        bottom: 5.h,
-                      ),
-                      child: Text(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        widget.isMe ? 'Вы' : (widget.mess.name ?? ''),
-                        style: TextStyle(
-                          height: 1.h,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          color: SupportColors.blood,
-                        ).copyWith(fontFamily: 'Inter'),
-                      ),
-                    ),
-                    if (widget.mess.text.isNotEmpty)
+                ),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: constrained.maxWidth * 0.75,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  color: widget.isMe
+                      ? SupportColors.light
+                      : SupportColors.white,
+                ),
+                child: IntrinsicWidth(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Padding(
                         padding: EdgeInsets.only(
                           left: 11.w,
                           right: 11.w,
+                          top: 5.h,
                           bottom: 5.h,
                         ),
-                        child: _MessageWidgetState(text: widget.mess.text),
-                      ),
-                    if (widget.attachments != null &&
-                        widget.attachments!.isNotEmpty)
-                      _BubbleAttachment(
-                        directory: widget.directory,
-                        chatCubit: widget.chatCubit,
-                        websocketChat: widget.websocketChat,
-                        attachments: widget.attachments!,
-                        width: constrained.maxWidth,
-                      ),
-                    if (widget.messageDate.isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.only(left: 11.w, right: 11.w),
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Row(
-                            spacing: 5.w,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                widget.messageDate,
-                                style: TextStyle(
-                                  height: 2.h,
-                                  color: SupportColors.grey,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              if (widget.mess.status != null)
-                                switch (widget.mess.status) {
-                                  (MessageStatus.sending) =>
-                                    Icon(
-                                          Icons.schedule_rounded,
-                                          size: 16.r,
-                                          color: SupportColors.grey,
-                                        )
-                                        .animate(
-                                          onPlay: (controller) =>
-                                              controller.repeat(),
-                                        )
-                                        .rotate(
-                                          duration: 1.seconds,
-                                          curve: Curves.linear,
-                                        ),
-                                  (MessageStatus.failed) => Icon(
-                                    Icons.close,
-                                    size: 16.r,
-                                    color: SupportColors.blood,
-                                  ),
-                                  MessageStatus.sent ||
-                                  null => const SizedBox.shrink(),
-                                },
-                            ],
+                        child: Text(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          widget.isMe ? 'Вы' : (widget.mess.name ?? ''),
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            height: 1.h,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: SupportColors.blood,
                           ),
                         ),
                       ),
-                  ],
+                      if (widget.mess.text.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: 11.w,
+                            right: 11.w,
+                            bottom: 5.h,
+                          ),
+                          child: _MessageWidgetState(text: widget.mess.text),
+                        ),
+                      if (widget.attachments != null &&
+                          widget.attachments!.isNotEmpty)
+                        _BubbleAttachment(
+                          directory: widget.directory,
+                          chatCubit: widget.chatCubit,
+                          websocketChat: widget.websocketChat,
+                          attachments: widget.attachments!,
+                          width: constrained.maxWidth,
+                        ),
+                      if (widget.messageDate.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(left: 11.w, right: 11.w),
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: Row(
+                              spacing: 5.w,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  widget.messageDate,
+                                  style: TextStyle(
+                                    fontFamily: 'Manrope',
+                                    height: 2.h,
+                                    color: SupportColors.grey,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                if (widget.mess.status != null)
+                                  switch (widget.mess.status) {
+                                    (MessageStatus.sending) =>
+                                      Icon(
+                                            Icons.schedule_rounded,
+                                            size: 16.r,
+                                            color: SupportColors.grey,
+                                          )
+                                          .animate(
+                                            onPlay: (controller) =>
+                                                controller.repeat(),
+                                          )
+                                          .rotate(
+                                            duration: 1.seconds,
+                                            curve: Curves.linear,
+                                          ),
+                                    (MessageStatus.failed) => Icon(
+                                      Icons.close,
+                                      size: 16.r,
+                                      color: SupportColors.blood,
+                                    ),
+                                    MessageStatus.sent ||
+                                    null => const SizedBox.shrink(),
+                                  },
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -229,6 +240,7 @@ class __MessageWidgetStateState extends State<_MessageWidgetState> {
           TextSpan(
             text: url,
             style: const TextStyle(
+              fontFamily: 'Manrope',
               color: Colors.blue,
               decoration: TextDecoration.underline,
             ),
@@ -245,7 +257,11 @@ class __MessageWidgetStateState extends State<_MessageWidgetState> {
         spans.add(
           TextSpan(
             text: t,
-            style: const TextStyle(fontSize: 12, color: Colors.black),
+            style: const TextStyle(
+              fontFamily: 'Manrope',
+              fontSize: 12,
+              color: Colors.black,
+            ),
           ),
         );
 
@@ -268,6 +284,7 @@ class _BubbleAttachment extends StatelessWidget {
   final Directory directory;
   final ChatCubit chatCubit;
   final double width;
+
   const _BubbleAttachment({
     required this.attachments,
     required this.width,
@@ -278,57 +295,109 @@ class _BubbleAttachment extends StatelessWidget {
 
   int get count => attachments.length;
 
+  String getFileName(AttachmentsModel attachment) {
+    if (attachment.name?.isNotEmpty == true) {
+      return attachment.name!;
+    }
+
+    final uri = Uri.tryParse(attachment.url);
+
+    if (uri == null || uri.pathSegments.isEmpty) {
+      return 'Файл';
+    }
+
+    final file = uri.pathSegments.last;
+    final uuid = file.split('.').first;
+
+    return AttachmentUuidService.I.get(uuid) ?? 'Файл';
+  }
+
   @override
   Widget build(BuildContext context) {
     switch (count) {
       case 1:
+        final attachment = attachments.first;
+
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 11.w),
-          child: switch (attachments.first.type) {
+          child: switch (attachment.type) {
             ChatAttachmentType.document => AttachmentWidgets.document(
               directory: directory,
-              url: attachments.first.url,
-              fileName: attachments.first.name ?? "Файл",
+              url: attachment.url,
+              fileName: getFileName(attachment),
             ),
+
             ChatAttachmentType.photo => AttachmentWidgets.photo(
               websocketChat: websocketChat,
-              attachment: attachments.first,
+              attachment: attachment,
             ),
+
             ChatAttachmentType.video => AttachmentWidgets.video(
               directory: directory,
-              url: attachments.first.url,
+              url: attachment.url,
             ),
           },
         );
+
       default:
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: width * 0.75, maxHeight: 77.w),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 11.w),
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              spacing: 5.w,
-              children: List.generate(attachments.length, (index) {
-                return SizedBox(
+        final documents = attachments
+            .where((e) => e.type == ChatAttachmentType.document)
+            .toList();
+
+        final media = attachments
+            .where(
+              (e) =>
+                  e.type == ChatAttachmentType.photo ||
+                  e.type == ChatAttachmentType.video,
+            )
+            .toList();
+
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 11.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 5.w,
+            children: [
+              if (documents.isNotEmpty)
+                ...documents.map(
+                  (attachment) => AttachmentWidgets.document(
+                    directory: directory,
+                    url: attachment.url,
+                    fileName: getFileName(attachment),
+                  ),
+                ),
+
+              if (media.isNotEmpty)
+                SizedBox(
                   height: 77.w,
-                  child: switch (attachments[index].type) {
-                    ChatAttachmentType.document => AttachmentWidgets.document(
-                      directory: directory,
-                      url: attachments[index].url,
-                      fileName: attachments[index].name ?? "Файл",
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      spacing: 5.w,
+                      children: media.map((attachment) {
+                        return SizedBox(
+                          width: 65.w,
+                          height: 65.w,
+                          child: switch (attachment.type) {
+                            ChatAttachmentType.photo => AttachmentWidgets.photo(
+                              websocketChat: websocketChat,
+                              attachment: attachment,
+                            ),
+
+                            ChatAttachmentType.video => AttachmentWidgets.video(
+                              directory: directory,
+                              url: attachment.url,
+                            ),
+
+                            _ => const SizedBox.shrink(),
+                          },
+                        );
+                      }).toList(),
                     ),
-                    ChatAttachmentType.photo => AttachmentWidgets.photo(
-                      websocketChat: websocketChat,
-                      attachment: attachments[index],
-                    ),
-                    ChatAttachmentType.video => AttachmentWidgets.video(
-                      directory: directory,
-                      url: attachments[index].url,
-                    ),
-                  },
-                );
-              }),
-            ),
+                  ),
+                ),
+            ],
           ),
         );
     }

@@ -78,6 +78,28 @@ flutter:
     - assets/support/png/
     - assets/report_problem/svg/
     - assets/network_problem/svg/
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/support/fonts/Inter/Inter.ttf
+
+    - family: Manrope
+      fonts:
+        - asset: assets/support/fonts/Manrope/Manrope-ExtraLight.ttf
+          weight: 200
+        - asset: assets/support/fonts/Manrope/Manrope-Light.ttf
+          weight: 300
+        - asset: assets/support/fonts/Manrope/Manrope-Regular.ttf
+          weight: 400
+        - asset: assets/support/fonts/Manrope/Manrope-Medium.ttf
+          weight: 500
+        - asset: assets/support/fonts/Manrope/Manrope-SemiBold.ttf
+          weight: 600
+        - asset: assets/support/fonts/Manrope/Manrope-Bold.ttf
+          weight: 700
+        - asset: assets/support/fonts/Manrope/Manrope-ExtraBold.ttf
+          weight: 800
+
 
   plugin:
     platforms:

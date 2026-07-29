@@ -84,6 +84,11 @@ class _ChatViewState extends State<ChatView> {
   double get topInset => mq.top;
   double get bottomInset => mq.bottom;
 
+  bool get isOpenKeyboard {
+    final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
+    return keyboardHeight > 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -108,6 +113,57 @@ class _ChatViewState extends State<ChatView> {
                     snapshot: snapshot,
                     chatCubit: widget.chatCubit,
                     directory: widget.directory,
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: 100.h,
+                    child: IgnorePointer(
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
+                        opacity: isOpenKeyboard ? 0.35 : 1,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.white,
+                                Colors.white.withValues(alpha: 0.8),
+                                Colors.white.withValues(alpha: 0.35),
+                                Colors.white.withValues(alpha: 0),
+                              ],
+                              stops: const [0.0, 0.3, 0.65, 1.0],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    height: 100.h,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.95),
+                              Colors.white.withValues(alpha: 0.75),
+                              Colors.white.withValues(alpha: 0.3),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.0, 0.3, 0.65, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   Positioned(
                     left: 17.w,

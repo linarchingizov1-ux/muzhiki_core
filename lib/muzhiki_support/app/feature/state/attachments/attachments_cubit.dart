@@ -8,6 +8,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/attachment_uuid_service.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_path.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/attachments/local_attachments.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/attachments/upload_data.dart';
@@ -86,6 +87,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
 
       final localItems = selectedFiles.map((file) {
         return LocalAttachmentsModel.local(
+          fileName: file.name,
           id: _uuid.v4(),
           type: type,
           path: file.path!,
@@ -133,6 +135,11 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
           );
 
           final uploadFile = UploadDataModel.fromJson(response.data);
+
+          AttachmentUuidService.I.save(
+            uuid: uploadFile.uuid,
+            fileName: uploadFile.fileName,
+          );
 
           _replaceLocalWithRemote(
             localId: localItem.id,
@@ -182,9 +189,10 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   void _setLocalLoading(String id, bool value) {
     final updated = state.items.map((item) {
       return item.maybeWhen(
-        local: (itemId, type, path, isLoading) {
+        local: (itemId, type, path, fileName, isLoading) {
           if (itemId != id) return item;
           return LocalAttachmentsModel.local(
+            fileName: fileName,
             id: itemId,
             type: type,
             path: path,
@@ -205,7 +213,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   }) {
     final updated = state.items.map((item) {
       return item.maybeWhen(
-        local: (id, itemType, path, isLoading) {
+        local: (id, itemType, path, fileName, isLoading) {
           if (id != localId) return item;
           return LocalAttachmentsModel.remote(
             id: localId,
@@ -238,9 +246,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
     final result = await FlutterImageCompress.compressAndGetFile(
       file.path,
       targetPath,
-      quality: 90,
-      minWidth: 1280,
-      minHeight: 720,
+      quality: 80,
       format: CompressFormat.jpeg,
     );
 

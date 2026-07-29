@@ -13,6 +13,7 @@ final class MuzhikiButtons {
   CircleButton circle({
     String? svgAsset,
     IconData? icon,
+    Color iconColor = Colors.white,
     Widget? child,
     required VoidCallback onTap,
     double size = 40,
@@ -20,6 +21,7 @@ final class MuzhikiButtons {
     Color? backgroundColor,
   }) => CircleButton(
     svgAsset: svgAsset,
+    iconColor: iconColor,
     icon: icon,
     onTap: onTap,
     size: size,

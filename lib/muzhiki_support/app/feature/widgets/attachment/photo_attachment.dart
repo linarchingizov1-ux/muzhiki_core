@@ -51,7 +51,7 @@ class PhotoAttachment extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).push(
                     PageRouteBuilder(
-                      opaque: true,
+                      opaque: false,
                       transitionDuration: const Duration(milliseconds: 300),
                       reverseTransitionDuration: const Duration(
                         milliseconds: 300,

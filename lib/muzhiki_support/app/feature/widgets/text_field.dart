@@ -1,15 +1,14 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/attachments/attachments_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/upload_data_widgets.dart';
+import 'package:muzhiki_core/muzhiki_ui/muzhiki_ui.dart';
 
 class TextFieldWidgets extends StatefulWidget {
   final AttachmentsCubit attachmentsCubit;
@@ -67,36 +66,49 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                   SizedBox(height: 6.h),
                   Stack(
                     children: [
-                      TextField(
-                        controller: widget.controller,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: 10,
-                        minLines: 1,
-                        expands: false,
-                        textAlignVertical: TextAlignVertical.top,
-                        onChanged: (_) => setState(() {}),
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
+                      TextSelectionTheme(
+                        data: TextSelectionThemeData(
+                          selectionColor: const Color(
+                            0xFF2AABEE,
+                          ).withValues(alpha: 0.25),
+                          selectionHandleColor: const Color(0xFF2AABEE),
                         ),
-                        decoration: InputDecoration(
-                          hintText: 'Сообщение...',
-                          hintStyle: TextStyle(
+                        child: TextField(
+                          controller: widget.controller,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 10,
+                          minLines: 1,
+                          expands: false,
+                          cursorColor: SupportColors.black1,
+                          cursorWidth: 2.w,
+                          cursorHeight: 16.h,
+                          textAlignVertical: TextAlignVertical.top,
+                          onChanged: (_) => setState(() {}),
+                          style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: 12.sp,
-                            color: SupportColors.grey,
+                            fontWeight: FontWeight.w500,
                           ),
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(
-                            left: 12.w,
-                            right: 50.w,
-                            top: 12.h,
-                            bottom: 12.h,
-                          ),
-                          filled: true,
-                          fillColor: SupportColors.light,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide.none,
+                          decoration: InputDecoration(
+                            hintText: 'Сообщение...',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Manrope',
+                              fontSize: 12.sp,
+                              color: SupportColors.grey,
+                            ),
+                            isDense: true,
+                            contentPadding: EdgeInsets.only(
+                              left: 12.w,
+                              right: 50.w,
+                              top: 12.h,
+                              bottom: 12.h,
+                            ),
+                            filled: true,
+                            fillColor: SupportColors.light,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                              borderSide: BorderSide.none,
+                            ),
                           ),
                         ),
                       ),
@@ -164,30 +176,29 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 80),
       reverseDuration: const Duration(milliseconds: 50),
     );
-
     fadeAnimation = CurvedAnimation(
       parent: animationController,
-      curve: Curves.easeOut,
-      reverseCurve: Curves.easeIn,
+      curve: Curves.easeOutQuart,
+      reverseCurve: Curves.easeInQuart,
     );
 
-    scaleAnimation = Tween<double>(begin: 0.7, end: 1).animate(
+    scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
       CurvedAnimation(
         parent: animationController,
-        curve: Curves.easeOutBack,
-        reverseCurve: Curves.easeIn,
+        curve: Curves.easeOutQuart,
+        reverseCurve: Curves.easeInQuart,
       ),
     );
 
     slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero).animate(
           CurvedAnimation(
             parent: animationController,
-            curve: Curves.ease,
-            reverseCurve: Curves.easeInCubic,
+            curve: Curves.easeOutQuart,
+            reverseCurve: Curves.easeInQuart,
           ),
         );
   }
@@ -203,7 +214,6 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
     if (isOpen || isDisopse) return;
     if (focus?.hasFocus ?? false) {
       focus?.unfocus();
-      await Future.delayed(const Duration(milliseconds: 250));
     }
     overlayPortalController.show();
     setState(() => isOpen = true);
@@ -242,15 +252,15 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                 child: SafeArea(
                   child: Stack(
                     children: [
-                      FadeTransition(
-                        opacity: fadeAnimation,
-                        child: InkWell(
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
                           onTap: _close,
                           child: const SizedBox.expand(),
                         ),
                       ),
                       Positioned(
-                        bottom: 70.h + MediaQuery.paddingOf(context).bottom,
+                        bottom: 62.h,
                         left: 17.w,
                         child: FadeTransition(
                           opacity: fadeAnimation,
@@ -259,44 +269,58 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                             child: ScaleTransition(
                               scale: scaleAnimation,
                               alignment: Alignment.bottomCenter,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: 10.h,
-                                children: [
-                                  _OverlayIconBuild(
-                                    asset: SupportAssets.I.svg.image,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.photo,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                  _OverlayIconBuild(
-                                    asset: SupportAssets.I.svg.recodeVideo,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.video,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                  _OverlayIconBuild(
-                                    asset: SupportAssets.I.svg.file,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.document,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                ],
+                              child: Container(
+                                padding: EdgeInsets.all(5.r),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(48.r),
+                                  color: SupportColors.light
+                                    ..withValues(alpha: 0.2),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 10.h,
+                                  children: [
+                                    MuzhikiUi.buttons.circle(
+                                      backgroundColor: SupportColors.white,
+                                      iconColor: SupportColors.blood,
+                                      svgAsset: SupportAssets.I.svg.image,
+                                      onTap: () async {
+                                        _close();
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.photo,
+                                            );
+                                      },
+                                    ),
+                                    MuzhikiUi.buttons.circle(
+                                      backgroundColor: SupportColors.white,
+                                      svgAsset: SupportAssets.I.svg.recodeVideo,
+                                      iconColor: SupportColors.blood,
+                                      onTap: () async {
+                                        _close();
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.video,
+                                            );
+                                      },
+                                    ),
+                                    MuzhikiUi.buttons.circle(
+                                      backgroundColor: SupportColors.white,
+                                      svgAsset: SupportAssets.I.svg.file,
+                                      iconColor: SupportColors.blood,
+                                      onTap: () async {
+                                        _close();
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.document,
+                                            );
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -307,62 +331,21 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                 ),
               );
             },
-            child: _OverlayIconBuild(
-              iconColor: isOpen ? SupportColors.blood : SupportColors.white,
-              color: isOpen ? SupportColors.white : SupportColors.blood,
-              onTap: _toggle,
-              asset: isOpen
-                  ? SupportAssets.I.svg.close
-                  : SupportAssets.I.svg.screpka,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5.r),
+              child: MuzhikiUi.buttons.circle(
+                iconColor: isOpen ? SupportColors.blood : SupportColors.white,
+                svgAsset: isOpen
+                    ? SupportAssets.I.svg.close
+                    : SupportAssets.I.svg.screpka,
+                backgroundColor: isOpen
+                    ? SupportColors.white
+                    : SupportColors.blood,
+                onTap: _toggle,
+              ),
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _OverlayIconBuild extends StatelessWidget {
-  final VoidCallback onTap;
-  final String asset;
-  final Color? color;
-  final Color? iconColor;
-
-  const _OverlayIconBuild({
-    required this.onTap,
-    required this.asset,
-    this.color,
-    this.iconColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 45.w,
-      height: 45.w,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color ?? SupportColors.white,
-          ),
-          child: Center(
-            child: SizedBox(
-              width: 15.r,
-              height: 15.r,
-              child: SvgPicture.asset(
-                asset,
-                fit: BoxFit.contain,
-                colorFilter: ColorFilter.mode(
-                  iconColor ?? SupportColors.blood,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

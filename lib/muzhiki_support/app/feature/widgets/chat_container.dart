@@ -41,6 +41,7 @@ class ChatContainerWidgets extends StatelessWidget {
                     chat.title,
                     maxLines: 1,
                     style: TextStyle(
+                      fontFamily: 'Manrope',
                       overflow: TextOverflow.ellipsis,
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
@@ -64,6 +65,7 @@ class ChatContainerWidgets extends StatelessWidget {
                   Text(
                     chat.stringStatus,
                     style: TextStyle(
+                      fontFamily: 'Manrope',
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w400,
                       wordSpacing: 0,
@@ -74,6 +76,7 @@ class ChatContainerWidgets extends StatelessWidget {
                     Text(
                       chat.createdAt!.formatDate,
                       style: TextStyle(
+                        fontFamily: 'Manrope',
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w400,
                         wordSpacing: 0,

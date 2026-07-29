@@ -44,6 +44,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                         const Text(
                           'Сбой приложения',
                           style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
                           ),
@@ -55,6 +56,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                           'Мы уже работаем над её устранением.\n\n'
                           'Попробуйте открыть приложение снова немного позже. Просим у вас прощения !',
                           style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: 15,
                             height: 1.5,
                             color: Colors.black87,
@@ -117,18 +119,33 @@ class SliverChatContainerWidget extends StatelessWidget {
                   ),
                   StateStatus.success => SliverPadding(
                     padding: EdgeInsetsGeometry.only(bottom: 20),
-                    sliver: SliverList.separated(
-                      separatorBuilder: (context, index) =>
-                          Divider(height: 1.h, color: SupportColors.light),
-                      itemCount: state.chats.length,
-                      itemBuilder: (context, i) {
-                        final chat = state.chats[i];
-                        return ChatContainerWidgets(
-                          isLoading: false,
-                          chat: chat,
-                        );
-                      },
-                    ),
+                    sliver: switch (state.chats.isEmpty) {
+                      true => SliverFillRemaining(
+                        child: Center(
+                          child: Text(
+                            "В этом канале пока нет обращений",
+                            style: TextStyle(
+                              fontFamily: 'Manrope',
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: SupportColors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                      false => SliverList.separated(
+                        separatorBuilder: (context, index) =>
+                            Divider(height: 1.h, color: SupportColors.light),
+                        itemCount: state.chats.length,
+                        itemBuilder: (context, i) {
+                          final chat = state.chats[i];
+                          return ChatContainerWidgets(
+                            isLoading: false,
+                            chat: chat,
+                          );
+                        },
+                      ),
+                    },
                   ),
                   StateStatus.fail => SliverToBoxAdapter(),
                   StateStatus.userNotFound => SliverFillRemaining(

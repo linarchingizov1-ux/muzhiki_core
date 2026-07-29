@@ -1,10 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
@@ -37,30 +35,41 @@ class UploadDataWidgets extends StatefulWidget {
 }
 
 class _UploadDataWidgetsState extends State<UploadDataWidgets> {
-  Future<String?>? fileName;
+  String? _videoThumbnail;
 
   ChatAttachmentType get type => widget.item.when(
-    local: (_, type, _, _) => type,
+    local: (_, type, _, _, _) => type,
     remote: (_, type, _) => type,
   );
 
-  String? get localPath =>
-      widget.item.maybeWhen(local: (_, _, path, _) => path, orElse: () => null);
+  String? get localPath => widget.item.maybeWhen(
+    local: (_, _, path, _, _) => path,
+    orElse: () => null,
+  );
 
   UploadDataModel? get remoteData =>
       widget.item.maybeWhen(remote: (_, _, data) => data, orElse: () => null);
 
+  String? get attachmentFileName => widget.item.maybeWhen(
+    local: (_, _, _, fileName, _) => fileName,
+    remote: (_, _, data) => data.fileName,
+    orElse: () => null,
+  );
+
   bool get isLoading => widget.item.maybeWhen(
-    local: (_, _, _, isLoading) => isLoading,
+    local: (_, _, _, _, isLoading) => isLoading,
     orElse: () => false,
   );
+
+  String get id =>
+      widget.item.when(local: (id, _, _, _, _) => id, remote: (id, _, _) => id);
 
   @override
   void initState() {
     super.initState();
 
     if (type == ChatAttachmentType.video) {
-      getFirstFrameVideo();
+      _getVideoThumbnail();
     }
   }
 
@@ -68,36 +77,53 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
   void didUpdateWidget(covariant UploadDataWidgets oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final oldType = oldWidget.item.when(
-      local: (_, type, _, _) => type,
-      remote: (_, type, _) => type,
-    );
+    if (oldWidget.item != widget.item) {
+      _videoThumbnail = null;
 
-    if (type == ChatAttachmentType.video &&
-        (oldWidget.item != widget.item || oldType != type)) {
-      getFirstFrameVideo();
+      if (type == ChatAttachmentType.video) {
+        _getVideoThumbnail();
+      }
     }
   }
 
-  void getFirstFrameVideo() {
-    try {
-      final videoPath = widget.item.when(
-        local: (_, _, path, _) => path,
-        remote: (_, _, data) => data.url,
-      );
+  Future<void> _getVideoThumbnail() async {
+    final videoPath = widget.item.when(
+      local: (_, _, path, _, _) => path,
+      remote: (_, _, data) => data.url,
+    );
 
-      fileName = VideoThumbnail.thumbnailFile(
+    try {
+      final result = await VideoThumbnail.thumbnailFile(
         video: videoPath,
         thumbnailPath: widget.directory.path,
         imageFormat: ImageFormat.JPEG,
         quality: 75,
       );
 
-      setState(() {});
+      if (!mounted) return;
+
+      setState(() {
+        _videoThumbnail = result;
+      });
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
+
       BannerController.I.showError(error: error, message: error.message);
     }
+  }
+
+  String get documentIcon {
+    final extension = attachmentFileName?.split('.').last.toLowerCase();
+
+    return switch (extension) {
+      'pdf' => SupportAssets.I.png.pdf,
+      'doc' || 'docx' => SupportAssets.I.png.doc,
+      'xls' || 'xlsx' => SupportAssets.I.png.xls,
+      'ppt' || 'pptx' => SupportAssets.I.png.ppt,
+      'zip' || 'rar' || '7z' => SupportAssets.I.png.zip,
+      'txt' => SupportAssets.I.png.txt,
+      _ => SupportAssets.I.png.file,
+    };
   }
 
   @override
@@ -106,145 +132,176 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
       height: 65.w,
       width: 65.w,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(11.r)),
-      child: AnimatedSwitcher(
-        key: ValueKey(widget.item),
-        duration: const Duration(milliseconds: 500),
-        child: Stack(
-          children: [
-            Positioned.fill(child: _buildContent(context)),
-            Positioned(
-              right: 0,
-              top: 0,
-              child: InkWell(
-                onTap: () => context.read<AttachmentsCubit>().removeById(
-                  widget.item.when(
-                    local: (id, _, _, _) => id,
-                    remote: (id, _, _) => id,
-                  ),
+      clipBehavior: Clip.hardEdge,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ColoredBox(
+              color: SupportColors.light.withValues(alpha: 0.6),
+            ),
+          ),
+          Positioned.fill(child: _buildContent(context)),
+
+          Positioned(
+            right: 0,
+            top: 0,
+            child: InkWell(
+              onTap: () {
+                context.read<AttachmentsCubit>().removeById(id);
+              },
+              child: Icon(Icons.close, size: 16.r, color: SupportColors.black1),
+            ),
+          ),
+
+          if (isLoading)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: Icon(
-                  Icons.close,
-                  size: 16.r,
-                  color: SupportColors.black1,
+                child: Center(
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.w,
+                    child: const CircularProgressIndicator(strokeWidth: 1.8),
+                  ),
                 ),
               ),
             ),
-            if (isLoading)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Center(
-                    child: SizedBox(
-                      width: 24.w,
-                      height: 24.w,
-                      child: const CircularProgressIndicator(strokeWidth: 1.8),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
-    ).animate().fade(duration: 350.ms);
+    );
   }
 
   Widget _buildContent(BuildContext context) {
     switch (type) {
       case ChatAttachmentType.document:
-        return Center(
-          child: SvgPicture.asset(
-            width: 25.w,
-            height: 25.w,
-            SupportAssets.I.svg.file,
-            colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
-          ),
-        );
+        return _buildDocument();
 
       case ChatAttachmentType.video:
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(12.r),
-          child: FutureBuilder<String?>(
-            future: fileName,
-            builder: (context, asyncSnapshot) {
-              if (!asyncSnapshot.hasData) {
-                return Shimmer.fromColors(
-                  baseColor: SupportColors.light,
-                  highlightColor: SupportColors.white,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 231, 231, 231),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                );
-              }
-
-              final remote = remoteData;
-
-              return InkWell(
-                onTap: remote == null
-                    ? null
-                    : () {
-                        context.pushNamed(
-                          SupportRouteConstant.I.videoView,
-                          queryParameters: {'url': remote.url},
-                          extra: asyncSnapshot.data,
-                        );
-                      },
-                child: Image.file(File(asyncSnapshot.data!), fit: BoxFit.cover),
-              );
-            },
-          ),
-        );
+        return _buildVideo();
 
       case ChatAttachmentType.photo:
-        final path = localPath;
-        final remote = remoteData;
+        return _buildPhoto();
+    }
+  }
 
-        final tag = remote?.url ?? path;
+  Widget _buildDocument() {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(5.r),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.r),
+          color: SupportColors.white,
+        ),
+        child: Image.asset(documentIcon, width: 25.r, height: 25.r),
+      ),
+    );
+  }
 
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(12.r),
-          child: path != null
-              ? Image.file(File(path), fit: BoxFit.cover)
-              : InkWell(
-                  onTap: remote == null
-                      ? null
-                      : () {
-                          final image = ViewerImageItem.network(remote.url);
-
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              opaque: true,
-                              transitionDuration: const Duration(
-                                milliseconds: 300,
-                              ),
-                              reverseTransitionDuration: const Duration(
-                                milliseconds: 300,
-                              ),
-                              pageBuilder: (_, _, _) {
-                                return PhotoViewerPage(
-                                  heroTagPrefix: tag,
-                                  images: [image],
-                                  initialIndex: 0,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                  child: Hero(
-                    tag: tag ?? '',
-                    child: Image.network(
-                      remote!.url,
-                      filterQuality: FilterQuality.medium,
-                      fit: BoxFit.cover,
-                    ),
+  Widget _buildVideo() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12.r),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeOutCubic,
+        child: _videoThumbnail == null
+            ? Shimmer.fromColors(
+                key: const ValueKey('loading'),
+                baseColor: SupportColors.light,
+                highlightColor: SupportColors.white,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 231, 231, 231),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                 ),
-        );
+              )
+            : _buildVideoThumbnail(key: const ValueKey('thumbnail')),
+      ),
+    );
+  }
+
+  Widget _buildVideoThumbnail({required Key key}) {
+    final remote = remoteData;
+
+    return InkWell(
+      key: key,
+      onTap: remote == null
+          ? null
+          : () {
+              context.pushNamed(
+                SupportRouteConstant.I.videoView,
+                queryParameters: {'url': remote.url},
+                extra: _videoThumbnail,
+              );
+            },
+      child: Image.file(
+        File(_videoThumbnail!),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      ),
+    );
+  }
+
+  Widget _buildPhoto() {
+    final path = localPath;
+    final remote = remoteData;
+
+    if (path != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: SizedBox.expand(
+          child: Image.file(
+            File(path),
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.medium,
+          ),
+        ),
+      );
     }
+
+    if (remote == null) {
+      return const SizedBox.shrink();
+    }
+
+    final tag = remote.url;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12.r),
+      child: InkWell(
+        onTap: () {
+          final image = ViewerImageItem.network(remote.url);
+
+          Navigator.of(context).push(
+            PageRouteBuilder(
+              opaque: false,
+              transitionDuration: const Duration(milliseconds: 300),
+              reverseTransitionDuration: const Duration(milliseconds: 300),
+              pageBuilder: (_, _, _) {
+                return PhotoViewerPage(
+                  heroTagPrefix: tag,
+                  images: [image],
+                  initialIndex: 0,
+                );
+              },
+            ),
+          );
+        },
+        child: Hero(
+          tag: tag,
+          child: SizedBox.expand(
+            child: Image.network(
+              remote.url,
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.medium,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
