@@ -125,7 +125,7 @@ class _CircleButtonState extends State<CircleButton>
     try {
       final animation = _controller.forward();
 
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 80));
 
       if (mounted) {
         widget.onTap();

@@ -117,18 +117,32 @@ class SliverChatContainerWidget extends StatelessWidget {
                   ),
                   StateStatus.success => SliverPadding(
                     padding: EdgeInsetsGeometry.only(bottom: 20),
-                    sliver: SliverList.separated(
-                      separatorBuilder: (context, index) =>
-                          Divider(height: 1.h, color: SupportColors.light),
-                      itemCount: state.chats.length,
-                      itemBuilder: (context, i) {
-                        final chat = state.chats[i];
-                        return ChatContainerWidgets(
-                          isLoading: false,
-                          chat: chat,
-                        );
-                      },
-                    ),
+                    sliver: switch (state.chats.isEmpty) {
+                      true => SliverFillRemaining(
+                        child: Center(
+                          child: Text(
+                            "У вас нет обращений",
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w700,
+                              color: SupportColors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                      false => SliverList.separated(
+                        separatorBuilder: (context, index) =>
+                            Divider(height: 1.h, color: SupportColors.light),
+                        itemCount: state.chats.length,
+                        itemBuilder: (context, i) {
+                          final chat = state.chats[i];
+                          return ChatContainerWidgets(
+                            isLoading: false,
+                            chat: chat,
+                          );
+                        },
+                      ),
+                    },
                   ),
                   StateStatus.fail => SliverToBoxAdapter(),
                   StateStatus.userNotFound => SliverFillRemaining(

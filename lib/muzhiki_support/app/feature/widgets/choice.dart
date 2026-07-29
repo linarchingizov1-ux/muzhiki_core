@@ -41,7 +41,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
       reverseDuration: const Duration(milliseconds: 140),
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.03).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutCubic,
