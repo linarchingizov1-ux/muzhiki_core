@@ -7,8 +7,10 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/attachment/phot
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/attachment/video_attachment.dart';
 
 abstract class AttachmentWidgets {
-  static VideoAttachment video({required String url}) =>
-      VideoAttachment(url: url);
+  static VideoAttachment video({
+    required Directory directory,
+    required String url,
+  }) => VideoAttachment(url: url, directory: directory);
   static DocumentAttachment document({
     required Directory directory,
     required String url,

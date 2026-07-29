@@ -1,12 +1,9 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get_thumbnail_video/index.dart';
-import 'package:get_thumbnail_video/video_thumbnail.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
@@ -20,6 +17,7 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/view_image_item_mode
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/attachments/attachments_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/photo_view_widget.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class UploadDataWidgets extends StatefulWidget {
   final Directory directory;
@@ -38,7 +36,7 @@ class UploadDataWidgets extends StatefulWidget {
 }
 
 class _UploadDataWidgetsState extends State<UploadDataWidgets> {
-  Future<Uint8List?> thumbnail = Future.value(null);
+  Future<String?>? fileName;
 
   ChatAttachmentType get type => widget.item.when(
     local: (_, type, _, _, _) => type,
@@ -92,17 +90,17 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
     );
 
     try {
-      final result = await VideoThumbnail.thumbnailData(
+      final result = await VideoThumbnail.thumbnailFile(
         video: videoPath,
+        thumbnailPath: widget.directory.path,
         imageFormat: ImageFormat.JPEG,
         quality: 75,
-        maxWidth: 280,
       );
 
       if (!mounted) return;
 
       setState(() {
-        thumbnail = Future.value(result);
+        fileName = Future.value(result);
       });
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
@@ -204,8 +202,8 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
   Widget _buildVideo() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12.r),
-      child: FutureBuilder<Uint8List?>(
-        future: thumbnail,
+      child: FutureBuilder<String?>(
+        future: fileName,
         builder: (context, snapshot) {
           final thumbnail = snapshot.data;
 
@@ -234,7 +232,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
                       extra: thumbnail,
                     );
                   },
-            child: Image.memory(thumbnail, fit: BoxFit.cover),
+            child: Image.file(File(thumbnail), fit: BoxFit.cover),
           );
         },
       ),
