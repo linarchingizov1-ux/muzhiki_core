@@ -177,18 +177,17 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
       duration: const Duration(milliseconds: 80),
       reverseDuration: const Duration(milliseconds: 50),
     );
-
     fadeAnimation = CurvedAnimation(
       parent: animationController,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
+      curve: Curves.easeOutQuart,
+      reverseCurve: Curves.easeInQuart,
     );
 
     scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
       CurvedAnimation(
         parent: animationController,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
+        curve: Curves.easeOutQuart,
+        reverseCurve: Curves.easeInQuart,
       ),
     );
 
@@ -196,8 +195,8 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
         Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero).animate(
           CurvedAnimation(
             parent: animationController,
-            curve: Curves.easeOutCubic,
-            reverseCurve: Curves.easeInCubic,
+            curve: Curves.easeOutQuart,
+            reverseCurve: Curves.easeInQuart,
           ),
         );
   }
@@ -251,6 +250,13 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                 child: SafeArea(
                   child: Stack(
                     children: [
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: _close,
+                          child: const SizedBox.expand(),
+                        ),
+                      ),
                       Positioned(
                         bottom: 62.h,
                         left: 17.w,
@@ -276,36 +282,36 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.image,
                                       onTap: () async {
+                                        _close();
                                         await context
                                             .read<AttachmentsCubit>()
                                             .addAttachment(
                                               type: ChatAttachmentType.photo,
                                             );
-                                        _close();
                                       },
                                     ),
                                     MuzhikiUi.buttons.circle(
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.recodeVideo,
                                       onTap: () async {
+                                        _close();
                                         await context
                                             .read<AttachmentsCubit>()
                                             .addAttachment(
                                               type: ChatAttachmentType.video,
                                             );
-                                        _close();
                                       },
                                     ),
                                     MuzhikiUi.buttons.circle(
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.file,
                                       onTap: () async {
+                                        _close();
                                         await context
                                             .read<AttachmentsCubit>()
                                             .addAttachment(
                                               type: ChatAttachmentType.document,
                                             );
-                                        _close();
                                       },
                                     ),
                                   ],
