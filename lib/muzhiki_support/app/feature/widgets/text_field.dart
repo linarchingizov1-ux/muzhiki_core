@@ -52,84 +52,37 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
             OverlayPortal(
               controller: overlayPortalController,
               overlayChildBuilder: (context) {
-                return CompositedTransformFollower(
-                  link: layerCircleButton,
-                  showWhenUnlinked: false,
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final box = context.findRenderObject() as RenderBox?;
 
-                  targetAnchor: Alignment.topCenter,
-                  followerAnchor: Alignment.bottomCenter,
-
-                  offset: Offset(0, -8.r),
-
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: 8.r,
-                    children: List.generate(
-                      5,
-                      (i) => Container(
-                        height: 40.r,
-                        width: 40.r,
-                        color: Colors.primaries[i % Colors.primaries.length],
-                      ),
-                    ),
-
-                    // MuzhikiUi.buttons.circle(
-                    //   onTap: () {
-                    //     overlayPortalController.hide();
-
-                    //     widget.attachmentsCubit.addAttachment(
-                    //       type: ChatAttachmentType.photo,
-                    //     );
-                    //   },
-                    //   backgroundColor: SupportColors.blood,
-                    //   icon: Icons.photo,
-                    // ),
-
-                    // MuzhikiUi.buttons.circle(
-                    //   onTap: () {
-                    //     overlayPortalController.hide();
-
-                    //     widget.attachmentsCubit.addAttachment(
-                    //       type: ChatAttachmentType.video,
-                    //     );
-                    //   },
-
-                    //   backgroundColor: SupportColors.blood,
-                    //   icon: Icons.videocam,
-                    // ),
-
-                    // MuzhikiUi.buttons.circle(
-                    //   onTap: () {
-                    //     overlayPortalController.hide();
-
-                    //     widget.attachmentsCubit.addAttachment(
-                    //       type: ChatAttachmentType.document,
-                    //     );
-                    //   },
-                    //   backgroundColor: SupportColors.blood,
-                    //   icon: Icons.insert_drive_file,
-                    // ),
+                  if (box != null) {
+                    debugPrint(
+                      'TARGET: '
+                      'position=${box.localToGlobal(Offset.zero)}, '
+                      'size=${box.size}',
+                    );
+                  }
+                });
+                return Positioned.fill(
+                  child: CompositedTransformFollower(
+                    link: layerCircleButton,
+                    showWhenUnlinked: true,
+                    targetAnchor: Alignment.topCenter,
+                    followerAnchor: Alignment.bottomCenter,
+                    child: Container(width: 40, height: 40, color: Colors.red),
                   ),
                 );
               },
               child: CompositedTransformTarget(
                 link: layerCircleButton,
-                child: Container(
-                  height: 40.r,
-                  width: 40.r,
-                  color: Colors.black,
+                child: GestureDetector(
+                  onTap: overlayPortalController.show,
+                  child: Container(
+                    height: 40.r,
+                    width: 40.r,
+                    color: Colors.black,
+                  ),
                 ),
-                // MuzhikiUi.buttons.circle(
-                //   onTap: () {
-                //     if (overlayPortalController.isShowing) {
-                //       overlayPortalController.hide();
-                //     } else {
-                //       overlayPortalController.show();
-                //     }
-                //   },
-                //   backgroundColor: SupportColors.blood,
-                //   svgAsset: SupportAssets.I.svg.screpka,
-                // ),
               ),
             ),
             Expanded(
