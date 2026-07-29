@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/extension/chat_extension.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
-import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/choice.dart';
+import 'package:muzhiki_core/muzhiki_ui/muzhiki_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SliverChoiWidget extends StatelessWidget {
@@ -72,7 +72,7 @@ class SliverChoiWidget extends StatelessWidget {
                     itemBuilder: (context, i) {
                       final channel = state.myChat!.channels[i];
 
-                      return ChoiceWidgets(
+                      return MuzhikiUi.buttons.choi(
                         newMessage: state.myChat!.chats.unreadByChannel(
                           channel.id,
                         ),

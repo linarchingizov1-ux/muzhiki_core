@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:muzhiki_core/muzhiki_ui/buttons/circle_button.dart';
+import 'package:muzhiki_core/muzhiki_ui/buttons/choi_widgets.dart';
 
 abstract final class MuzhikiUi {
   static final buttons = MuzhikiButtons._();
@@ -28,6 +29,20 @@ final class MuzhikiButtons {
     iconSize: iconSize,
     backgroundColor: backgroundColor,
     child: child,
+  );
+
+  ChoiceWidgets choi({
+    required void Function(bool)? onSelected,
+    required bool isSelected,
+    required String label,
+    required int newMessage,
+    bool isLoading = false,
+  }) => ChoiceWidgets(
+    isLoading: isLoading,
+    newMessage: newMessage,
+    onSelected: onSelected,
+    isSelected: isSelected,
+    label: label,
   );
 
   // ClassicButton classic({
