@@ -118,12 +118,13 @@ class _ChatViewState extends State<ChatView> {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    child: AnimatedSize(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOut,
-                      child: SizedBox(
-                        height: isOpenKeyboard ? 50.h : 100.h,
-                        child: IgnorePointer(
+                    child: IgnorePointer(
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
+                        opacity: isOpenKeyboard ? 0.65 : 1,
+                        child: SizedBox(
+                          height: 100.h,
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -133,7 +134,7 @@ class _ChatViewState extends State<ChatView> {
                                   Colors.white,
                                   Colors.white.withValues(alpha: 0.8),
                                   Colors.white.withValues(alpha: 0.35),
-                                  Colors.white.withValues(alpha: 0),
+                                  Colors.transparent,
                                 ],
                                 stops: const [0.0, 0.3, 0.65, 1.0],
                               ),
