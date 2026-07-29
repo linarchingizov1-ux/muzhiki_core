@@ -289,8 +289,6 @@ class _BubbleAttachment extends StatelessWidget {
   int get count => attachments.length;
 
   String getFileName(AttachmentsModel attachment) {
-    // Если сервер когда-нибудь начнёт присылать name —
-    // используем его.
     if (attachment.name?.isNotEmpty == true) {
       return attachment.name!;
     }

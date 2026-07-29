@@ -57,6 +57,12 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
     orElse: () => false,
   );
 
+  String? get attachmentFileName => widget.item.maybeWhen(
+    local: (_, _, _, fileName, _) => fileName,
+    remote: (_, _, data) => data.fileName,
+    orElse: () => null,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +105,36 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
       BannerController.I.showError(error: error, message: error.message);
+    }
+  }
+
+  String get getDocumentIcon {
+    switch (attachmentFileName) {
+      case 'pdf':
+        return SupportAssets.I.png.pdf;
+
+      case 'doc':
+      case 'docx':
+        return SupportAssets.I.png.doc;
+
+      case 'xls':
+      case 'xlsx':
+        return SupportAssets.I.png.xls;
+
+      case 'ppt':
+      case 'pptx':
+        return SupportAssets.I.png.ppt;
+
+      case 'zip':
+      case 'rar':
+      case '7z':
+        return SupportAssets.I.png.zip;
+
+      case 'txt':
+        return SupportAssets.I.png.txt;
+
+      default:
+        return SupportAssets.I.png.file;
     }
   }
 
@@ -157,11 +193,13 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
     switch (type) {
       case ChatAttachmentType.document:
         return Center(
-          child: SvgPicture.asset(
-            width: 25.w,
-            height: 25.w,
-            SupportAssets.I.svg.file,
-            colorFilter: ColorFilter.mode(SupportColors.grey, BlendMode.srcIn),
+          child: Container(
+            padding: EdgeInsets.all(5.r),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.r),
+              color: SupportColors.white,
+            ),
+            child: Image.asset(width: 25.r, height: 25.r, getDocumentIcon),
           ),
         );
 
@@ -220,7 +258,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
 
                           Navigator.of(context).push(
                             PageRouteBuilder(
-                              opaque: true,
+                              opaque: false,
                               transitionDuration: const Duration(
                                 milliseconds: 300,
                               ),
