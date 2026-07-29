@@ -40,18 +40,20 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
   Future<String?>? fileName;
 
   ChatAttachmentType get type => widget.item.when(
-    local: (_, type, _, _) => type,
+    local: (_, type, _, _, _) => type,
     remote: (_, type, _) => type,
   );
 
-  String? get localPath =>
-      widget.item.maybeWhen(local: (_, _, path, _) => path, orElse: () => null);
+  String? get localPath => widget.item.maybeWhen(
+    local: (_, _, path, _, _) => path,
+    orElse: () => null,
+  );
 
   UploadDataModel? get remoteData =>
       widget.item.maybeWhen(remote: (_, _, data) => data, orElse: () => null);
 
   bool get isLoading => widget.item.maybeWhen(
-    local: (_, _, _, isLoading) => isLoading,
+    local: (_, _, _, _, isLoading) => isLoading,
     orElse: () => false,
   );
 
@@ -69,7 +71,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
     super.didUpdateWidget(oldWidget);
 
     final oldType = oldWidget.item.when(
-      local: (_, type, _, _) => type,
+      local: (_, type, _, _, _) => type,
       remote: (_, type, _) => type,
     );
 
@@ -82,7 +84,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
   void getFirstFrameVideo() {
     try {
       final videoPath = widget.item.when(
-        local: (_, _, path, _) => path,
+        local: (_, _, path, _, _) => path,
         remote: (_, _, data) => data.url,
       );
 
@@ -118,7 +120,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
               child: InkWell(
                 onTap: () => context.read<AttachmentsCubit>().removeById(
                   widget.item.when(
-                    local: (id, _, _, _) => id,
+                    local: (id, _, _, _, _) => id,
                     remote: (id, _, _) => id,
                   ),
                 ),

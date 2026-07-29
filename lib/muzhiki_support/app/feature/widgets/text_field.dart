@@ -9,7 +9,6 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connec
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/attachments/attachments_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/upload_data_widgets.dart';
 import 'package:muzhiki_core/muzhiki_ui/muzhiki_ui.dart';
-import 'package:talker/talker.dart';
 
 class TextFieldWidgets extends StatefulWidget {
   final AttachmentsCubit attachmentsCubit;
@@ -56,9 +55,6 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                         itemCount: state.items.length,
                         separatorBuilder: (_, _) => SizedBox(width: 8.w),
                         itemBuilder: (context, i) {
-                          for (final item in state.items) {
-                            Talker().debug('item: $item');
-                          }
                           return UploadDataWidgets(
                             item: state.items[i],
                             directory: widget.directory,

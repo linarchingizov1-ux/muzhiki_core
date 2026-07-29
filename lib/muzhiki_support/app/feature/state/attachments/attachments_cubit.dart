@@ -86,6 +86,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
 
       final localItems = selectedFiles.map((file) {
         return LocalAttachmentsModel.local(
+          fileName: file.name,
           id: _uuid.v4(),
           type: type,
           path: file.path!,
@@ -182,9 +183,10 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   void _setLocalLoading(String id, bool value) {
     final updated = state.items.map((item) {
       return item.maybeWhen(
-        local: (itemId, type, path, isLoading) {
+        local: (itemId, type, path, fileName, isLoading) {
           if (itemId != id) return item;
           return LocalAttachmentsModel.local(
+            fileName: fileName,
             id: itemId,
             type: type,
             path: path,
@@ -205,7 +207,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   }) {
     final updated = state.items.map((item) {
       return item.maybeWhen(
-        local: (id, itemType, path, isLoading) {
+        local: (id, itemType, path, fileName, isLoading) {
           if (id != localId) return item;
           return LocalAttachmentsModel.remote(
             id: localId,

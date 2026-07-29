@@ -5,7 +5,6 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
@@ -250,15 +249,6 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
                 color: SupportColors.white,
               ),
               child: Image.asset(width: 25.r, height: 25.r, fileIcon),
-              // SvgPicture.asset(
-              //   SupportAssets.I.svg.file,
-              //   width: 25.r,
-              //   height: 25.r,
-              //   colorFilter: ColorFilter.mode(
-              //     SupportColors.grey,
-              //     BlendMode.srcIn,
-              //   ),
-              // ),
             ),
           ),
           SizedBox(

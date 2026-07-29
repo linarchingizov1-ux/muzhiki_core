@@ -154,10 +154,10 @@ return remote(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  ChatAttachmentType type,  String path,  bool isLoading)?  local,TResult Function( String id,  ChatAttachmentType type,  UploadDataModel data)?  remote,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  ChatAttachmentType type,  String path,  String fileName,  bool isLoading)?  local,TResult Function( String id,  ChatAttachmentType type,  UploadDataModel data)?  remote,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LocalAttachmentViewItem() when local != null:
-return local(_that.id,_that.type,_that.path,_that.isLoading);case _RemoteAttachmentViewItem() when remote != null:
+return local(_that.id,_that.type,_that.path,_that.fileName,_that.isLoading);case _RemoteAttachmentViewItem() when remote != null:
 return remote(_that.id,_that.type,_that.data);case _:
   return orElse();
 
@@ -176,10 +176,10 @@ return remote(_that.id,_that.type,_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  ChatAttachmentType type,  String path,  bool isLoading)  local,required TResult Function( String id,  ChatAttachmentType type,  UploadDataModel data)  remote,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  ChatAttachmentType type,  String path,  String fileName,  bool isLoading)  local,required TResult Function( String id,  ChatAttachmentType type,  UploadDataModel data)  remote,}) {final _that = this;
 switch (_that) {
 case _LocalAttachmentViewItem():
-return local(_that.id,_that.type,_that.path,_that.isLoading);case _RemoteAttachmentViewItem():
+return local(_that.id,_that.type,_that.path,_that.fileName,_that.isLoading);case _RemoteAttachmentViewItem():
 return remote(_that.id,_that.type,_that.data);case _:
   throw StateError('Unexpected subclass');
 
@@ -197,10 +197,10 @@ return remote(_that.id,_that.type,_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  ChatAttachmentType type,  String path,  bool isLoading)?  local,TResult? Function( String id,  ChatAttachmentType type,  UploadDataModel data)?  remote,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  ChatAttachmentType type,  String path,  String fileName,  bool isLoading)?  local,TResult? Function( String id,  ChatAttachmentType type,  UploadDataModel data)?  remote,}) {final _that = this;
 switch (_that) {
 case _LocalAttachmentViewItem() when local != null:
-return local(_that.id,_that.type,_that.path,_that.isLoading);case _RemoteAttachmentViewItem() when remote != null:
+return local(_that.id,_that.type,_that.path,_that.fileName,_that.isLoading);case _RemoteAttachmentViewItem() when remote != null:
 return remote(_that.id,_that.type,_that.data);case _:
   return null;
 
@@ -213,12 +213,13 @@ return remote(_that.id,_that.type,_that.data);case _:
 
 
 class _LocalAttachmentViewItem extends LocalAttachmentsModel {
-  const _LocalAttachmentViewItem({required this.id, required this.type, required this.path, this.isLoading = true}): super._();
+  const _LocalAttachmentViewItem({required this.id, required this.type, required this.path, required this.fileName, this.isLoading = true}): super._();
   
 
 @override final  String id;
 @override final  ChatAttachmentType type;
  final  String path;
+ final  String fileName;
 @JsonKey() final  bool isLoading;
 
 /// Create a copy of LocalAttachmentsModel
@@ -231,16 +232,16 @@ _$LocalAttachmentViewItemCopyWith<_LocalAttachmentViewItem> get copyWith => __$L
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalAttachmentViewItem&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.path, path) || other.path == path)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalAttachmentViewItem&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.path, path) || other.path == path)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,type,path,isLoading);
+int get hashCode => Object.hash(runtimeType,id,type,path,fileName,isLoading);
 
 @override
 String toString() {
-  return 'LocalAttachmentsModel.local(id: $id, type: $type, path: $path, isLoading: $isLoading)';
+  return 'LocalAttachmentsModel.local(id: $id, type: $type, path: $path, fileName: $fileName, isLoading: $isLoading)';
 }
 
 
@@ -251,7 +252,7 @@ abstract mixin class _$LocalAttachmentViewItemCopyWith<$Res> implements $LocalAt
   factory _$LocalAttachmentViewItemCopyWith(_LocalAttachmentViewItem value, $Res Function(_LocalAttachmentViewItem) _then) = __$LocalAttachmentViewItemCopyWithImpl;
 @override @useResult
 $Res call({
- String id, ChatAttachmentType type, String path, bool isLoading
+ String id, ChatAttachmentType type, String path, String fileName, bool isLoading
 });
 
 
@@ -268,11 +269,12 @@ class __$LocalAttachmentViewItemCopyWithImpl<$Res>
 
 /// Create a copy of LocalAttachmentsModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? path = null,Object? isLoading = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? path = null,Object? fileName = null,Object? isLoading = null,}) {
   return _then(_LocalAttachmentViewItem(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as ChatAttachmentType,path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
+as String,fileName: null == fileName ? _self.fileName : fileName // ignore: cast_nullable_to_non_nullable
 as String,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,
   ));

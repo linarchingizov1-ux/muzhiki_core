@@ -94,7 +94,7 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
                 final uuidFile = uploadedFiles
                     .map(
                       (e) => e.when(
-                        local: (_, _, _, _) => null,
+                        local: (_, _, _, _, _) => null,
                         remote: (_, _, data) => data.uuid,
                       ),
                     )
