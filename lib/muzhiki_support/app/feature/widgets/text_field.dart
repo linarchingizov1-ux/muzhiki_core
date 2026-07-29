@@ -73,8 +73,8 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                         minLines: 1,
                         expands: false,
                         cursorColor: SupportColors.black1,
-                        cursorWidth: 2.w,
-                        cursorHeight: 4.h,
+                        cursorWidth: 4.w,
+                        cursorHeight: 12.h,
                         textAlignVertical: TextAlignVertical.top,
                         onChanged: (_) => setState(() {}),
                         style: TextStyle(
