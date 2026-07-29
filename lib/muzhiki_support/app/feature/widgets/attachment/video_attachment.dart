@@ -1,39 +1,35 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_thumbnail_video/index.dart';
+import 'package:get_thumbnail_video/video_thumbnail.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_route_constant.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 class VideoAttachment extends StatefulWidget {
-  final Directory directory;
   final String url;
 
-  const VideoAttachment({
-    super.key,
-    required this.url,
-    required this.directory,
-  });
+  const VideoAttachment({super.key, required this.url});
 
   @override
   State<VideoAttachment> createState() => _VideoAttachmentState();
 }
 
 class _VideoAttachmentState extends State<VideoAttachment> {
-  late Future<String?> fileName;
+  late Future<Uint8List?> thumbnail;
 
   @override
   void initState() {
-    fileName = VideoThumbnail.thumbnailFile(
-      video: widget.url,
-      thumbnailPath: widget.directory.path,
-      imageFormat: ImageFormat.JPEG,
-      quality: 75,
-    );
     super.initState();
+    thumbnail = VideoThumbnail.thumbnailData(
+      video: widget.url,
+      imageFormat: ImageFormat.JPEG,
+      maxWidth: 128,
+      quality: 25,
+    );
   }
 
   @override
@@ -46,7 +42,7 @@ class _VideoAttachmentState extends State<VideoAttachment> {
         minWidth: 77.w,
       ),
       child: FutureBuilder(
-        future: fileName,
+        future: thumbnail,
         builder: (context, value) {
           if (value.hasData) {
             return InkWell(
@@ -63,7 +59,7 @@ class _VideoAttachmentState extends State<VideoAttachment> {
                   Positioned.fill(
                     child: ClipRRect(
                       borderRadius: BorderRadiusGeometry.circular(12.r),
-                      child: Image.file(fit: BoxFit.cover, File(value.data!)),
+                      child: Image.memory(value.data!, fit: BoxFit.cover),
                     ),
                   ),
                   Positioned.fill(

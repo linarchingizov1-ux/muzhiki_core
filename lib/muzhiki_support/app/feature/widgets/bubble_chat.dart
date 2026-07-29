@@ -333,7 +333,6 @@ class _BubbleAttachment extends StatelessWidget {
             ),
 
             ChatAttachmentType.video => AttachmentWidgets.video(
-              directory: directory,
               url: attachment.url,
             ),
           },
@@ -383,7 +382,6 @@ class _BubbleAttachment extends StatelessWidget {
                           ),
 
                           ChatAttachmentType.video => AttachmentWidgets.video(
-                            directory: directory,
                             url: attachment.url,
                           ),
 
