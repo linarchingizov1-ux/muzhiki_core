@@ -122,14 +122,20 @@ class _CircleButtonState extends State<CircleButton>
 
     _isPopping = true;
 
-    widget.onTap();
-
     try {
-      await _controller.forward();
+      final animation = _controller.forward();
 
-      if (!mounted) return;
+      await Future.delayed(const Duration(milliseconds: 50));
 
-      await _controller.reverse();
+      if (mounted) {
+        widget.onTap();
+      }
+
+      await animation;
+
+      if (mounted) {
+        await _controller.reverse();
+      }
     } finally {
       _isPopping = false;
     }
