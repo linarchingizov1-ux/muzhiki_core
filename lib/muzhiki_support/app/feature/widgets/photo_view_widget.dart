@@ -230,6 +230,7 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
                           size: 45,
                           iconSize: 20,
                           onTap: _close,
+                          icon: Icons.close,
                           backgroundColor: SupportColors.black1.withValues(
                             alpha: 0.65,
                           ),
