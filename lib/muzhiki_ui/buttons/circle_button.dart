@@ -47,7 +47,6 @@ class _CircleButtonState extends State<CircleButton>
       vsync: this,
       duration: const Duration(milliseconds: 180),
       reverseDuration: const Duration(milliseconds: 140),
-      value: 0.0,
     );
 
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
@@ -116,16 +115,24 @@ class _CircleButtonState extends State<CircleButton>
     _controller.forward();
   }
 
-  Future<void> _onTapUp(TapUpDetails details) async {
+  void _onTapUp(TapUpDetails details) async {
     if (_isPopping) return;
 
     _isPopping = true;
 
-    await _controller.reverse();
+    try {
+      await _controller.forward();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    widget.onTap();
+      await _controller.reverse();
+
+      if (!mounted) return;
+
+      widget.onTap();
+    } finally {
+      _isPopping = false;
+    }
   }
 
   void _onTapCancel() {
