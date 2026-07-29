@@ -335,38 +335,60 @@ class _BubbleAttachment extends StatelessWidget {
         );
 
       default:
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: width * 0.75, maxHeight: 77.w),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 11.w),
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              spacing: 5.w,
-              children: List.generate(attachments.length, (index) {
-                final attachment = attachments[index];
+        final documents = attachments
+            .where((e) => e.type == ChatAttachmentType.document)
+            .toList();
 
-                return SizedBox(
+        final media = attachments
+            .where(
+              (e) =>
+                  e.type == ChatAttachmentType.photo ||
+                  e.type == ChatAttachmentType.video,
+            )
+            .toList();
+
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 11.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 5.w,
+            children: [
+              if (documents.isNotEmpty)
+                ...documents.map(
+                  (attachment) => AttachmentWidgets.document(
+                    directory: directory,
+                    url: attachment.url,
+                    fileName: getFileName(attachment),
+                  ),
+                ),
+
+              if (media.isNotEmpty)
+                SizedBox(
                   height: 77.w,
-                  child: switch (attachment.type) {
-                    ChatAttachmentType.document => AttachmentWidgets.document(
-                      directory: directory,
-                      url: attachment.url,
-                      fileName: getFileName(attachment),
-                    ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      spacing: 5.w,
+                      children: media.map((attachment) {
+                        return switch (attachment.type) {
+                          ChatAttachmentType.photo => AttachmentWidgets.photo(
+                            websocketChat: websocketChat,
+                            attachment: attachment,
+                          ),
 
-                    ChatAttachmentType.photo => AttachmentWidgets.photo(
-                      websocketChat: websocketChat,
-                      attachment: attachment,
-                    ),
+                          ChatAttachmentType.video => AttachmentWidgets.video(
+                            directory: directory,
+                            url: attachment.url,
+                          ),
 
-                    ChatAttachmentType.video => AttachmentWidgets.video(
-                      directory: directory,
-                      url: attachment.url,
+                          _ => const SizedBox.shrink(),
+                        };
+                      }).toList(),
                     ),
-                  },
-                );
-              }),
-            ),
+                  ),
+                ),
+            ],
           ),
         );
     }
