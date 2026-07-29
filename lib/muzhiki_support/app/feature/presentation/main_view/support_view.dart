@@ -43,35 +43,13 @@ class SupportView extends StatefulWidget {
 }
 
 class _SupportViewState extends State<SupportView> {
+  final ValueNotifier<bool> _showChoiInAppBar = ValueNotifier(false);
   SessionRole? role;
-  late final ScrollController _scrollController;
-
-  bool _showChoiInAppBar = false;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-
-    _scrollController.addListener(_onScroll);
     loadChats();
-  }
-
-  void _onScroll() {
-    if (!_scrollController.hasClients) return;
-
-    final position = _scrollController.position;
-
-    final isScrollingUp =
-        position.userScrollDirection == ScrollDirection.forward;
-
-    final shouldShow = position.pixels > 0 && isScrollingUp;
-
-    if (_showChoiInAppBar != shouldShow) {
-      setState(() {
-        _showChoiInAppBar = shouldShow;
-      });
-    }
   }
 
   Future<void> loadChats() async {
@@ -112,7 +90,7 @@ class _SupportViewState extends State<SupportView> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _showChoiInAppBar.dispose();
     super.dispose();
   }
 
@@ -145,25 +123,35 @@ class _SupportViewState extends State<SupportView> {
               },
             ),
           ),
-          body: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverHomeAppbarWidget(
-                chatCubit: widget.chatCubit,
-                showChoi: _showChoiInAppBar,
-                canPop: widget.canPop,
-                typeApp: widget.typeApp,
-                sessionApp: widget.sessionApp,
-                firebaseRemoveFCM: widget.firebaseRemoveFCM,
-              ),
-              if (widget.showInformator) const SliverInformator(),
-              SliverChoiWidget(chatCubit: widget.chatCubit),
-              SliverChatContainerWidget(
-                chatCubit: widget.chatCubit,
-                homeRoute: widget.homeRoute,
-                profileRoute: widget.profileRoute,
-              ),
-            ],
+          body: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.forward) {
+                _showChoiInAppBar.value = true;
+              } else if (notification.direction == ScrollDirection.reverse) {
+                _showChoiInAppBar.value = false;
+              }
+
+              return false;
+            },
+            child: CustomScrollView(
+              slivers: [
+                SliverHomeAppbarWidget(
+                  chatCubit: widget.chatCubit,
+                  showChoi: _showChoiInAppBar,
+                  canPop: widget.canPop,
+                  typeApp: widget.typeApp,
+                  sessionApp: widget.sessionApp,
+                  firebaseRemoveFCM: widget.firebaseRemoveFCM,
+                ),
+                if (widget.showInformator) const SliverInformator(),
+                SliverChoiWidget(chatCubit: widget.chatCubit),
+                SliverChatContainerWidget(
+                  chatCubit: widget.chatCubit,
+                  homeRoute: widget.homeRoute,
+                  profileRoute: widget.profileRoute,
+                ),
+              ],
+            ),
           ),
         ),
       ),
