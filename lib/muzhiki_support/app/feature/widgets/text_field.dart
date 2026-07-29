@@ -51,10 +51,56 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
             OverlayPortal(
               controller: overlayPortalController,
               overlayChildBuilder: (context) {
-                return MuzhikiUi.buttons.circle(
-                  onTap: () {},
-                  backgroundColor: SupportColors.white,
-                  icon: Icons.add,
+                return CompositedTransformFollower(
+                  link: layerCircleButton,
+                  showWhenUnlinked: false,
+
+                  targetAnchor: Alignment.topCenter,
+                  followerAnchor: Alignment.bottomCenter,
+
+                  offset: Offset(0, -8.r),
+
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 8.r,
+                    children: [
+                      MuzhikiUi.buttons.circle(
+                        onTap: () {
+                          overlayPortalController.hide();
+
+                          widget.attachmentsCubit.addAttachment(
+                            type: ChatAttachmentType.photo,
+                          );
+                        },
+                        backgroundColor: SupportColors.white,
+                        icon: Icons.photo,
+                      ),
+
+                      MuzhikiUi.buttons.circle(
+                        onTap: () {
+                          overlayPortalController.hide();
+
+                          widget.attachmentsCubit.addAttachment(
+                            type: ChatAttachmentType.video,
+                          );
+                        },
+                        backgroundColor: SupportColors.white,
+                        icon: Icons.videocam,
+                      ),
+
+                      MuzhikiUi.buttons.circle(
+                        onTap: () {
+                          overlayPortalController.hide();
+
+                          widget.attachmentsCubit.addAttachment(
+                            type: ChatAttachmentType.document,
+                          );
+                        },
+                        backgroundColor: SupportColors.white,
+                        icon: Icons.insert_drive_file,
+                      ),
+                    ],
+                  ),
                 );
               },
               child: CompositedTransformTarget(
