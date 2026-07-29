@@ -84,6 +84,11 @@ class _ChatViewState extends State<ChatView> {
   double get topInset => mq.top;
   double get bottomInset => mq.bottom;
 
+  bool get isOpenKeyboard {
+    final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
+    return keyboardHeight > 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -113,7 +118,7 @@ class _ChatViewState extends State<ChatView> {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    height: 100.h,
+                    height: isOpenKeyboard ? 30.h : 100.h,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
