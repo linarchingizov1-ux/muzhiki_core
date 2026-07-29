@@ -164,8 +164,8 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
-      reverseDuration: const Duration(milliseconds: 80),
+      duration: const Duration(milliseconds: 150),
+      reverseDuration: const Duration(milliseconds: 150),
     );
 
     fadeAnimation = CurvedAnimation(
@@ -203,7 +203,6 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
     if (isOpen || isDisopse) return;
     if (focus?.hasFocus ?? false) {
       focus?.unfocus();
-      await Future.delayed(const Duration(milliseconds: 250));
     }
     overlayPortalController.show();
     setState(() => isOpen = true);
