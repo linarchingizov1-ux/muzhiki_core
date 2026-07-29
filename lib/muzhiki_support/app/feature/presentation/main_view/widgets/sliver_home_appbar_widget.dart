@@ -37,7 +37,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
         padding: EdgeInsets.only(bottom: 5.h),
         sliver: SliverAppBar(
           centerTitle: false,
-          pinned: true,
+          pinned: false,
           floating: true,
           title: Row(
             spacing: 10.w,

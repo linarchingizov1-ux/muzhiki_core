@@ -20,7 +20,7 @@ class SliverChoiWidget extends StatelessWidget {
             case StateStatus.loading:
               return SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 42.h,
+                  height: 40.h,
                   child: Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
@@ -54,7 +54,8 @@ class SliverChoiWidget extends StatelessWidget {
                 automaticallyImplyLeading: false,
                 primary: false,
                 forceMaterialTransparency: true,
-                pinned: true,
+                pinned: false,
+                floating: true,
                 stretch: false,
                 elevation: 0,
                 scrolledUnderElevation: 0,
