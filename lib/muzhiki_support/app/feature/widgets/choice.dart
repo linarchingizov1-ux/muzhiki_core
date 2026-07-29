@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/notification.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/skelet.dart';
@@ -29,7 +30,10 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
 
-  bool _isAnimating = false;
+  bool _isPopping = false;
+
+  GoRouter? _router;
+  VoidCallback? _routerListener;
 
   @override
   void initState() {
@@ -51,27 +55,90 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final router = GoRouter.of(context);
+
+    if (identical(_router, router)) {
+      return;
+    }
+
+    _removeRouterListener();
+
+    _router = router;
+
+    _routerListener = () {
+      _resetPressState();
+    };
+
+    router.routerDelegate.addListener(_routerListener!);
+  }
+
+  @override
   void dispose() {
+    _removeRouterListener();
     _controller.dispose();
+
     super.dispose();
   }
 
-  void _onTap() {
-    if (_isAnimating || widget.onSelected == null) return;
+  void _removeRouterListener() {
+    final router = _router;
+    final listener = _routerListener;
 
-    _isAnimating = true;
+    if (router != null && listener != null) {
+      router.routerDelegate.removeListener(listener);
+    }
 
-    widget.onSelected!(!widget.isSelected);
+    _router = null;
+    _routerListener = null;
+  }
 
-    _controller.forward(from: 0).then((_) async {
-      if (!mounted) return;
+  void _resetPressState() {
+    if (!mounted) return;
 
-      await _controller.reverse();
+    _isPopping = false;
+
+    _controller
+      ..stop()
+      ..value = 0.0;
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    if (_isPopping) return;
+
+    _controller.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) async {
+    if (_isPopping) return;
+
+    _isPopping = true;
+
+    try {
+      final animation = _controller.forward();
+
+      await Future.delayed(const Duration(milliseconds: 80));
+
+      if (mounted && widget.onSelected != null) {
+        widget.onSelected!(!widget.isSelected);
+      }
+
+      await animation;
 
       if (mounted) {
-        _isAnimating = false;
+        await _controller.reverse();
       }
-    });
+    } finally {
+      _isPopping = false;
+    }
+  }
+
+  void _onTapCancel() {
+    if (_isPopping) return;
+
+    _controller.reverse();
   }
 
   @override
@@ -81,7 +148,9 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
       ignoreContainer: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: _onTap,
+        onTapDown: _onTapDown,
+        onTapUp: _onTapUp,
+        onTapCancel: _onTapCancel,
         child: AnimatedBuilder(
           animation: _scaleAnimation,
           builder: (context, child) {
