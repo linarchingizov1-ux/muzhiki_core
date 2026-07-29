@@ -238,67 +238,64 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
           return OverlayPortal(
             controller: overlayPortalController,
             overlayChildBuilder: (context) {
-              return GestureDetector(
-                onTap: _close,
-                child: Positioned.fill(
-                  child: SafeArea(
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          bottom: 70.h,
-                          left: 17.w,
-                          child: FadeTransition(
-                            opacity: fadeAnimation,
-                            child: SlideTransition(
-                              position: slideAnimation,
-                              child: ScaleTransition(
-                                scale: scaleAnimation,
-                                alignment: Alignment.bottomCenter,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  spacing: 10.h,
-                                  children: [
-                                    MuzhikiUi.buttons.circle(
-                                      svgAsset: SupportAssets.I.svg.image,
-                                      onTap: () async {
-                                        await context
-                                            .read<AttachmentsCubit>()
-                                            .addAttachment(
-                                              type: ChatAttachmentType.photo,
-                                            );
-                                        _close();
-                                      },
-                                    ),
-                                    MuzhikiUi.buttons.circle(
-                                      svgAsset: SupportAssets.I.svg.recodeVideo,
-                                      onTap: () async {
-                                        await context
-                                            .read<AttachmentsCubit>()
-                                            .addAttachment(
-                                              type: ChatAttachmentType.video,
-                                            );
-                                        _close();
-                                      },
-                                    ),
-                                    MuzhikiUi.buttons.circle(
-                                      svgAsset: SupportAssets.I.svg.file,
-                                      onTap: () async {
-                                        await context
-                                            .read<AttachmentsCubit>()
-                                            .addAttachment(
-                                              type: ChatAttachmentType.document,
-                                            );
-                                        _close();
-                                      },
-                                    ),
-                                  ],
-                                ),
+              return Positioned.fill(
+                child: SafeArea(
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        bottom: 70.h,
+                        left: 17.w,
+                        child: FadeTransition(
+                          opacity: fadeAnimation,
+                          child: SlideTransition(
+                            position: slideAnimation,
+                            child: ScaleTransition(
+                              scale: scaleAnimation,
+                              alignment: Alignment.bottomCenter,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                spacing: 10.h,
+                                children: [
+                                  MuzhikiUi.buttons.circle(
+                                    svgAsset: SupportAssets.I.svg.image,
+                                    onTap: () async {
+                                      await context
+                                          .read<AttachmentsCubit>()
+                                          .addAttachment(
+                                            type: ChatAttachmentType.photo,
+                                          );
+                                      _close();
+                                    },
+                                  ),
+                                  MuzhikiUi.buttons.circle(
+                                    svgAsset: SupportAssets.I.svg.recodeVideo,
+                                    onTap: () async {
+                                      await context
+                                          .read<AttachmentsCubit>()
+                                          .addAttachment(
+                                            type: ChatAttachmentType.video,
+                                          );
+                                      _close();
+                                    },
+                                  ),
+                                  MuzhikiUi.buttons.circle(
+                                    svgAsset: SupportAssets.I.svg.file,
+                                    onTap: () async {
+                                      await context
+                                          .read<AttachmentsCubit>()
+                                          .addAttachment(
+                                            type: ChatAttachmentType.document,
+                                          );
+                                      _close();
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               );
