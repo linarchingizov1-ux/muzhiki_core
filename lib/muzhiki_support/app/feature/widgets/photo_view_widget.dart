@@ -32,10 +32,8 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
   late final AnimationController _dragController;
 
   double _dragDy = 0;
-  double opacity = 1;
+  double _opacity = 1;
   bool _isClosing = false;
-  double backgroundOpacity = 1;
-  double imageOpacity = 1;
 
   @override
   void initState() {
@@ -103,52 +101,13 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
     setState(() {
       _dragDy += details.delta.dy;
 
-      final progress = (_dragDy.abs() / 500).clamp(0.0, 1.0);
-
-      backgroundOpacity = 1 - progress;
-      imageOpacity = 1 - progress * 0.3;
+      _opacity = (1 - (_dragDy.abs() / 500)).clamp(0.0, 1.0);
     });
   }
 
   void _close() {
-    _animateClose();
-  }
-
-  Future<void> _animateClose({double direction = 1}) async {
-    if (_isClosing || !mounted) return;
-
+    if (_isClosing) return;
     _isClosing = true;
-
-    final startDy = _dragDy;
-
-    final animation = Tween<double>(begin: startDy, end: direction * 700)
-        .animate(
-          CurvedAnimation(parent: _dragController, curve: Curves.easeOutCubic),
-        );
-
-    void listener() {
-      if (!mounted) return;
-
-      final progress = animation.value == startDy
-          ? 0.0
-          : ((animation.value - startDy).abs() / (700 - startDy.abs())).clamp(
-              0.0,
-              1.0,
-            );
-
-      setState(() {
-        _dragDy = animation.value;
-
-        backgroundOpacity = 1 - progress;
-        imageOpacity = 1 - progress * 0.25;
-      });
-    }
-
-    animation.addListener(listener);
-
-    await _dragController.forward(from: 0);
-
-    animation.removeListener(listener);
 
     if (!mounted) return;
 
@@ -159,18 +118,15 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
     final start = _dragDy;
 
     final animation = Tween<double>(begin: start, end: 0).animate(
-      CurvedAnimation(parent: _dragController, curve: Curves.easeOutBack),
+      CurvedAnimation(parent: _dragController, curve: Curves.elasticOut),
     );
 
     void listener() {
       if (!mounted || _isClosing) return;
 
-      final progress = (animation.value.abs() / 500).clamp(0.0, 1.0);
-
       setState(() {
         _dragDy = animation.value;
-        backgroundOpacity = 1 - progress;
-        imageOpacity = 1 - progress * 0.25;
+        _opacity = (1 - (_dragDy.abs() / 500)).clamp(0.0, 1.0);
       });
     }
 
@@ -178,34 +134,19 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
 
     _dragController.forward(from: 0).then((_) {
       animation.removeListener(listener);
-
-      if (!mounted || _isClosing) return;
-
-      setState(() {
-        _dragDy = 0;
-        backgroundOpacity = 1;
-        imageOpacity = 1;
-      });
     });
   }
 
   void _onDragEnd(DragEndDetails details) {
     if (_isClosing) return;
 
-    const threshold = 120.0;
-    const velocityThreshold = 800.0;
-
+    const threshold = 120;
     final velocity = details.primaryVelocity ?? 0;
 
-    final shouldClose =
-        _dragDy.abs() > threshold || velocity.abs() > velocityThreshold;
+    final shouldClose = _dragDy.abs() > threshold || velocity.abs() > 800;
 
     if (shouldClose) {
-      final direction = _dragDy == 0
-          ? (velocity >= 0 ? 1.0 : -1.0)
-          : (_dragDy > 0 ? 1.0 : -1.0);
-
-      _animateClose(direction: direction);
+      _close();
       return;
     }
 
@@ -217,18 +158,11 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: SupportColors.black17.withValues(alpha: _opacity),
         body: widget.images.isEmpty
             ? const Center(child: Text('Нет изображений'))
             : Stack(
                 children: [
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: ColoredBox(
-                        color: SupportColors.black17.withValues(alpha: opacity),
-                      ),
-                    ),
-                  ),
                   Positioned(
                     top: 100.h,
                     left: 0,
@@ -241,7 +175,7 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
                         onVerticalDragUpdate: _onDragUpdate,
                         onVerticalDragEnd: _onDragEnd,
                         child: Opacity(
-                          opacity: opacity,
+                          opacity: _opacity,
                           child: PhotoViewGallery.builder(
                             pageController: _pageController,
                             itemCount: widget.images.length,
