@@ -112,31 +112,32 @@ class _ChatViewState extends State<ChatView> {
                   Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 0,
-                    height: 100.h,
+                    top: 0,
+                    height: topInset + 90.h,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
                             colors: [
-                              Colors.white,
-                              Colors.white.withValues(alpha: 0.8),
-                              Colors.white.withValues(alpha: 0.35),
-                              Colors.white.withValues(alpha: 0),
+                              Colors.white.withValues(alpha: 0.95),
+                              Colors.white.withValues(alpha: 0.75),
+                              Colors.white.withValues(alpha: 0.3),
+                              Colors.transparent,
                             ],
-                            stops: const [0.0, 0.3, 0.65, 1.0],
+                            stops: const [0.0, 0.25, 0.65, 1.0],
                           ),
                         ),
                       ),
                     ),
                   ),
+
                   Positioned(
                     left: 0,
                     right: 0,
-                    top: 0,
-                    height: 100.h,
+                    bottom: 0,
+                    height: bottomInset + 130.h,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -144,12 +145,12 @@ class _ChatViewState extends State<ChatView> {
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.white,
-                              Colors.white.withValues(alpha: 0.8),
-                              Colors.white.withValues(alpha: 0.35),
-                              Colors.white.withValues(alpha: 0),
+                              Colors.white.withValues(alpha: 0.95),
+                              Colors.white.withValues(alpha: 0.75),
+                              Colors.white.withValues(alpha: 0.3),
+                              Colors.transparent,
                             ],
-                            stops: const [0.0, 0.3, 0.65, 1.0],
+                            stops: const [0.0, 0.25, 0.65, 1.0],
                           ),
                         ),
                       ),
