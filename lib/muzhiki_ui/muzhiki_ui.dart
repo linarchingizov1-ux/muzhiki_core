@@ -35,7 +35,7 @@ final class MuzhikiButtons {
     required void Function(bool)? onSelected,
     required bool isSelected,
     required String label,
-    required int newMessage,
+    int newMessage = 0,
     bool isLoading = false,
   }) => ChoiceWidgets(
     isLoading: isLoading,
