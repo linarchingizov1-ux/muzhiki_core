@@ -308,6 +308,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
   Future<void> _init() async {
     final file = File(path);
+    talker.debug("Ищем файл, путь $path\nФайл: $file");
     isDownloadsFile = await file.exists();
     if (isDownloadsFile) {
       final sizeFile = await file.length();
