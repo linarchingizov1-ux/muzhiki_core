@@ -78,6 +78,40 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
     }
   }
 
+  String get fileExtension {
+    return p.extension(widget.fileName).toLowerCase().replaceFirst('.', '');
+  }
+
+  String get fileIcon {
+    switch (fileExtension) {
+      case 'pdf':
+        return SupportAssets.I.png.pdf;
+
+      case 'doc':
+      case 'docx':
+        return SupportAssets.I.png.doc;
+
+      case 'xls':
+      case 'xlsx':
+        return SupportAssets.I.png.xls;
+
+      case 'ppt':
+      case 'pptx':
+        return SupportAssets.I.png.ppt;
+
+      case 'zip':
+      case 'rar':
+      case '7z':
+        return SupportAssets.I.png.zip;
+
+      case 'txt':
+        return SupportAssets.I.png.txt;
+
+      default:
+        return SupportAssets.I.png.file;
+    }
+  }
+
   Future<void> downloads() async {
     if (isDownloadsFile || isDownloading) {
       return;
@@ -210,20 +244,21 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
           ConstrainedBox(
             constraints: BoxConstraints(maxHeight: 35.r),
             child: Container(
-              padding: EdgeInsets.all(3.r),
+              padding: EdgeInsets.all(5.r),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(8.r),
                 color: SupportColors.white,
               ),
-              child: SvgPicture.asset(
-                SupportAssets.I.svg.file,
-                width: 35.r,
-                height: 35.r,
-                colorFilter: ColorFilter.mode(
-                  SupportColors.grey,
-                  BlendMode.srcIn,
-                ),
-              ),
+              child: Image.asset(width: 25.r, height: 25.r, fileIcon),
+              // SvgPicture.asset(
+              //   SupportAssets.I.svg.file,
+              //   width: 25.r,
+              //   height: 25.r,
+              //   colorFilter: ColorFilter.mode(
+              //     SupportColors.grey,
+              //     BlendMode.srcIn,
+              //   ),
+              // ),
             ),
           ),
           SizedBox(

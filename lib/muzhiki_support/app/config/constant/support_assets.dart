@@ -12,6 +12,14 @@ class _SupportAssetsPng {
   final starEnable = '$_base/star_e.png';
   final starDisable = '$_base/star_dis.png';
   final informatorBackground = '$_base/informator_background.png';
+
+  final doc = '$_base/doc.png';
+  final pdf = '$_base/pdf.png';
+  final ppt = '$_base/ppt.png';
+  final txt = '$_base/txt.png';
+  final xls = '$_base/xls.png';
+  final zip = '$_base/zip.png';
+  final file = '$_base/file.png';
 }
 
 class _SupportAssetsSvg {
