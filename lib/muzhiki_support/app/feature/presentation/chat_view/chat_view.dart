@@ -137,7 +137,7 @@ class _ChatViewState extends State<ChatView> {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    height: 100.h,
+                    height: 130.h,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -147,10 +147,10 @@ class _ChatViewState extends State<ChatView> {
                             colors: [
                               Colors.white.withValues(alpha: 0.95),
                               Colors.white.withValues(alpha: 0.75),
-                              Colors.white.withValues(alpha: 0.3),
+                              Colors.white.withValues(alpha: 0.35),
                               Colors.transparent,
                             ],
-                            stops: const [0.0, 0.25, 0.65, 1.0],
+                            stops: const [0.0, 0.3, 0.65, 1.0],
                           ),
                         ),
                       ),
