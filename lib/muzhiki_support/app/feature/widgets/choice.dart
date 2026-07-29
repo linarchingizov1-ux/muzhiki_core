@@ -4,12 +4,13 @@ import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/notification.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/skelet.dart';
 
-class ChoiceWidgets extends StatelessWidget {
+class ChoiceWidgets extends StatefulWidget {
   final bool isSelected;
   final bool isLoading;
   final String label;
   final int newMessage;
-  final void Function(bool)? onSelected;
+  final ValueChanged<bool>? onSelected;
+
   const ChoiceWidgets({
     super.key,
     this.newMessage = 0,
@@ -20,72 +21,103 @@ class ChoiceWidgets extends StatelessWidget {
   });
 
   @override
+  State<ChoiceWidgets> createState() => _ChoiceWidgetsState();
+}
+
+class _ChoiceWidgetsState extends State<ChoiceWidgets>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+
+  bool _isAnimating = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+      reverseDuration: const Duration(milliseconds: 100),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onTap() async {
+    if (_isAnimating || widget.onSelected == null) return;
+
+    _isAnimating = true;
+
+    await _controller.forward();
+
+    if (!mounted) return;
+
+    await _controller.reverse();
+
+    if (!mounted) return;
+
+    widget.onSelected!(!widget.isSelected);
+
+    _isAnimating = false;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppSkelet(
-      enable: isLoading,
+      enable: widget.isLoading,
       ignoreContainer: true,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(48.r),
-          color: isSelected ? SupportColors.black1 : SupportColors.light,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 10.w,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w500,
-                color: isSelected ? SupportColors.white : SupportColors.black1,
-              ),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _onTap,
+        child: AnimatedBuilder(
+          animation: _scaleAnimation,
+          builder: (context, child) {
+            return Transform.scale(scale: _scaleAnimation.value, child: child);
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 11.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(48.r),
+              color: widget.isSelected
+                  ? SupportColors.black1
+                  : SupportColors.light,
             ),
-
-            if (newMessage > 0) ...[NotificationWidgets(count: newMessage)],
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: 10.w,
+              children: [
+                Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                    color: widget.isSelected
+                        ? SupportColors.white
+                        : SupportColors.black1,
+                  ),
+                ),
+                if (widget.newMessage > 0)
+                  NotificationWidgets(count: widget.newMessage),
+              ],
+            ),
+          ),
         ),
       ),
-      // ChoiceChip(
-      //   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      //   padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.h),
-      //   pressElevation: 15,
-      //   surfaceTintColor: SupportColors.white,
-      //   shadowColor: const Color.fromARGB(255, 122, 122, 122),
-      //   chipAnimationStyle: ChipAnimationStyle(
-      //     selectAnimation: AnimationStyle(
-      //       curve: Curves.easeInQuart,
-      //       reverseCurve: Curves.easeOutBack,
-      //       duration: const Duration(milliseconds: 500),
-      //     ),
-      //     enableAnimation: AnimationStyle(
-      //       curve: Curves.easeInSine,
-      //       reverseCurve: Curves.easeInQuint,
-      //       duration: const Duration(seconds: 1),
-      //     ),
-      //   ),
-      //   side: BorderSide.none,
-      //   shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadiusGeometry.circular(22.r),
-      //   ),
-      //   backgroundColor: SupportColors.light,
-      //   selectedColor: SupportColors.black1,
-      //   disabledColor: Colors.red,
-      //   elevation: 0,
-      //   showCheckmark: false,
-      //   labelStyle: TextStyle(
-      //     letterSpacing: 0,
-      //     color: isSelected ? SupportColors.white : SupportColors.black1,
-      //     fontSize: 15.sp,
-      //     fontWeight: FontWeight.w500,
-      //   ),
-      //   label: ,
-      //   selected: isSelected,
-      //   onSelected: onSelected,
-      // ),
     );
   }
 }
