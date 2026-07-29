@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,9 +30,6 @@ class TextFieldWidgets extends StatefulWidget {
 }
 
 class _TextFieldWidgetsState extends State<TextFieldWidgets> {
-  final layerCircleButton = LayerLink();
-  final OverlayPortalController overlayPortalController =
-      OverlayPortalController();
   bool get _hasText => widget.controller.text.trim().isNotEmpty;
 
   bool get _hasAttachments =>
@@ -48,60 +43,7 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
           spacing: 8.w,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // _CircleMenuAnimated(attachmentsCubit: widget.attachmentsCubit),
-            OverlayPortal(
-              controller: overlayPortalController,
-
-              overlayChildBuilder: (context) {
-                return CompositedTransformFollower(
-                  link: layerCircleButton,
-                  showWhenUnlinked: false,
-
-                  targetAnchor: Alignment.bottomCenter,
-                  followerAnchor: Alignment.topCenter,
-
-                  offset: Offset(0, -8.r),
-
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: 8.r,
-                    children: List.generate(
-                      5,
-                      (i) => GestureDetector(
-                        onTap: overlayPortalController.hide,
-                        child: Container(
-                          width: 40.r,
-                          height: 40.r,
-                          color: Colors.primaries[i % Colors.primaries.length],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-
-              child: SizedBox(
-                width: 40.r,
-                height: 40.r,
-                child: CompositedTransformTarget(
-                  link: layerCircleButton,
-                  child: GestureDetector(
-                    onTap: () {
-                      if (overlayPortalController.isShowing) {
-                        overlayPortalController.hide();
-                      } else {
-                        overlayPortalController.show();
-                      }
-                    },
-                    child: Container(
-                      width: 40.r,
-                      height: 40.r,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _CircleMenuAnimated(attachmentsCubit: widget.attachmentsCubit),
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -296,131 +238,82 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
           return OverlayPortal(
             controller: overlayPortalController,
             overlayChildBuilder: (context) {
-              return Positioned.fill(
-                child: SafeArea(
-                  child: Stack(
-                    children: [
-                      FadeTransition(
-                        opacity: fadeAnimation,
-                        child: InkWell(
-                          onTap: _close,
-                          child: const SizedBox.expand(),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 70.h + MediaQuery.paddingOf(context).bottom,
-                        left: 17.w,
-                        child: FadeTransition(
-                          opacity: fadeAnimation,
-                          child: SlideTransition(
-                            position: slideAnimation,
-                            child: ScaleTransition(
-                              scale: scaleAnimation,
-                              alignment: Alignment.bottomCenter,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: 10.h,
-                                children: [
-                                  _OverlayIconBuild(
-                                    asset: SupportAssets.I.svg.image,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.photo,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                  _OverlayIconBuild(
-                                    asset: SupportAssets.I.svg.recodeVideo,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.video,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                  _OverlayIconBuild(
-                                    asset: SupportAssets.I.svg.file,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.document,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                ],
+              return GestureDetector(
+                onTap: _close,
+                child: Positioned.fill(
+                  child: SafeArea(
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          bottom: 70.h,
+                          left: 17.w,
+                          child: FadeTransition(
+                            opacity: fadeAnimation,
+                            child: SlideTransition(
+                              position: slideAnimation,
+                              child: ScaleTransition(
+                                scale: scaleAnimation,
+                                alignment: Alignment.bottomCenter,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 10.h,
+                                  children: [
+                                    MuzhikiUi.buttons.circle(
+                                      svgAsset: SupportAssets.I.svg.image,
+                                      onTap: () async {
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.photo,
+                                            );
+                                        _close();
+                                      },
+                                    ),
+                                    MuzhikiUi.buttons.circle(
+                                      svgAsset: SupportAssets.I.svg.recodeVideo,
+                                      onTap: () async {
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.video,
+                                            );
+                                        _close();
+                                      },
+                                    ),
+                                    MuzhikiUi.buttons.circle(
+                                      svgAsset: SupportAssets.I.svg.file,
+                                      onTap: () async {
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.document,
+                                            );
+                                        _close();
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
             },
-            child: _OverlayIconBuild(
-              iconColor: isOpen ? SupportColors.blood : SupportColors.white,
-              color: isOpen ? SupportColors.white : SupportColors.blood,
-              onTap: _toggle,
-              asset: isOpen
+            child: MuzhikiUi.buttons.circle(
+              svgAsset: isOpen
                   ? SupportAssets.I.svg.close
                   : SupportAssets.I.svg.screpka,
+              backgroundColor: isOpen
+                  ? SupportColors.white
+                  : SupportColors.blood,
+              onTap: _toggle,
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _OverlayIconBuild extends StatelessWidget {
-  final VoidCallback onTap;
-  final String asset;
-  final Color? color;
-  final Color? iconColor;
-
-  const _OverlayIconBuild({
-    required this.onTap,
-    required this.asset,
-    this.color,
-    this.iconColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 45.w,
-      height: 45.w,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color ?? SupportColors.white,
-          ),
-          child: Center(
-            child: SizedBox(
-              width: 15.r,
-              height: 15.r,
-              child: SvgPicture.asset(
-                asset,
-                fit: BoxFit.contain,
-                colorFilter: ColorFilter.mode(
-                  iconColor ?? SupportColors.blood,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
