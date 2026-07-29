@@ -313,7 +313,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
               );
             },
             child: Padding(
-              padding: EdgeInsets.all(5.r),
+              padding: EdgeInsets.symmetric(horizontal: 5.r),
               child: MuzhikiUi.buttons.circle(
                 svgAsset: isOpen
                     ? SupportAssets.I.svg.close
