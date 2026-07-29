@@ -254,7 +254,13 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
     if (path != null) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12.r),
-        child: Image.file(File(path), fit: BoxFit.cover),
+        child: SizedBox.expand(
+          child: Image.file(
+            File(path),
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.medium,
+          ),
+        ),
       );
     }
 
@@ -287,10 +293,12 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
         },
         child: Hero(
           tag: tag,
-          child: Image.network(
-            remote.url,
-            filterQuality: FilterQuality.medium,
-            fit: BoxFit.cover,
+          child: SizedBox.expand(
+            child: Image.network(
+              remote.url,
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.medium,
+            ),
           ),
         ),
       ),
