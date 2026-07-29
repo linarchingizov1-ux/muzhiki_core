@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -43,11 +44,34 @@ class SupportView extends StatefulWidget {
 
 class _SupportViewState extends State<SupportView> {
   SessionRole? role;
+  late final ScrollController _scrollController;
+
+  bool _showChoiInAppBar = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+
+    _scrollController.addListener(_onScroll);
     loadChats();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final position = _scrollController.position;
+
+    final isScrollingUp =
+        position.userScrollDirection == ScrollDirection.forward;
+
+    final shouldShow = position.pixels > 0 && isScrollingUp;
+
+    if (_showChoiInAppBar != shouldShow) {
+      setState(() {
+        _showChoiInAppBar = shouldShow;
+      });
+    }
   }
 
   Future<void> loadChats() async {
@@ -87,6 +111,12 @@ class _SupportViewState extends State<SupportView> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.dark,
@@ -116,8 +146,11 @@ class _SupportViewState extends State<SupportView> {
             ),
           ),
           body: CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverHomeAppbarWidget(
+                chatCubit: widget.chatCubit,
+                showChoi: _showChoiInAppBar,
                 canPop: widget.canPop,
                 typeApp: widget.typeApp,
                 sessionApp: widget.sessionApp,
