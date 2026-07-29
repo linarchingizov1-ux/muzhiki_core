@@ -133,6 +133,29 @@ class _ChatViewState extends State<ChatView> {
                     ),
                   ),
                   Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    height: 100.h,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Colors.white,
+                              Colors.white.withValues(alpha: 0.8),
+                              Colors.white.withValues(alpha: 0.35),
+                              Colors.white.withValues(alpha: 0),
+                            ],
+                            stops: const [0.0, 0.3, 0.65, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
                     left: 17.w,
                     right: 17.w,
                     top: topInset + 10.h,
