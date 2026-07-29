@@ -24,53 +24,68 @@ class ChoiceWidgets extends StatelessWidget {
     return AppSkelet(
       enable: isLoading,
       ignoreContainer: true,
-      child: ChoiceChip(
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      child: Container(
         padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.h),
-        pressElevation: 15,
-        surfaceTintColor: SupportColors.white,
-        shadowColor: const Color.fromARGB(255, 122, 122, 122),
-        chipAnimationStyle: ChipAnimationStyle(
-          selectAnimation: AnimationStyle(
-            curve: Curves.easeInQuart,
-            reverseCurve: Curves.easeOutBack,
-            duration: const Duration(milliseconds: 500),
-          ),
-          enableAnimation: AnimationStyle(
-            curve: Curves.easeInSine,
-            reverseCurve: Curves.easeInQuint,
-            duration: const Duration(seconds: 1),
-          ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(48.r),
+          color: isSelected ? SupportColors.black1 : SupportColors.light,
         ),
-        side: BorderSide.none,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(22.r),
-        ),
-        backgroundColor: SupportColors.light,
-        selectedColor: SupportColors.black1,
-        disabledColor: Colors.red,
-        elevation: 0,
-        showCheckmark: false,
-        labelStyle: TextStyle(
-          letterSpacing: 0,
-          color: isSelected ? SupportColors.white : SupportColors.black1,
-          fontSize: 15.sp,
-          fontWeight: FontWeight.w500,
-        ),
-        label: Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 10.w,
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(label),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? SupportColors.white : SupportColors.black1,
+              ),
+            ),
 
             if (newMessage > 0) ...[NotificationWidgets(count: newMessage)],
           ],
         ),
-        selected: isSelected,
-        onSelected: onSelected,
       ),
+      // ChoiceChip(
+      //   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      //   padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.h),
+      //   pressElevation: 15,
+      //   surfaceTintColor: SupportColors.white,
+      //   shadowColor: const Color.fromARGB(255, 122, 122, 122),
+      //   chipAnimationStyle: ChipAnimationStyle(
+      //     selectAnimation: AnimationStyle(
+      //       curve: Curves.easeInQuart,
+      //       reverseCurve: Curves.easeOutBack,
+      //       duration: const Duration(milliseconds: 500),
+      //     ),
+      //     enableAnimation: AnimationStyle(
+      //       curve: Curves.easeInSine,
+      //       reverseCurve: Curves.easeInQuint,
+      //       duration: const Duration(seconds: 1),
+      //     ),
+      //   ),
+      //   side: BorderSide.none,
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadiusGeometry.circular(22.r),
+      //   ),
+      //   backgroundColor: SupportColors.light,
+      //   selectedColor: SupportColors.black1,
+      //   disabledColor: Colors.red,
+      //   elevation: 0,
+      //   showCheckmark: false,
+      //   labelStyle: TextStyle(
+      //     letterSpacing: 0,
+      //     color: isSelected ? SupportColors.white : SupportColors.black1,
+      //     fontSize: 15.sp,
+      //     fontWeight: FontWeight.w500,
+      //   ),
+      //   label: ,
+      //   selected: isSelected,
+      //   onSelected: onSelected,
+      // ),
     );
   }
 }
