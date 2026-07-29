@@ -136,7 +136,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
           children: [
             Positioned.fill(
               child: ColoredBox(
-                color: SupportColors.light.withValues(alpha: 0.3),
+                color: SupportColors.light.withValues(alpha: 0.6),
               ),
             ),
             Positioned.fill(child: _buildContent(context)),
