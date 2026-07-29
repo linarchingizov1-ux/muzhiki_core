@@ -8,6 +8,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/exception/network_map_error.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/attachment_uuid_service.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_path.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/attachments/local_attachments.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/attachments/upload_data.dart';
@@ -134,6 +135,11 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
           );
 
           final uploadFile = UploadDataModel.fromJson(response.data);
+
+          AttachmentUuidService.I.save(
+            uuid: uploadFile.uuid,
+            fileName: uploadFile.fileName,
+          );
 
           _replaceLocalWithRemote(
             localId: localItem.id,

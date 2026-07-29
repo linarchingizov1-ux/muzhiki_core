@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/network/url_launch/url_launch.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/attachment_uuid_service.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
@@ -276,6 +277,7 @@ class _BubbleAttachment extends StatelessWidget {
   final Directory directory;
   final ChatCubit chatCubit;
   final double width;
+
   const _BubbleAttachment({
     required this.attachments,
     required this.width,
@@ -286,28 +288,52 @@ class _BubbleAttachment extends StatelessWidget {
 
   int get count => attachments.length;
 
+  String getFileName(AttachmentsModel attachment) {
+    // Если сервер когда-нибудь начнёт присылать name —
+    // используем его.
+    if (attachment.name?.isNotEmpty == true) {
+      return attachment.name!;
+    }
+
+    final uri = Uri.tryParse(attachment.url);
+
+    if (uri == null || uri.pathSegments.isEmpty) {
+      return 'Файл';
+    }
+
+    final file = uri.pathSegments.last;
+    final uuid = file.split('.').first;
+
+    return AttachmentUuidService.I.get(uuid) ?? 'Файл';
+  }
+
   @override
   Widget build(BuildContext context) {
     switch (count) {
       case 1:
+        final attachment = attachments.first;
+
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 11.w),
-          child: switch (attachments.first.type) {
+          child: switch (attachment.type) {
             ChatAttachmentType.document => AttachmentWidgets.document(
               directory: directory,
-              url: attachments.first.url,
-              fileName: attachments.first.name ?? "Файл",
+              url: attachment.url,
+              fileName: getFileName(attachment),
             ),
+
             ChatAttachmentType.photo => AttachmentWidgets.photo(
               websocketChat: websocketChat,
-              attachment: attachments.first,
+              attachment: attachment,
             ),
+
             ChatAttachmentType.video => AttachmentWidgets.video(
               directory: directory,
-              url: attachments.first.url,
+              url: attachment.url,
             ),
           },
         );
+
       default:
         return ConstrainedBox(
           constraints: BoxConstraints(maxWidth: width * 0.75, maxHeight: 77.w),
@@ -317,21 +343,25 @@ class _BubbleAttachment extends StatelessWidget {
             child: Row(
               spacing: 5.w,
               children: List.generate(attachments.length, (index) {
+                final attachment = attachments[index];
+
                 return SizedBox(
                   height: 77.w,
-                  child: switch (attachments[index].type) {
+                  child: switch (attachment.type) {
                     ChatAttachmentType.document => AttachmentWidgets.document(
                       directory: directory,
-                      url: attachments[index].url,
-                      fileName: attachments[index].name ?? "Файл",
+                      url: attachment.url,
+                      fileName: getFileName(attachment),
                     ),
+
                     ChatAttachmentType.photo => AttachmentWidgets.photo(
                       websocketChat: websocketChat,
-                      attachment: attachments[index],
+                      attachment: attachment,
                     ),
+
                     ChatAttachmentType.video => AttachmentWidgets.video(
                       directory: directory,
-                      url: attachments[index].url,
+                      url: attachment.url,
                     ),
                   },
                 );
