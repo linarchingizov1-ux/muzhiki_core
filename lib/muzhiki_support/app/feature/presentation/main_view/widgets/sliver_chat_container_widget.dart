@@ -121,10 +121,10 @@ class SliverChatContainerWidget extends StatelessWidget {
                       true => SliverFillRemaining(
                         child: Center(
                           child: Text(
-                            "У вас нет обращений",
+                            "В этом канале пока нет обращений",
                             style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
                               color: SupportColors.grey,
                             ),
                           ),
