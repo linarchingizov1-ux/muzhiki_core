@@ -114,26 +114,30 @@ class _ChatViewState extends State<ChatView> {
                     chatCubit: widget.chatCubit,
                     directory: widget.directory,
                   ),
-                  AnimatedPositioned(
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeOut,
+                  Positioned(
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    height: isOpenKeyboard ? 50.h : 100.h,
-                    child: IgnorePointer(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.white,
-                              Colors.white.withValues(alpha: 0.8),
-                              Colors.white.withValues(alpha: 0.35),
-                              Colors.white.withValues(alpha: 0),
-                            ],
-                            stops: const [0.0, 0.3, 0.65, 1.0],
+                    child: AnimatedSize(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOut,
+                      child: SizedBox(
+                        height: isOpenKeyboard ? 50.h : 100.h,
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.white,
+                                  Colors.white.withValues(alpha: 0.8),
+                                  Colors.white.withValues(alpha: 0.35),
+                                  Colors.white.withValues(alpha: 0),
+                                ],
+                                stops: const [0.0, 0.3, 0.65, 1.0],
+                              ),
+                            ),
                           ),
                         ),
                       ),
