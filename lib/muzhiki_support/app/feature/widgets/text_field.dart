@@ -3,7 +3,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
@@ -73,6 +72,9 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                         maxLines: 10,
                         minLines: 1,
                         expands: false,
+                        cursorColor: SupportColors.black1,
+                        cursorWidth: 2.w,
+                        cursorHeight: 4.h,
                         textAlignVertical: TextAlignVertical.top,
                         onChanged: (_) => setState(() {}),
                         style: TextStyle(
@@ -310,14 +312,17 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                 ),
               );
             },
-            child: MuzhikiUi.buttons.circle(
-              svgAsset: isOpen
-                  ? SupportAssets.I.svg.close
-                  : SupportAssets.I.svg.screpka,
-              backgroundColor: isOpen
-                  ? SupportColors.white
-                  : SupportColors.blood,
-              onTap: _toggle,
+            child: Padding(
+              padding: EdgeInsets.all(5.r),
+              child: MuzhikiUi.buttons.circle(
+                svgAsset: isOpen
+                    ? SupportAssets.I.svg.close
+                    : SupportAssets.I.svg.screpka,
+                backgroundColor: isOpen
+                    ? SupportColors.white
+                    : SupportColors.blood,
+                onTap: _toggle,
+              ),
             ),
           );
         },
