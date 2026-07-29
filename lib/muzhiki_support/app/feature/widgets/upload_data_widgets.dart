@@ -128,6 +128,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
       height: 65.w,
       width: 65.w,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(11.r)),
+      clipBehavior: Clip.hardEdge,
       child: AnimatedSwitcher(
         key: ValueKey(widget.item),
         duration: const Duration(milliseconds: 500),
@@ -135,7 +136,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
           children: [
             Positioned.fill(
               child: ColoredBox(
-                color: SupportColors.black1.withValues(alpha: 0.5),
+                color: SupportColors.light.withValues(alpha: 0.3),
               ),
             ),
             Positioned.fill(child: _buildContent(context)),
