@@ -57,8 +57,8 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                   link: layerCircleButton,
                   showWhenUnlinked: false,
 
-                  targetAnchor: Alignment.topCenter,
-                  followerAnchor: Alignment.bottomCenter,
+                  targetAnchor: Alignment.bottomCenter,
+                  followerAnchor: Alignment.topCenter,
 
                   offset: layerCircleButton.leader != null
                       ? layerCircleButton.leader!.offset
