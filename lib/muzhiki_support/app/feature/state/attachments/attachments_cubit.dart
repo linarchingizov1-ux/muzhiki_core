@@ -14,6 +14,7 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/attachments/l
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/attachments/upload_data.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:path/path.dart' as p;
+import 'package:talker/talker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_compress/video_compress.dart';
 
@@ -237,22 +238,56 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
     if (!await file.exists()) {
       throw FileSystemException('Не удается найти указанный файл', file.path);
     }
+    final talker = Talker();
+    final beforeSize = await file.length();
+
+    talker.debug('══════════════════════════════════════');
+    talker.debug('COMPRESS START');
+    talker.debug('path: ${file.path}');
+    talker.debug(
+      'before size: ${(beforeSize / 1024 / 1024).toStringAsFixed(2)} MB',
+    );
 
     final targetPath = p.join(
       directory.path,
       'img_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
 
+    talker.debug('target: $targetPath');
+
     final result = await FlutterImageCompress.compressAndGetFile(
       file.path,
       targetPath,
-      quality: 90,
-      minWidth: 1280,
-      minHeight: 720,
+      quality: 80,
       format: CompressFormat.jpeg,
     );
 
-    return result == null ? null : File(result.path);
+    if (result == null) {
+      talker.debug('❌ COMPRESS RESULT: NULL');
+      talker.debug('══════════════════════════════════════');
+      return null;
+    }
+
+    final compressedFile = File(result.path);
+    final afterSize = await compressedFile.length();
+
+    talker.debug('✅ COMPRESS SUCCESS');
+    talker.debug('result: ${result.path}');
+    talker.debug(
+      'after size: ${(afterSize / 1024 / 1024).toStringAsFixed(2)} MB',
+    );
+    talker.debug(
+      'compression: '
+      '${(beforeSize / 1024 / 1024).toStringAsFixed(2)} MB → '
+      '${(afterSize / 1024 / 1024).toStringAsFixed(2)} MB',
+    );
+    talker.debug(
+      'saved: '
+      '${((1 - afterSize / beforeSize) * 100).toStringAsFixed(1)}%',
+    );
+    talker.debug('══════════════════════════════════════');
+
+    return compressedFile;
   }
 
   Future<File?> compressVideoFile(File file) async {
