@@ -14,8 +14,6 @@ import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/attachments/l
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/attachments/upload_data.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:path/path.dart' as p;
-import 'package:talker/talker.dart';
-import 'package:image/image.dart' as img;
 import 'package:uuid/uuid.dart';
 import 'package:video_compress/video_compress.dart';
 
@@ -236,79 +234,14 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
   }
 
   Future<File?> compressImageFile(File file) async {
-    final talker = Talker();
-
-    talker.debug('════════════════════════════════════════════');
-    talker.debug('📸 НАЧАЛО ОБРАБОТКИ ФОТОГРАФИИ');
-    talker.debug('════════════════════════════════════════════');
-
-    // ─────────────────────────────────────────────
-    // 1. Проверяем существование файла
-    // ─────────────────────────────────────────────
-
     if (!await file.exists()) {
-      talker.error(
-        '❌ Исходный файл не существует',
-        FileSystemException('Не удается найти указанный файл', file.path),
-      );
-
-      return null;
+      throw FileSystemException('Не удается найти указанный файл', file.path);
     }
-
-    talker.debug('📁 Исходный файл:');
-    talker.debug('   ${file.path}');
-
-    // ─────────────────────────────────────────────
-    // 2. Размер и разрешение ДО сжатия
-    // ─────────────────────────────────────────────
-
-    final beforeBytes = await file.readAsBytes();
-    final beforeSize = beforeBytes.length;
-
-    final beforeImage = img.decodeImage(beforeBytes);
-
-    final beforeWidth = beforeImage?.width;
-    final beforeHeight = beforeImage?.height;
-
-    talker.debug('📐 ДО СЖАТИЯ:');
-
-    if (beforeWidth != null && beforeHeight != null) {
-      talker.debug('   Разрешение: ${beforeWidth} × $beforeHeight px');
-
-      talker.debug(
-        '   Соотношение сторон: '
-        '${(beforeWidth / beforeHeight).toStringAsFixed(3)}',
-      );
-    } else {
-      talker.warning('⚠️ Не удалось определить разрешение исходной фотографии');
-    }
-
-    talker.debug(
-      '   Размер файла: '
-      '${(beforeSize / 1024 / 1024).toStringAsFixed(3)} MB '
-      '(${(beforeSize / 1024).toStringAsFixed(1)} KB)',
-    );
-
-    // ─────────────────────────────────────────────
-    // 3. Путь нового файла
-    // ─────────────────────────────────────────────
 
     final targetPath = p.join(
       directory.path,
       'img_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
-
-    talker.debug('📁 Файл после сжатия будет сохранён:');
-    talker.debug('   $targetPath');
-
-    // ─────────────────────────────────────────────
-    // 4. Сжатие
-    // ─────────────────────────────────────────────
-
-    talker.debug('🔄 Начинаю сжатие...');
-    talker.debug('   Качество JPEG: 80');
-    talker.debug('   Формат: JPEG');
-    talker.debug('   Ограничение разрешения: отсутствует');
 
     final result = await FlutterImageCompress.compressAndGetFile(
       file.path,
@@ -317,116 +250,7 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
       format: CompressFormat.jpeg,
     );
 
-    // ─────────────────────────────────────────────
-    // 5. Проверяем результат
-    // ─────────────────────────────────────────────
-
-    if (result == null) {
-      talker.error('❌ Сжатие не выполнено: результат = null');
-
-      talker.debug('════════════════════════════════════════════');
-
-      return null;
-    }
-
-    final compressedFile = File(result.path);
-
-    if (!await compressedFile.exists()) {
-      talker.error(
-        '❌ FlutterImageCompress вернул путь, '
-        'но файл по этому пути не существует',
-      );
-
-      talker.debug('   ${result.path}');
-      talker.debug('════════════════════════════════════════════');
-
-      return null;
-    }
-
-    // ─────────────────────────────────────────────
-    // 6. Размер и разрешение ПОСЛЕ сжатия
-    // ─────────────────────────────────────────────
-
-    final afterBytes = await compressedFile.readAsBytes();
-    final afterSize = afterBytes.length;
-
-    final afterImage = img.decodeImage(afterBytes);
-
-    final afterWidth = afterImage?.width;
-    final afterHeight = afterImage?.height;
-
-    talker.debug('✅ СЖАТИЕ УСПЕШНО');
-
-    talker.debug('📐 ПОСЛЕ СЖАТИЯ:');
-
-    if (afterWidth != null && afterHeight != null) {
-      talker.debug('   Разрешение: ${afterWidth} × $afterHeight px');
-
-      talker.debug(
-        '   Соотношение сторон: '
-        '${(afterWidth / afterHeight).toStringAsFixed(3)}',
-      );
-    } else {
-      talker.warning('⚠️ Не удалось определить разрешение сжатой фотографии');
-    }
-
-    talker.debug(
-      '   Размер файла: '
-      '${(afterSize / 1024 / 1024).toStringAsFixed(3)} MB '
-      '(${(afterSize / 1024).toStringAsFixed(1)} KB)',
-    );
-
-    // ─────────────────────────────────────────────
-    // 7. Сравнение
-    // ─────────────────────────────────────────────
-
-    final savedPercent = beforeSize == 0
-        ? 0
-        : (1 - afterSize / beforeSize) * 100;
-
-    talker.debug('📊 СРАВНЕНИЕ:');
-
-    talker.debug(
-      '   Размер: '
-      '${(beforeSize / 1024 / 1024).toStringAsFixed(3)} MB → '
-      '${(afterSize / 1024 / 1024).toStringAsFixed(3)} MB',
-    );
-
-    talker.debug(
-      '   Изменение размера файла: '
-      '${savedPercent.toStringAsFixed(1)}%',
-    );
-
-    if (beforeWidth != null &&
-        beforeHeight != null &&
-        afterWidth != null &&
-        afterHeight != null) {
-      talker.debug(
-        '   Разрешение: '
-        '${beforeWidth}×$beforeHeight → '
-        '${afterWidth}×$afterHeight',
-      );
-
-      final beforeRatio = beforeWidth / beforeHeight;
-      final afterRatio = afterWidth / afterHeight;
-
-      final ratioChanged = (beforeRatio - afterRatio).abs() > 0.01;
-
-      if (ratioChanged) {
-        talker.warning('⚠️ ВНИМАНИЕ: изменилось соотношение сторон!');
-      } else {
-        talker.debug('   Соотношение сторон не изменилось ✅');
-      }
-    }
-
-    talker.debug('📁 Итоговый файл:');
-    talker.debug('   ${compressedFile.path}');
-
-    talker.debug('════════════════════════════════════════════');
-    talker.debug('🏁 ОБРАБОТКА ФОТОГРАФИИ ЗАВЕРШЕНА');
-    talker.debug('════════════════════════════════════════════');
-
-    return compressedFile;
+    return result == null ? null : File(result.path);
   }
 
   Future<File?> compressVideoFile(File file) async {
