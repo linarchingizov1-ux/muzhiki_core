@@ -164,8 +164,8 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 220),
-      reverseDuration: const Duration(milliseconds: 160),
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 80),
     );
 
     fadeAnimation = CurvedAnimation(
@@ -256,7 +256,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                 padding: EdgeInsets.all(5.r),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(48.r),
-                                  color: SupportColors.grey
+                                  color: SupportColors.light
                                     ..withValues(alpha: 0.2),
                                 ),
                                 child: Column(
@@ -264,7 +264,6 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                   spacing: 10.h,
                                   children: [
                                     MuzhikiUi.buttons.circle(
-                                      size: 30,
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.image,
                                       onTap: () async {
@@ -277,7 +276,6 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       },
                                     ),
                                     MuzhikiUi.buttons.circle(
-                                      size: 30,
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.recodeVideo,
                                       onTap: () async {
@@ -290,7 +288,6 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       },
                                     ),
                                     MuzhikiUi.buttons.circle(
-                                      size: 30,
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.file,
                                       onTap: () async {
@@ -315,7 +312,6 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
               );
             },
             child: MuzhikiUi.buttons.circle(
-              size: 38,
               svgAsset: isOpen
                   ? SupportAssets.I.svg.close
                   : SupportAssets.I.svg.screpka,
