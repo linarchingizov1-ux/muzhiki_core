@@ -123,21 +123,18 @@ class _ChatViewState extends State<ChatView> {
                         duration: const Duration(milliseconds: 250),
                         curve: Curves.easeOut,
                         opacity: isOpenKeyboard ? 0.65 : 1,
-                        child: SizedBox(
-                          height: 100.h,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  Colors.white,
-                                  Colors.white.withValues(alpha: 0.8),
-                                  Colors.white.withValues(alpha: 0.35),
-                                  Colors.transparent,
-                                ],
-                                stops: const [0.0, 0.3, 0.65, 1.0],
-                              ),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.white,
+                                Colors.white.withValues(alpha: 0.8),
+                                Colors.white.withValues(alpha: 0.35),
+                                Colors.white.withValues(alpha: 0),
+                              ],
+                              stops: const [0.0, 0.3, 0.65, 1.0],
                             ),
                           ),
                         ),
