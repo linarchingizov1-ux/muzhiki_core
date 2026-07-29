@@ -114,11 +114,13 @@ class _ChatViewState extends State<ChatView> {
                     chatCubit: widget.chatCubit,
                     directory: widget.directory,
                   ),
-                  Positioned(
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    height: isOpenKeyboard ? 30.h : 100.h,
+                    height: isOpenKeyboard ? 50.h : 100.h,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
