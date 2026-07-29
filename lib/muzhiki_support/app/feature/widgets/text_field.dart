@@ -166,8 +166,8 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 150),
-      reverseDuration: const Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: 80),
+      reverseDuration: const Duration(milliseconds: 50),
     );
 
     fadeAnimation = CurvedAnimation(
@@ -244,7 +244,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                   child: Stack(
                     children: [
                       Positioned(
-                        bottom: 70.h,
+                        bottom: 62.h,
                         left: 17.w,
                         child: FadeTransition(
                           opacity: fadeAnimation,
