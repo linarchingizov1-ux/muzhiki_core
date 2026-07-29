@@ -309,9 +309,10 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
   Future<void> _init() async {
     final file = File(path);
     isDownloadsFile = await file.exists();
-
     if (isDownloadsFile) {
-      totalFileSize = await file.length();
+      final sizeFile = await file.length();
+      totalFileSize = sizeFile;
+      talker.debug("Файл уже скачен, его размер $sizeFile");
     }
 
     if (mounted) setState(() {});
@@ -385,9 +386,6 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
   @override
   Widget build(BuildContext context) {
-    talker.debug(
-      'BUILD: ${widget.fileName}, size=$totalFileSize, text=$fileSizeText',
-    );
     return GestureDetector(
       onTap: openReadFile,
       child: Row(
