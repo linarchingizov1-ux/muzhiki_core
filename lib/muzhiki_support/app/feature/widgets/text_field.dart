@@ -164,29 +164,29 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
-      reverseDuration: const Duration(milliseconds: 50),
+      duration: const Duration(milliseconds: 220),
+      reverseDuration: const Duration(milliseconds: 160),
     );
 
     fadeAnimation = CurvedAnimation(
       parent: animationController,
-      curve: Curves.easeOut,
-      reverseCurve: Curves.easeIn,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
     );
 
-    scaleAnimation = Tween<double>(begin: 0.7, end: 1).animate(
+    scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
       CurvedAnimation(
         parent: animationController,
-        curve: Curves.easeOutBack,
-        reverseCurve: Curves.easeIn,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
       ),
     );
 
     slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero).animate(
           CurvedAnimation(
             parent: animationController,
-            curve: Curves.ease,
+            curve: Curves.easeOutCubic,
             reverseCurve: Curves.easeInCubic,
           ),
         );
@@ -245,24 +245,26 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                       Positioned(
                         bottom: 70.h,
                         left: 17.w,
-                        child: Container(
-                          padding: EdgeInsets.all(2.r),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(48.r),
-                            color: SupportColors.black1..withValues(alpha: 0.5),
-                          ),
-                          child: FadeTransition(
-                            opacity: fadeAnimation,
-                            child: SlideTransition(
-                              position: slideAnimation,
-                              child: ScaleTransition(
-                                scale: scaleAnimation,
-                                alignment: Alignment.bottomCenter,
+                        child: FadeTransition(
+                          opacity: fadeAnimation,
+                          child: SlideTransition(
+                            position: slideAnimation,
+                            child: ScaleTransition(
+                              scale: scaleAnimation,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                padding: EdgeInsets.all(5.r),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(48.r),
+                                  color: SupportColors.grey
+                                    ..withValues(alpha: 0.2),
+                                ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   spacing: 10.h,
                                   children: [
                                     MuzhikiUi.buttons.circle(
+                                      size: 30,
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.image,
                                       onTap: () async {
@@ -275,6 +277,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       },
                                     ),
                                     MuzhikiUi.buttons.circle(
+                                      size: 30,
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.recodeVideo,
                                       onTap: () async {
@@ -287,6 +290,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       },
                                     ),
                                     MuzhikiUi.buttons.circle(
+                                      size: 30,
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.file,
                                       onTap: () async {
@@ -311,6 +315,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
               );
             },
             child: MuzhikiUi.buttons.circle(
+              size: 38,
               svgAsset: isOpen
                   ? SupportAssets.I.svg.close
                   : SupportAssets.I.svg.screpka,
