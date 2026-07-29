@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -60,66 +61,75 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
 
                   offset: Offset(0, -8.r),
 
-                  child: SizedBox(
-                    height: 80.h,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 8.r,
-                      children: [
-                        MuzhikiUi.buttons.circle(
-                          onTap: () {
-                            overlayPortalController.hide();
-
-                            widget.attachmentsCubit.addAttachment(
-                              type: ChatAttachmentType.photo,
-                            );
-                          },
-                          backgroundColor: SupportColors.blood,
-                          icon: Icons.photo,
-                        ),
-
-                        MuzhikiUi.buttons.circle(
-                          onTap: () {
-                            overlayPortalController.hide();
-
-                            widget.attachmentsCubit.addAttachment(
-                              type: ChatAttachmentType.video,
-                            );
-                          },
-
-                          backgroundColor: SupportColors.blood,
-                          icon: Icons.videocam,
-                        ),
-
-                        MuzhikiUi.buttons.circle(
-                          onTap: () {
-                            overlayPortalController.hide();
-
-                            widget.attachmentsCubit.addAttachment(
-                              type: ChatAttachmentType.document,
-                            );
-                          },
-                          backgroundColor: SupportColors.blood,
-                          icon: Icons.insert_drive_file,
-                        ),
-                      ],
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 8.r,
+                    children: List.generate(
+                      5,
+                      (i) => Container(
+                        height: 40.r,
+                        width: 40.r,
+                        color: Colors.primaries[i % Colors.primaries.length],
+                      ),
                     ),
+
+                    // MuzhikiUi.buttons.circle(
+                    //   onTap: () {
+                    //     overlayPortalController.hide();
+
+                    //     widget.attachmentsCubit.addAttachment(
+                    //       type: ChatAttachmentType.photo,
+                    //     );
+                    //   },
+                    //   backgroundColor: SupportColors.blood,
+                    //   icon: Icons.photo,
+                    // ),
+
+                    // MuzhikiUi.buttons.circle(
+                    //   onTap: () {
+                    //     overlayPortalController.hide();
+
+                    //     widget.attachmentsCubit.addAttachment(
+                    //       type: ChatAttachmentType.video,
+                    //     );
+                    //   },
+
+                    //   backgroundColor: SupportColors.blood,
+                    //   icon: Icons.videocam,
+                    // ),
+
+                    // MuzhikiUi.buttons.circle(
+                    //   onTap: () {
+                    //     overlayPortalController.hide();
+
+                    //     widget.attachmentsCubit.addAttachment(
+                    //       type: ChatAttachmentType.document,
+                    //     );
+                    //   },
+                    //   backgroundColor: SupportColors.blood,
+                    //   icon: Icons.insert_drive_file,
+                    // ),
                   ),
                 );
               },
               child: CompositedTransformTarget(
                 link: layerCircleButton,
-                child: MuzhikiUi.buttons.circle(
-                  onTap: () {
-                    if (overlayPortalController.isShowing) {
-                      overlayPortalController.hide();
-                    } else {
-                      overlayPortalController.show();
-                    }
-                  },
-                  backgroundColor: SupportColors.blood,
-                  svgAsset: SupportAssets.I.svg.screpka,
+                child: Container(
+                  height: 40.r,
+                  width: 40.r,
+                  color: Colors.black,
                 ),
+                // MuzhikiUi.buttons.circle(
+                //   onTap: () {
+                //     if (overlayPortalController.isShowing) {
+                //       overlayPortalController.hide();
+                //     } else {
+                //       overlayPortalController.show();
+                //     }
+                //   },
+                //   backgroundColor: SupportColors.blood,
+                //   svgAsset: SupportAssets.I.svg.screpka,
+                // ),
               ),
             ),
             Expanded(
