@@ -55,51 +55,55 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                   link: layerCircleButton,
                   showWhenUnlinked: false,
 
-                  targetAnchor: Alignment.bottomCenter,
-                  followerAnchor: Alignment.topCenter,
+                  targetAnchor: Alignment.topCenter,
+                  followerAnchor: Alignment.bottomCenter,
 
                   offset: Offset(0, -8.r),
 
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: 8.r,
-                    children: [
-                      MuzhikiUi.buttons.circle(
-                        onTap: () {
-                          overlayPortalController.hide();
+                  child: SizedBox(
+                    height: 80.h,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 8.r,
+                      children: [
+                        MuzhikiUi.buttons.circle(
+                          onTap: () {
+                            overlayPortalController.hide();
 
-                          widget.attachmentsCubit.addAttachment(
-                            type: ChatAttachmentType.photo,
-                          );
-                        },
-                        backgroundColor: SupportColors.white,
-                        icon: Icons.photo,
-                      ),
+                            widget.attachmentsCubit.addAttachment(
+                              type: ChatAttachmentType.photo,
+                            );
+                          },
+                          backgroundColor: SupportColors.blood,
+                          icon: Icons.photo,
+                        ),
 
-                      MuzhikiUi.buttons.circle(
-                        onTap: () {
-                          overlayPortalController.hide();
+                        MuzhikiUi.buttons.circle(
+                          onTap: () {
+                            overlayPortalController.hide();
 
-                          widget.attachmentsCubit.addAttachment(
-                            type: ChatAttachmentType.video,
-                          );
-                        },
-                        backgroundColor: SupportColors.white,
-                        icon: Icons.videocam,
-                      ),
+                            widget.attachmentsCubit.addAttachment(
+                              type: ChatAttachmentType.video,
+                            );
+                          },
 
-                      MuzhikiUi.buttons.circle(
-                        onTap: () {
-                          overlayPortalController.hide();
+                          backgroundColor: SupportColors.blood,
+                          icon: Icons.videocam,
+                        ),
 
-                          widget.attachmentsCubit.addAttachment(
-                            type: ChatAttachmentType.document,
-                          );
-                        },
-                        backgroundColor: SupportColors.white,
-                        icon: Icons.insert_drive_file,
-                      ),
-                    ],
+                        MuzhikiUi.buttons.circle(
+                          onTap: () {
+                            overlayPortalController.hide();
+
+                            widget.attachmentsCubit.addAttachment(
+                              type: ChatAttachmentType.document,
+                            );
+                          },
+                          backgroundColor: SupportColors.blood,
+                          icon: Icons.insert_drive_file,
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
