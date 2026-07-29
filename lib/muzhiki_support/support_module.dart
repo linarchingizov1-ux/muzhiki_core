@@ -67,7 +67,7 @@ class SupportModule {
         name: routeConstant.videoView,
         builder: (context, state) {
           final url = state.uri.queryParameters['url']!;
-          final preview = state.extra as String?;
+          final preview = state.extra as Uint8List?;
           return ChatVideoPlayerView(url: url, preview: preview);
         },
       ),

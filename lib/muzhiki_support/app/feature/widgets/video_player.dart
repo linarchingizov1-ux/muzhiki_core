@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -10,7 +9,8 @@ import 'package:video_player/video_player.dart';
 
 class ChatVideoPlayerView extends StatefulWidget {
   final String url;
-  final String? preview;
+  final Uint8List? preview;
+
   const ChatVideoPlayerView({super.key, required this.url, this.preview});
 
   @override
@@ -24,7 +24,9 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
   @override
   void initState() {
     super.initState();
+
     controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+
     initializeFuture = controller.initialize();
   }
 
@@ -36,6 +38,7 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
 
   void togglePlay() {
     if (!controller.value.isInitialized) return;
+
     setState(() {
       if (controller.value.isPlaying) {
         controller.pause();
@@ -55,12 +58,12 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: SafeArea(
-          child: FutureBuilder(
+          child: FutureBuilder<void>(
             future: initializeFuture,
             builder: (context, snapshot) {
               return Stack(
@@ -71,8 +74,7 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
                     child: Builder(
                       builder: (context) {
                         if (snapshot.connectionState != ConnectionState.done &&
-                            widget.preview != null &&
-                            widget.preview!.isNotEmpty) {
+                            widget.preview != null) {
                           return Center(
                             child: ImageFiltered(
                               imageFilter: ImageFilter.blur(
@@ -81,21 +83,21 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
                               ),
                               child: Container(
                                 color: Colors.white.withValues(alpha: 0.04),
-                                child: Image.file(
+                                child: Image.memory(
+                                  widget.preview!,
                                   fit: BoxFit.cover,
-                                  File(widget.preview!),
                                 ),
                               ),
                             ),
                           );
-                        } else {
-                          return Center(
-                            child: AspectRatio(
-                              aspectRatio: controller.value.aspectRatio,
-                              child: VideoPlayer(controller),
-                            ),
-                          );
                         }
+
+                        return Center(
+                          child: AspectRatio(
+                            aspectRatio: controller.value.aspectRatio,
+                            child: VideoPlayer(controller),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -133,6 +135,7 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
                         ),
                       ),
                     ),
+
                   Positioned(
                     left: 16.w,
                     right: 16.w,
@@ -148,10 +151,12 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
                       padding: EdgeInsets.zero,
                     ),
                   ),
+
                   ValueListenableBuilder(
                     valueListenable: controller,
                     builder: (context, value, child) {
                       final bool muteSound = value.volume == 0;
+
                       return Positioned(
                         right: 16.w,
                         bottom: 40.h,
@@ -165,6 +170,7 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
                       );
                     },
                   ),
+
                   Positioned(
                     top: 12,
                     left: 12,
