@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +42,6 @@ class SupportView extends StatefulWidget {
 }
 
 class _SupportViewState extends State<SupportView> {
-  final ValueNotifier<bool> _showChoiInAppBar = ValueNotifier(false);
   SessionRole? role;
 
   @override
@@ -89,12 +87,6 @@ class _SupportViewState extends State<SupportView> {
   }
 
   @override
-  void dispose() {
-    _showChoiInAppBar.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.dark,
@@ -123,35 +115,22 @@ class _SupportViewState extends State<SupportView> {
               },
             ),
           ),
-          body: NotificationListener<UserScrollNotification>(
-            onNotification: (notification) {
-              if (notification.direction == ScrollDirection.forward) {
-                _showChoiInAppBar.value = true;
-              } else if (notification.direction == ScrollDirection.reverse) {
-                _showChoiInAppBar.value = false;
-              }
-
-              return false;
-            },
-            child: CustomScrollView(
-              slivers: [
-                SliverHomeAppbarWidget(
-                  chatCubit: widget.chatCubit,
-                  showChoi: _showChoiInAppBar,
-                  canPop: widget.canPop,
-                  typeApp: widget.typeApp,
-                  sessionApp: widget.sessionApp,
-                  firebaseRemoveFCM: widget.firebaseRemoveFCM,
-                ),
-                if (widget.showInformator) const SliverInformator(),
-                SliverChoiWidget(chatCubit: widget.chatCubit),
-                SliverChatContainerWidget(
-                  chatCubit: widget.chatCubit,
-                  homeRoute: widget.homeRoute,
-                  profileRoute: widget.profileRoute,
-                ),
-              ],
-            ),
+          body: CustomScrollView(
+            slivers: [
+              SliverHomeAppbarWidget(
+                canPop: widget.canPop,
+                typeApp: widget.typeApp,
+                sessionApp: widget.sessionApp,
+                firebaseRemoveFCM: widget.firebaseRemoveFCM,
+              ),
+              if (widget.showInformator) const SliverInformator(),
+              SliverChoiWidget(chatCubit: widget.chatCubit),
+              SliverChatContainerWidget(
+                chatCubit: widget.chatCubit,
+                homeRoute: widget.homeRoute,
+                profileRoute: widget.profileRoute,
+              ),
+            ],
           ),
         ),
       ),
