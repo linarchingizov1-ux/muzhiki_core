@@ -24,7 +24,7 @@ class SliverChoiWidget extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     separatorBuilder: (context, index) => SizedBox(width: 5.w),
                     itemCount: 2,
-                    padding: EdgeInsets.zero,
+                    padding: EdgeInsets.symmetric(horizontal: 17.w),
                     itemBuilder: (context, i) {
                       return ChoiceWidgets(
                         isLoading: true,
@@ -47,27 +47,33 @@ class SliverChoiWidget extends StatelessWidget {
                 automaticallyImplyLeading: false,
                 primary: false,
                 forceMaterialTransparency: true,
-                stretchTriggerOffset: 40.h,
                 pinned: true,
                 stretch: false,
                 elevation: 0,
                 scrolledUnderElevation: 0,
+
+                titleSpacing: 0,
+
                 title: SizedBox(
                   height: 40.h,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    separatorBuilder: (context, index) => SizedBox(width: 5.w),
+                    padding: EdgeInsets.symmetric(horizontal: 17.w),
+                    separatorBuilder: (_, _) => SizedBox(width: 5.w),
                     itemCount: state.myChat!.channels.length,
-                    padding: EdgeInsets.zero,
                     itemBuilder: (context, i) {
                       final channel = state.myChat!.channels[i];
+
                       return ChoiceWidgets(
                         newMessage: state.myChat!.chats.unreadByChannel(
                           channel.id,
                         ),
-                        onSelected: (v) => context
-                            .read<ChatCubit>()
-                            .selecteChannel(index: i, channelId: channel.id),
+                        onSelected: (v) {
+                          context.read<ChatCubit>().selecteChannel(
+                            index: i,
+                            channelId: channel.id,
+                          );
+                        },
                         isSelected: i == state.selectedChannels,
                         label: channel.name,
                       );
