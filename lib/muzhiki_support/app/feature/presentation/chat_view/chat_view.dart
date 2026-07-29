@@ -113,7 +113,7 @@ class _ChatViewState extends State<ChatView> {
                     left: 0,
                     right: 0,
                     top: 0,
-                    height: topInset + 90.h,
+                    height: 100.h,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -137,7 +137,7 @@ class _ChatViewState extends State<ChatView> {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    height: bottomInset + 130.h,
+                    height: 100.h,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
