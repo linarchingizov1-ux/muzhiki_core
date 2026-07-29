@@ -19,12 +19,12 @@ class SliverChoiWidget extends StatelessWidget {
             case StateStatus.loading:
               return SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 40.h,
+                  height: 42.h,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     separatorBuilder: (context, index) => SizedBox(width: 5.w),
                     itemCount: 2,
-                    padding: EdgeInsets.symmetric(horizontal: 17.w),
+                    padding: EdgeInsets.zero,
                     itemBuilder: (context, i) {
                       return ChoiceWidgets(
                         isLoading: true,

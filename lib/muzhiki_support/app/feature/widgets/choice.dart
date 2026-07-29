@@ -37,15 +37,15 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 120),
-      reverseDuration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 180),
+      reverseDuration: const Duration(milliseconds: 140),
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
+        reverseCurve: Curves.easeInOutCubic,
       ),
     );
   }
@@ -56,22 +56,22 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
     super.dispose();
   }
 
-  Future<void> _onTap() async {
+  void _onTap() {
     if (_isAnimating || widget.onSelected == null) return;
 
     _isAnimating = true;
 
-    await _controller.forward();
-
-    if (!mounted) return;
-
-    await _controller.reverse();
-
-    if (!mounted) return;
-
     widget.onSelected!(!widget.isSelected);
 
-    _isAnimating = false;
+    _controller.forward(from: 0).then((_) async {
+      if (!mounted) return;
+
+      await _controller.reverse();
+
+      if (mounted) {
+        _isAnimating = false;
+      }
+    });
   }
 
   @override
