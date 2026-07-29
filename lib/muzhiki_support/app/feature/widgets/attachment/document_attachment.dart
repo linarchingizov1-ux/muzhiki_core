@@ -1,0 +1,255 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:crypto/crypto.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:muzhiki_core/muzhiki_dependecies/service/app_banner/app_banner_controller.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_assets.dart';
+import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path/path.dart' as p;
+
+class DocumentAttachment extends StatefulWidget {
+  const DocumentAttachment({
+    super.key,
+    required this.url,
+    required this.directory,
+    required this.fileName,
+  });
+
+  final Directory directory;
+  final String url;
+  final String fileName;
+
+  @override
+  State<DocumentAttachment> createState() => _DocumentAttachmentState();
+}
+
+class _DocumentAttachmentState extends State<DocumentAttachment> {
+  int totalFileSize = 0;
+
+  bool isCheckingFile = true;
+  bool isDownloading = false;
+  bool isDownloadsFile = false;
+  bool isOpenFile = false;
+
+  final downloadsClient = Dio();
+
+  String get localFileId {
+    final uri = Uri.parse(widget.url);
+
+    return sha256.convert(utf8.encode(uri.path)).toString();
+  }
+
+  String get path {
+    final extension = p.extension(widget.fileName);
+
+    return p.join(widget.directory.path, '$localFileId$extension');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final file = File(path);
+
+    try {
+      final exists = await file.exists();
+
+      if (exists) {
+        final size = await file.length();
+
+        totalFileSize = size;
+        isDownloadsFile = true;
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) {
+        setState(() {
+          isCheckingFile = false;
+        });
+      }
+    }
+  }
+
+  Future<void> downloads() async {
+    if (isDownloadsFile || isDownloading) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        isDownloading = true;
+        totalFileSize = 0;
+      });
+    }
+
+    try {
+      await downloadsClient.download(
+        widget.url,
+        path,
+        onReceiveProgress: (received, total) {
+          if (!mounted) return;
+
+          setState(() {
+            totalFileSize = received;
+          });
+        },
+      );
+
+      final file = File(path);
+      final exists = await file.exists();
+
+      if (!exists) {
+        throw FileSystemException('После скачивания файл не найден', path);
+      }
+
+      final size = await file.length();
+
+      if (!mounted) return;
+
+      setState(() {
+        isDownloadsFile = true;
+        totalFileSize = size;
+      });
+    } catch (_) {
+    } finally {
+      if (mounted) {
+        setState(() {
+          isDownloading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> openReadFile() async {
+    if (isOpenFile || isDownloading || isCheckingFile) {
+      return;
+    }
+
+    if (!isDownloadsFile) {
+      await downloads();
+
+      if (!isDownloadsFile) {
+        return;
+      }
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      isOpenFile = true;
+    });
+
+    try {
+      final result = await OpenFilex.open(path);
+
+      if (!mounted) return;
+
+      if (result.type == ResultType.noAppToOpen) {
+        BannerController.I.show(
+          message: 'На устройстве нет приложения для открытия этого файла',
+        );
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) {
+        setState(() {
+          isOpenFile = false;
+        });
+      }
+    }
+  }
+
+  String get fileSizeText {
+    if (totalFileSize <= 0) {
+      return '';
+    }
+
+    if (totalFileSize < 1024) {
+      return '$totalFileSize Б';
+    }
+
+    if (totalFileSize < 1024 * 1024) {
+      return '${(totalFileSize / 1024).toStringAsFixed(1)} КБ';
+    }
+
+    return '${(totalFileSize / 1024 / 1024).toStringAsFixed(1)} МБ';
+  }
+
+  String get fileStatusText {
+    if (isCheckingFile) {
+      return 'Проверяем...';
+    }
+
+    if (isDownloading) {
+      return fileSizeText.isEmpty ? 'Скачивание...' : 'Скачано $fileSizeText';
+    }
+
+    if (!isDownloadsFile) {
+      return 'Скачать';
+    }
+
+    return fileSizeText;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: openReadFile,
+      child: Row(
+        spacing: 5.w,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 35.r),
+            child: SvgPicture.asset(
+              SupportAssets.I.svg.file,
+              width: 35.r,
+              height: 35.r,
+              colorFilter: ColorFilter.mode(
+                SupportColors.grey,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 100.w,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.fileName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+
+                Text(
+                  fileStatusText,
+                  style: TextStyle(
+                    color: isDownloadsFile
+                        ? SupportColors.black1
+                        : SupportColors.darkGrey,
+                    fontSize: 10.sp,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

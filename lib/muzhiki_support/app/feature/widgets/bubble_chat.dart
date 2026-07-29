@@ -10,7 +10,7 @@ import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.
 import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/socket_connection.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
-import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/chat_attachment.dart';
+import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/attachment/attachment_widgets.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ChatMessageBubble extends StatefulWidget {
@@ -68,7 +68,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                           memCacheHeight: 44,
                           memCacheWidth: 44,
                           fit: BoxFit.cover,
-                          placeholder: (_, __) => Shimmer.fromColors(
+                          placeholder: (_, _) => Shimmer.fromColors(
                             baseColor: Colors.grey.shade300,
                             highlightColor: Colors.grey.shade100,
                             child: Container(
@@ -80,7 +80,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                               ),
                             ),
                           ),
-                          errorWidget: (_, __, ___) => Icon(
+                          errorWidget: (_, _, _) => Icon(
                             Icons.person,
                             size: 20.r,
                             color: Colors.grey,
@@ -284,12 +284,21 @@ class _BubbleAttachment extends StatelessWidget {
       case 1:
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 11.w),
-          child: ChatAttachment(
-            attachment: attachments.first,
-            websocketChat: websocketChat,
-            chatCubit: chatCubit,
-            directory: directory,
-          ),
+          child: switch (attachments[attachments.length].type) {
+            ChatAttachmentType.document => AttachmentWidgets.document(
+              directory: directory,
+              url: attachments[attachments.length].url,
+              fileName: attachments[attachments.length].name ?? "Файл",
+            ),
+            ChatAttachmentType.photo => AttachmentWidgets.photo(
+              websocketChat: websocketChat,
+              attachment: attachments[attachments.length],
+            ),
+            ChatAttachmentType.video => AttachmentWidgets.video(
+              directory: directory,
+              url: attachments[attachments.length].url,
+            ),
+          },
         );
       default:
         return ConstrainedBox(
@@ -301,14 +310,22 @@ class _BubbleAttachment extends StatelessWidget {
               spacing: 5.w,
               children: List.generate(attachments.length, (index) {
                 return SizedBox(
-                  // width: 77.w,
                   height: 77.w,
-                  child: ChatAttachment(
-                    attachment: attachments[index],
-                    websocketChat: websocketChat,
-                    chatCubit: chatCubit,
-                    directory: directory,
-                  ),
+                  child: switch (attachments[attachments.length].type) {
+                    ChatAttachmentType.document => AttachmentWidgets.document(
+                      directory: directory,
+                      url: attachments[attachments.length].url,
+                      fileName: attachments[attachments.length].name ?? "Файл",
+                    ),
+                    ChatAttachmentType.photo => AttachmentWidgets.photo(
+                      websocketChat: websocketChat,
+                      attachment: attachments[attachments.length],
+                    ),
+                    ChatAttachmentType.video => AttachmentWidgets.video(
+                      directory: directory,
+                      url: attachments[attachments.length].url,
+                    ),
+                  },
                 );
               }),
             ),
