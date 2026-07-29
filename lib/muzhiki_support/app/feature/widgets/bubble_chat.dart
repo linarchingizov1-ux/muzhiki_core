@@ -284,19 +284,19 @@ class _BubbleAttachment extends StatelessWidget {
       case 1:
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 11.w),
-          child: switch (attachments[attachments.length].type) {
+          child: switch (attachments.first.type) {
             ChatAttachmentType.document => AttachmentWidgets.document(
               directory: directory,
-              url: attachments[attachments.length].url,
+              url: attachments.first.url,
               fileName: attachments[attachments.length].name ?? "Файл",
             ),
             ChatAttachmentType.photo => AttachmentWidgets.photo(
               websocketChat: websocketChat,
-              attachment: attachments[attachments.length],
+              attachment: attachments.first,
             ),
             ChatAttachmentType.video => AttachmentWidgets.video(
               directory: directory,
-              url: attachments[attachments.length].url,
+              url: attachments.first.url,
             ),
           },
         );
