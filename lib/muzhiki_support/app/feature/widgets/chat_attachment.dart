@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,9 +20,9 @@ import 'package:muzhiki_core/muzhiki_support/app/extension/websocket_extension.d
 import 'package:muzhiki_core/muzhiki_support/app/feature/state/chat/chat_cubit.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/photo_view_widget.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path/path.dart' as p;
 import 'package:shimmer/shimmer.dart';
 import 'package:talker/talker.dart';
-import 'package:uuid/v4.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class ChatAttachment extends StatelessWidget {
@@ -291,18 +293,31 @@ class _DocumentAttachment extends StatefulWidget {
 }
 
 class _DocumentAttachmentState extends State<_DocumentAttachment> {
-  String path = "";
   int totalFileSize = 0;
+
+  bool isCheckingFile = true;
+  bool isDownloading = false;
   bool isDownloadsFile = false;
   bool isOpenFile = false;
+
   final downloadsClient = Dio();
-  final uuid = UuidV4();
   final talker = Talker();
+
+  String get localFileId {
+    final uri = Uri.parse(widget.url);
+
+    return sha256.convert(utf8.encode(uri.path)).toString();
+  }
+
+  String get path {
+    final extension = p.extension(widget.fileName);
+
+    return p.join(widget.directory.path, '$localFileId$extension');
+  }
 
   @override
   void initState() {
     super.initState();
-    path = '${widget.directory.path}/${widget.fileName}';
     _init();
   }
 
@@ -331,15 +346,26 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
       }
     } catch (e, st) {
       talker.error('Ошибка проверки файла', e, st);
-    }
-
-    if (mounted) {
-      setState(() {});
+    } finally {
+      if (mounted) {
+        setState(() {
+          isCheckingFile = false;
+        });
+      }
     }
   }
 
   Future<void> downloads() async {
-    if (isDownloadsFile) return;
+    if (isDownloadsFile || isDownloading) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        isDownloading = true;
+        totalFileSize = 0;
+      });
+    }
 
     try {
       talker.debug(
@@ -352,16 +378,16 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
         widget.url,
         path,
         onReceiveProgress: (received, total) {
-          if (total > 0 && mounted) {
-            setState(() {
-              totalFileSize = total;
-            });
-          }
+          if (!mounted) return;
+
+          setState(() {
+            // Во время скачивания показываем уже полученный размер.
+            totalFileSize = received;
+          });
         },
       );
 
       final file = File(path);
-
       final exists = await file.exists();
 
       talker.debug(
@@ -371,8 +397,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
       );
 
       if (!exists) {
-        talker.error('После скачивания файл не найден: $path');
-        return;
+        throw FileSystemException('После скачивания файл не найден', path);
       }
 
       final size = await file.length();
@@ -390,36 +415,61 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
       });
     } catch (e, st) {
       talker.error('Ошибка скачивания файла', e, st);
+    } finally {
+      if (mounted) {
+        setState(() {
+          isDownloading = false;
+        });
+      }
     }
   }
 
   Future<void> openReadFile() async {
-    if (isOpenFile) return;
+    if (isOpenFile || isDownloading || isCheckingFile) {
+      return;
+    }
 
+    // Если файла нет — скачиваем.
     if (!isDownloadsFile) {
       await downloads();
-      return;
+
+      // Если скачать не удалось — ничего больше не делаем.
+      if (!isDownloadsFile) {
+        return;
+      }
     }
 
     if (!mounted) return;
 
-    setState(() => isOpenFile = true);
+    setState(() {
+      isOpenFile = true;
+    });
 
-    final result = await OpenFilex.open(path);
+    try {
+      final result = await OpenFilex.open(path);
 
-    if (mounted && result.type == ResultType.done) {
-      setState(() => isOpenFile = false);
-    }
-    if (mounted && result.type == ResultType.noAppToOpen) {
-      setState(() => isOpenFile = false);
-      BannerController.I.show(
-        message: "На устройстве нет приложения для открытия этого файла",
-      );
+      if (!mounted) return;
+
+      if (result.type == ResultType.noAppToOpen) {
+        BannerController.I.show(
+          message: 'На устройстве нет приложения для открытия этого файла',
+        );
+      }
+    } catch (e, st) {
+      talker.error('Ошибка открытия файла', e, st);
+    } finally {
+      if (mounted) {
+        setState(() {
+          isOpenFile = false;
+        });
+      }
     }
   }
 
   String get fileSizeText {
-    if (totalFileSize <= 0) return '';
+    if (totalFileSize <= 0) {
+      return '';
+    }
 
     if (totalFileSize < 1024) {
       return '$totalFileSize Б';
@@ -430,6 +480,22 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
     }
 
     return '${(totalFileSize / 1024 / 1024).toStringAsFixed(1)} МБ';
+  }
+
+  String get fileStatusText {
+    if (isCheckingFile) {
+      return 'Проверяем...';
+    }
+
+    if (isDownloading) {
+      return fileSizeText.isEmpty ? 'Скачивание...' : 'Скачано $fileSizeText';
+    }
+
+    if (!isDownloadsFile) {
+      return 'Скачать';
+    }
+
+    return fileSizeText;
   }
 
   @override
@@ -469,7 +535,7 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
                   ),
                 ),
                 Text(
-                  fileSizeText.isEmpty ? 'Определяем размер...' : fileSizeText,
+                  fileStatusText,
                   style: TextStyle(
                     color: isDownloadsFile
                         ? SupportColors.green
