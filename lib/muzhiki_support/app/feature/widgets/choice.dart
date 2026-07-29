@@ -41,11 +41,11 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 180),
-      reverseDuration: const Duration(milliseconds: 140),
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 260),
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.03).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutCubic,
@@ -119,7 +119,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
     try {
       final animation = _controller.forward();
 
-      await Future.delayed(const Duration(milliseconds: 80));
+      await Future.delayed(const Duration(milliseconds: 50));
 
       if (mounted && widget.onSelected != null) {
         widget.onSelected!(!widget.isSelected);

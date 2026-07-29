@@ -47,8 +47,8 @@ class _CircleButtonState extends State<CircleButton>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 180),
-      reverseDuration: const Duration(milliseconds: 140),
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 260),
     );
 
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
@@ -125,7 +125,7 @@ class _CircleButtonState extends State<CircleButton>
     try {
       final animation = _controller.forward();
 
-      await Future.delayed(const Duration(milliseconds: 80));
+      await Future.delayed(const Duration(milliseconds: 50));
 
       if (mounted) {
         widget.onTap();
