@@ -11,6 +11,7 @@ class CircleButton extends StatefulWidget {
     this.icon,
     required this.size,
     required this.iconSize,
+    required this.iconColor,
     this.child,
     this.isGlasses = false,
     this.backgroundColor,
@@ -19,6 +20,7 @@ class CircleButton extends StatefulWidget {
   final String? svgAsset;
   final bool isGlasses;
   final IconData? icon;
+  final Color iconColor;
   final VoidCallback onTap;
   final Widget? child;
 
@@ -168,8 +170,16 @@ class _CircleButtonState extends State<CircleButton>
                   widget.svgAsset!,
                   width: widget.iconSize.r,
                   height: widget.iconSize.r,
+                  colorFilter: ColorFilter.mode(
+                    widget.iconColor,
+                    BlendMode.srcIn,
+                  ),
                 )
-              : Icon(widget.icon, size: widget.iconSize.r, color: Colors.white),
+              : Icon(
+                  widget.icon,
+                  size: widget.iconSize.r,
+                  color: widget.iconColor,
+                ),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_core/muzhiki_support/app/config/constant/support_colors.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/view_image_item_model.dart';
+import 'package:muzhiki_core/muzhiki_ui/muzhiki_ui.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
@@ -225,25 +226,15 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
+                        MuzhikiUi.buttons.circle(
+                          size: 45,
+                          iconSize: 20,
                           onTap: _close,
-                          child: Container(
-                            height: 45.h,
-                            width: 45.h,
-                            padding: EdgeInsets.all(5.r),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: SupportColors.black1.withValues(
-                                alpha: 0.65,
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 20,
-                            ),
+                          backgroundColor: SupportColors.black1.withValues(
+                            alpha: 0.65,
                           ),
                         ),
+
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,

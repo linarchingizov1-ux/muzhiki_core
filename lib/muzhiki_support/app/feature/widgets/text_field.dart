@@ -280,6 +280,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                   children: [
                                     MuzhikiUi.buttons.circle(
                                       backgroundColor: SupportColors.white,
+                                      iconColor: SupportColors.blood,
                                       svgAsset: SupportAssets.I.svg.image,
                                       onTap: () async {
                                         _close();
@@ -293,6 +294,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                     MuzhikiUi.buttons.circle(
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.recodeVideo,
+                                      iconColor: SupportColors.blood,
                                       onTap: () async {
                                         _close();
                                         await context
@@ -305,6 +307,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                     MuzhikiUi.buttons.circle(
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.file,
+                                      iconColor: SupportColors.blood,
                                       onTap: () async {
                                         _close();
                                         await context
@@ -329,6 +332,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 5.r),
               child: MuzhikiUi.buttons.circle(
+                iconColor: isOpen ? SupportColors.blood : SupportColors.white,
                 svgAsset: isOpen
                     ? SupportAssets.I.svg.close
                     : SupportAssets.I.svg.screpka,
