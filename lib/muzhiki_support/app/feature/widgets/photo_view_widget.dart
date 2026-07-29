@@ -248,6 +248,7 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
                           child: Text(
                             '${_currentIndex + 1} / ${widget.images.length}',
                             style: const TextStyle(
+                              fontFamily: 'Manrope',
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
@@ -291,7 +292,7 @@ class _ZoomableImageLayer extends StatelessWidget {
               return const Center(
                 child: Text(
                   'Не удалось загрузить изображение',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(fontFamily: 'Manrope', color: Colors.white),
                 ),
               );
             },

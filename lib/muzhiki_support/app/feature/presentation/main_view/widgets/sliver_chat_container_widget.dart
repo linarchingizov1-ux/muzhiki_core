@@ -44,6 +44,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                         const Text(
                           'Сбой приложения',
                           style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
                           ),
@@ -55,6 +56,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                           'Мы уже работаем над её устранением.\n\n'
                           'Попробуйте открыть приложение снова немного позже. Просим у вас прощения !',
                           style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: 15,
                             height: 1.5,
                             color: Colors.black87,
@@ -123,6 +125,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                           child: Text(
                             "В этом канале пока нет обращений",
                             style: TextStyle(
+                              fontFamily: 'Manrope',
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
                               color: SupportColors.grey,

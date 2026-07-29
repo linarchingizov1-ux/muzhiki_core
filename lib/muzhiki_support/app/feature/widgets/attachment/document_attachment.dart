@@ -262,6 +262,7 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
+                    fontFamily: 'Manrope',
                     color: Colors.blueAccent,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w700,
@@ -271,6 +272,7 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
                 Text(
                   fileStatusText,
                   style: TextStyle(
+                    fontFamily: 'Manrope',
                     fontWeight: isDownloadsFile
                         ? FontWeight.w600
                         : FontWeight.w800,

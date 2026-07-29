@@ -45,6 +45,7 @@ class _ChatBottomAreaTicketWidgetsState
               Text(
                 'По вашему обращению создана задача ',
                 style: TextStyle(
+                  fontFamily: 'Manrope',
                   color: SupportColors.alertTextGrey,
                   height: 1.h,
                   fontSize: 12.sp,
@@ -55,6 +56,7 @@ class _ChatBottomAreaTicketWidgetsState
               Text(
                 widget.state.title ?? 'Нет название обращения',
                 style: TextStyle(
+                  fontFamily: 'Manrope',
                   color: SupportColors.black17,
                   height: 1.h,
                   fontSize: 15.sp,
@@ -89,6 +91,7 @@ class _ChatBottomAreaTicketWidgetsState
               Text(
                 'После решения задачи вам придет уведомление',
                 style: TextStyle(
+                  fontFamily: 'Manrope',
                   color: SupportColors.alertTextGrey,
                   height: 1.h,
                   fontSize: 12.sp,
@@ -149,6 +152,7 @@ class _InformationTablo extends StatelessWidget {
         TextSpan(
           text: "$title  ",
           style: TextStyle(
+            fontFamily: 'Manrope',
             fontSize: 12.sp,
             fontWeight: FontWeight.w600,
             color: SupportColors.alertTextGrey,
@@ -156,7 +160,10 @@ class _InformationTablo extends StatelessWidget {
           children: [
             TextSpan(
               text: label,
-              style: TextStyle(color: SupportColors.black17),
+              style: TextStyle(
+                fontFamily: 'Manrope',
+                color: SupportColors.black17,
+              ),
             ),
           ],
         ),

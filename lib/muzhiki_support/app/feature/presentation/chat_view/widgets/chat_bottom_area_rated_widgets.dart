@@ -59,11 +59,16 @@ class _ChatBottomAreaRatedWidgetsState
             children: [
               Text(
                 'Обращение закрыто',
-                style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontFamily: 'Manrope',
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               Text(
                 'Оцените работу оператора',
                 style: TextStyle(
+                  fontFamily: 'Manrope',
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
                   color: SupportColors.alertTextGrey,

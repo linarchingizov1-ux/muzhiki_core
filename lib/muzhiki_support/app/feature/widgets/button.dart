@@ -73,6 +73,7 @@ class AppButton extends StatelessWidget {
                         Text(
                           label ?? '',
                           style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: labelSize.sp,
                             fontWeight: labelWeight ?? FontWeight.w700,
                             color: disable != null && disable!
@@ -119,6 +120,7 @@ class AppButton extends StatelessWidget {
                       Text(
                         label ?? '',
                         style: TextStyle(
+                          fontFamily: 'Manrope',
                           fontSize: labelSize.sp,
                           fontWeight:
                               labelWeight ??
@@ -135,6 +137,7 @@ class AppButton extends StatelessWidget {
                           child: Text(
                             description!,
                             style: TextStyle(
+                              fontFamily: 'Manrope',
                               fontSize: 10.sp,
                               color: backgroundColor != SupportColors.light
                                   ? SupportColors.white
@@ -173,6 +176,7 @@ class AppButton extends StatelessWidget {
                         Text(
                           label ?? '',
                           style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: labelSize,
                             fontWeight: labelWeight ?? FontWeight.w700,
                             color: disable != null && disable!
@@ -185,6 +189,7 @@ class AppButton extends StatelessWidget {
                             child: Text(
                               description!,
                               style: TextStyle(
+                                fontFamily: 'Manrope',
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w400,
                                 color: SupportColors.grey,
@@ -246,6 +251,7 @@ class AppButton extends StatelessWidget {
                   : Text(
                       label ?? '',
                       style: TextStyle(
+                        fontFamily: 'Manrope',
                         fontSize: labelSize.sp,
                         color: disable != null && disable!
                             ? labelColor?.withValues(alpha: 0.2) ??

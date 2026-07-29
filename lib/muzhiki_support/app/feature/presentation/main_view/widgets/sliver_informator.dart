@@ -34,6 +34,7 @@ class SliverInformator extends StatelessWidget {
                 Text(
                   'Информатор',
                   style: TextStyle(
+                    fontFamily: 'Manrope',
                     color: SupportColors.white,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w600,
@@ -42,6 +43,7 @@ class SliverInformator extends StatelessWidget {
                 Text(
                   'Аудиты и детализация по СМС',
                   style: TextStyle(
+                    fontFamily: 'Manrope',
                     color: SupportColors.white,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,

@@ -106,6 +106,7 @@ class _SupportAppBarState extends State<SupportAppBar> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
+                          fontFamily: 'Manrope',
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
                           color: SupportColors.black17,
@@ -123,6 +124,7 @@ class _SupportAppBarState extends State<SupportAppBar> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
+                  fontFamily: 'Manrope',
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
                   color: SupportColors.grey,

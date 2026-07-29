@@ -85,12 +85,14 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                           textAlignVertical: TextAlignVertical.top,
                           onChanged: (_) => setState(() {}),
                           style: TextStyle(
+                            fontFamily: 'Manrope',
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                           ),
                           decoration: InputDecoration(
                             hintText: 'Сообщение...',
                             hintStyle: TextStyle(
+                              fontFamily: 'Manrope',
                               fontSize: 12.sp,
                               color: SupportColors.grey,
                             ),

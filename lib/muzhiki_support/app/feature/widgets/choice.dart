@@ -104,6 +104,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
                 Text(
                   widget.label,
                   style: TextStyle(
+                    fontFamily: 'Manrope',
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                     color: widget.isSelected

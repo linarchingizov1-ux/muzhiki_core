@@ -159,6 +159,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                 Text(
                                   widget.messageDate,
                                   style: TextStyle(
+                                    fontFamily: 'Manrope',
                                     height: 2.h,
                                     color: SupportColors.grey,
                                     fontSize: 12.sp,
@@ -239,6 +240,7 @@ class __MessageWidgetStateState extends State<_MessageWidgetState> {
           TextSpan(
             text: url,
             style: const TextStyle(
+              fontFamily: 'Manrope',
               color: Colors.blue,
               decoration: TextDecoration.underline,
             ),
@@ -255,7 +257,11 @@ class __MessageWidgetStateState extends State<_MessageWidgetState> {
         spans.add(
           TextSpan(
             text: t,
-            style: const TextStyle(fontSize: 12, color: Colors.black),
+            style: const TextStyle(
+              fontFamily: 'Manrope',
+              fontSize: 12,
+              color: Colors.black,
+            ),
           ),
         );
 

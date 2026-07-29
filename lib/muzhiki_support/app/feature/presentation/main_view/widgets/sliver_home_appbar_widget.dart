@@ -56,7 +56,11 @@ class SliverHomeAppbarWidget extends StatelessWidget {
                 ),
               Text(
                 'Мои чаты',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontFamily: 'Manrope',
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
