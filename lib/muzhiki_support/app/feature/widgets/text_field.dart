@@ -31,6 +31,9 @@ class TextFieldWidgets extends StatefulWidget {
 }
 
 class _TextFieldWidgetsState extends State<TextFieldWidgets> {
+  final layerCircleButton = LayerLink();
+  final OverlayPortalController overlayPortalController =
+      OverlayPortalController();
   bool get _hasText => widget.controller.text.trim().isNotEmpty;
 
   bool get _hasAttachments =>
@@ -45,10 +48,29 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             // _CircleMenuAnimated(attachmentsCubit: widget.attachmentsCubit),
-            MuzhikiUi.buttons.circle(
-              onTap: () {},
-              backgroundColor: SupportColors.blood,
-              svgAsset: SupportAssets.I.svg.screpka,
+            OverlayPortal(
+              controller: overlayPortalController,
+              overlayChildBuilder: (context) {
+                return MuzhikiUi.buttons.circle(
+                  onTap: () {},
+                  backgroundColor: SupportColors.white,
+                  icon: Icons.add,
+                );
+              },
+              child: CompositedTransformTarget(
+                link: layerCircleButton,
+                child: MuzhikiUi.buttons.circle(
+                  onTap: () {
+                    if (overlayPortalController.isShowing) {
+                      overlayPortalController.hide();
+                    } else {
+                      overlayPortalController.show();
+                    }
+                  },
+                  backgroundColor: SupportColors.blood,
+                  svgAsset: SupportAssets.I.svg.screpka,
+                ),
+              ),
             ),
             Expanded(
               child: Column(
