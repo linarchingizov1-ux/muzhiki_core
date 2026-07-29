@@ -308,41 +308,88 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
 
   Future<void> _init() async {
     final file = File(path);
-    talker.debug("Ищем файл, путь $path\nФайл: $file");
-    isDownloadsFile = await file.exists();
-    if (isDownloadsFile) {
-      final sizeFile = await file.length();
-      totalFileSize = sizeFile;
-      talker.debug("Файл уже скачен, его размер $sizeFile");
+
+    try {
+      final exists = await file.exists();
+
+      talker.debug(
+        'Проверяем файл:\n'
+        'path: ${file.path}\n'
+        'exists: $exists',
+      );
+
+      if (exists) {
+        final size = await file.length();
+
+        totalFileSize = size;
+        isDownloadsFile = true;
+
+        talker.debug(
+          'Файл уже скачан:\n'
+          'size: $size bytes',
+        );
+      }
+    } catch (e, st) {
+      talker.error('Ошибка проверки файла', e, st);
     }
 
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> downloads() async {
     if (isDownloadsFile) return;
 
     try {
+      talker.debug(
+        'Скачиваем:\n'
+        'url: ${widget.url}\n'
+        'path: $path',
+      );
+
       await downloadsClient.download(
         widget.url,
         path,
         onReceiveProgress: (received, total) {
           if (total > 0 && mounted) {
-            setState(() => totalFileSize = total);
+            setState(() {
+              totalFileSize = total;
+            });
           }
         },
       );
 
       final file = File(path);
 
+      final exists = await file.exists();
+
+      talker.debug(
+        'Скачивание завершено:\n'
+        'path: ${file.path}\n'
+        'exists: $exists',
+      );
+
+      if (!exists) {
+        talker.error('После скачивания файл не найден: $path');
+        return;
+      }
+
+      final size = await file.length();
+
+      talker.debug(
+        'Файл скачан:\n'
+        'size: $size bytes',
+      );
+
       if (!mounted) return;
 
       setState(() {
         isDownloadsFile = true;
-        totalFileSize = file.lengthSync();
+        totalFileSize = size;
       });
     } catch (e, st) {
-      talker.error('Ошибка скачивания файла: $e, $st');
+      talker.error('Ошибка скачивания файла', e, st);
     }
   }
 
