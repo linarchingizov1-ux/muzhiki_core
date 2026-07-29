@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -134,6 +133,11 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
         duration: const Duration(milliseconds: 500),
         child: Stack(
           children: [
+            Positioned.fill(
+              child: ColoredBox(
+                color: SupportColors.black1.withValues(alpha: 0.5),
+              ),
+            ),
             Positioned.fill(child: _buildContent(context)),
 
             Positioned(
@@ -170,7 +174,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
           ],
         ),
       ),
-    ).animate().fade(duration: 350.ms);
+    );
   }
 
   Widget _buildContent(BuildContext context) {
