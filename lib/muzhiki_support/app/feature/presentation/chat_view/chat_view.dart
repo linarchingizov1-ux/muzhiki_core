@@ -118,11 +118,12 @@ class _ChatViewState extends State<ChatView> {
                     left: 0,
                     right: 0,
                     bottom: 0,
+                    height: 100.h,
                     child: IgnorePointer(
                       child: AnimatedOpacity(
                         duration: const Duration(milliseconds: 250),
                         curve: Curves.easeOut,
-                        opacity: isOpenKeyboard ? 0.65 : 1,
+                        opacity: isOpenKeyboard ? 0.35 : 1,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
