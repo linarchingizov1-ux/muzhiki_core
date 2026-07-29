@@ -66,39 +66,47 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                   SizedBox(height: 6.h),
                   Stack(
                     children: [
-                      TextField(
-                        controller: widget.controller,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: 10,
-                        minLines: 1,
-                        expands: false,
-                        cursorColor: SupportColors.black1,
-                        cursorWidth: 2.w,
-                        cursorHeight: 16.h,
-                        textAlignVertical: TextAlignVertical.top,
-                        onChanged: (_) => setState(() {}),
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
+                      TextSelectionTheme(
+                        data: TextSelectionThemeData(
+                          selectionColor: const Color(
+                            0xFF2AABEE,
+                          ).withValues(alpha: 0.25),
+                          selectionHandleColor: const Color(0xFF2AABEE),
                         ),
-                        decoration: InputDecoration(
-                          hintText: 'Сообщение...',
-                          hintStyle: TextStyle(
+                        child: TextField(
+                          controller: widget.controller,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 10,
+                          minLines: 1,
+                          expands: false,
+                          cursorColor: SupportColors.black1,
+                          cursorWidth: 2.w,
+                          cursorHeight: 16.h,
+                          textAlignVertical: TextAlignVertical.top,
+                          onChanged: (_) => setState(() {}),
+                          style: TextStyle(
                             fontSize: 12.sp,
-                            color: SupportColors.grey,
+                            fontWeight: FontWeight.w500,
                           ),
-                          isDense: true,
-                          contentPadding: EdgeInsets.only(
-                            left: 12.w,
-                            right: 50.w,
-                            top: 12.h,
-                            bottom: 12.h,
-                          ),
-                          filled: true,
-                          fillColor: SupportColors.light,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide.none,
+                          decoration: InputDecoration(
+                            hintText: 'Сообщение...',
+                            hintStyle: TextStyle(
+                              fontSize: 12.sp,
+                              color: SupportColors.grey,
+                            ),
+                            isDense: true,
+                            contentPadding: EdgeInsets.only(
+                              left: 12.w,
+                              right: 50.w,
+                              top: 12.h,
+                              bottom: 12.h,
+                            ),
+                            filled: true,
+                            fillColor: SupportColors.light,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                              borderSide: BorderSide.none,
+                            ),
                           ),
                         ),
                       ),

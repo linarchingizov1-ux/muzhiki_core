@@ -44,153 +44,161 @@ class ChatMessageBubble extends StatefulWidget {
 class _ChatMessageBubbleState extends State<ChatMessageBubble> {
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constrained) {
-        return Row(
-          spacing: 6.w,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: widget.isMe
-              ? MainAxisAlignment.end
-              : MainAxisAlignment.start,
-          children: [
-            if (!widget.isMe)
-              CircleAvatar(
-                backgroundColor: SupportColors.white,
-                radius: 22.r,
-                child: widget.avatar == null || widget.avatar!.isEmpty
-                    ? Icon(Icons.person, size: 20.r, color: Colors.grey)
-                    : ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: widget.avatar!,
-                          width: 44.r,
-                          height: 44.r,
-                          memCacheHeight: 44,
-                          memCacheWidth: 44,
-                          fit: BoxFit.cover,
-                          placeholder: (_, _) => Shimmer.fromColors(
-                            baseColor: Colors.grey.shade300,
-                            highlightColor: Colors.grey.shade100,
-                            child: Container(
-                              width: 44.r,
-                              height: 44.r,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
+    return TextSelectionTheme(
+      data: TextSelectionThemeData(
+        selectionColor: const Color(0xFF2AABEE).withValues(alpha: 0.25),
+        selectionHandleColor: const Color(0xFF2AABEE),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constrained) {
+          return Row(
+            spacing: 6.w,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: widget.isMe
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
+            children: [
+              if (!widget.isMe)
+                CircleAvatar(
+                  backgroundColor: SupportColors.white,
+                  radius: 22.r,
+                  child: widget.avatar == null || widget.avatar!.isEmpty
+                      ? Icon(Icons.person, size: 20.r, color: Colors.grey)
+                      : ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: widget.avatar!,
+                            width: 44.r,
+                            height: 44.r,
+                            memCacheHeight: 44,
+                            memCacheWidth: 44,
+                            fit: BoxFit.cover,
+                            placeholder: (_, _) => Shimmer.fromColors(
+                              baseColor: Colors.grey.shade300,
+                              highlightColor: Colors.grey.shade100,
+                              child: Container(
+                                width: 44.r,
+                                height: 44.r,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                          ),
-                          errorWidget: (_, _, _) => Icon(
-                            Icons.person,
-                            size: 20.r,
-                            color: Colors.grey,
+                            errorWidget: (_, _, _) => Icon(
+                              Icons.person,
+                              size: 20.r,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
-                      ),
-              ),
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: constrained.maxWidth * 0.75,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                color: widget.isMe ? SupportColors.light : SupportColors.white,
-              ),
-              child: IntrinsicWidth(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: 11.w,
-                        right: 11.w,
-                        top: 5.h,
-                        bottom: 5.h,
-                      ),
-                      child: Text(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        widget.isMe ? 'Вы' : (widget.mess.name ?? ''),
-                        style: TextStyle(
-                          height: 1.h,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          color: SupportColors.blood,
-                        ).copyWith(fontFamily: 'Inter'),
-                      ),
-                    ),
-                    if (widget.mess.text.isNotEmpty)
+                ),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: constrained.maxWidth * 0.75,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  color: widget.isMe
+                      ? SupportColors.light
+                      : SupportColors.white,
+                ),
+                child: IntrinsicWidth(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Padding(
                         padding: EdgeInsets.only(
                           left: 11.w,
                           right: 11.w,
+                          top: 5.h,
                           bottom: 5.h,
                         ),
-                        child: _MessageWidgetState(text: widget.mess.text),
-                      ),
-                    if (widget.attachments != null &&
-                        widget.attachments!.isNotEmpty)
-                      _BubbleAttachment(
-                        directory: widget.directory,
-                        chatCubit: widget.chatCubit,
-                        websocketChat: widget.websocketChat,
-                        attachments: widget.attachments!,
-                        width: constrained.maxWidth,
-                      ),
-                    if (widget.messageDate.isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.only(left: 11.w, right: 11.w),
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Row(
-                            spacing: 5.w,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                widget.messageDate,
-                                style: TextStyle(
-                                  height: 2.h,
-                                  color: SupportColors.grey,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              if (widget.mess.status != null)
-                                switch (widget.mess.status) {
-                                  (MessageStatus.sending) =>
-                                    Icon(
-                                          Icons.schedule_rounded,
-                                          size: 16.r,
-                                          color: SupportColors.grey,
-                                        )
-                                        .animate(
-                                          onPlay: (controller) =>
-                                              controller.repeat(),
-                                        )
-                                        .rotate(
-                                          duration: 1.seconds,
-                                          curve: Curves.linear,
-                                        ),
-                                  (MessageStatus.failed) => Icon(
-                                    Icons.close,
-                                    size: 16.r,
-                                    color: SupportColors.blood,
-                                  ),
-                                  MessageStatus.sent ||
-                                  null => const SizedBox.shrink(),
-                                },
-                            ],
-                          ),
+                        child: Text(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          widget.isMe ? 'Вы' : (widget.mess.name ?? ''),
+                          style: TextStyle(
+                            height: 1.h,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: SupportColors.blood,
+                          ).copyWith(fontFamily: 'Inter'),
                         ),
                       ),
-                  ],
+                      if (widget.mess.text.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: 11.w,
+                            right: 11.w,
+                            bottom: 5.h,
+                          ),
+                          child: _MessageWidgetState(text: widget.mess.text),
+                        ),
+                      if (widget.attachments != null &&
+                          widget.attachments!.isNotEmpty)
+                        _BubbleAttachment(
+                          directory: widget.directory,
+                          chatCubit: widget.chatCubit,
+                          websocketChat: widget.websocketChat,
+                          attachments: widget.attachments!,
+                          width: constrained.maxWidth,
+                        ),
+                      if (widget.messageDate.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(left: 11.w, right: 11.w),
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: Row(
+                              spacing: 5.w,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  widget.messageDate,
+                                  style: TextStyle(
+                                    height: 2.h,
+                                    color: SupportColors.grey,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                if (widget.mess.status != null)
+                                  switch (widget.mess.status) {
+                                    (MessageStatus.sending) =>
+                                      Icon(
+                                            Icons.schedule_rounded,
+                                            size: 16.r,
+                                            color: SupportColors.grey,
+                                          )
+                                          .animate(
+                                            onPlay: (controller) =>
+                                                controller.repeat(),
+                                          )
+                                          .rotate(
+                                            duration: 1.seconds,
+                                            curve: Curves.linear,
+                                          ),
+                                    (MessageStatus.failed) => Icon(
+                                      Icons.close,
+                                      size: 16.r,
+                                      color: SupportColors.blood,
+                                    ),
+                                    MessageStatus.sent ||
+                                    null => const SizedBox.shrink(),
+                                  },
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 }
