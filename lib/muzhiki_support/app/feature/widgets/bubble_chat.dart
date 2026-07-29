@@ -376,19 +376,23 @@ class _BubbleAttachment extends StatelessWidget {
                     child: Row(
                       spacing: 5.w,
                       children: media.map((attachment) {
-                        return switch (attachment.type) {
-                          ChatAttachmentType.photo => AttachmentWidgets.photo(
-                            websocketChat: websocketChat,
-                            attachment: attachment,
-                          ),
+                        return SizedBox(
+                          width: 65.w,
+                          height: 65.w,
+                          child: switch (attachment.type) {
+                            ChatAttachmentType.photo => AttachmentWidgets.photo(
+                              websocketChat: websocketChat,
+                              attachment: attachment,
+                            ),
 
-                          ChatAttachmentType.video => AttachmentWidgets.video(
-                            directory: directory,
-                            url: attachment.url,
-                          ),
+                            ChatAttachmentType.video => AttachmentWidgets.video(
+                              directory: directory,
+                              url: attachment.url,
+                            ),
 
-                          _ => const SizedBox.shrink(),
-                        };
+                            _ => const SizedBox.shrink(),
+                          },
+                        );
                       }).toList(),
                     ),
                   ),
