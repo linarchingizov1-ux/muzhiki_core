@@ -78,6 +78,10 @@ flutter:
     - assets/support/png/
     - assets/report_problem/svg/
     - assets/network_problem/svg/
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: fonts/support/Inter.ttf
 
   plugin:
     platforms:

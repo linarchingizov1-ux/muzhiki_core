@@ -121,11 +121,12 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                           overflow: TextOverflow.ellipsis,
                           widget.isMe ? 'Вы' : (widget.mess.name ?? ''),
                           style: TextStyle(
+                            fontFamily: 'Inter',
                             height: 1.h,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                             color: SupportColors.blood,
-                          ).copyWith(fontFamily: 'Inter'),
+                          ),
                         ),
                       ),
                       if (widget.mess.text.isNotEmpty)
