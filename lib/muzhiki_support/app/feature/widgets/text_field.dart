@@ -245,51 +245,61 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                       Positioned(
                         bottom: 70.h,
                         left: 17.w,
-                        child: FadeTransition(
-                          opacity: fadeAnimation,
-                          child: SlideTransition(
-                            position: slideAnimation,
-                            child: ScaleTransition(
-                              scale: scaleAnimation,
-                              alignment: Alignment.bottomCenter,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: 10.h,
-                                children: [
-                                  MuzhikiUi.buttons.circle(
-                                    svgAsset: SupportAssets.I.svg.image,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.photo,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                  MuzhikiUi.buttons.circle(
-                                    svgAsset: SupportAssets.I.svg.recodeVideo,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.video,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                  MuzhikiUi.buttons.circle(
-                                    svgAsset: SupportAssets.I.svg.file,
-                                    onTap: () async {
-                                      await context
-                                          .read<AttachmentsCubit>()
-                                          .addAttachment(
-                                            type: ChatAttachmentType.document,
-                                          );
-                                      _close();
-                                    },
-                                  ),
-                                ],
+                        child: Container(
+                          padding: EdgeInsets.all(2.r),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(48.r),
+                            color: SupportColors.black1..withValues(alpha: 0.5),
+                          ),
+                          child: FadeTransition(
+                            opacity: fadeAnimation,
+                            child: SlideTransition(
+                              position: slideAnimation,
+                              child: ScaleTransition(
+                                scale: scaleAnimation,
+                                alignment: Alignment.bottomCenter,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 10.h,
+                                  children: [
+                                    MuzhikiUi.buttons.circle(
+                                      backgroundColor: SupportColors.white,
+                                      svgAsset: SupportAssets.I.svg.image,
+                                      onTap: () async {
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.photo,
+                                            );
+                                        _close();
+                                      },
+                                    ),
+                                    MuzhikiUi.buttons.circle(
+                                      backgroundColor: SupportColors.white,
+                                      svgAsset: SupportAssets.I.svg.recodeVideo,
+                                      onTap: () async {
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.video,
+                                            );
+                                        _close();
+                                      },
+                                    ),
+                                    MuzhikiUi.buttons.circle(
+                                      backgroundColor: SupportColors.white,
+                                      svgAsset: SupportAssets.I.svg.file,
+                                      onTap: () async {
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.document,
+                                            );
+                                        _close();
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
