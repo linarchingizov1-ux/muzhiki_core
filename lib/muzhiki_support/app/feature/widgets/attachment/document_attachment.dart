@@ -209,13 +209,20 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(maxHeight: 35.r),
-            child: SvgPicture.asset(
-              SupportAssets.I.svg.file,
-              width: 35.r,
-              height: 35.r,
-              colorFilter: ColorFilter.mode(
-                SupportColors.grey,
-                BlendMode.srcIn,
+            child: Container(
+              padding: EdgeInsets.all(3.r),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.r),
+                color: SupportColors.white,
+              ),
+              child: SvgPicture.asset(
+                SupportAssets.I.svg.file,
+                width: 35.r,
+                height: 35.r,
+                colorFilter: ColorFilter.mode(
+                  SupportColors.grey,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -239,9 +246,10 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
                 Text(
                   fileStatusText,
                   style: TextStyle(
-                    color: isDownloadsFile
-                        ? SupportColors.black1
-                        : SupportColors.darkGrey,
+                    fontWeight: isDownloadsFile
+                        ? FontWeight.w600
+                        : FontWeight.w800,
+                    color: isDownloadsFile ? SupportColors.black1 : Colors.blue,
                     fontSize: 10.sp,
                   ),
                 ),
