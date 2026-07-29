@@ -35,7 +35,7 @@ class UploadDataWidgets extends StatefulWidget {
 }
 
 class _UploadDataWidgetsState extends State<UploadDataWidgets> {
-  Future<String?>? fileName;
+  String? _videoThumbnail;
 
   ChatAttachmentType get type => widget.item.when(
     local: (_, type, _, _, _) => type,
@@ -77,8 +77,12 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
   void didUpdateWidget(covariant UploadDataWidgets oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.item != widget.item && type == ChatAttachmentType.video) {
-      _getVideoThumbnail();
+    if (oldWidget.item != widget.item) {
+      _videoThumbnail = null;
+
+      if (type == ChatAttachmentType.video) {
+        _getVideoThumbnail();
+      }
     }
   }
 
@@ -99,7 +103,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
       if (!mounted) return;
 
       setState(() {
-        fileName = Future.value(result);
+        _videoThumbnail = result;
       });
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
@@ -129,51 +133,43 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
       width: 65.w,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(11.r)),
       clipBehavior: Clip.hardEdge,
-      child: AnimatedSwitcher(
-        key: ValueKey(widget.item),
-        duration: const Duration(milliseconds: 500),
-        child: Stack(
-          children: [
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ColoredBox(
+              color: SupportColors.light.withValues(alpha: 0.6),
+            ),
+          ),
+          Positioned.fill(child: _buildContent(context)),
+
+          Positioned(
+            right: 0,
+            top: 0,
+            child: InkWell(
+              onTap: () {
+                context.read<AttachmentsCubit>().removeById(id);
+              },
+              child: Icon(Icons.close, size: 16.r, color: SupportColors.black1),
+            ),
+          ),
+
+          if (isLoading)
             Positioned.fill(
-              child: ColoredBox(
-                color: SupportColors.light.withValues(alpha: 0.6),
-              ),
-            ),
-            Positioned.fill(child: _buildContent(context)),
-
-            Positioned(
-              right: 0,
-              top: 0,
-              child: InkWell(
-                onTap: () {
-                  context.read<AttachmentsCubit>().removeById(id);
-                },
-                child: Icon(
-                  Icons.close,
-                  size: 16.r,
-                  color: SupportColors.black1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-              ),
-            ),
-
-            if (isLoading)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Center(
-                    child: SizedBox(
-                      width: 24.w,
-                      height: 24.w,
-                      child: const CircularProgressIndicator(strokeWidth: 1.8),
-                    ),
+                child: Center(
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.w,
+                    child: const CircularProgressIndicator(strokeWidth: 1.8),
                   ),
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -207,39 +203,46 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
   Widget _buildVideo() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12.r),
-      child: FutureBuilder<String?>(
-        future: fileName,
-        builder: (context, snapshot) {
-          final thumbnail = snapshot.data;
-
-          if (thumbnail == null) {
-            return Shimmer.fromColors(
-              baseColor: SupportColors.light,
-              highlightColor: SupportColors.white,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 231, 231, 231),
-                  borderRadius: BorderRadius.circular(12.r),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeOutCubic,
+        child: _videoThumbnail == null
+            ? Shimmer.fromColors(
+                key: const ValueKey('loading'),
+                baseColor: SupportColors.light,
+                highlightColor: SupportColors.white,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 231, 231, 231),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
                 ),
-              ),
-            );
-          }
+              )
+            : _buildVideoThumbnail(key: const ValueKey('thumbnail')),
+      ),
+    );
+  }
 
-          final remote = remoteData;
+  Widget _buildVideoThumbnail({required Key key}) {
+    final remote = remoteData;
 
-          return InkWell(
-            onTap: remote == null
-                ? null
-                : () {
-                    context.pushNamed(
-                      SupportRouteConstant.I.videoView,
-                      queryParameters: {'url': remote.url},
-                      extra: thumbnail,
-                    );
-                  },
-            child: Image.file(File(thumbnail), fit: BoxFit.cover),
-          );
-        },
+    return InkWell(
+      key: key,
+      onTap: remote == null
+          ? null
+          : () {
+              context.pushNamed(
+                SupportRouteConstant.I.videoView,
+                queryParameters: {'url': remote.url},
+                extra: _videoThumbnail,
+              );
+            },
+      child: Image.file(
+        File(_videoThumbnail!),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
       ),
     );
   }
