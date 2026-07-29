@@ -381,7 +381,6 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
           if (!mounted) return;
 
           setState(() {
-            // Во время скачивания показываем уже полученный размер.
             totalFileSize = received;
           });
         },
@@ -429,11 +428,9 @@ class _DocumentAttachmentState extends State<_DocumentAttachment> {
       return;
     }
 
-    // Если файла нет — скачиваем.
     if (!isDownloadsFile) {
       await downloads();
 
-      // Если скачать не удалось — ничего больше не делаем.
       if (!isDownloadsFile) {
         return;
       }
