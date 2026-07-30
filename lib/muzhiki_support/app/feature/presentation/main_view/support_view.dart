@@ -121,7 +121,6 @@ class _SupportViewState extends State<SupportView> {
                 canPop: widget.canPop,
                 typeApp: widget.typeApp,
                 sessionApp: widget.sessionApp,
-                firebaseRemoveFCM: widget.firebaseRemoveFCM,
               ),
               if (widget.showInformator) const SliverInformator(),
               SliverChoiWidget(chatCubit: widget.chatCubit),

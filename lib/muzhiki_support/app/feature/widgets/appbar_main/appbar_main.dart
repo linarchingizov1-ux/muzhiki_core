@@ -13,12 +13,7 @@ import 'package:muzhiki_core/muzhiki_support/app/feature/widgets/skelet.dart';
 
 class SupportAppBar extends StatefulWidget {
   final SessionApp sessionApp;
-  final void Function()? firebaseRemoveFCM;
-  const SupportAppBar({
-    super.key,
-    required this.sessionApp,
-    this.firebaseRemoveFCM,
-  });
+  const SupportAppBar({super.key, required this.sessionApp});
 
   @override
   State<SupportAppBar> createState() => _SupportAppBarState();
@@ -48,7 +43,6 @@ class _SupportAppBarState extends State<SupportAppBar> {
 
       try {
         await DialogMenu.showAnimationTopMenu(
-          firebaseRemoveFCM: widget.firebaseRemoveFCM,
           sessionApp: widget.sessionApp,
           context: context,
           anchorRect: rect,
@@ -147,7 +141,6 @@ class DialogMenu {
     required BuildContext context,
     required Rect anchorRect,
     required SessionApp sessionApp,
-    required void Function()? firebaseRemoveFCM,
   }) async {
     if (_isShowing || _isClosing) return;
 
@@ -227,10 +220,7 @@ class DialogMenu {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           appear(
-                            DashboardMenuBottomWidgets(
-                              sessionApp: sessionApp,
-                              firebaseRemoveFCM: firebaseRemoveFCM,
-                            ),
+                            DashboardMenuBottomWidgets(sessionApp: sessionApp),
                             from: const Offset(0, 15),
                           ),
                         ],

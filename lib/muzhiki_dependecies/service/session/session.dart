@@ -364,7 +364,7 @@ class SessionApp extends ChangeNotifier {
     }
   }
 
-  Future<void> logoutSession({VoidCallback? firebaseRemoveFCM}) async {
+  Future<void> logoutSession() async {
     try {
       await dio.post(
         "https://auth.muzhiki.pro/api/v1/logout",
@@ -377,7 +377,6 @@ class SessionApp extends ChangeNotifier {
       final error = AppErrorMapper.I.map(e, st);
       BannerController.I.showError(error: error, message: error.message);
     } finally {
-      firebaseRemoveFCM?.call();
       cleareSession();
     }
   }

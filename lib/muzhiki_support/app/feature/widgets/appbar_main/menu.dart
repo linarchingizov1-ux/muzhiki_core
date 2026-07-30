@@ -44,12 +44,7 @@ class SupportAppBarMenu extends StatelessWidget {
 
 class DashboardMenuBottomWidgets extends StatelessWidget {
   final SessionApp sessionApp;
-  final void Function()? firebaseRemoveFCM;
-  const DashboardMenuBottomWidgets({
-    super.key,
-    required this.sessionApp,
-    this.firebaseRemoveFCM,
-  });
+  const DashboardMenuBottomWidgets({super.key, required this.sessionApp});
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +86,7 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
           icon: SupportAssets.I.svg.logout,
           title: 'Выйти из системы',
           description: 'И завершить сессию',
-          onTap: () =>
-              sessionApp.logoutSession(firebaseRemoveFCM: firebaseRemoveFCM),
+          onTap: () => sessionApp.logoutSession(),
         ),
       ],
     );

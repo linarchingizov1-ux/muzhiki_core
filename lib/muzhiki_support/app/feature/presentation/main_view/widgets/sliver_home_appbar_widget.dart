@@ -10,13 +10,11 @@ class SliverHomeAppbarWidget extends StatelessWidget {
   final TypeApp typeApp;
   final SessionApp? sessionApp;
   final bool canPop;
-  final Function()? firebaseRemoveFCM;
   const SliverHomeAppbarWidget({
     super.key,
     required this.canPop,
     required this.typeApp,
     this.sessionApp,
-    this.firebaseRemoveFCM,
   });
 
   @override
@@ -27,10 +25,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
         pinned: true,
         automaticallyImplyLeading: false,
 
-        title: SupportAppBar(
-          sessionApp: sessionApp!,
-          firebaseRemoveFCM: firebaseRemoveFCM,
-        ),
+        title: SupportAppBar(sessionApp: sessionApp!),
       );
     } else {
       return SliverPadding(
