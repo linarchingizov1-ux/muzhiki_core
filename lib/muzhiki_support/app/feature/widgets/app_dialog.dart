@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -56,33 +58,37 @@ class AppDialog {
         } else {
           return PopScope(
             canPop: canPop,
-            child:
-                Padding(
-                      padding: EdgeInsets.all(8.r),
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(20.w),
-                        decoration: BoxDecoration(
-                          color: SupportColors.white,
-                          borderRadius: BorderRadius.circular(40.r),
+            child: SafeArea(
+              top: false,
+              bottom: Platform.isIOS ? false : true,
+              child:
+                  Padding(
+                        padding: EdgeInsets.all(8.r),
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(20.w),
+                          decoration: BoxDecoration(
+                            color: SupportColors.white,
+                            borderRadius: BorderRadius.circular(40.r),
+                          ),
+                          child: child,
                         ),
-                        child: child,
+                      )
+                      .animate()
+                      .fade(duration: 250.ms, curve: Curves.easeOut)
+                      .moveY(
+                        begin: 20,
+                        end: 0,
+                        duration: 350.ms,
+                        curve: Curves.easeOutCubic,
+                      )
+                      .scale(
+                        begin: const Offset(0.97, 0.97),
+                        end: const Offset(1, 1),
+                        duration: 350.ms,
+                        curve: Curves.easeOutCubic,
                       ),
-                    )
-                    .animate()
-                    .fade(duration: 250.ms, curve: Curves.easeOut)
-                    .moveY(
-                      begin: 20,
-                      end: 0,
-                      duration: 350.ms,
-                      curve: Curves.easeOutCubic,
-                    )
-                    .scale(
-                      begin: const Offset(0.97, 0.97),
-                      end: const Offset(1, 1),
-                      duration: 350.ms,
-                      curve: Curves.easeOutCubic,
-                    ),
+            ),
           );
         }
       },
