@@ -106,6 +106,7 @@ class _ChatViewState extends State<ChatView> {
             initialData: websocketApp.state,
             stream: websocketApp.stream,
             builder: (context, snapshot) {
+              final footerState = snapshot.data?.socket?.footerState;
               return Stack(
                 children: [
                   ChatMessageWidgets(
@@ -116,14 +117,10 @@ class _ChatViewState extends State<ChatView> {
                     chatCubit: widget.chatCubit,
                     directory: widget.directory,
                   ),
-                  if (snapshot.data != null &&
-                          snapshot.data!.socket != null &&
-                          snapshot.data!.socket!.footerState !=
-                              ChatFooterState.closedNeedRating ||
-                      snapshot.data!.socket!.footerState !=
-                          ChatFooterState.closedNeedRating ||
-                      snapshot.data!.socket!.footerState !=
-                          ChatFooterState.ticketActive)
+                  if (snapshot.data?.socket != null &&
+                      footerState != ChatFooterState.closedRated &&
+                      footerState != ChatFooterState.closedNeedRating &&
+                      footerState != ChatFooterState.ticketActive)
                     Positioned(
                       left: 0,
                       right: 0,
