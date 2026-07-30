@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_core/muzhiki_dependecies/service/session/session.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/model/socket/chat_websocket_state.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/model/support_chats_event_widgets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/data/websocket/chat_websocket_app.dart';
+import 'package:muzhiki_core/muzhiki_support/app/data/websocket/extension/chat_footer_state_extension.dart';
 import 'package:muzhiki_core/muzhiki_support/app/domain/usecase/chat_usecase.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/chat_view/chat_bottom_widgets.dart';
 import 'package:muzhiki_core/muzhiki_support/app/feature/presentation/chat_view/chat_header_widgets.dart';
@@ -114,34 +116,40 @@ class _ChatViewState extends State<ChatView> {
                     chatCubit: widget.chatCubit,
                     directory: widget.directory,
                   ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    height: 100.h,
-                    child: IgnorePointer(
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeOut,
-                        opacity: isOpenKeyboard ? 0.35 : 1,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                Colors.white,
-                                Colors.white.withValues(alpha: 0.8),
-                                Colors.white.withValues(alpha: 0.35),
-                                Colors.white.withValues(alpha: 0),
-                              ],
-                              stops: const [0.0, 0.3, 0.65, 1.0],
+                  if (snapshot.data!.socket!.footerState !=
+                          ChatFooterState.closedNeedRating ||
+                      snapshot.data!.socket!.footerState !=
+                          ChatFooterState.closedNeedRating ||
+                      snapshot.data!.socket!.footerState !=
+                          ChatFooterState.ticketActive)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: 100.h,
+                      child: IgnorePointer(
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOut,
+                          opacity: isOpenKeyboard ? 0.35 : 1,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.white,
+                                  Colors.white.withValues(alpha: 0.8),
+                                  Colors.white.withValues(alpha: 0.35),
+                                  Colors.white.withValues(alpha: 0),
+                                ],
+                                stops: const [0.0, 0.3, 0.65, 1.0],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
                   Positioned(
                     left: 0,
                     right: 0,
