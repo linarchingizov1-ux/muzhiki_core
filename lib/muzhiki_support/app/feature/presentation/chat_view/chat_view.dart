@@ -116,8 +116,10 @@ class _ChatViewState extends State<ChatView> {
                     chatCubit: widget.chatCubit,
                     directory: widget.directory,
                   ),
-                  if (snapshot.data!.socket!.footerState !=
-                          ChatFooterState.closedNeedRating ||
+                  if (snapshot.data != null &&
+                          snapshot.data!.socket != null &&
+                          snapshot.data!.socket!.footerState !=
+                              ChatFooterState.closedNeedRating ||
                       snapshot.data!.socket!.footerState !=
                           ChatFooterState.closedNeedRating ||
                       snapshot.data!.socket!.footerState !=
