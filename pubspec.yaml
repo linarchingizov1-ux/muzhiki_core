@@ -64,6 +64,7 @@ dependencies:
   provider: ^6.1.5+1
   vibration: ^3.2.0
   android_id: ^0.5.2+1
+  flutter_bounceable: ^1.2.0
 
 dev_dependencies:
   flutter_test:
