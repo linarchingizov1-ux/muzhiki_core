@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:muzhiki_core/muzhiki_ui/buttons/circle_button.dart';
+import 'package:muzhiki_core/muzhiki_ui/buttons/animated_button.dart';
 import 'package:muzhiki_core/muzhiki_ui/buttons/choi_widgets.dart';
 
 abstract final class MuzhikiUi {

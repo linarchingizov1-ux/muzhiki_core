@@ -41,6 +41,14 @@ class _AnimatedButtonState extends State<AnimatedButton>
   GoRouter? _router;
   VoidCallback? _routerListener;
 
+  double _getScale() {
+    if (widget.child != null) {
+      return 1.05;
+    }
+
+    return 1.12;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -51,7 +59,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
       reverseDuration: const Duration(milliseconds: 260),
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: _getScale()).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutCubic,
