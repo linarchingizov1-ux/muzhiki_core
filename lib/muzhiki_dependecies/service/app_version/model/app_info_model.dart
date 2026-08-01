@@ -5,6 +5,7 @@ class AppInfoModel {
   final String osVersion;
   final String? manufacturer;
   final String model;
+  final String deviceId;
 
   const AppInfoModel({
     required this.version,
@@ -13,10 +14,11 @@ class AppInfoModel {
     required this.osVersion,
     required this.manufacturer,
     required this.model,
+    required this.deviceId,
   });
 
   @override
   String toString() {
-    return 'AppInfo(version: $version, buildNumber: $buildNumber, platform: $platform, osVersion: $osVersion, manufacturer: $manufacturer, model: $model)';
+    return 'AppInfo(version: $version, buildNumber: $buildNumber, platform: $platform, osVersion: $osVersion, manufacturer: $manufacturer, model: $model deviceId: $deviceId)';
   }
 }
