@@ -56,14 +56,14 @@ class _AnimatedButtonState extends State<AnimatedButton>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 100),
-      reverseDuration: const Duration(milliseconds: 260),
+      reverseDuration: const Duration(milliseconds: 400),
     );
 
     _scaleAnimation = Tween<double>(begin: 1.0, end: _getScale()).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInOutCubic,
+        curve: Curves.easeOutBack,
+        reverseCurve: Curves.easeOutCubic,
       ),
     );
   }
