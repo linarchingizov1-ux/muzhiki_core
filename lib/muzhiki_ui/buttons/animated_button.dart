@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -16,10 +15,12 @@ class AnimatedButton extends StatefulWidget {
     this.child,
     this.isGlasses = false,
     this.backgroundColor,
+    required this.scale,
   });
 
   final String? svgAsset;
   final bool isGlasses;
+  final double scale;
   final IconData? icon;
   final Color iconColor;
   final VoidCallback onTap;
@@ -38,27 +39,9 @@ class _AnimatedButtonState extends State<AnimatedButton>
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
   bool _isPopping = false;
-  Size? _childSize;
 
   GoRouter? _router;
   VoidCallback? _routerListener;
-
-  double _getScale() {
-    final size = _childSize?.shortestSide ?? widget.size;
-
-    return (1 + 6 / size).clamp(1.05, 1.12);
-  }
-
-  void _updateScaleAnimation() {
-    _scaleAnimation = Tween<double>(begin: 1.0, end: _getScale()).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutBack,
-        reverseCurve: Curves.easeOutCubic,
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -69,7 +52,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
       reverseDuration: const Duration(milliseconds: 450),
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: _getScale()).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: widget.scale).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutBack,
@@ -175,17 +158,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
         builder: (context, child) {
           return Transform.scale(scale: _scaleAnimation.value, child: child);
         },
-        child: SizeReportingWidget(
-          onSizeChanged: (size) {
-            if (_childSize != size) {
-              setState(() {
-                _childSize = size;
-                _updateScaleAnimation();
-              });
-            }
-          },
-          child: widget.child ?? _defaultButton(),
-        ),
+        child: widget.child ?? _defaultButton(),
       ),
     );
   }
@@ -211,40 +184,5 @@ class _AnimatedButtonState extends State<AnimatedButton>
             )
           : Icon(widget.icon, size: widget.iconSize.r, color: widget.iconColor),
     );
-  }
-}
-
-class SizeReportingWidget extends SingleChildRenderObjectWidget {
-  const SizeReportingWidget({
-    required this.onSizeChanged,
-    required super.child,
-    super.key,
-  });
-
-  final ValueChanged<Size> onSizeChanged;
-
-  @override
-  RenderObject createRenderObject(BuildContext context) {
-    return _SizeReportingRenderObject(onSizeChanged);
-  }
-}
-
-class _SizeReportingRenderObject extends RenderProxyBox {
-  _SizeReportingRenderObject(this.onSizeChanged);
-
-  final ValueChanged<Size> onSizeChanged;
-
-  Size? oldSize;
-
-  @override
-  void performLayout() {
-    super.performLayout();
-
-    if (size != oldSize) {
-      oldSize = size;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        onSizeChanged(size);
-      });
-    }
   }
 }

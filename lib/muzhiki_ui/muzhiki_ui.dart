@@ -20,8 +20,10 @@ final class MuzhikiButtons {
     double size = 40,
     double iconSize = 16,
     Color? backgroundColor,
+    double scale = 1.2,
   }) => AnimatedButton(
     svgAsset: svgAsset,
+    scale: scale,
     iconColor: iconColor,
     icon: icon,
     onTap: onTap,
