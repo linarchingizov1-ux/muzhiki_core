@@ -56,7 +56,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 100),
-      reverseDuration: const Duration(milliseconds: 400),
+      reverseDuration: const Duration(milliseconds: 450),
     );
 
     _scaleAnimation = Tween<double>(begin: 1.0, end: _getScale()).animate(
@@ -133,7 +133,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
     try {
       final animation = _controller.forward();
 
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 100));
 
       if (mounted) {
         widget.onTap();
