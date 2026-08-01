@@ -280,7 +280,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                   mainAxisSize: MainAxisSize.min,
                                   spacing: 10.h,
                                   children: [
-                                    MuzhikiUi.buttons.circle(
+                                    MuzhikiUi.buttons.animated(
                                       backgroundColor: SupportColors.white,
                                       iconColor: SupportColors.blood,
                                       svgAsset: SupportAssets.I.svg.image,
@@ -293,7 +293,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                             );
                                       },
                                     ),
-                                    MuzhikiUi.buttons.circle(
+                                    MuzhikiUi.buttons.animated(
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.recodeVideo,
                                       iconColor: SupportColors.blood,
@@ -306,7 +306,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                             );
                                       },
                                     ),
-                                    MuzhikiUi.buttons.circle(
+                                    MuzhikiUi.buttons.animated(
                                       backgroundColor: SupportColors.white,
                                       svgAsset: SupportAssets.I.svg.file,
                                       iconColor: SupportColors.blood,
@@ -333,7 +333,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
             },
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 5.r),
-              child: MuzhikiUi.buttons.circle(
+              child: MuzhikiUi.buttons.animated(
                 iconColor: isOpen ? SupportColors.blood : SupportColors.white,
                 svgAsset: isOpen
                     ? SupportAssets.I.svg.close

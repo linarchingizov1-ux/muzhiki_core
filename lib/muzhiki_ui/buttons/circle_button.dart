@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class CircleButton extends StatefulWidget {
-  const CircleButton({
+class AnimatedButton extends StatefulWidget {
+  const AnimatedButton({
     required this.onTap,
     super.key,
     this.svgAsset,
@@ -29,10 +29,10 @@ class CircleButton extends StatefulWidget {
   final Color? backgroundColor;
 
   @override
-  State<CircleButton> createState() => _CircleButtonState();
+  State<AnimatedButton> createState() => _AnimatedButtonState();
 }
 
-class _CircleButtonState extends State<CircleButton>
+class _AnimatedButtonState extends State<AnimatedButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
@@ -159,33 +159,31 @@ class _CircleButtonState extends State<CircleButton>
         builder: (context, child) {
           return Transform.scale(scale: _scaleAnimation.value, child: child);
         },
-        child: Container(
-          width: widget.size.r,
-          height: widget.size.r,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: widget.backgroundColor,
-          ),
-          alignment: Alignment.center,
-          child: widget.child != null
-              ? widget.child!
-              : widget.svgAsset != null
-              ? SvgPicture.asset(
-                  widget.svgAsset!,
-                  width: widget.iconSize.r,
-                  height: widget.iconSize.r,
-                  colorFilter: ColorFilter.mode(
-                    widget.iconColor,
-                    BlendMode.srcIn,
-                  ),
-                )
-              : Icon(
-                  widget.icon,
-                  size: widget.iconSize.r,
-                  color: widget.iconColor,
-                ),
-        ),
+        child: widget.child ?? _defaultButton(),
       ),
+    );
+  }
+
+  Widget _defaultButton() {
+    return Container(
+      width: widget.size.r,
+      height: widget.size.r,
+
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: widget.backgroundColor,
+      ),
+
+      alignment: Alignment.center,
+
+      child: widget.svgAsset != null
+          ? SvgPicture.asset(
+              widget.svgAsset!,
+              width: widget.iconSize.r,
+              height: widget.iconSize.r,
+              colorFilter: ColorFilter.mode(widget.iconColor, BlendMode.srcIn),
+            )
+          : Icon(widget.icon, size: widget.iconSize.r, color: widget.iconColor),
     );
   }
 }

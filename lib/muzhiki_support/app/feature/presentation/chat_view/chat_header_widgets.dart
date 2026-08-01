@@ -30,7 +30,7 @@ class ChatHeaderWidgets extends StatelessWidget {
           ),
           child: Row(
             children: [
-              MuzhikiUi.buttons.circle(
+              MuzhikiUi.buttons.animated(
                 onTap: () => context.pop(true),
                 size: 44,
                 backgroundColor: SupportColors.black1,

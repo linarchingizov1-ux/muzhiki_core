@@ -226,7 +226,7 @@ class _PhotoViewerPageState extends State<PhotoViewerPage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        MuzhikiUi.buttons.circle(
+                        MuzhikiUi.buttons.animated(
                           size: 45,
                           iconSize: 20,
                           onTap: _close,

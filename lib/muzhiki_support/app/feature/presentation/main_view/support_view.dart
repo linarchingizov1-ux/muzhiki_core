@@ -100,7 +100,7 @@ class _SupportViewState extends State<SupportView> {
             child: BlocBuilder<ChatCubit, ChatState>(
               builder: (context, state) {
                 if (state.chatStatus == StateStatus.success) {
-                  return MuzhikiUi.buttons.circle(
+                  return MuzhikiUi.buttons.animated(
                     backgroundColor: SupportColors.blood,
                     size: 55,
                     svgAsset: SupportAssets.I.svg.add,

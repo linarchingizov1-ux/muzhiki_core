@@ -41,7 +41,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
               if (canPop)
                 Padding(
                   padding: EdgeInsets.only(left: 17.w),
-                  child: MuzhikiUi.buttons.circle(
+                  child: MuzhikiUi.buttons.animated(
                     size: 40,
                     iconSize: 16,
                     backgroundColor: SupportColors.alertTextGrey,

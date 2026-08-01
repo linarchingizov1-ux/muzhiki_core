@@ -11,7 +11,7 @@ abstract final class MuzhikiUi {
 final class MuzhikiButtons {
   const MuzhikiButtons._();
 
-  CircleButton circle({
+  AnimatedButton animated({
     String? svgAsset,
     IconData? icon,
     Color iconColor = Colors.white,
@@ -20,7 +20,7 @@ final class MuzhikiButtons {
     double size = 40,
     double iconSize = 16,
     Color? backgroundColor,
-  }) => CircleButton(
+  }) => AnimatedButton(
     svgAsset: svgAsset,
     iconColor: iconColor,
     icon: icon,
@@ -44,16 +44,6 @@ final class MuzhikiButtons {
     isSelected: isSelected,
     label: label,
   );
-
-  // ClassicButton classic({
-  //   required double borderRadius,
-  //   EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
-  //     vertical: 5,
-  //     horizontal: 10,
-  //   ),
-  //   Color backgroudColor = Colors.black,
-  //   required VoidCallback onTap,
-  // }) => ClassicButton();
 }
 
 final class MuzhikiAppBar {
