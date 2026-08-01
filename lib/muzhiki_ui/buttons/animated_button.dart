@@ -37,7 +37,7 @@ class AnimatedButton extends StatefulWidget {
 class _AnimatedButtonState extends State<AnimatedButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _scaleAnimation;
+  late  Animation<double> _scaleAnimation;
   bool _isPopping = false;
 
   GoRouter? _router;
