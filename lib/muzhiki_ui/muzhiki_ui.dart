@@ -14,6 +14,7 @@ final class MuzhikiButtons {
   AnimatedButton animated({
     String? svgAsset,
     IconData? icon,
+    Key? key,
     Color iconColor = Colors.white,
     Widget? child,
     required VoidCallback onTap,
@@ -22,6 +23,7 @@ final class MuzhikiButtons {
     Color? backgroundColor,
     double scale = 1.1,
   }) => AnimatedButton(
+    key: key,
     svgAsset: svgAsset,
     scale: scale,
     iconColor: iconColor,
