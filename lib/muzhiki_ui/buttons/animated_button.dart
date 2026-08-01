@@ -48,8 +48,8 @@ class _AnimatedButtonState extends State<AnimatedButton>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
-      reverseDuration: const Duration(milliseconds: 450),
+      duration: const Duration(milliseconds: 120),
+      reverseDuration: const Duration(milliseconds: 180),
     );
 
     _scaleAnimation = Tween<double>(begin: 1.0, end: widget.scale).animate(
@@ -80,6 +80,21 @@ class _AnimatedButtonState extends State<AnimatedButton>
     };
 
     router.routerDelegate.addListener(_routerListener!);
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.scale != widget.scale) {
+      _scaleAnimation = Tween<double>(begin: 1.0, end: widget.scale).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Curves.easeOutBack,
+          reverseCurve: Curves.easeOutCubic,
+        ),
+      );
+    }
   }
 
   @override
@@ -126,7 +141,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
     try {
       _controller.forward();
 
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 50));
 
       if (mounted) {
         widget.onTap();
