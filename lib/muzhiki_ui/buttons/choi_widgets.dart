@@ -157,7 +157,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
             return Transform.scale(scale: _scaleAnimation.value, child: child);
           },
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 11.h),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(48.r),
               color: widget.isSelected
