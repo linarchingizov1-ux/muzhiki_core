@@ -5,8 +5,6 @@ class MuzhikiDependencies {
   static final I = MuzhikiDependencies._();
   final _rootKey = GlobalKey<NavigatorState>();
   GlobalKey<NavigatorState> get routerKey => _rootKey;
-
-  // BannerController get banner => BannerController.I;
   ScreenRadius? divesRadius;
   late bool _isUninstalling;
 
@@ -18,18 +16,26 @@ class MuzhikiDependencies {
     required bool showTalkerMetricsHttp,
     required TypeApp typeApp,
   }) async {
+    final sw = Stopwatch()..start();
+    final talker = Talker();
+    talker.debug('Создали Talker: ${sw.elapsedMilliseconds}ms');
+
     final directory = await Future.microtask(
       () => getApplicationDocumentsDirectory(),
     );
+    talker.debug('Взяли директорию: ${sw.elapsedMilliseconds}ms');
     final sharedPreferences = await Future.microtask(
       () => SharedPreferences.getInstance(),
     );
+    talker.debug('Взяли SharedPreferences: ${sw.elapsedMilliseconds}ms');
     final secureStorage = const FlutterSecureStorage();
     _isUninstalling =
         sharedPreferences.getBool('${typeApp.nameApp}-isUninstalling') ?? true;
+    talker.debug('Проверили статус удаления: ${sw.elapsedMilliseconds}ms');
+
     final tokenStorage = SecureTokenStorage(secureStorage);
     final hiveStore = HiveCacheStore(directory.path);
-    final talker = Talker();
+
     final mapper = AppErrorMapper.I;
     final pathCoockies = path.join(directory.path, '.cookies');
 
@@ -37,9 +43,15 @@ class MuzhikiDependencies {
       ignoreExpires: true,
       storage: FileStorage(pathCoockies),
     );
+    talker.debug('Создали CookieJar: ${sw.elapsedMilliseconds}ms');
     await InternetCheckNotifier.I.init();
+    talker.debug(
+      'Инициализировали InternetCheckNotifier: ${sw.elapsedMilliseconds}ms',
+    );
     final infoProject = await AppInfoService.I.info;
+    talker.debug('Получили информацию о проекте: ${sw.elapsedMilliseconds}ms');
     final UserSession userSession = UserSession(sharedPreferences);
+    talker.debug('Создали UserSession: ${sw.elapsedMilliseconds}ms');
     final network = await NetworkFactory.create(
       showTalkerMetricsHttp: showTalkerMetricsHttp,
       userSession: userSession,
@@ -54,7 +66,7 @@ class MuzhikiDependencies {
       store: hiveStore,
       tokenStorage: tokenStorage,
     );
-
+    talker.debug('Создали Network: ${sw.elapsedMilliseconds}ms');
     final session = SessionApp(
       tokenStorage: tokenStorage,
       typeApp: typeApp,
@@ -67,8 +79,13 @@ class MuzhikiDependencies {
       cookieJar: cookie,
       hiveStore: hiveStore,
     );
+    talker.debug('Создали Session: ${sw.elapsedMilliseconds}ms');
     divesRadius = await ScreenCornerRadius.get();
+    talker.debug(
+      'Получили радиус скругления экрана: ${sw.elapsedMilliseconds}ms',
+    );
     await session.init();
+    talker.debug('Инициализировали Session: ${sw.elapsedMilliseconds}ms');
     if (_isUninstalling) {
       await sharedPreferences.clear();
 
