@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -133,15 +131,13 @@ class _AnimatedButtonState extends State<AnimatedButton>
     _isPopping = true;
 
     try {
-      final animation = _controller.forward();
+      _controller.forward();
 
-      await _waitAnimationProgress(0.5);
+      await Future.delayed(const Duration(milliseconds: 100));
 
       if (mounted) {
         widget.onTap();
       }
-
-      await animation;
 
       if (mounted) {
         await _controller.reverse();
@@ -149,21 +145,6 @@ class _AnimatedButtonState extends State<AnimatedButton>
     } finally {
       _isPopping = false;
     }
-  }
-
-  Future<void> _waitAnimationProgress(double value) {
-    final completer = Completer<void>();
-
-    void listener() {
-      if (_controller.value >= value) {
-        _controller.removeListener(listener);
-        completer.complete();
-      }
-    }
-
-    _controller.addListener(listener);
-
-    return completer.future;
   }
 
   void _onTapCancel() {
