@@ -218,27 +218,29 @@ class _DefaultBannerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(18.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.95),
+          borderRadius: BorderRadius.circular(18.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Text(
+          message,
+          maxLines: 4,
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
-        ],
-      ),
-      child: Text(
-        message,
-        maxLines: 4,
-        style: TextStyle(
-          fontSize: 13.sp,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
         ),
       ),
     );
