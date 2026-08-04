@@ -1,5 +1,7 @@
 part of 'package:muzhiki_core/muzhiki_core.dart';
 
+typedef MpBridgeClearCookies = Future<void> Function();
+
 class MpBridgeWebView extends StatefulWidget {
   final bool showAppBar;
   final String initialUrl;
@@ -7,6 +9,9 @@ class MpBridgeWebView extends StatefulWidget {
   final String? companyId;
   final SessionApp session;
   final List<int>? masterAudit;
+
+  /// Вызывается после инициализации и передаёт функцию очистки cookies WebView.
+  final void Function(MpBridgeClearCookies clearCookies)? onClearCookiesReady;
 
   const MpBridgeWebView({
     super.key,
@@ -17,6 +22,7 @@ class MpBridgeWebView extends StatefulWidget {
     required this.build,
     required this.version,
     required this.session,
+    this.onClearCookiesReady,
   });
 
   @override
@@ -30,6 +36,7 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
   late final WebViewController _controller;
   late final Stream<BridgeSession> _sessionUpdates;
   StreamSubscription? _sessionSubscription;
+  final WebViewCookieManager _cookieManager = WebViewCookieManager();
 
   bool _bridgeInjectedForCurrentPage = false;
   bool isLoading = true;
@@ -64,6 +71,8 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     _sessionUpdates = bridgeAuthUsecase.sessionUpdates;
     _controller = _buildController();
     _listenSessionUpdates();
+    widget.onClearCookiesReady?.call(clearCookies);
+
     final urlParse = widget.companyId != null
         ? "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
         : widget.masterAudit != null && widget.masterAudit!.isNotEmpty
@@ -81,6 +90,15 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     _sessionSubscription?.cancel();
     bridgeAuthUsecase.dispose();
     super.dispose();
+  }
+
+  /// Очищает cookies WebView.
+  Future<void> clearCookies() async {
+    try {
+      await _cookieManager.clearCookies();
+    } catch (e) {
+      debugPrint('Clear cookies failed: $e');
+    }
   }
 
   void _listenSessionUpdates() {
