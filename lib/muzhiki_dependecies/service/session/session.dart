@@ -22,7 +22,8 @@ enum TypeApp {
   master("mp_master_app", "app.mpmaster.com"),
   bussines("mp_business_mobile_app", "app.mpbussines.com"),
   support("mp_support_app", "app.mpsupport.com"),
-  client("mp_client_app", "app.mpclient.com");
+  client("mp_client_app", "app.mpclient.com"),
+  task("mp_task_app", "app.mptask.com");
 
   final String nameApp;
   final String scheme;
