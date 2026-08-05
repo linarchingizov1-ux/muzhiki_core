@@ -1,0 +1,202 @@
+﻿import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:muzhiki_dependencies/service/session/session.dart';
+import 'package:muzhiki_support/app/data/model/socket/chat_websocket_state.dart';
+import 'package:muzhiki_support/app/data/model/support_chats_event_widgets.dart';
+import 'package:muzhiki_support/app/data/websocket/chat_websocket_app.dart';
+import 'package:muzhiki_support/app/data/websocket/extension/chat_footer_state_extension.dart';
+import 'package:muzhiki_support/app/domain/usecase/chat_usecase.dart';
+import 'package:muzhiki_support/app/feature/presentation/chat_view/chat_bottom_widgets.dart';
+import 'package:muzhiki_support/app/feature/presentation/chat_view/chat_header_widgets.dart';
+import 'package:muzhiki_support/app/feature/presentation/chat_view/chat_message_widgets.dart';
+import 'package:muzhiki_support/app/feature/state/attachments/attachments_cubit.dart';
+import 'package:muzhiki_support/app/feature/state/chat/chat_cubit.dart';
+
+String _startNewSessionText = 'Здравствуйте 👋!';
+
+class ChatView extends StatefulWidget {
+  final ChatUseCase chatUseCase;
+  final ChatCubit chatCubit;
+  final Directory directory;
+  final SessionApp session;
+  final AttachmentsCubit attachmentsCubit;
+  final int? id;
+  final Object? extra;
+
+  const ChatView({
+    super.key,
+    required this.id,
+    this.extra,
+    required this.chatUseCase,
+    required this.session,
+    required this.attachmentsCubit,
+    required this.chatCubit,
+    required this.directory,
+  });
+
+  @override
+  State<ChatView> createState() => _ChatViewState();
+}
+
+class _ChatViewState extends State<ChatView> {
+  late final AppWebsocketChat websocketApp;
+  bool needUpdate = true;
+
+  @override
+  void initState() {
+    super.initState();
+    websocketApp = AppWebsocketChat(
+      sessionChatId: widget.id,
+      channelId: widget.chatCubit.state.channelId,
+      chatUsecase: widget.chatUseCase,
+      session: widget.session,
+    );
+
+    if (websocketApp.isDraft) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        websocketApp.openDraftChat();
+      });
+    } else {
+      websocketApp.connect();
+    }
+
+    switch (widget.extra) {
+      case SupportChatsEventWidgets event:
+        if (event.type == SupportChatsEventWidgetsType.records) {
+          _startNewSessionText = event.label;
+        } else if (event.type == SupportChatsEventWidgetsType.mobileWidgets) {
+          needUpdate = false;
+        }
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    websocketApp.dispose();
+    widget.attachmentsCubit.clear();
+    super.dispose();
+  }
+
+  EdgeInsets get mq => MediaQuery.paddingOf(context);
+
+  double get topInset => mq.top;
+  double get bottomInset => mq.bottom;
+
+  bool get isOpenKeyboard {
+    final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
+    return keyboardHeight > 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: PopScope(
+        onPopInvokedWithResult: (didPop, result) {
+          if (needUpdate || (widget.id == null && !websocketApp.isDraft)) {
+            widget.chatCubit.silenceRefresh();
+          }
+        },
+        child: Scaffold(
+          body: StreamBuilder(
+            initialData: websocketApp.state,
+            stream: websocketApp.stream,
+            builder: (context, snapshot) {
+              final footerState = snapshot.data?.socket?.footerState;
+              return Stack(
+                children: [
+                  ChatMessageWidgets(
+                    websocket: websocketApp,
+                    topInset: topInset,
+                    bottomInset: bottomInset,
+                    snapshot: snapshot,
+                    chatCubit: widget.chatCubit,
+                    directory: widget.directory,
+                  ),
+                  if (snapshot.data?.socket != null &&
+                      footerState != ChatFooterState.closedRated &&
+                      footerState != ChatFooterState.closedNeedRating &&
+                      footerState != ChatFooterState.ticketActive)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: 100.h,
+                      child: IgnorePointer(
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOut,
+                          opacity: isOpenKeyboard ? 0.35 : 1,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.white,
+                                  Colors.white.withValues(alpha: 0.8),
+                                  Colors.white.withValues(alpha: 0.35),
+                                  Colors.white.withValues(alpha: 0),
+                                ],
+                                stops: const [0.0, 0.3, 0.65, 1.0],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    height: 100.h,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.95),
+                              Colors.white.withValues(alpha: 0.75),
+                              Colors.white.withValues(alpha: 0.3),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.0, 0.3, 0.65, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 17.w,
+                    right: 17.w,
+                    top: topInset + 10.h,
+                    child: ChatHeaderWidgets(snapshot: snapshot),
+                  ),
+
+                  Positioned(
+                    left: 17.w,
+                    right: 17.w,
+                    bottom: bottomInset + 15.h,
+                    child: ChatBottomWidgets(
+                      snapshot: snapshot,
+                      attachmentsCubit: widget.attachmentsCubit,
+                      websocket: websocketApp,
+                      initMessage: _startNewSessionText,
+                      directory: widget.directory,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}

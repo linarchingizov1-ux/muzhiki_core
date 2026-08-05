@@ -1,0 +1,22 @@
+name: muzhiki_bridge
+description: WebView bridge widget shared across Muzhiki apps.
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.1
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  muzhiki_dependencies:
+    path: ../muzhiki_dependencies
+  permission_handler: ^12.0.3
+  webview_flutter: ^4.14.0
+  webview_flutter_android: ^4.13.0
+  webview_flutter_wkwebview: ^3.26.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

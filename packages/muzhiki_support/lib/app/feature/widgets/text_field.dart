@@ -1,0 +1,352 @@
+﻿import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:muzhiki_support/app/config/constant/support_assets.dart';
+import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_support/app/data/model/socket/socket_connection.dart';
+import 'package:muzhiki_support/app/feature/state/attachments/attachments_cubit.dart';
+import 'package:muzhiki_support/app/feature/widgets/upload_data_widgets.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
+
+class TextFieldWidgets extends StatefulWidget {
+  final AttachmentsCubit attachmentsCubit;
+  final Directory directory;
+  final void Function() send;
+  final TextEditingController controller;
+
+  const TextFieldWidgets({
+    super.key,
+    required this.controller,
+    required this.attachmentsCubit,
+    required this.send,
+    required this.directory,
+  });
+
+  @override
+  State<TextFieldWidgets> createState() => _TextFieldWidgetsState();
+}
+
+class _TextFieldWidgetsState extends State<TextFieldWidgets> {
+  bool get _hasText => widget.controller.text.trim().isNotEmpty;
+
+  bool get _hasAttachments =>
+      context.watch<AttachmentsCubit>().state.items.isNotEmpty;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AttachmentsCubit, AttachmentsState>(
+      builder: (context, state) {
+        return Row(
+          spacing: 8.w,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            _CircleMenuAnimated(attachmentsCubit: widget.attachmentsCubit),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (state.items.isNotEmpty)
+                    SizedBox(
+                      height: 65.h,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: state.items.length,
+                        separatorBuilder: (_, _) => SizedBox(width: 8.w),
+                        itemBuilder: (context, i) {
+                          return UploadDataWidgets(
+                            item: state.items[i],
+                            directory: widget.directory,
+                            attachmentsCubit: widget.attachmentsCubit,
+                          );
+                        },
+                      ),
+                    ),
+                  SizedBox(height: 6.h),
+                  Stack(
+                    children: [
+                      TextSelectionTheme(
+                        data: TextSelectionThemeData(
+                          selectionColor: const Color(
+                            0xFF2AABEE,
+                          ).withValues(alpha: 0.25),
+                          selectionHandleColor: const Color(0xFF2AABEE),
+                        ),
+                        child: TextField(
+                          controller: widget.controller,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 10,
+                          minLines: 1,
+                          expands: false,
+                          cursorColor: SupportColors.black1,
+                          cursorWidth: 2.w,
+                          cursorHeight: 16.h,
+                          textAlignVertical: TextAlignVertical.top,
+                          onChanged: (_) => setState(() {}),
+                          style: TextStyle(
+                            fontFamily: 'Manrope',
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Сообщение...',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Manrope',
+                              fontSize: 12.sp,
+                              color: SupportColors.grey,
+                            ),
+                            isDense: true,
+                            contentPadding: EdgeInsets.only(
+                              left: 12.w,
+                              right: 50.w,
+                              top: 12.h,
+                              bottom: 12.h,
+                            ),
+                            filled: true,
+                            fillColor: SupportColors.light,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 4.w,
+                        bottom: 4.w,
+                        child: GestureDetector(
+                          onTap: widget.send,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            height: 30.w,
+                            width: 45.w,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.r),
+                              color: _hasText || _hasAttachments
+                                  ? SupportColors.blood
+                                  : SupportColors.grey,
+                            ),
+                            child: Icon(
+                              Icons.send,
+                              size: 16.r,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _CircleMenuAnimated extends StatefulWidget {
+  final AttachmentsCubit attachmentsCubit;
+  const _CircleMenuAnimated({required this.attachmentsCubit});
+
+  @override
+  State<_CircleMenuAnimated> createState() => _CircleMenuAnimatedState();
+}
+
+class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
+    with SingleTickerProviderStateMixin {
+  late final OverlayPortalController overlayPortalController;
+  late final AnimationController animationController;
+  late final Animation<double> fadeAnimation;
+  late final Animation<double> scaleAnimation;
+  late final Animation<Offset> slideAnimation;
+  List<PlatformFile> files = [];
+
+  bool isOpen = false;
+  bool isDisopse = false;
+
+  FocusNode? get focus => WidgetsBinding.instance.focusManager.primaryFocus;
+
+  @override
+  void initState() {
+    super.initState();
+    overlayPortalController = OverlayPortalController();
+
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 80),
+      reverseDuration: const Duration(milliseconds: 50),
+    );
+    fadeAnimation = CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeOutQuart,
+      reverseCurve: Curves.easeInQuart,
+    );
+
+    scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: Curves.easeOutQuart,
+        reverseCurve: Curves.easeInQuart,
+      ),
+    );
+
+    slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: animationController,
+            curve: Curves.easeOutQuart,
+            reverseCurve: Curves.easeInQuart,
+          ),
+        );
+  }
+
+  @override
+  void dispose() {
+    isDisopse = true;
+    animationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _open() async {
+    if (isOpen || isDisopse) return;
+    if (focus?.hasFocus ?? false) {
+      focus?.unfocus();
+    }
+    overlayPortalController.show();
+    setState(() => isOpen = true);
+    await animationController.forward();
+  }
+
+  Future<void> _close() async {
+    if (!isOpen || animationController.isDismissed) return;
+
+    await animationController.reverse();
+    overlayPortalController.hide();
+
+    if (mounted) {
+      setState(() => isOpen = false);
+    }
+  }
+
+  Future<void> _toggle() async {
+    if (isOpen) {
+      await _close();
+    } else {
+      await _open();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: widget.attachmentsCubit,
+      child: BlocBuilder<AttachmentsCubit, AttachmentsState>(
+        builder: (context, state) {
+          return OverlayPortal(
+            controller: overlayPortalController,
+            overlayChildBuilder: (context) {
+              return Positioned.fill(
+                child: SafeArea(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: _close,
+                          child: const SizedBox.expand(),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 62.h,
+                        left: 17.w,
+                        child: FadeTransition(
+                          opacity: fadeAnimation,
+                          child: SlideTransition(
+                            position: slideAnimation,
+                            child: ScaleTransition(
+                              scale: scaleAnimation,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                padding: EdgeInsets.all(5.r),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(48.r),
+                                  color: SupportColors.light
+                                    ..withValues(alpha: 0.2),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 10.h,
+                                  children: [
+                                    MuzhikiUi.buttons.animated(
+                                      backgroundColor: SupportColors.white,
+                                      iconColor: SupportColors.blood,
+                                      svgAsset: SupportAssets.I.svg.image,
+                                      onTap: () async {
+                                        _close();
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.photo,
+                                            );
+                                      },
+                                    ),
+                                    MuzhikiUi.buttons.animated(
+                                      backgroundColor: SupportColors.white,
+                                      svgAsset: SupportAssets.I.svg.recodeVideo,
+                                      iconColor: SupportColors.blood,
+                                      onTap: () async {
+                                        _close();
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.video,
+                                            );
+                                      },
+                                    ),
+                                    MuzhikiUi.buttons.animated(
+                                      backgroundColor: SupportColors.white,
+                                      svgAsset: SupportAssets.I.svg.file,
+                                      iconColor: SupportColors.blood,
+                                      onTap: () async {
+                                        _close();
+                                        await context
+                                            .read<AttachmentsCubit>()
+                                            .addAttachment(
+                                              type: ChatAttachmentType.document,
+                                            );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5.r),
+              child: MuzhikiUi.buttons.animated(
+                iconColor: isOpen ? SupportColors.blood : SupportColors.white,
+                svgAsset: isOpen
+                    ? SupportAssets.I.svg.close
+                    : SupportAssets.I.svg.screpka,
+                backgroundColor: isOpen
+                    ? SupportColors.white
+                    : SupportColors.blood,
+                onTap: _toggle,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

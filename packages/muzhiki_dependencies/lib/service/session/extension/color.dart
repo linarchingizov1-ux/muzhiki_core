@@ -1,0 +1,45 @@
+﻿import 'dart:ui';
+
+import 'package:muzhiki_ui/theme/support_colors.dart';
+
+extension ColorExtension on String {
+  Color get toColor {
+    try {
+      final hex = trim().replaceAll('#', '');
+
+      if (hex.isEmpty) {
+        return SupportColors.light;
+      }
+
+      String normalized;
+
+      switch (hex.length) {
+        case 3:
+          normalized = hex.split('').map((e) => '$e$e').join();
+          normalized = 'FF$normalized';
+          break;
+
+        case 6:
+          normalized = 'FF$hex';
+          break;
+
+        case 8:
+          normalized = hex;
+          break;
+
+        default:
+          return SupportColors.light;
+      }
+
+      final value = int.tryParse(normalized, radix: 16);
+
+      if (value == null) {
+        return SupportColors.light;
+      }
+
+      return Color(value);
+    } catch (_) {
+      return SupportColors.light;
+    }
+  }
+}

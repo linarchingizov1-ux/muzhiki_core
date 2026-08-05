@@ -1,0 +1,41 @@
+﻿class SupportAssets {
+  SupportAssets._();
+  static final I = SupportAssets._();
+
+  final svg = _SupportAssetsSvg();
+  final png = _SupportAssetsPng();
+}
+
+class _SupportAssetsPng {
+  const _SupportAssetsPng();
+  static const _base = 'packages/muzhiki_support/assets/png';
+  final starEnable = '$_base/star_e.png';
+  final starDisable = '$_base/star_dis.png';
+  final informatorBackground = '$_base/informator_background.png';
+
+  final doc = '$_base/doc.png';
+  final pdf = '$_base/pdf.png';
+  final ppt = '$_base/ppt.png';
+  final txt = '$_base/txt.png';
+  final xls = '$_base/xls.png';
+  final zip = '$_base/zip.png';
+  final file = '$_base/file.png';
+}
+
+class _SupportAssetsSvg {
+  const _SupportAssetsSvg();
+
+  static const _base = 'packages/muzhiki_support/assets/svg';
+  final arrowBack = '$_base/arrow_back.svg';
+  final dashboard = '$_base/dashboard.svg';
+  final logout = '$_base/logout.svg';
+  final add = '$_base/add.svg';
+  final info = '$_base/info.svg';
+  final doc = '$_base/doc.svg';
+  final close = '$_base/close.svg';
+  final recodeVideo = '$_base/recorde_video.svg';
+  final file = '$_base/file.svg';
+  final image = '$_base/image.svg';
+  final screpka = '$_base/screpka.svg';
+  final speaker = '$_base/speaker.svg';
+}

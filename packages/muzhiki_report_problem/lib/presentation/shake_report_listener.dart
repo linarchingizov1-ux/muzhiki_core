@@ -1,0 +1,82 @@
+﻿import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
+import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
+import 'package:muzhiki_report_problem/config/report_problem_config.dart';
+import 'package:muzhiki_report_problem/presentation/report_problem_dialog.dart';
+import 'package:muzhiki_report_problem/presentation/widgets/app_standart_dialog.dart';
+import 'package:shake/shake.dart';
+import 'package:vibration/vibration.dart';
+
+class ShakeReportListener extends StatefulWidget {
+  final ReportProblemConfig config;
+  final Widget child;
+
+  const ShakeReportListener({
+    super.key,
+    required this.config,
+    required this.child,
+  });
+
+  @override
+  State<ShakeReportListener> createState() => _ShakeReportListenerState();
+}
+
+class _ShakeReportListenerState extends State<ShakeReportListener> {
+  ShakeDetector? _detector;
+  bool _isDialogOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final isIos = Platform.isIOS;
+    _detector = ShakeDetector.autoStart(
+      minimumShakeCount: 2,
+      shakeThresholdGravity: isIos ? 1.7 : 2,
+      shakeSlopTimeMS: isIos ? 200 : 400,
+      onPhoneShake: (_) => _openDialog(),
+    );
+  }
+
+  Future<void> _openDialog() async {
+    if (_isDialogOpen) return;
+    _isDialogOpen = true;
+    if (await Vibration.hasVibrator()) {
+      unawaited(
+        Vibration.vibrate(duration: 100, amplitude: 200, sharpness: 0.7),
+      );
+    }
+    try {
+      await AppStandartDialog.open<void>(
+        backgroundColor: ReportProblemColors.appBackgroud,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(22.r),
+          bottom: Radius.circular(
+            MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
+          ),
+        ),
+        outerPadding: EdgeInsets.only(
+          left: 8.w,
+          right: 8.w,
+          top: 8.h,
+          bottom: 20.h,
+        ),
+        child: ReportProblemDialog(config: widget.config),
+      );
+    } finally {
+      _isDialogOpen = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    _detector?.stopListening();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}

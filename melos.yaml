@@ -1,0 +1,23 @@
+name: muzhiki_core
+repository: https://github.com/linarchingizov1-ux/muzhiki_core
+
+packages:
+  - packages/**
+  - apps/**
+
+command:
+  bootstrap:
+    runPubGetInParallel: true
+
+scripts:
+  analyze:
+    run: melos exec -- flutter analyze --no-fatal-infos
+    description: Run flutter analyze in all packages
+
+  get:
+    run: melos bootstrap
+    description: Bootstrap all packages
+
+  clean:
+    run: melos exec -- flutter clean
+    description: Clean all packages
