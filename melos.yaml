@@ -3,7 +3,6 @@ repository: https://github.com/linarchingizov1-ux/muzhiki_core
 
 packages:
   - packages/**
-  - apps/**
 
 command:
   bootstrap:

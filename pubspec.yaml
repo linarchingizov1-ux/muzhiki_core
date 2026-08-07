@@ -16,6 +16,3 @@ workspace:
   - packages/muzhiki_support
   - packages/muzhiki_report_problem
   - packages/flutter_appauth
-  - apps/mp_master
-  - apps/mp_business
-  - apps/mp_client

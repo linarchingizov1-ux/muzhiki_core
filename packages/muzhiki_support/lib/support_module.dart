@@ -3,16 +3,16 @@
 import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
-import 'package:muzhiki_support/app/config/constant/support_route_constant.dart';
-import 'package:muzhiki_support/app/config/support_route_event.dart';
-import 'package:muzhiki_support/app/data/repository/chat_repository_impl.dart';
-import 'package:muzhiki_support/app/domain/usecase/chat_usecase.dart';
-import 'package:muzhiki_support/app/feature/presentation/chat_view/chat_view.dart';
-import 'package:muzhiki_support/app/feature/presentation/informator/informator_view.dart';
-import 'package:muzhiki_support/app/feature/presentation/main_view/support_view.dart';
-import 'package:muzhiki_support/app/feature/state/attachments/attachments_cubit.dart';
-import 'package:muzhiki_support/app/feature/state/chat/chat_cubit.dart';
-import 'package:muzhiki_support/app/feature/widgets/video_player.dart';
+import 'package:muzhiki_support/config/support_route_constant.dart';
+import 'package:muzhiki_support/config/support_route_event.dart';
+import 'package:muzhiki_support/data/repositories/chat_repository_impl.dart';
+import 'package:muzhiki_support/domain/usecases/chat_usecase.dart';
+import 'package:muzhiki_support/features/chat/chat_view.dart';
+import 'package:muzhiki_support/features/informator/informator_view.dart';
+import 'package:muzhiki_support/features/home/support_view.dart';
+import 'package:muzhiki_support/features/chat/state/attachments_cubit.dart';
+import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
+import 'package:muzhiki_support/shared/widgets/video_player.dart';
 
 class SupportModuleConfig {
   final String homeRoute;

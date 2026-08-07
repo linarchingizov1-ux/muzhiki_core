@@ -1,7 +1,10 @@
 export 'support_module.dart';
-export 'app/config/support_route_event.dart';
-export 'app/config/constant/support_route_constant.dart';
-export 'app/config/constant/support_assets.dart';
-export 'app/feature/presentation/main_view/support_view.dart';
-export 'app/feature/presentation/chat_view/chat_view.dart';
-export 'app/feature/presentation/informator/informator_view.dart';
+export 'config/support_route_event.dart';
+export 'config/support_route_constant.dart';
+export 'config/support_assets.dart';
+export 'data/models/support_chats_event_widgets.dart';
+export 'data/models/view_image_item_model.dart';
+export 'features/home/support_view.dart';
+export 'features/chat/chat_view.dart';
+export 'features/informator/informator_view.dart';
+export 'shared/widgets/photo_view_widget.dart';

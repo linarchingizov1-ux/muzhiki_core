@@ -17,9 +17,8 @@ import 'package:muzhiki_ui/widgets/button_small.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/error_dialog.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/multiline_input_card.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/success_dialog.dart';
-import 'package:muzhiki_support/app/data/model/view_image_item_model.dart';
+import 'package:muzhiki_support/muzhiki_support.dart';
 import 'package:muzhiki_ui/widgets/button.dart';
-import 'package:muzhiki_support/app/feature/widgets/photo_view_widget.dart';
 import 'package:provider/provider.dart';
 
 class ReportProblemDialog extends StatefulWidget {

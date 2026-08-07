@@ -1,0 +1,13 @@
+﻿import 'package:muzhiki_support/data/models/socket/socket_connection.dart';
+import 'package:muzhiki_support/data/models/view_image_item_model.dart';
+import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
+
+extension ChatMediaExtension on AppWebsocketChat {
+  List<ViewerImageItem> buildImages() {
+    return state.messages
+        .expand((m) => m.attachments)
+        .where((a) => a.type == ChatAttachmentType.photo)
+        .map((a) => ViewerImageItem.network(a.url))
+        .toList();
+  }
+}
