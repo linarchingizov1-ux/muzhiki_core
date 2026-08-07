@@ -1,11 +1,13 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_ui/theme/support_colors.dart';
 
 enum ButtonMode { classic, black, description, circle, rounded }
 
-class AppButton extends StatelessWidget {
+/// @deprecated Используйте [AppButton.primary], [AppButton.dark] и т.д.
+@Deprecated('Use AppButton.primary() and other AppButton factories')
+class LegacyAppButton extends StatelessWidget {
   final void Function() onPressed;
   final ButtonMode mode;
   final String? label;
@@ -21,7 +23,7 @@ class AppButton extends StatelessWidget {
   final bool isLoading;
   final String? assetIcon;
   final double borderRadius;
-  const AppButton({
+  const LegacyAppButton({
     this.sizeProgress = 28,
     this.progressColor = SupportColors.white,
     this.isLoading = false,

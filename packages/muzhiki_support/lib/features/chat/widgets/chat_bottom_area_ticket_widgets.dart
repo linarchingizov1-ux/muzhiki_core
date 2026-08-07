@@ -6,7 +6,7 @@ import 'package:muzhiki_ui/theme/support_colors.dart';
 import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_support/shared/extensions/date_format.dart';
-import 'package:muzhiki_ui/widgets/button.dart';
+import 'package:muzhiki_ui/buttons/app_button.dart';
 
 class ChatBottomAreaTicketWidgets extends StatefulWidget {
   final WebSocketChat webSocketApp;
@@ -99,14 +99,13 @@ class _ChatBottomAreaTicketWidgetsState
                 ),
               ),
               SizedBox(height: 12.h),
-              AppButton(
+              AppButton.pill(
                 isLoading: isLoadingReopen,
                 height: 48,
                 backgroundColor: SupportColors.light,
                 labelWeight: FontWeight.w700,
                 progressColor: SupportColors.alertTextGrey,
                 labelColor: SupportColors.alertTextGrey,
-                mode: ButtonMode.rounded,
                 onPressed: () async {
                   setState(() {
                     isLoadingReopen = true;

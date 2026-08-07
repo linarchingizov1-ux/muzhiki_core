@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:muzhiki_dependencies/network/ui/config/network_problem_assets.dart';
 import 'package:muzhiki_dependencies/network/ui/config/network_problem_colors.dart';
 import 'package:muzhiki_ui/widgets/button_small.dart';
-import 'package:muzhiki_ui/widgets/button.dart';
+import 'package:muzhiki_ui/buttons/app_button.dart';
 
 enum _NetworkIssuePage { main, whatToDo, whatWeDo }
 
@@ -123,8 +123,7 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
             ),
           ],
           SizedBox(height: 27.h),
-          AppButton(
-            mode: ButtonMode.classic,
+          AppButton.primary(
             label: 'Ох, ладно',
             backgroundColor: NetworkProblemColors.greyLight,
             labelColor: NetworkProblemColors.black23,

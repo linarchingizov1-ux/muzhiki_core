@@ -16,6 +16,7 @@ class AnimatedButton extends StatefulWidget {
     this.isGlasses = false,
     this.backgroundColor,
     required this.scale,
+    this.enabled = true,
   });
 
   final String? svgAsset;
@@ -29,6 +30,7 @@ class AnimatedButton extends StatefulWidget {
   final double size;
   final double iconSize;
   final Color? backgroundColor;
+  final bool enabled;
 
   @override
   State<AnimatedButton> createState() => _AnimatedButtonState();
@@ -128,13 +130,13 @@ class _AnimatedButtonState extends State<AnimatedButton>
   }
 
   void _onTapDown(TapDownDetails details) {
-    if (_isPopping) return;
+    if (!widget.enabled || _isPopping) return;
 
     _controller.forward();
   }
 
   void _onTapUp(TapUpDetails details) async {
-    if (_isPopping) return;
+    if (!widget.enabled || _isPopping) return;
 
     _isPopping = true;
 
@@ -156,25 +158,31 @@ class _AnimatedButtonState extends State<AnimatedButton>
   }
 
   void _onTapCancel() {
-    if (_isPopping) return;
+    if (!widget.enabled || _isPopping) return;
 
     _controller.reverse();
   }
 
   @override
   Widget build(BuildContext context) {
+    final content = AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(scale: _scaleAnimation.value, child: child);
+      },
+      child: widget.child ?? _defaultButton(),
+    );
+
+    if (!widget.enabled) {
+      return content;
+    }
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
-      child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(scale: _scaleAnimation.value, child: child);
-        },
-        child: widget.child ?? _defaultButton(),
-      ),
+      child: content,
     );
   }
 

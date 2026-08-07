@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/theme/support_colors.dart';
 import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
-import 'package:muzhiki_ui/widgets/button.dart';
+import 'package:muzhiki_ui/buttons/app_button.dart';
 
 class ChatBottomAreaClosedAndRatedWidgets extends StatefulWidget {
   final WebSocketChat webSocketApp;
@@ -68,14 +68,13 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
                 ),
               ),
               if (!hideReopenButton)
-                AppButton(
+                AppButton.pill(
                   height: 48,
                   isLoading: isLoadingReopen,
                   labelWeight: FontWeight.w700,
                   backgroundColor: SupportColors.light,
                   progressColor: SupportColors.black17,
                   labelColor: SupportColors.alertTextGrey,
-                  mode: ButtonMode.rounded,
                   onPressed: () {
                     setState(() {
                       isLoadingReopen = true;

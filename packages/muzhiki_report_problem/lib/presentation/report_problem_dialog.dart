@@ -18,7 +18,7 @@ import 'package:muzhiki_report_problem/presentation/widgets/error_dialog.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/multiline_input_card.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/success_dialog.dart';
 import 'package:muzhiki_support/muzhiki_support.dart';
-import 'package:muzhiki_ui/widgets/button.dart';
+import 'package:muzhiki_ui/buttons/app_button.dart';
 import 'package:provider/provider.dart';
 
 class ReportProblemDialog extends StatefulWidget {
@@ -313,12 +313,12 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                   SizedBox(height: 27.h),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    child: AppButton(
-                      mode: ButtonMode.classic,
+                    child: AppButton.primary(
                       label: viewModel.isSubmitSuccess == false
                           ? 'Повторить'
                           : 'Отправить',
                       isLoading: viewModel.isSubmitting,
+                      disabled: !viewModel.isValid,
                       backgroundColor: viewModel.isValid
                           ? ReportProblemColors.black23
                           : ReportProblemColors.light,
@@ -326,7 +326,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                           ? ReportProblemColors.white
                           : ReportProblemColors.black23,
                       borderRadius: 20,
-                      onPressed: viewModel.isValid ? () => _submit() : () {},
+                      onPressed: () => _submit(),
                     ),
                   ),
                 ],

@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_ui/widgets/button.dart';
+import 'package:muzhiki_ui/buttons/app_button.dart';
 import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
 
 class ErrorDialog extends StatelessWidget {
@@ -47,8 +47,7 @@ class ErrorDialog extends StatelessWidget {
         ],
         SizedBox(height: 27.h),
         if (onRetry != null) ...[
-          AppButton(
-            mode: ButtonMode.classic,
+          AppButton.primary(
             label: 'Повторить',
             backgroundColor: ReportProblemColors.black23,
             labelColor: ReportProblemColors.white,
@@ -60,8 +59,7 @@ class ErrorDialog extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
         ],
-        AppButton(
-          mode: ButtonMode.classic,
+        AppButton.primary(
           label: 'Понятно',
           backgroundColor: ReportProblemColors.light,
           labelColor: ReportProblemColors.black23,

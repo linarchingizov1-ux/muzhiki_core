@@ -106,13 +106,13 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
   }
 
   void _onTapDown(TapDownDetails details) {
-    if (_isPopping) return;
+    if (_isPopping || widget.isLoading || widget.onSelected == null) return;
 
     _controller.forward();
   }
 
   void _onTapUp(TapUpDetails details) async {
-    if (_isPopping) return;
+    if (_isPopping || widget.isLoading || widget.onSelected == null) return;
 
     _isPopping = true;
 
@@ -136,7 +136,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
   }
 
   void _onTapCancel() {
-    if (_isPopping) return;
+    if (_isPopping || widget.isLoading) return;
 
     _controller.reverse();
   }
@@ -146,46 +146,52 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
     return AppSkelet(
       enable: widget.isLoading,
       ignoreContainer: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: _onTapDown,
-        onTapUp: _onTapUp,
-        onTapCancel: _onTapCancel,
-        child: AnimatedBuilder(
-          animation: _scaleAnimation,
-          builder: (context, child) {
-            return Transform.scale(scale: _scaleAnimation.value, child: child);
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(48.r),
-              color: widget.isSelected
-                  ? SupportColors.black1
-                  : SupportColors.light,
+      child: widget.isLoading || widget.onSelected == null
+          ? _buildChip()
+          : GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: _onTapDown,
+              onTapUp: _onTapUp,
+              onTapCancel: _onTapCancel,
+              child: _buildChip(),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 10.w,
-              children: [
-                Text(
-                  widget.label,
-                  style: TextStyle(
-                    fontFamily: 'Manrope',
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                    color: widget.isSelected
-                        ? SupportColors.white
-                        : SupportColors.black1,
-                  ),
-                ),
-                if (widget.newMessage > 0)
-                  NotificationWidgets(count: widget.newMessage),
-              ],
+    );
+  }
+
+  Widget _buildChip() {
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(scale: _scaleAnimation.value, child: child);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(48.r),
+          color: widget.isSelected
+              ? SupportColors.black1
+              : SupportColors.light,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 10.w,
+          children: [
+            Text(
+              widget.label,
+              style: TextStyle(
+                fontFamily: 'Manrope',
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+                color: widget.isSelected
+                    ? SupportColors.white
+                    : SupportColors.black1,
+              ),
             ),
-          ),
+            if (widget.newMessage > 0)
+              NotificationWidgets(count: widget.newMessage),
+          ],
         ),
       ),
     );

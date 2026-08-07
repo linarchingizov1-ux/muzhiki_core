@@ -2,7 +2,7 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_ui/widgets/button.dart';
+import 'package:muzhiki_ui/buttons/app_button.dart';
 import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
 import 'package:muzhiki_report_problem/config/report_problem_assets.dart';
 
@@ -34,8 +34,7 @@ class SuccessDialog extends StatelessWidget {
           ),
         ),
         SizedBox(height: 27.h),
-        AppButton(
-          mode: ButtonMode.classic,
+        AppButton.primary(
           label: 'Отлично',
           backgroundColor: ReportProblemColors.black23,
           labelColor: ReportProblemColors.white,

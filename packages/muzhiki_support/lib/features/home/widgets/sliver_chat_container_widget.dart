@@ -6,7 +6,7 @@ import 'package:muzhiki_ui/theme/support_colors.dart';
 import 'package:muzhiki_support/data/models/my_chat.dart';
 import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
 import 'package:muzhiki_dependencies/ui/app_dialog.dart';
-import 'package:muzhiki_ui/widgets/button.dart';
+import 'package:muzhiki_ui/buttons/app_button.dart';
 import 'package:muzhiki_support/shared/widgets/chat_container.dart';
 
 class SliverChatContainerWidget extends StatelessWidget {
@@ -64,8 +64,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
-                        AppButton(
-                          mode: ButtonMode.black,
+                        AppButton.dark(
                           onPressed: () {
                             context.read<ChatCubit>().sendProblems(
                               error: state.error,
@@ -163,9 +162,8 @@ class SliverChatContainerWidget extends StatelessWidget {
                           Text(
                             'Подтвердите аккаунт, чтобы пользоваться сервисом.\nКак это сделать вы можете узнать у себя в профиле',
                           ),
-                          AppButton(
+                          AppButton.primary(
                             label: 'Мой аккаунт',
-                            mode: ButtonMode.classic,
                             onPressed: () {
                               context.pushNamed(profileRoute);
                             },

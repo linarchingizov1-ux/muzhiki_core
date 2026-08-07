@@ -1,10 +1,14 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:muzhiki_ui/buttons/animated_button.dart';
 import 'package:muzhiki_ui/buttons/choi_widgets.dart';
+import 'package:muzhiki_ui/dialog/app_dialog.dart';
 
+export 'buttons/app_button.dart';
+export 'buttons/buttons.dart';
+export 'dialog/dialog.dart';
 export 'theme/support_colors.dart';
-export 'widgets/button.dart';
 export 'widgets/button_small.dart';
+export 'widgets/legacy_button.dart';
 export 'widgets/notification.dart';
 export 'widgets/skelet.dart';
 export 'buttons/animated_button.dart';
@@ -30,6 +34,7 @@ final class MuzhikiButtons {
     double iconSize = 16,
     Color? backgroundColor,
     double scale = 1.1,
+    bool enabled = true,
   }) => AnimatedButton(
     key: key,
     svgAsset: svgAsset,
@@ -40,6 +45,7 @@ final class MuzhikiButtons {
     size: size,
     iconSize: iconSize,
     backgroundColor: backgroundColor,
+    enabled: enabled,
     child: child,
   );
 
@@ -64,4 +70,27 @@ final class MuzhikiAppBar {
 
 final class MuzhikiDialog {
   const MuzhikiDialog._();
+
+  Future<T?> standart<T>({
+    required Widget child,
+    BuildContext? context,
+    double? height,
+    bool isDismissible = true,
+    bool enableDrag = true,
+    bool canPop = true,
+  }) =>
+      AppDialog.standart<T>(
+        child: child,
+        context: context,
+        height: height,
+        isDismissible: isDismissible,
+        enableDrag: enableDrag,
+        canPop: canPop,
+      );
+
+  Future<bool?> needUpdate({
+    required Widget child,
+    BuildContext? context,
+  }) =>
+      AppDialog.needUpdate(child: child, context: context);
 }

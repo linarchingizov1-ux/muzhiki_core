@@ -13,6 +13,7 @@ import 'package:muzhiki_dependencies/service/app_banner/app_banner_controller.da
 import 'package:muzhiki_dependencies/service/app_version/app_version.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
 import 'package:muzhiki_dependencies/service/session/user_session.dart';
+import 'package:muzhiki_ui/dialog/app_dialog.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:screen_corner_radius/screen_corner_radius.dart';
@@ -89,6 +90,10 @@ class MuzhikiDependencies {
       hiveStore: hiveStore,
     );
     divesRadius = await ScreenCornerRadius.get();
+    AppDialog.configure(
+      navigatorKey: routerKey,
+      bottomSheetBottomRadius: () => divesRadius?.bottomLeft ?? 32,
+    );
 
     await session.init();
     if (_isUninstalling) {

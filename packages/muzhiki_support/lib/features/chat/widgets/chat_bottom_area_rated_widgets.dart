@@ -7,7 +7,7 @@ import 'package:muzhiki_support/config/support_assets.dart';
 import 'package:muzhiki_ui/theme/support_colors.dart';
 import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
-import 'package:muzhiki_ui/widgets/button.dart';
+import 'package:muzhiki_ui/buttons/app_button.dart';
 
 class ChatBottomAreaRatedWidgets extends StatefulWidget {
   final WebSocketChat webSocketApp;
@@ -113,11 +113,10 @@ class _ChatBottomAreaRatedWidgetsState
               SizedBox(height: 16.h),
 
               if (selectedStar != 0)
-                AppButton(
+                AppButton.pill(
                       height: 43,
                       isLoading: isLoadingReview,
                       progressColor: SupportColors.white,
-                      mode: ButtonMode.rounded,
                       onPressed: () {
                         if (selectedStar == 0 && widget.state.socket == null) {
                           return;
@@ -161,14 +160,13 @@ class _ChatBottomAreaRatedWidgetsState
               if (!hideReopenButton)
                 Padding(
                   padding: EdgeInsets.only(top: 9.h),
-                  child: AppButton(
+                  child: AppButton.pill(
                     height: 48,
                     labelWeight: FontWeight.w700,
                     isLoading: isLoadingReopen,
                     backgroundColor: SupportColors.light,
                     progressColor: SupportColors.black17,
                     labelColor: SupportColors.alertTextGrey,
-                    mode: ButtonMode.rounded,
                     onPressed: () {
                       if (selectedStar == 0 && widget.state.socket == null) {
                         return;
