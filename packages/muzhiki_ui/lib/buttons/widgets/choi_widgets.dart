@@ -1,9 +1,10 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:muzhiki_ui/other/other.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
-import 'package:muzhiki_ui/other/notification.dart';
-import 'package:muzhiki_ui/other/skelet.dart';
+
+const _other = MuzhikiOther();
 
 class ChoiceWidgets extends StatefulWidget {
   final bool isSelected;
@@ -143,7 +144,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
 
   @override
   Widget build(BuildContext context) {
-    return AppSkelet(
+    return _other.skelet(
       enable: widget.isLoading,
       ignoreContainer: true,
       child: widget.isLoading || widget.onSelected == null
@@ -188,7 +189,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
               ),
             ),
             if (widget.newMessage > 0)
-              NotificationWidgets(count: widget.newMessage),
+              _other.notification(count: widget.newMessage),
           ],
         ),
       ),

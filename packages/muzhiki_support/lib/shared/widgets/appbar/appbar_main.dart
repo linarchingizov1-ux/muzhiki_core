@@ -7,9 +7,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
 import 'package:muzhiki_support/config/support_assets.dart';
+import 'package:muzhiki_ui/other/other.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:muzhiki_support/shared/widgets/appbar/menu.dart';
-import 'package:muzhiki_ui/other/skelet.dart';
+
+const _other = MuzhikiOther();
 
 class SupportAppBar extends StatefulWidget {
   final SessionApp sessionApp;
@@ -93,7 +95,7 @@ class _SupportAppBarState extends State<SupportAppBar> {
               child: Row(
                 children: [
                   Flexible(
-                    child: AppSkelet(
+                    child: _other.skelet(
                       enable: widget.sessionApp.user == null,
                       child: Text(
                         widget.sessionApp.user?.username ?? '',

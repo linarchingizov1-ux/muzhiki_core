@@ -7,8 +7,9 @@ import 'package:muzhiki_support/data/models/my_chat.dart';
 import 'package:muzhiki_support/shared/extensions/date_format.dart';
 import 'package:muzhiki_support/shared/extensions/status_extension.dart';
 import 'package:muzhiki_support/shared/widgets/circle.dart';
-import 'package:muzhiki_ui/other/notification.dart';
-import 'package:muzhiki_ui/other/skelet.dart';
+import 'package:muzhiki_ui/other/other.dart';
+
+const _other = MuzhikiOther();
 
 class ChatContainerWidgets extends StatelessWidget {
   final bool isLoading;
@@ -21,7 +22,7 @@ class ChatContainerWidgets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppSkelet(
+    return _other.skelet(
       enable: isLoading,
       child: InkWell(
         onTap: () => context.pushNamed(
@@ -51,7 +52,7 @@ class ChatContainerWidgets extends StatelessWidget {
                   ),
                 ),
                 if (chat.unreadCount > 0)
-                  NotificationWidgets(count: chat.unreadCount),
+                  _other.notification(count: chat.unreadCount),
               ],
             ),
             Padding(

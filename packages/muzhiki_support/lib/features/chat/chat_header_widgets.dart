@@ -7,6 +7,9 @@ import 'package:muzhiki_support/config/support_assets.dart';
 import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/shared/widgets/circle.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
+import 'package:muzhiki_ui/other/other.dart';
+
+const _other = MuzhikiOther();
 
 class ChatHeaderWidgets extends StatelessWidget {
   final AsyncSnapshot<WebSocketChatState> snapshot;
@@ -42,7 +45,7 @@ class ChatHeaderWidgets extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (snapshot.data!.title != null)
-                      AppSkelet(
+                      _other.skelet(
                         enable:
                             snapshot.connectionState != ConnectionState.active,
                         child: Text(
@@ -57,7 +60,7 @@ class ChatHeaderWidgets extends StatelessWidget {
                       ),
 
                     if (snapshot.data!.createdAt != null)
-                      AppSkelet(
+                      _other.skelet(
                         enable:
                             snapshot.connectionState != ConnectionState.active,
                         child: Row(

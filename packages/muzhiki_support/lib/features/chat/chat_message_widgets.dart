@@ -13,7 +13,9 @@ import 'package:muzhiki_support/features/chat/widgets/chat_bottom_area_rated_wid
 import 'package:muzhiki_support/features/chat/widgets/chat_bottom_area_ticket_widgets.dart';
 import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
 import 'package:muzhiki_support/shared/widgets/bubble_chat.dart';
-import 'package:muzhiki_ui/other/skelet.dart';
+import 'package:muzhiki_ui/other/other.dart';
+
+const _other = MuzhikiOther();
 
 class ChatMessageWidgets extends StatelessWidget {
   final AppWebsocketChat websocket;
@@ -66,7 +68,7 @@ class ChatMessageWidgets extends StatelessWidget {
 
                 final isMe = mess.type == MessageType.client;
 
-                return AppSkelet(
+                return _other.skelet(
                   enable: snapshot.connectionState != ConnectionState.active,
                   child: ChatMessageBubble(
                     chatCubit: chatCubit,

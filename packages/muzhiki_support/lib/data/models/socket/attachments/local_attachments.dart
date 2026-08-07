@@ -26,5 +26,5 @@ abstract class LocalAttachmentsModel with _$LocalAttachmentsModel {
       maybeWhen(local: (_, _, _, _, _) => true, orElse: () => false);
 
   bool get isRemote =>
-      maybeWhen(remote: (_, __, ___) => true, orElse: () => false);
+      maybeWhen(remote: (_, _, _) => true, orElse: () => false);
 }

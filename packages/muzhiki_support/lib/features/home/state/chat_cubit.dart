@@ -15,7 +15,6 @@ class ChatCubit extends Cubit<ChatState> {
   ChatCubit({required this.chatUseCase}) : super(const ChatState());
 
   void silenceRefresh() async {
-    print("Тихо обновили чат");
     final myChat = await chatUseCase.getMyChats(page: state.chatPage);
     int channelId;
     if (state.channelId != null) {
