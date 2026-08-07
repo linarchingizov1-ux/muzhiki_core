@@ -6,7 +6,6 @@ import 'package:muzhiki_support/config/support_route_constant.dart';
 import 'package:muzhiki_support/data/models/my_chat.dart';
 import 'package:muzhiki_support/shared/extensions/date_format.dart';
 import 'package:muzhiki_support/shared/extensions/status_extension.dart';
-import 'package:muzhiki_support/shared/widgets/circle.dart';
 import 'package:muzhiki_ui/other/other.dart';
 
 const _other = MuzhikiOther();
@@ -62,7 +61,7 @@ class ChatContainerWidgets extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 spacing: 5.w,
                 children: [
-                  CircleWidgets(colors: chat.statusColor.toColor),
+                  _other.circle(colors: chat.statusColor.toColor),
                   Text(
                     chat.stringStatus,
                     style: TextStyle(

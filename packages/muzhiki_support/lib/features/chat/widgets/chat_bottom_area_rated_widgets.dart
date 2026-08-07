@@ -57,7 +57,7 @@ class _ChatBottomAreaRatedWidgetsState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '��������� �������',
+                'Обращение закрыто',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   fontSize: 15.sp,
@@ -65,7 +65,7 @@ class _ChatBottomAreaRatedWidgetsState
                 ),
               ),
               Text(
-                '������� ������ ���������',
+                'Оцените работу оператора',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   fontSize: 12.sp,
@@ -141,7 +141,7 @@ class _ChatBottomAreaRatedWidgetsState
                               }
                             });
                       },
-                      label: '�������',
+                      label: 'Оценить',
                     )
                     .animate()
                     .fadeIn(duration: 220.ms)
@@ -187,7 +187,7 @@ class _ChatBottomAreaRatedWidgetsState
                             }
                           });
                     },
-                    label: '������ �� �����',
+                    label: 'Вопрос не решён',
                   ),
                 ),
             ],

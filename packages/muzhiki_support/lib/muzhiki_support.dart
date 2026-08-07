@@ -7,4 +7,3 @@ export 'data/models/view_image_item_model.dart';
 export 'features/home/support_view.dart';
 export 'features/chat/chat_view.dart';
 export 'features/informator/informator_view.dart';
-export 'shared/widgets/photo_view_widget.dart';

@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_support/config/support_assets.dart';
 import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
-import 'package:muzhiki_support/shared/widgets/circle.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 import 'package:muzhiki_ui/other/other.dart';
 
@@ -66,7 +65,7 @@ class ChatHeaderWidgets extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            CircleWidgets(colors: snapshot.data!.statusColor),
+                            _other.circle(colors: snapshot.data!.statusColor),
 
                             SizedBox(width: 5.w),
 

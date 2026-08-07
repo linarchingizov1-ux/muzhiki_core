@@ -42,7 +42,7 @@ class _ChatBottomAreaTicketWidgetsState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '�� ������ ��������� ������� ������ ',
+                'По вашему обращению создана задача ',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   color: MuzhikiColors.alertTextGrey,
@@ -53,7 +53,7 @@ class _ChatBottomAreaTicketWidgetsState
               ),
               SizedBox(height: 28.h),
               Text(
-                widget.state.title ?? '��� �������� ���������',
+                widget.state.title ?? 'Нет название обращения',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   color: MuzhikiColors.black17,
@@ -74,13 +74,13 @@ class _ChatBottomAreaTicketWidgetsState
                     if (widget.state.socket != null &&
                         widget.state.socket!.id != 0)
                       _InformationTablo(
-                        "����� ������",
+                        "Номер задачи",
                         widget.state.socket!.id.toString(),
                       ),
                     if (widget.state.socket != null &&
                         widget.state.socket!.deadline != null)
                       _InformationTablo(
-                        "�������",
+                        "Дедлайн",
                         widget.state.socket!.deadline!.formatDate,
                       ),
                   ],
@@ -88,7 +88,7 @@ class _ChatBottomAreaTicketWidgetsState
               ),
 
               Text(
-                '����� ������� ������ ��� ������ �����������',
+                'После решения задачи вам придет уведомление',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   color: MuzhikiColors.alertTextGrey,
@@ -124,7 +124,7 @@ class _ChatBottomAreaTicketWidgetsState
                     }
                   }
                 },
-                label: '��� ����� �������� ������',
+                label: 'Мне нужно уточнить детали',
               ),
             ],
           ),

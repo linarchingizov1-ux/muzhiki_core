@@ -58,7 +58,7 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
                 : CrossAxisAlignment.center,
             children: [
               Text(
-                '��������� �������',
+                'Обращение закрыто',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   height: 1.h,
@@ -86,7 +86,7 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
                           });
                         });
                   },
-                  label: '������ �� �����',
+                  label: 'Вопрос не решён',
                 ),
             ],
           ),

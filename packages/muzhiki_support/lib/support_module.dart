@@ -12,7 +12,6 @@ import 'package:muzhiki_support/features/informator/informator_view.dart';
 import 'package:muzhiki_support/features/home/support_view.dart';
 import 'package:muzhiki_support/features/chat/state/attachments_cubit.dart';
 import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
-import 'package:muzhiki_support/shared/widgets/video_player.dart';
 
 class SupportModuleConfig {
   final String homeRoute;
@@ -74,15 +73,6 @@ class SupportModule {
             homeRoute: config.homeRoute,
             profileRoute: config.profileRoute,
           );
-        },
-      ),
-      GoRoute(
-        path: routeConstant.videoView,
-        name: routeConstant.videoView,
-        builder: (context, state) {
-          final url = state.uri.queryParameters['url']!;
-          final preview = state.extra as String?;
-          return ChatVideoPlayerView(url: url, preview: preview);
         },
       ),
       GoRoute(
