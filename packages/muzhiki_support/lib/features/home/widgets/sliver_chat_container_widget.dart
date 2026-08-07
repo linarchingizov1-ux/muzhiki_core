@@ -2,12 +2,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
 import 'package:muzhiki_support/data/models/my_chat.dart';
 import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
-import 'package:muzhiki_dependencies/ui/app_dialog.dart';
-import 'package:muzhiki_ui/buttons/app_button.dart';
 import 'package:muzhiki_support/shared/widgets/chat_container.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class SliverChatContainerWidget extends StatelessWidget {
   final ChatCubit chatCubit;
@@ -29,7 +27,7 @@ class SliverChatContainerWidget extends StatelessWidget {
           if (state.error != null) {
             Future.delayed(const Duration(milliseconds: 350), () {
               if (context.mounted) {
-                AppDialog.standart(
+                MuzhikiUi.dialog.standart(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(
@@ -64,7 +62,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
-                        AppButton.dark(
+                        MuzhikiUi.buttons.dark(
                           onPressed: () {
                             context.read<ChatCubit>().sendProblems(
                               error: state.error,
@@ -99,7 +97,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                 return switch (state.chatStatus) {
                   StateStatus.loading => SliverList.separated(
                     separatorBuilder: (context, index) =>
-                        Divider(height: 1.h, color: SupportColors.light),
+                        Divider(height: 1.h, color: MuzhikiColors.light),
                     itemCount: 5,
                     itemBuilder: (context, index) {
                       return ChatContainerWidgets(
@@ -127,14 +125,14 @@ class SliverChatContainerWidget extends StatelessWidget {
                               fontFamily: 'Manrope',
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
-                              color: SupportColors.grey,
+                              color: MuzhikiColors.grey,
                             ),
                           ),
                         ),
                       ),
                       false => SliverList.separated(
                         separatorBuilder: (context, index) =>
-                            Divider(height: 1.h, color: SupportColors.light),
+                            Divider(height: 1.h, color: MuzhikiColors.light),
                         itemCount: state.chats.length,
                         itemBuilder: (context, i) {
                           final chat = state.chats[i];
@@ -162,7 +160,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                           Text(
                             'Подтвердите аккаунт, чтобы пользоваться сервисом.\nКак это сделать вы можете узнать у себя в профиле',
                           ),
-                          AppButton.primary(
+                          MuzhikiUi.buttons.primary(
                             label: 'Мой аккаунт',
                             onPressed: () {
                               context.pushNamed(profileRoute);

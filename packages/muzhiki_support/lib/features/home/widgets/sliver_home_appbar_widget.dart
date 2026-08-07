@@ -43,7 +43,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
                   child: MuzhikiUi.buttons.animated(
                     size: 40,
                     iconSize: 16,
-                    backgroundColor: SupportColors.alertTextGrey,
+                    backgroundColor: MuzhikiColors.alertTextGrey,
                     onTap: context.pop,
                     icon: Icons.arrow_back_ios_new,
                   ),

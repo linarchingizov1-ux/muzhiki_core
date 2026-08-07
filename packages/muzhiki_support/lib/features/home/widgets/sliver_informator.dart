@@ -2,7 +2,7 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_support/config/support_assets.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:muzhiki_support/config/support_route_constant.dart';
 
 class SliverInformator extends StatelessWidget {
@@ -21,7 +21,7 @@ class SliverInformator extends StatelessWidget {
             padding: EdgeInsets.all(12.r),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(21.r),
-              color: SupportColors.black17,
+              color: MuzhikiColors.black17,
               image: DecorationImage(
                 alignment: AlignmentGeometry.centerRight,
                 image: AssetImage(SupportAssets.I.png.informatorBackground),
@@ -35,7 +35,7 @@ class SliverInformator extends StatelessWidget {
                   'Информатор',
                   style: TextStyle(
                     fontFamily: 'Manrope',
-                    color: SupportColors.white,
+                    color: MuzhikiColors.white,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -44,7 +44,7 @@ class SliverInformator extends StatelessWidget {
                   'Аудиты и детализация по СМС',
                   style: TextStyle(
                     fontFamily: 'Manrope',
-                    color: SupportColors.white,
+                    color: MuzhikiColors.white,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                   ),

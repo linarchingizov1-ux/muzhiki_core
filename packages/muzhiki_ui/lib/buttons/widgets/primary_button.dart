@@ -3,15 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_ui/buttons/shared/button_loading.dart';
 import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
-/// Широкая кнопка действия с опциональной SVG-иконкой.
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
     required this.onPressed,
     required this.label,
-    this.backgroundColor = SupportColors.black17,
+    this.backgroundColor = MuzhikiColors.black17,
     this.labelColor,
     this.labelWeight,
     this.labelSize = 15,
@@ -22,7 +21,7 @@ class PrimaryButton extends StatelessWidget {
     this.iconAsset,
     this.isLoading = false,
     this.disabled = false,
-    this.progressColor = SupportColors.white,
+    this.progressColor = MuzhikiColors.white,
     this.progressSize = 28,
   });
 
@@ -44,7 +43,10 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canTap = buttonIsInteractive(disabled: disabled, isLoading: isLoading);
+    final canTap = buttonIsInteractive(
+      disabled: disabled,
+      isLoading: isLoading,
+    );
     final bg = buttonBackgroundColor(backgroundColor, enabled: !disabled);
     final textColor = _labelColor(!disabled);
 
@@ -52,7 +54,8 @@ class PrimaryButton extends StatelessWidget {
       onPressed: onPressed,
       enabled: canTap,
       child: Container(
-        padding: padding ?? EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
+        padding:
+            padding ?? EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
         height: height.h,
         width: width.w,
         decoration: BoxDecoration(
@@ -85,13 +88,13 @@ class PrimaryButton extends StatelessWidget {
 
   Color _labelColor(bool enabled) {
     if (!enabled) {
-      return backgroundColor == SupportColors.black17
-          ? SupportColors.white.withValues(alpha: 0.3)
-          : SupportColors.black17.withValues(alpha: 0.3);
+      return backgroundColor == MuzhikiColors.black17
+          ? MuzhikiColors.white.withValues(alpha: 0.3)
+          : MuzhikiColors.black17.withValues(alpha: 0.3);
     }
-    if (backgroundColor == SupportColors.black17) {
-      return SupportColors.white;
+    if (backgroundColor == MuzhikiColors.black17) {
+      return MuzhikiColors.white;
     }
-    return labelColor ?? SupportColors.black17;
+    return labelColor ?? MuzhikiColors.black17;
   }
 }

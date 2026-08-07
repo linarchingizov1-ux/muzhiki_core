@@ -7,9 +7,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
 import 'package:muzhiki_support/config/support_assets.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:muzhiki_support/shared/widgets/appbar/menu.dart';
-import 'package:muzhiki_ui/widgets/skelet.dart';
+import 'package:muzhiki_ui/other/skelet.dart';
 
 class SupportAppBar extends StatefulWidget {
   final SessionApp sessionApp;
@@ -78,7 +78,7 @@ class _SupportAppBarState extends State<SupportAppBar> {
               height: 40.h,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: SupportColors.blood,
+                color: MuzhikiColors.blood,
               ),
               child: InkWell(
                 borderRadius: BorderRadius.circular(100),
@@ -103,7 +103,7 @@ class _SupportAppBarState extends State<SupportAppBar> {
                           fontFamily: 'Manrope',
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
-                          color: SupportColors.black17,
+                          color: MuzhikiColors.black17,
                         ),
                       ),
                     ),
@@ -121,7 +121,7 @@ class _SupportAppBarState extends State<SupportAppBar> {
                   fontFamily: 'Manrope',
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
-                  color: SupportColors.grey,
+                  color: MuzhikiColors.grey,
                 ),
               ),
           ],
@@ -234,7 +234,7 @@ class DialogMenu {
                   child: DecoratedBox(
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: SupportColors.appBackgroud,
+                      color: MuzhikiColors.appBackgroud,
                     ),
                     child: Material(
                       color: Colors.red,
@@ -246,7 +246,7 @@ class DialogMenu {
                           child: SvgPicture.asset(
                             SupportAssets.I.svg.dashboard,
                             colorFilter: const ColorFilter.mode(
-                              SupportColors.darkGrey,
+                              MuzhikiColors.darkGrey,
                               BlendMode.srcIn,
                             ),
                           ),
@@ -305,7 +305,7 @@ class CircleReveal extends StatelessWidget {
         value: SystemUiOverlayStyle.light,
         child: Container(
           decoration: BoxDecoration(
-            color: SupportColors.black17,
+            color: MuzhikiColors.black17,
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(18.r),
               bottomRight: Radius.circular(18.r),

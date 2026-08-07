@@ -2,7 +2,7 @@
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 class AppStandartDialog {
   static Future<T?> open<T>({
@@ -11,7 +11,7 @@ class AppStandartDialog {
     bool isDismissible = true,
     bool enableDrag = true,
     bool canPop = true,
-    Color backgroundColor = SupportColors.white,
+    Color backgroundColor = MuzhikiColors.white,
     BorderRadius? borderRadius,
     EdgeInsetsGeometry? outerPadding,
   }) async {
@@ -45,7 +45,7 @@ class AppStandartDialog {
                   bottom: 20.h,
                 ),
                 decoration: BoxDecoration(
-                  color: SupportColors.white,
+                  color: MuzhikiColors.white,
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(
                       MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,

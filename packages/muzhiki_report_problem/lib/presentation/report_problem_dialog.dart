@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -13,12 +13,10 @@ import 'package:muzhiki_report_problem/config/report_problem_config.dart';
 import 'package:muzhiki_report_problem/data/repository/report_problem_repository_impl.dart';
 import 'package:muzhiki_report_problem/presentation/view_model/report_problem_view_model.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/app_standart_dialog.dart';
-import 'package:muzhiki_ui/widgets/button_small.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/error_dialog.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/multiline_input_card.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/success_dialog.dart';
-import 'package:muzhiki_support/muzhiki_support.dart';
-import 'package:muzhiki_ui/buttons/app_button.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 import 'package:provider/provider.dart';
 
 class ReportProblemDialog extends StatefulWidget {
@@ -61,7 +59,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
           ),
         ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
-        child: const SuccessDialog(title: 'Форма отправлена'),
+        child: const SuccessDialog(title: '????? ??????????'),
       );
       await Future.delayed(500.ms);
       if (!mounted) return;
@@ -77,10 +75,10 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
         ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
         child: ErrorDialog(
-          title: 'Не удалось отправить форму',
+          title: '?? ??????? ????????? ?????',
           description:
               viewModel.submitError ??
-              'Что-то пошло не так, попробуйте ещё раз',
+              '???-?? ????? ?? ???, ?????????? ??? ???',
           onRetry: () => _submit(),
         ),
       );
@@ -106,9 +104,9 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                 children: [
                   Align(
                     alignment: Alignment.centerRight,
-                    child: AppButtonSmall(
+                    child: MuzhikiUi.buttons.small(
                       mode: SmallButtonMode.standart,
-                      label: 'Отменить',
+                      label: '????????',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       labelColor: ReportProblemColors.alertTextGrey,
@@ -132,7 +130,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                   ),
                   SizedBox(height: 21.h),
                   Text(
-                    'Сообщить о проблеме',
+                    '???????? ? ????????',
                     style: TextStyle(
                       fontSize: 18.sp,
                       height: 1.3,
@@ -142,7 +140,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                   ),
                   SizedBox(height: 12.h),
                   Text(
-                    'Это окно открылось потому что вы потрясли устройство',
+                    '??? ???? ????????? ?????? ??? ?? ???????? ??????????',
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w500,
@@ -158,14 +156,14 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                     maxLines: 10,
                     maxLength: 5000,
                     enabled: !viewModel.isSubmitting,
-                    hintText: 'Опишите проблему',
+                    hintText: '??????? ????????',
                     footer: SizedBox(
                       width: double.infinity,
                       child: Wrap(
                         alignment: WrapAlignment.spaceBetween,
                         crossAxisAlignment: WrapCrossAlignment.end,
                         children: [
-                          AppButtonSmall(
+                          MuzhikiUi.buttons.small(
                             mode: SmallButtonMode.icon,
                             alignment: AlignmentButtonIcon.start,
                             icon: SvgPicture.asset(
@@ -177,7 +175,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            label: 'Добавить скриншот',
+                            label: '???????? ????????',
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             labelColor: ReportProblemColors.alertTextGrey,
@@ -212,50 +210,15 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                         ),
                                         child: InkWell(
                                           onTap: () {
-                                            Navigator.of(context).push(
-                                              PageRouteBuilder(
-                                                opaque: false,
-                                                maintainState: true,
-                                                transitionDuration:
-                                                    const Duration(
-                                                      milliseconds: 350,
-                                                    ),
-                                                reverseTransitionDuration:
-                                                    const Duration(
-                                                      milliseconds: 350,
-                                                    ),
-                                                transitionsBuilder:
-                                                    (
-                                                      context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                      child,
-                                                    ) {
-                                                      return FadeTransition(
-                                                        opacity: CurvedAnimation(
-                                                          parent: animation,
-                                                          curve: Curves
-                                                              .easeInOutCubic,
-                                                        ),
-                                                        child: child,
-                                                      );
-                                                    },
-                                                pageBuilder:
-                                                    (
-                                                      context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                    ) {
-                                                      return PhotoViewerPage(
-                                                        images: [
-                                                          ViewerImageItem.filePath(
-                                                            viewModel
-                                                                .screenshotPath!,
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                              ),
+                                            MediaViewer.open(
+                                              context,
+                                              items: [
+                                                MediaItem.photoFile(
+                                                  viewModel.screenshotPath!,
+                                                  heroTag: viewModel
+                                                      .screenshotPath!,
+                                                ),
+                                              ],
                                             );
                                           },
                                           child: Image.file(
@@ -302,7 +265,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                   ),
                   SizedBox(height: 27.h),
                   Text(
-                    'Данные о вашем устройстве и действиях будут отправлены автоматически',
+                    '?????? ? ????? ?????????? ? ????????? ????? ?????????? ?????????????',
                     style: TextStyle(
                       fontSize: 15.sp,
                       height: 1.3,
@@ -313,10 +276,10 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                   SizedBox(height: 27.h),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    child: AppButton.primary(
+                    child: MuzhikiUi.buttons.primary(
                       label: viewModel.isSubmitSuccess == false
-                          ? 'Повторить'
-                          : 'Отправить',
+                          ? '?????????'
+                          : '?????????',
                       isLoading: viewModel.isSubmitting,
                       disabled: !viewModel.isValid,
                       backgroundColor: viewModel.isValid

@@ -1,12 +1,13 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 enum SmallButtonMode { icon, standart }
 
 enum AlignmentButtonIcon { start, end }
 
-class AppButtonSmall extends StatelessWidget {
+/// Компактная pill-кнопка (текст / текст + иконка).
+class SmallButton extends StatelessWidget {
   final SmallButtonMode mode;
   final AlignmentButtonIcon alignment;
   final Widget? icon;
@@ -19,7 +20,7 @@ class AppButtonSmall extends StatelessWidget {
   final EdgeInsetsGeometry? labelPadding;
   final VoidCallback? onTap;
 
-  const AppButtonSmall({
+  const SmallButton({
     super.key,
     required this.mode,
     this.alignment = AlignmentButtonIcon.start,
@@ -27,8 +28,8 @@ class AppButtonSmall extends StatelessWidget {
     required this.label,
     this.fontSize = 15,
     this.fontWeight = FontWeight.w500,
-    this.labelColor = SupportColors.black23,
-    this.backgroundColor = SupportColors.light,
+    this.labelColor = MuzhikiColors.black23,
+    this.backgroundColor = MuzhikiColors.light,
     this.radius = 30,
     this.labelPadding,
     this.onTap,

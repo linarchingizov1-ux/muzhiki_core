@@ -7,8 +7,8 @@ import 'package:muzhiki_support/data/models/my_chat.dart';
 import 'package:muzhiki_support/shared/extensions/date_format.dart';
 import 'package:muzhiki_support/shared/extensions/status_extension.dart';
 import 'package:muzhiki_support/shared/widgets/circle.dart';
-import 'package:muzhiki_ui/widgets/notification.dart';
-import 'package:muzhiki_ui/widgets/skelet.dart';
+import 'package:muzhiki_ui/other/notification.dart';
+import 'package:muzhiki_ui/other/skelet.dart';
 
 class ChatContainerWidgets extends StatelessWidget {
   final bool isLoading;

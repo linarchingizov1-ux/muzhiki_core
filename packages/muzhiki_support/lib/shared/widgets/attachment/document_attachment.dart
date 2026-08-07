@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_dependencies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_support/shared/utils/file_icon_mapper.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart' as p;
 
@@ -218,7 +218,7 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
               padding: EdgeInsets.all(5.r),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.r),
-                color: SupportColors.white,
+                color: MuzhikiColors.white,
               ),
               child: Image.asset(width: 25.r, height: 25.r, fileIcon),
             ),
@@ -248,7 +248,7 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
                     fontWeight: isDownloadsFile
                         ? FontWeight.w600
                         : FontWeight.w800,
-                    color: isDownloadsFile ? SupportColors.black1 : Colors.blue,
+                    color: isDownloadsFile ? MuzhikiColors.black1 : Colors.blue,
                     fontSize: 10.sp,
                   ),
                 ),

@@ -1,12 +1,11 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
 import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_support/shared/extensions/date_format.dart';
-import 'package:muzhiki_ui/buttons/app_button.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class ChatBottomAreaTicketWidgets extends StatefulWidget {
   final WebSocketChat webSocketApp;
@@ -37,16 +36,16 @@ class _ChatBottomAreaTicketWidgetsState
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.r),
-            color: SupportColors.white,
+            color: MuzhikiColors.white,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'По вашему обращению создана задача ',
+                '�� ������ ��������� ������� ������ ',
                 style: TextStyle(
                   fontFamily: 'Manrope',
-                  color: SupportColors.alertTextGrey,
+                  color: MuzhikiColors.alertTextGrey,
                   height: 1.h,
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
@@ -54,10 +53,10 @@ class _ChatBottomAreaTicketWidgetsState
               ),
               SizedBox(height: 28.h),
               Text(
-                widget.state.title ?? 'Нет название обращения',
+                widget.state.title ?? '��� �������� ���������',
                 style: TextStyle(
                   fontFamily: 'Manrope',
-                  color: SupportColors.black17,
+                  color: MuzhikiColors.black17,
                   height: 1.h,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
@@ -75,13 +74,13 @@ class _ChatBottomAreaTicketWidgetsState
                     if (widget.state.socket != null &&
                         widget.state.socket!.id != 0)
                       _InformationTablo(
-                        "Номер задачи",
+                        "����� ������",
                         widget.state.socket!.id.toString(),
                       ),
                     if (widget.state.socket != null &&
                         widget.state.socket!.deadline != null)
                       _InformationTablo(
-                        "Дедлайн",
+                        "�������",
                         widget.state.socket!.deadline!.formatDate,
                       ),
                   ],
@@ -89,23 +88,23 @@ class _ChatBottomAreaTicketWidgetsState
               ),
 
               Text(
-                'После решения задачи вам придет уведомление',
+                '����� ������� ������ ��� ������ �����������',
                 style: TextStyle(
                   fontFamily: 'Manrope',
-                  color: SupportColors.alertTextGrey,
+                  color: MuzhikiColors.alertTextGrey,
                   height: 1.h,
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               SizedBox(height: 12.h),
-              AppButton.pill(
+              MuzhikiUi.buttons.pill(
                 isLoading: isLoadingReopen,
                 height: 48,
-                backgroundColor: SupportColors.light,
+                backgroundColor: MuzhikiColors.light,
                 labelWeight: FontWeight.w700,
-                progressColor: SupportColors.alertTextGrey,
-                labelColor: SupportColors.alertTextGrey,
+                progressColor: MuzhikiColors.alertTextGrey,
+                labelColor: MuzhikiColors.alertTextGrey,
                 onPressed: () async {
                   setState(() {
                     isLoadingReopen = true;
@@ -125,7 +124,7 @@ class _ChatBottomAreaTicketWidgetsState
                     }
                   }
                 },
-                label: 'Мне нужно уточнить детали',
+                label: '��� ����� �������� ������',
               ),
             ],
           ),
@@ -144,7 +143,7 @@ class _InformationTablo extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 10.w),
       decoration: BoxDecoration(
-        color: SupportColors.light,
+        color: MuzhikiColors.light,
         borderRadius: BorderRadius.circular(42.r),
       ),
       child: Text.rich(
@@ -154,14 +153,14 @@ class _InformationTablo extends StatelessWidget {
             fontFamily: 'Manrope',
             fontSize: 12.sp,
             fontWeight: FontWeight.w600,
-            color: SupportColors.alertTextGrey,
+            color: MuzhikiColors.alertTextGrey,
           ),
           children: [
             TextSpan(
               text: label,
               style: TextStyle(
                 fontFamily: 'Manrope',
-                color: SupportColors.black17,
+                color: MuzhikiColors.black17,
               ),
             ),
           ],

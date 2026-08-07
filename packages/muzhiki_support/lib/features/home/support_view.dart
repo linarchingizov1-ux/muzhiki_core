@@ -100,7 +100,7 @@ class _SupportViewState extends State<SupportView> {
               builder: (context, state) {
                 if (state.chatStatus == StateStatus.success) {
                   return MuzhikiUi.buttons.animated(
-                    backgroundColor: SupportColors.blood,
+                    backgroundColor: MuzhikiColors.blood,
                     size: 55,
                     svgAsset: SupportAssets.I.svg.add,
                     iconSize: 15,

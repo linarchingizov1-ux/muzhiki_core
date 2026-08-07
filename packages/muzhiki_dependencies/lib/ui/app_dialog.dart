@@ -1,1 +1,1 @@
-﻿export 'package:muzhiki_ui/dialog/app_dialog.dart';
+﻿export 'package:muzhiki_ui/dialog/muzhiki_dialog.dart';

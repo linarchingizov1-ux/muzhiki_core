@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/buttons/shared/button_loading.dart';
 import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
-/// Тёмная кнопка с белым текстом и опциональным подзаголовком.
 class DarkButton extends StatelessWidget {
   const DarkButton({
     super.key,
@@ -18,7 +17,7 @@ class DarkButton extends StatelessWidget {
     this.labelWeight,
     this.isLoading = false,
     this.disabled = false,
-    this.progressColor = SupportColors.white,
+    this.progressColor = MuzhikiColors.white,
     this.progressSize = 28,
   });
 
@@ -37,10 +36,13 @@ class DarkButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canTap = buttonIsInteractive(disabled: disabled, isLoading: isLoading);
+    final canTap = buttonIsInteractive(
+      disabled: disabled,
+      isLoading: isLoading,
+    );
     final bg = !disabled
-        ? SupportColors.black17
-        : SupportColors.black17.withValues(alpha: 0.3);
+        ? MuzhikiColors.black17
+        : MuzhikiColors.black17.withValues(alpha: 0.3);
 
     return ButtonTap(
       onPressed: onPressed,
@@ -66,8 +68,8 @@ class DarkButton extends StatelessWidget {
                         fontSize: labelSize,
                         fontWeight: labelWeight ?? FontWeight.w700,
                         color: !disabled
-                            ? SupportColors.white
-                            : SupportColors.white.withValues(alpha: 0.5),
+                            ? MuzhikiColors.white
+                            : MuzhikiColors.white.withValues(alpha: 0.5),
                       ),
                     ),
                     if (description != null)
@@ -78,7 +80,7 @@ class DarkButton extends StatelessWidget {
                             fontFamily: 'Manrope',
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w400,
-                            color: SupportColors.grey,
+                            color: MuzhikiColors.grey,
                           ),
                         ),
                       ),

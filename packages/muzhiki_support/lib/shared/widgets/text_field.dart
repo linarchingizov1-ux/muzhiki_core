@@ -78,7 +78,7 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                           maxLines: 10,
                           minLines: 1,
                           expands: false,
-                          cursorColor: SupportColors.black1,
+                          cursorColor: MuzhikiColors.black1,
                           cursorWidth: 2.w,
                           cursorHeight: 16.h,
                           textAlignVertical: TextAlignVertical.top,
@@ -93,7 +93,7 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                             hintStyle: TextStyle(
                               fontFamily: 'Manrope',
                               fontSize: 12.sp,
-                              color: SupportColors.grey,
+                              color: MuzhikiColors.grey,
                             ),
                             isDense: true,
                             contentPadding: EdgeInsets.only(
@@ -103,7 +103,7 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                               bottom: 12.h,
                             ),
                             filled: true,
-                            fillColor: SupportColors.light,
+                            fillColor: MuzhikiColors.light,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12.r),
                               borderSide: BorderSide.none,
@@ -123,8 +123,8 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20.r),
                               color: _hasText || _hasAttachments
-                                  ? SupportColors.blood
-                                  : SupportColors.grey,
+                                  ? MuzhikiColors.blood
+                                  : MuzhikiColors.grey,
                             ),
                             child: Icon(
                               Icons.send,
@@ -272,7 +272,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                 padding: EdgeInsets.all(5.r),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(48.r),
-                                  color: SupportColors.light
+                                  color: MuzhikiColors.light
                                     ..withValues(alpha: 0.2),
                                 ),
                                 child: Column(
@@ -280,8 +280,8 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                   spacing: 10.h,
                                   children: [
                                     MuzhikiUi.buttons.animated(
-                                      backgroundColor: SupportColors.white,
-                                      iconColor: SupportColors.blood,
+                                      backgroundColor: MuzhikiColors.white,
+                                      iconColor: MuzhikiColors.blood,
                                       svgAsset: SupportAssets.I.svg.image,
                                       onTap: () async {
                                         _close();
@@ -293,9 +293,9 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       },
                                     ),
                                     MuzhikiUi.buttons.animated(
-                                      backgroundColor: SupportColors.white,
+                                      backgroundColor: MuzhikiColors.white,
                                       svgAsset: SupportAssets.I.svg.recodeVideo,
-                                      iconColor: SupportColors.blood,
+                                      iconColor: MuzhikiColors.blood,
                                       onTap: () async {
                                         _close();
                                         await context
@@ -306,9 +306,9 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       },
                                     ),
                                     MuzhikiUi.buttons.animated(
-                                      backgroundColor: SupportColors.white,
+                                      backgroundColor: MuzhikiColors.white,
                                       svgAsset: SupportAssets.I.svg.file,
-                                      iconColor: SupportColors.blood,
+                                      iconColor: MuzhikiColors.blood,
                                       onTap: () async {
                                         _close();
                                         await context
@@ -333,13 +333,13 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 5.r),
               child: MuzhikiUi.buttons.animated(
-                iconColor: isOpen ? SupportColors.blood : SupportColors.white,
+                iconColor: isOpen ? MuzhikiColors.blood : MuzhikiColors.white,
                 svgAsset: isOpen
                     ? SupportAssets.I.svg.close
                     : SupportAssets.I.svg.screpka,
                 backgroundColor: isOpen
-                    ? SupportColors.white
-                    : SupportColors.blood,
+                    ? MuzhikiColors.white
+                    : MuzhikiColors.blood,
                 onTap: _toggle,
               ),
             ),

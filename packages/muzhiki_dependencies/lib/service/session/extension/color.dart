@@ -1,6 +1,6 @@
 ﻿import 'dart:ui';
 
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 extension ColorExtension on String {
   Color get toColor {
@@ -8,7 +8,7 @@ extension ColorExtension on String {
       final hex = trim().replaceAll('#', '');
 
       if (hex.isEmpty) {
-        return SupportColors.light;
+        return MuzhikiColors.light;
       }
 
       String normalized;
@@ -28,18 +28,18 @@ extension ColorExtension on String {
           break;
 
         default:
-          return SupportColors.light;
+          return MuzhikiColors.light;
       }
 
       final value = int.tryParse(normalized, radix: 16);
 
       if (value == null) {
-        return SupportColors.light;
+        return MuzhikiColors.light;
       }
 
       return Color(value);
     } catch (_) {
-      return SupportColors.light;
+      return MuzhikiColors.light;
     }
   }
 }

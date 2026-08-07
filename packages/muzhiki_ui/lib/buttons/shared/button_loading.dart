@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Индикатор загрузки для кнопок.
 class ButtonLoading extends StatelessWidget {
   const ButtonLoading({
     super.key,

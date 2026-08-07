@@ -1,15 +1,15 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_ui/buttons/app_button.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
 import 'package:muzhiki_report_problem/config/report_problem_assets.dart';
 
 class SuccessDialog extends StatelessWidget {
   final String title;
 
-  const SuccessDialog({super.key, this.title = 'Заявка отправлена'});
+  const SuccessDialog({super.key, this.title = '������ ����������'});
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +34,8 @@ class SuccessDialog extends StatelessWidget {
           ),
         ),
         SizedBox(height: 27.h),
-        AppButton.primary(
-          label: 'Отлично',
+        MuzhikiUi.buttons.primary(
+          label: '�������',
           backgroundColor: ReportProblemColors.black23,
           labelColor: ReportProblemColors.white,
           borderRadius: 23,

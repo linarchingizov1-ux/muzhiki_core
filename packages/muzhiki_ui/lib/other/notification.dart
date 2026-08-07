@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 class NotificationWidgets extends StatelessWidget {
   final int count;
@@ -12,7 +12,7 @@ class NotificationWidgets extends StatelessWidget {
     return Container(
       padding: padding ?? EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: SupportColors.blood,
+        color: MuzhikiColors.blood,
         borderRadius: BorderRadius.circular(35.r),
       ),
       child: IntrinsicHeight(
@@ -26,7 +26,7 @@ class NotificationWidgets extends StatelessWidget {
               height: 1.h,
               fontSize: 12.sp,
               fontWeight: FontWeight.w600,
-              color: SupportColors.white,
+              color: MuzhikiColors.white,
             ),
           ),
         ),

@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class AppSkelet extends StatelessWidget {
@@ -23,7 +23,7 @@ class AppSkelet extends StatelessWidget {
       enabled: enable,
       effect: !lightPage
           ? const RawShimmerEffect(
-              colors: [SupportColors.blackOpticalZero, SupportColors.grey],
+              colors: [MuzhikiColors.blackOpticalZero, MuzhikiColors.grey],
             )
           : const RawShimmerEffect(
               colors: [

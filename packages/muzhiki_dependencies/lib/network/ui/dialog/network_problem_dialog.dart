@@ -1,11 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_dependencies/network/ui/config/network_problem_assets.dart';
 import 'package:muzhiki_dependencies/network/ui/config/network_problem_colors.dart';
-import 'package:muzhiki_ui/widgets/button_small.dart';
-import 'package:muzhiki_ui/buttons/app_button.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 enum _NetworkIssuePage { main, whatToDo, whatWeDo }
 
@@ -20,19 +19,19 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
   _NetworkIssuePage _page = _NetworkIssuePage.main;
 
   static const _whatToDoText =
-      'Попробуйте изменить подключение к сети: подключитесь другим способом, '
-      'через WiFi или наоборот через мобильную сеть. Попробуйте отключить VPN '
-      'или наоборот подключить его.\n\n'
-      'Нам очень жаль, что вы столкнулись с проблемой. Если вы считаете, что '
-      'проблема не с сетью, потрясите устройство, чтобы отправить информацию '
-      'разработчикам.';
+      '���������� �������� ����������� � ����: ������������ ������ ��������, '
+      '����� WiFi ��� �������� ����� ��������� ����. ���������� ��������� VPN '
+      '��� �������� ���������� ���.\n\n'
+      '��� ����� ����, ��� �� ����������� � ���������. ���� �� ��������, ��� '
+      '�������� �� � �����, ��������� ����������, ����� ��������� ���������� '
+      '�������������.';
 
   static const _whatWeDoText =
-      'Для локализации и контроля над проблемой мы замеряем время, за которое '
-      'наши пользователи получают ответ от сервера и видим большую часть '
-      'задержек.\n\n'
-      'Мы проводим миграцию на сервера крупных компаний — со временем это '
-      'должно стабилизировать ситуацию с сетью.';
+      '��� ����������� � �������� ��� ��������� �� �������� �����, �� ������� '
+      '���� ������������ �������� ����� �� ������� � ����� ������� ����� '
+      '��������.\n\n'
+      '�� �������� �������� �� ������� ������� �������� � �� �������� ��� '
+      '������ ��������������� �������� � �����.';
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +58,10 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
             SizedBox(height: 21.h),
             Text.rich(
               const TextSpan(
-                text: 'Не во всех странах сеть работает стабильно',
+                text: '�� �� ���� ������� ���� �������� ���������',
                 children: [
                   TextSpan(
-                    text: ', такие времена',
+                    text: ', ����� �������',
                     style: TextStyle(color: NetworkProblemColors.greyText),
                   ),
                 ],
@@ -76,8 +75,8 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
             ),
             SizedBox(height: 12.h),
             Text(
-              'Видим, что приложение зависает из-за проблем с сетью. '
-              'Это не связано с ошибками в коде или качеством разработки.',
+              '�����, ��� ���������� �������� ��-�� ������� � �����. '
+              '��� �� ������� � �������� � ���� ��� ��������� ����������.',
               style: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
@@ -90,13 +89,13 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _NetworkIssueButton(
-                  label: 'И что делать?',
+                  label: '� ��� ������?',
                   onTap: () =>
                       setState(() => _page = _NetworkIssuePage.whatToDo),
                 ),
                 SizedBox(height: 9.h),
                 _NetworkIssueButton(
-                  label: 'Что мы делаем, чтобы стало лучше',
+                  label: '��� �� ������, ����� ����� �����',
                   onTap: () =>
                       setState(() => _page = _NetworkIssuePage.whatWeDo),
                 ),
@@ -106,7 +105,7 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
             Align(
               alignment: Alignment.centerLeft,
               child: _NetworkIssueButton(
-                label: 'Назад',
+                label: '�����',
                 onTap: () => setState(() => _page = _NetworkIssuePage.main),
               ),
             ),
@@ -123,8 +122,8 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
             ),
           ],
           SizedBox(height: 27.h),
-          AppButton.primary(
-            label: 'Ох, ладно',
+          MuzhikiUi.buttons.primary(
+            label: '��, �����',
             backgroundColor: NetworkProblemColors.greyLight,
             labelColor: NetworkProblemColors.black23,
             borderRadius: 20,
@@ -143,7 +142,7 @@ class _NetworkIssueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppButtonSmall(
+    return MuzhikiUi.buttons.small(
       mode: SmallButtonMode.standart,
       label: label,
       fontSize: 15,

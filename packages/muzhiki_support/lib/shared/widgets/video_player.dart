@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:video_player/video_player.dart';
 
 class ChatVideoPlayerView extends StatefulWidget {
@@ -129,7 +129,7 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
                     Positioned.fill(
                       child: Center(
                         child: CircularProgressIndicator(
-                          color: SupportColors.white,
+                          color: MuzhikiColors.white,
                         ),
                       ),
                     ),
@@ -140,9 +140,9 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
                     child: VideoProgressIndicator(
                       controller,
                       colors: VideoProgressColors(
-                        playedColor: SupportColors.blood,
-                        bufferedColor: SupportColors.grey,
-                        backgroundColor: SupportColors.light,
+                        playedColor: MuzhikiColors.blood,
+                        bufferedColor: MuzhikiColors.grey,
+                        backgroundColor: MuzhikiColors.light,
                       ),
                       allowScrubbing: true,
                       padding: EdgeInsets.zero,
@@ -159,7 +159,7 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
                           onTap: mute,
                           child: Icon(
                             muteSound ? Icons.volume_off : Icons.volume_up,
-                            color: SupportColors.white,
+                            color: MuzhikiColors.white,
                           ),
                         ),
                       );

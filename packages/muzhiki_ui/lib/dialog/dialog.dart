@@ -1,1 +1,1 @@
-export 'app_dialog.dart';
+export 'muzhiki_dialog.dart';

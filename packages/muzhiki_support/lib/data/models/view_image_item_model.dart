@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:muzhiki_ui/media/media_item.dart';
 
+/// Совместимая обёртка над [MediaItem] для фото.
+@Deprecated('Use MediaItem from package:muzhiki_ui/media/media_viewer.dart')
 class ViewerImageItem {
   final String? url;
   final String? filePath;
@@ -23,6 +26,27 @@ class ViewerImageItem {
     return ViewerImageItem._(xfile: file, remarks: remarks);
   }
 
+  MediaItem toMediaItem() {
+    if (url != null) {
+      return MediaItem.photoNetwork(url!, remarks: remarks, heroTag: url);
+    }
+    if (xfile != null) {
+      return MediaItem.photoFile(
+        xfile!.path,
+        remarks: remarks,
+        heroTag: xfile!.path,
+      );
+    }
+    if (filePath != null) {
+      return MediaItem.photoFile(
+        filePath!,
+        remarks: remarks,
+        heroTag: filePath,
+      );
+    }
+    throw Exception('Пустой ViewerImageItem');
+  }
+
   ImageProvider get imageProvider {
     if (url != null) return NetworkImage(url!);
     if (xfile != null) return FileImage(File(xfile!.path));
@@ -41,6 +65,7 @@ class ViewerImageItem {
   }
 }
 
+@Deprecated('Use MediaItem directly')
 class ViewerParser {
   static ViewerImageItem parse(dynamic item) {
     if (item is ViewerImageItem) return item;

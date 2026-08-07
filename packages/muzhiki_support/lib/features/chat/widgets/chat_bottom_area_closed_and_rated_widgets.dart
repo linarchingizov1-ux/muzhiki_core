@@ -1,11 +1,10 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
 import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
-import 'package:muzhiki_ui/buttons/app_button.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class ChatBottomAreaClosedAndRatedWidgets extends StatefulWidget {
   final WebSocketChat webSocketApp;
@@ -50,7 +49,7 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.r),
-            color: SupportColors.white,
+            color: MuzhikiColors.white,
           ),
           child: Column(
             spacing: 24.h,
@@ -59,7 +58,7 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
                 : CrossAxisAlignment.center,
             children: [
               Text(
-                'Обращение закрыто',
+                '��������� �������',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   height: 1.h,
@@ -68,13 +67,13 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
                 ),
               ),
               if (!hideReopenButton)
-                AppButton.pill(
+                MuzhikiUi.buttons.pill(
                   height: 48,
                   isLoading: isLoadingReopen,
                   labelWeight: FontWeight.w700,
-                  backgroundColor: SupportColors.light,
-                  progressColor: SupportColors.black17,
-                  labelColor: SupportColors.alertTextGrey,
+                  backgroundColor: MuzhikiColors.light,
+                  progressColor: MuzhikiColors.black17,
+                  labelColor: MuzhikiColors.alertTextGrey,
                   onPressed: () {
                     setState(() {
                       isLoadingReopen = true;
@@ -87,7 +86,7 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
                           });
                         });
                   },
-                  label: 'Вопрос не решён',
+                  label: '������ �� �����',
                 ),
             ],
           ),

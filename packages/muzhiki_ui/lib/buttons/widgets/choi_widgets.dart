@@ -1,9 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
-import 'package:muzhiki_ui/widgets/notification.dart';
-import 'package:muzhiki_ui/widgets/skelet.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/other/notification.dart';
+import 'package:muzhiki_ui/other/skelet.dart';
 
 class ChoiceWidgets extends StatefulWidget {
   final bool isSelected;
@@ -168,9 +168,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(48.r),
-          color: widget.isSelected
-              ? SupportColors.black1
-              : SupportColors.light,
+          color: widget.isSelected ? MuzhikiColors.black1 : MuzhikiColors.light,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -185,8 +183,8 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
                 color: widget.isSelected
-                    ? SupportColors.white
-                    : SupportColors.black1,
+                    ? MuzhikiColors.white
+                    : MuzhikiColors.black1,
               ),
             ),
             if (widget.newMessage > 0)

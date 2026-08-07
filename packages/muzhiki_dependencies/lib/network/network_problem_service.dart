@@ -3,7 +3,7 @@ import 'package:muzhiki_dependencies/network/extension/dio_error_extension.dart'
 import 'package:muzhiki_dependencies/network/ui/dialog/network_problem_dialog.dart';
 import 'package:muzhiki_dependencies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_dependencies/service/app_banner/app_banner_widget.dart';
-import 'package:muzhiki_dependencies/ui/app_dialog.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NetworkProblemService {
@@ -57,7 +57,7 @@ class NetworkProblemService {
       DateTime.now().millisecondsSinceEpoch,
     );
     try {
-      await AppDialog.standart(child: const NetworkIssueDialog());
+      await MuzhikiUi.dialog.standart(child: const NetworkIssueDialog());
     } finally {
       _isSheetShowing = false;
       _errorTimes.clear();

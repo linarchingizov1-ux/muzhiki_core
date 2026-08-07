@@ -2,20 +2,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
-import 'package:muzhiki_support/config/support_route_constant.dart';
+import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
+import 'package:muzhiki_support/shared/extensions/chat_media_extension.dart';
+import 'package:muzhiki_ui/media/media_viewer.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class VideoAttachment extends StatefulWidget {
   final Directory directory;
   final String url;
+  final AppWebsocketChat websocketChat;
 
   const VideoAttachment({
     super.key,
     required this.url,
     required this.directory,
+    required this.websocketChat,
   });
 
   @override
@@ -36,6 +39,13 @@ class _VideoAttachmentState extends State<VideoAttachment> {
     super.initState();
   }
 
+  List<MediaItem> get media => widget.websocketChat.buildMedia();
+
+  int get index {
+    final i = media.indexWhere((e) => e.identity == widget.url);
+    return i < 0 ? 0 : i;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
@@ -51,18 +61,26 @@ class _VideoAttachmentState extends State<VideoAttachment> {
           if (value.hasData) {
             return InkWell(
               onTap: () {
-                context.pushNamed(
-                  SupportRouteConstant.I.videoView,
-                  queryParameters: {'url': widget.url},
-                  extra: value.data,
-                );
+                final preview = value.data;
+                final items = media.map((item) {
+                  if (item.identity == widget.url && item.isVideo) {
+                    return MediaItem.videoNetwork(
+                      item.url!,
+                      previewPath: preview,
+                      heroTag: item.heroTag,
+                    );
+                  }
+                  return item;
+                }).toList();
+
+                MediaViewer.open(context, items: items, initialIndex: index);
               },
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   Positioned.fill(
                     child: ClipRRect(
-                      borderRadius: BorderRadiusGeometry.circular(12.r),
+                      borderRadius: BorderRadius.circular(12.r),
                       child: Image.file(fit: BoxFit.cover, File(value.data!)),
                     ),
                   ),
@@ -71,7 +89,6 @@ class _VideoAttachmentState extends State<VideoAttachment> {
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           final size = constraints.biggest.shortestSide;
-
                           final iconSize = size * 0.25;
                           final containerSize = size * 0.35;
 
@@ -80,7 +97,7 @@ class _VideoAttachmentState extends State<VideoAttachment> {
                             height: containerSize,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: SupportColors.black17.withValues(
+                              color: MuzhikiColors.black17.withValues(
                                 alpha: 0.2,
                               ),
                             ),
@@ -99,8 +116,8 @@ class _VideoAttachmentState extends State<VideoAttachment> {
             );
           } else {
             return Shimmer.fromColors(
-              baseColor: SupportColors.light,
-              highlightColor: SupportColors.white,
+              baseColor: MuzhikiColors.light,
+              highlightColor: MuzhikiColors.white,
               child: SizedBox(
                 height: 77.w,
                 width: 77.h,

@@ -1,4 +1,4 @@
-export 'app_button.dart';
+export 'muzhiki_buttons.dart';
 export 'shared/button_loading.dart';
 export 'shared/button_tap.dart';
 export 'widgets/circle_button.dart';
@@ -6,3 +6,4 @@ export 'widgets/dark_button.dart';
 export 'widgets/labeled_button.dart';
 export 'widgets/pill_button.dart';
 export 'widgets/primary_button.dart';
+export 'widgets/small_button.dart';

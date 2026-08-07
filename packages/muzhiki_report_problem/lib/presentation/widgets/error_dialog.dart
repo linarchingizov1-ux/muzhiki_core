@@ -1,7 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_ui/buttons/app_button.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
 
 class ErrorDialog extends StatelessWidget {
@@ -11,7 +11,7 @@ class ErrorDialog extends StatelessWidget {
 
   const ErrorDialog({
     super.key,
-    this.title = 'Не удалось отправить заявку',
+    this.title = '�� ������� ��������� ������',
     this.description,
     this.onRetry,
   });
@@ -47,8 +47,8 @@ class ErrorDialog extends StatelessWidget {
         ],
         SizedBox(height: 27.h),
         if (onRetry != null) ...[
-          AppButton.primary(
-            label: 'Повторить',
+          MuzhikiUi.buttons.primary(
+            label: '���������',
             backgroundColor: ReportProblemColors.black23,
             labelColor: ReportProblemColors.white,
             borderRadius: 23,
@@ -59,8 +59,8 @@ class ErrorDialog extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
         ],
-        AppButton.primary(
-          label: 'Понятно',
+        MuzhikiUi.buttons.primary(
+          label: '�������',
           backgroundColor: ReportProblemColors.light,
           labelColor: ReportProblemColors.black23,
           onPressed: () => context.pop(),

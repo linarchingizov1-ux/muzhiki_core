@@ -1,13 +1,12 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_support/config/support_assets.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
 import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
-import 'package:muzhiki_ui/buttons/app_button.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class ChatBottomAreaRatedWidgets extends StatefulWidget {
   final WebSocketChat webSocketApp;
@@ -52,13 +51,13 @@ class _ChatBottomAreaRatedWidgetsState
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.r),
-            color: SupportColors.white,
+            color: MuzhikiColors.white,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Обращение закрыто',
+                '��������� �������',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   fontSize: 15.sp,
@@ -66,12 +65,12 @@ class _ChatBottomAreaRatedWidgetsState
                 ),
               ),
               Text(
-                'Оцените работу оператора',
+                '������� ������ ���������',
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
-                  color: SupportColors.alertTextGrey,
+                  color: MuzhikiColors.alertTextGrey,
                 ),
               ),
 
@@ -113,10 +112,11 @@ class _ChatBottomAreaRatedWidgetsState
               SizedBox(height: 16.h),
 
               if (selectedStar != 0)
-                AppButton.pill(
+                MuzhikiUi.buttons
+                    .pill(
                       height: 43,
                       isLoading: isLoadingReview,
-                      progressColor: SupportColors.white,
+                      progressColor: MuzhikiColors.white,
                       onPressed: () {
                         if (selectedStar == 0 && widget.state.socket == null) {
                           return;
@@ -141,7 +141,7 @@ class _ChatBottomAreaRatedWidgetsState
                               }
                             });
                       },
-                      label: 'Оценить',
+                      label: '�������',
                     )
                     .animate()
                     .fadeIn(duration: 220.ms)
@@ -160,13 +160,13 @@ class _ChatBottomAreaRatedWidgetsState
               if (!hideReopenButton)
                 Padding(
                   padding: EdgeInsets.only(top: 9.h),
-                  child: AppButton.pill(
+                  child: MuzhikiUi.buttons.pill(
                     height: 48,
                     labelWeight: FontWeight.w700,
                     isLoading: isLoadingReopen,
-                    backgroundColor: SupportColors.light,
-                    progressColor: SupportColors.black17,
-                    labelColor: SupportColors.alertTextGrey,
+                    backgroundColor: MuzhikiColors.light,
+                    progressColor: MuzhikiColors.black17,
+                    labelColor: MuzhikiColors.alertTextGrey,
                     onPressed: () {
                       if (selectedStar == 0 && widget.state.socket == null) {
                         return;
@@ -187,7 +187,7 @@ class _ChatBottomAreaRatedWidgetsState
                             }
                           });
                     },
-                    label: 'Вопрос не решён',
+                    label: '������ �� �����',
                   ),
                 ),
             ],

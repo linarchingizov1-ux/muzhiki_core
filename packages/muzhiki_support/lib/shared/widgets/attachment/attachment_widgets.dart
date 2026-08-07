@@ -10,7 +10,12 @@ abstract class AttachmentWidgets {
   static VideoAttachment video({
     required Directory directory,
     required String url,
-  }) => VideoAttachment(url: url, directory: directory);
+    required AppWebsocketChat websocketChat,
+  }) => VideoAttachment(
+    url: url,
+    directory: directory,
+    websocketChat: websocketChat,
+  );
   static DocumentAttachment document({
     required Directory directory,
     required String url,

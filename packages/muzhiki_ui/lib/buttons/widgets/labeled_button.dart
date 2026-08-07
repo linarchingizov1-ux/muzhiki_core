@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/buttons/shared/button_loading.dart';
 import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
-/// Кнопка с заголовком и описанием (две строки).
 class LabeledButton extends StatelessWidget {
   const LabeledButton({
     super.key,
@@ -14,13 +13,13 @@ class LabeledButton extends StatelessWidget {
     this.height = 56,
     this.width = double.infinity,
     this.borderRadius = 16,
-    this.backgroundColor = SupportColors.black17,
+    this.backgroundColor = MuzhikiColors.black17,
     this.padding,
     this.labelSize = 15,
     this.labelWeight,
     this.isLoading = false,
     this.disabled = false,
-    this.progressColor = SupportColors.white,
+    this.progressColor = MuzhikiColors.white,
     this.progressSize = 28,
   });
 
@@ -41,9 +40,12 @@ class LabeledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canTap = buttonIsInteractive(disabled: disabled, isLoading: isLoading);
+    final canTap = buttonIsInteractive(
+      disabled: disabled,
+      isLoading: isLoading,
+    );
     final bg = buttonBackgroundColor(backgroundColor, enabled: !disabled);
-    final isLight = backgroundColor == SupportColors.light;
+    final isLight = backgroundColor == MuzhikiColors.light;
 
     return ButtonTap(
       onPressed: onPressed,
@@ -73,7 +75,9 @@ class LabeledButton extends StatelessWidget {
                       fontWeight:
                           labelWeight ??
                           (isLight ? FontWeight.w600 : FontWeight.w700),
-                      color: isLight ? SupportColors.black17 : SupportColors.white,
+                      color: isLight
+                          ? MuzhikiColors.black17
+                          : MuzhikiColors.white,
                     ),
                   ),
                   if (description != null)
@@ -83,7 +87,9 @@ class LabeledButton extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Manrope',
                           fontSize: 10.sp,
-                          color: isLight ? SupportColors.grey : SupportColors.white,
+                          color: isLight
+                              ? MuzhikiColors.grey
+                              : MuzhikiColors.white,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

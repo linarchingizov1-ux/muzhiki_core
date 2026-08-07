@@ -7,7 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_dependencies/network/url_launch/url_launch.dart';
 import 'package:muzhiki_support/data/services/attachment_uuid_service.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:muzhiki_support/data/models/socket/socket_connection.dart';
 import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
@@ -62,7 +62,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
             children: [
               if (!widget.isMe)
                 CircleAvatar(
-                  backgroundColor: SupportColors.white,
+                  backgroundColor: MuzhikiColors.white,
                   radius: 22.r,
                   child: widget.avatar == null || widget.avatar!.isEmpty
                       ? Icon(Icons.person, size: 20.r, color: Colors.grey)
@@ -101,8 +101,8 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.r),
                   color: widget.isMe
-                      ? SupportColors.light
-                      : SupportColors.white,
+                      ? MuzhikiColors.light
+                      : MuzhikiColors.white,
                 ),
                 child: IntrinsicWidth(
                   child: Column(
@@ -125,7 +125,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                             height: 1.h,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
-                            color: SupportColors.blood,
+                            color: MuzhikiColors.blood,
                           ),
                         ),
                       ),
@@ -161,7 +161,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                   style: TextStyle(
                                     fontFamily: 'Manrope',
                                     height: 2.h,
-                                    color: SupportColors.grey,
+                                    color: MuzhikiColors.grey,
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -172,7 +172,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                       Icon(
                                             Icons.schedule_rounded,
                                             size: 16.r,
-                                            color: SupportColors.grey,
+                                            color: MuzhikiColors.grey,
                                           )
                                           .animate(
                                             onPlay: (controller) =>
@@ -185,7 +185,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                     (MessageStatus.failed) => Icon(
                                       Icons.close,
                                       size: 16.r,
-                                      color: SupportColors.blood,
+                                      color: MuzhikiColors.blood,
                                     ),
                                     MessageStatus.sent ||
                                     null => const SizedBox.shrink(),
@@ -335,6 +335,7 @@ class _BubbleAttachment extends StatelessWidget {
             ChatAttachmentType.video => AttachmentWidgets.video(
               directory: directory,
               url: attachment.url,
+              websocketChat: websocketChat,
             ),
           },
         );
@@ -388,6 +389,7 @@ class _BubbleAttachment extends StatelessWidget {
                             ChatAttachmentType.video => AttachmentWidgets.video(
                               directory: directory,
                               url: attachment.url,
+                              websocketChat: websocketChat,
                             ),
 
                             _ => const SizedBox.shrink(),

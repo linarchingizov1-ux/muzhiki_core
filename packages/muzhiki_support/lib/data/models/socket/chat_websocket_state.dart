@@ -1,6 +1,6 @@
 ﻿import 'dart:ui';
 
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:muzhiki_support/data/models/socket/socket_connection.dart';
 import 'package:muzhiki_support/shared/extensions/date_format.dart';
 
@@ -168,8 +168,8 @@ class WebSocketChatState {
 
   Color get statusColor {
     return status == SocketConnectionChatStatus.close
-        ? SupportColors.blood
-        : SupportColors.orange;
+        ? MuzhikiColors.blood
+        : MuzhikiColors.orange;
   }
 
   WebSocketChatState copyWith({

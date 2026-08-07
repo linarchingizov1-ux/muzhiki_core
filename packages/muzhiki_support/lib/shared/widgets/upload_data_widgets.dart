@@ -3,18 +3,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:muzhiki_dependencies/network/exception/network_map_error.dart';
 import 'package:muzhiki_dependencies/service/app_banner/app_banner_controller.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
-import 'package:muzhiki_support/config/support_route_constant.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:muzhiki_support/data/models/socket/attachments/local_attachments.dart';
 import 'package:muzhiki_support/data/models/socket/attachments/upload_data.dart';
 import 'package:muzhiki_support/data/models/socket/socket_connection.dart';
-import 'package:muzhiki_support/data/models/view_image_item_model.dart';
 import 'package:muzhiki_support/features/chat/state/attachments_cubit.dart';
 import 'package:muzhiki_support/shared/utils/file_icon_mapper.dart';
-import 'package:muzhiki_support/shared/widgets/photo_view_widget.dart';
+import 'package:muzhiki_ui/media/media_viewer.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -125,7 +122,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
         children: [
           Positioned.fill(
             child: ColoredBox(
-              color: SupportColors.light.withValues(alpha: 0.6),
+              color: MuzhikiColors.light.withValues(alpha: 0.6),
             ),
           ),
           Positioned.fill(child: _buildContent(context)),
@@ -137,7 +134,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
               onTap: () {
                 context.read<AttachmentsCubit>().removeById(id);
               },
-              child: Icon(Icons.close, size: 16.r, color: SupportColors.black1),
+              child: Icon(Icons.close, size: 16.r, color: MuzhikiColors.black1),
             ),
           ),
 
@@ -181,7 +178,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
         padding: EdgeInsets.all(5.r),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.r),
-          color: SupportColors.white,
+          color: MuzhikiColors.white,
         ),
         child: Image.asset(documentIcon, width: 25.r, height: 25.r),
       ),
@@ -198,8 +195,8 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
         child: _videoThumbnail == null
             ? Shimmer.fromColors(
                 key: const ValueKey('loading'),
-                baseColor: SupportColors.light,
-                highlightColor: SupportColors.white,
+                baseColor: MuzhikiColors.light,
+                highlightColor: MuzhikiColors.white,
                 child: Container(
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 231, 231, 231),
@@ -220,10 +217,15 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
       onTap: remote == null
           ? null
           : () {
-              context.pushNamed(
-                SupportRouteConstant.I.videoView,
-                queryParameters: {'url': remote.url},
-                extra: _videoThumbnail,
+              MediaViewer.open(
+                context,
+                items: [
+                  MediaItem.videoNetwork(
+                    remote.url,
+                    previewPath: _videoThumbnail,
+                    heroTag: remote.url,
+                  ),
+                ],
               );
             },
       child: Image.file(
@@ -262,21 +264,9 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
       borderRadius: BorderRadius.circular(12.r),
       child: InkWell(
         onTap: () {
-          final image = ViewerImageItem.network(remote.url);
-
-          Navigator.of(context).push(
-            PageRouteBuilder(
-              opaque: false,
-              transitionDuration: const Duration(milliseconds: 300),
-              reverseTransitionDuration: const Duration(milliseconds: 300),
-              pageBuilder: (_, _, _) {
-                return PhotoViewerPage(
-                  heroTagPrefix: tag,
-                  images: [image],
-                  initialIndex: 0,
-                );
-              },
-            ),
+          MediaViewer.open(
+            context,
+            items: [MediaItem.photoNetwork(remote.url, heroTag: tag)],
           );
         },
         child: Hero(

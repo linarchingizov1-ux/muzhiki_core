@@ -13,7 +13,7 @@ import 'package:muzhiki_support/features/chat/widgets/chat_bottom_area_rated_wid
 import 'package:muzhiki_support/features/chat/widgets/chat_bottom_area_ticket_widgets.dart';
 import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
 import 'package:muzhiki_support/shared/widgets/bubble_chat.dart';
-import 'package:muzhiki_ui/widgets/skelet.dart';
+import 'package:muzhiki_ui/other/skelet.dart';
 
 class ChatMessageWidgets extends StatelessWidget {
   final AppWebsocketChat websocket;

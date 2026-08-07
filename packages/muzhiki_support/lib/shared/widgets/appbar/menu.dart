@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
 import 'package:muzhiki_support/config/support_assets.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 class SupportAppBarMenu extends StatelessWidget {
   final SessionApp sessionApp;
@@ -20,7 +20,7 @@ class SupportAppBarMenu extends StatelessWidget {
           'Добро пожаловать!',
           style: TextStyle(
             fontFamily: 'Manrope',
-            color: SupportColors.grey,
+            color: MuzhikiColors.grey,
             height: 1.5.h,
             fontSize: 11.sp,
             fontWeight: FontWeight.w500,
@@ -31,7 +31,7 @@ class SupportAppBarMenu extends StatelessWidget {
             sessionApp.user!.username,
             style: TextStyle(
               fontFamily: 'Manrope',
-              color: SupportColors.appBackgroud,
+              color: MuzhikiColors.appBackgroud,
               fontSize: 12.sp,
               height: 1.h,
               fontWeight: FontWeight.w600,
@@ -90,7 +90,7 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
                       fontFamily: 'Manrope',
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: SupportColors.appBackgroud,
+                      color: MuzhikiColors.appBackgroud,
                       height: 1.5.h,
                     ),
                   ),
@@ -100,7 +100,7 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
                       fontFamily: 'Manrope',
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
-                      color: SupportColors.greyText,
+                      color: MuzhikiColors.greyText,
                     ),
                   ),
                 ],
@@ -108,7 +108,7 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              color: SupportColors.appBackgroud,
+              color: MuzhikiColors.appBackgroud,
               size: 12.h,
             ),
           ],

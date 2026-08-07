@@ -3,7 +3,7 @@ import 'package:muzhiki_bridge/data/repository/bridge_auth_repository.dart';
 import 'package:muzhiki_bridge/domain/usecase/bridge_auth_usecase.dart';
 import 'package:muzhiki_bridge/mp_bridge_view.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 class InformatorView extends StatefulWidget {
   final String initialUrl;
@@ -42,7 +42,7 @@ class _InformatorViewState extends State<InformatorView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: SupportColors.white,
+      backgroundColor: MuzhikiColors.white,
       appBar: AppBar(title: const Text('Информатор')),
       body: MpBridgeWebView(
         showAppBar: false,

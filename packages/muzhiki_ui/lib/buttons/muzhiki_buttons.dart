@@ -1,32 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
+import 'package:muzhiki_ui/buttons/widgets/animated_button.dart';
+import 'package:muzhiki_ui/buttons/widgets/choi_widgets.dart';
 import 'package:muzhiki_ui/buttons/widgets/circle_button.dart';
 import 'package:muzhiki_ui/buttons/widgets/dark_button.dart';
 import 'package:muzhiki_ui/buttons/widgets/labeled_button.dart';
 import 'package:muzhiki_ui/buttons/widgets/pill_button.dart';
-import 'package:muzhiki_ui/buttons/animated_button.dart';
-import 'package:muzhiki_ui/buttons/choi_widgets.dart';
 import 'package:muzhiki_ui/buttons/widgets/primary_button.dart';
-import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
-import 'package:muzhiki_ui/theme/support_colors.dart';
+import 'package:muzhiki_ui/buttons/widgets/small_button.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
-/// Фабрика кнопок UI-kit.
-///
-/// ```dart
-/// AppButton.primary(label: 'Сохранить', onPressed: _save);
-/// AppButton.circle(iconAsset: 'assets/icons/back.svg', onPressed: context.pop);
-/// AppButton.back(svgAsset: backIcon, onTap: context.pop);
-/// ```
-abstract final class AppButton {
-  const AppButton._();
+export 'widgets/small_button.dart';
 
-  // ── CTA-кнопки ───────────────────────────────────────────────
+final class MuzhikiButtons {
+  const MuzhikiButtons();
 
-  static Widget primary({
+  Widget primary({
     Key? key,
     required String label,
     required VoidCallback onPressed,
     String? iconAsset,
-    Color backgroundColor = SupportColors.black17,
+    Color backgroundColor = MuzhikiColors.black17,
     Color? labelColor,
     FontWeight? labelWeight,
     double labelSize = 15,
@@ -36,7 +30,7 @@ abstract final class AppButton {
     EdgeInsets? padding,
     bool isLoading = false,
     bool disabled = false,
-    Color progressColor = SupportColors.white,
+    Color progressColor = MuzhikiColors.white,
     double progressSize = 28,
   }) {
     return PrimaryButton(
@@ -59,7 +53,7 @@ abstract final class AppButton {
     );
   }
 
-  static Widget dark({
+  Widget dark({
     Key? key,
     required String label,
     required VoidCallback onPressed,
@@ -81,14 +75,14 @@ abstract final class AppButton {
     );
   }
 
-  static Widget labeled({
+  Widget labeled({
     Key? key,
     required String label,
     required VoidCallback onPressed,
     String? description,
     double height = 56,
     double borderRadius = 16,
-    Color backgroundColor = SupportColors.black17,
+    Color backgroundColor = MuzhikiColors.black17,
     bool isLoading = false,
     bool disabled = false,
     EdgeInsets? padding,
@@ -111,7 +105,7 @@ abstract final class AppButton {
     );
   }
 
-  static Widget labeledAnimated({
+  Widget labeledAnimated({
     Key? key,
     required String label,
     required VoidCallback onPressed,
@@ -146,11 +140,11 @@ abstract final class AppButton {
     );
   }
 
-  static Widget pill({
+  Widget pill({
     Key? key,
     required String label,
     required VoidCallback onPressed,
-    Color backgroundColor = SupportColors.black17,
+    Color backgroundColor = MuzhikiColors.black17,
     Color? labelColor,
     double height = 45,
     EdgeInsets? padding,
@@ -158,7 +152,7 @@ abstract final class AppButton {
     bool disabled = false,
     FontWeight? labelWeight,
     double labelSize = 15,
-    Color progressColor = SupportColors.white,
+    Color progressColor = MuzhikiColors.white,
   }) {
     return PillButton(
       key: key,
@@ -176,11 +170,42 @@ abstract final class AppButton {
     );
   }
 
-  static Widget circle({
+  /// Компактная pill-кнопка (текст / текст + иконка).
+  Widget small({
+    Key? key,
+    required String label,
+    SmallButtonMode mode = SmallButtonMode.standart,
+    AlignmentButtonIcon alignment = AlignmentButtonIcon.start,
+    Widget? icon,
+    double fontSize = 15,
+    FontWeight fontWeight = FontWeight.w500,
+    Color labelColor = MuzhikiColors.black23,
+    Color backgroundColor = MuzhikiColors.light,
+    double radius = 30,
+    EdgeInsetsGeometry? labelPadding,
+    VoidCallback? onTap,
+  }) {
+    return SmallButton(
+      key: key,
+      mode: mode,
+      alignment: alignment,
+      icon: icon,
+      label: label,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      labelColor: labelColor,
+      backgroundColor: backgroundColor,
+      radius: radius,
+      labelPadding: labelPadding,
+      onTap: onTap,
+    );
+  }
+
+  Widget circle({
     Key? key,
     required String iconAsset,
     required VoidCallback onPressed,
-    Color backgroundColor = SupportColors.alertTextGrey,
+    Color backgroundColor = MuzhikiColors.alertTextGrey,
     double size = 42,
     double iconSize = 40,
     bool disabled = false,
@@ -196,17 +221,41 @@ abstract final class AppButton {
     );
   }
 
-  // ── Навигация ────────────────────────────────────────────────
+  AnimatedButton animated({
+    String? svgAsset,
+    IconData? icon,
+    Key? key,
+    Color iconColor = Colors.white,
+    Widget? child,
+    required VoidCallback onTap,
+    double size = 40,
+    double iconSize = 16,
+    Color? backgroundColor,
+    double scale = 1.1,
+    bool enabled = true,
+  }) => AnimatedButton(
+    key: key,
+    svgAsset: svgAsset,
+    scale: scale,
+    iconColor: iconColor,
+    icon: icon,
+    onTap: onTap,
+    size: size,
+    iconSize: iconSize,
+    backgroundColor: backgroundColor,
+    enabled: enabled,
+    child: child,
+  );
 
-  static Widget back({
+  Widget back({
     Key? key,
     required String svgAsset,
     required VoidCallback onTap,
-    Color backgroundColor = SupportColors.alertTextGrey,
-    Color iconColor = SupportColors.white,
+    Color backgroundColor = MuzhikiColors.alertTextGrey,
+    Color iconColor = MuzhikiColors.white,
     double size = 40,
   }) {
-    return AnimatedButton(
+    return animated(
       key: key,
       backgroundColor: backgroundColor,
       iconColor: iconColor,
@@ -218,15 +267,15 @@ abstract final class AppButton {
     );
   }
 
-  static Widget close({
+  Widget close({
     Key? key,
     required VoidCallback onTap,
     double size = 44,
-    Color backgroundColor = SupportColors.black17,
-    Color iconColor = SupportColors.white,
+    Color backgroundColor = MuzhikiColors.black17,
+    Color iconColor = MuzhikiColors.white,
     double iconSize = 24,
   }) {
-    return AnimatedButton(
+    return animated(
       key: key,
       size: size,
       iconColor: iconColor,
@@ -238,16 +287,16 @@ abstract final class AppButton {
     );
   }
 
-  static Widget icon({
+  Widget icon({
     Key? key,
     required String svgAsset,
     required VoidCallback onTap,
     Color? backgroundColor,
-    Color iconColor = SupportColors.white,
+    Color iconColor = MuzhikiColors.white,
     double size = 40,
     double iconSize = 16,
   }) {
-    return AnimatedButton(
+    return animated(
       key: key,
       svgAsset: svgAsset,
       backgroundColor: backgroundColor,
@@ -259,28 +308,26 @@ abstract final class AppButton {
     );
   }
 
-  // ── Интерактивные обёртки ────────────────────────────────────
-
-  static Widget pressable({
+  Widget pressable({
     Key? key,
     required Widget child,
     required VoidCallback onTap,
     double scale = 1.02,
     bool enabled = true,
   }) {
-    return AnimatedButton(
+    return animated(
       key: key,
       scale: scale,
       onTap: onTap,
       enabled: enabled,
       size: 40,
       iconSize: 16,
-      iconColor: SupportColors.white,
+      iconColor: MuzhikiColors.white,
       child: child,
     );
   }
 
-  static Widget card({
+  Widget card({
     Key? key,
     required Widget child,
     required VoidCallback onTap,
@@ -296,14 +343,28 @@ abstract final class AppButton {
     );
   }
 
-  static Widget filterChip({
+  ChoiceWidgets choi({
+    required void Function(bool)? onSelected,
+    required bool isSelected,
+    required String label,
+    int newMessage = 0,
+    bool isLoading = false,
+  }) => ChoiceWidgets(
+    isLoading: isLoading,
+    newMessage: newMessage,
+    onSelected: onSelected,
+    isSelected: isSelected,
+    label: label,
+  );
+
+  Widget filterChip({
     required String label,
     required bool isSelected,
     required ValueChanged<bool>? onSelected,
     int badgeCount = 0,
     bool isLoading = false,
   }) {
-    return ChoiceWidgets(
+    return choi(
       label: label,
       isSelected: isSelected,
       onSelected: onSelected,
@@ -312,22 +373,22 @@ abstract final class AppButton {
     );
   }
 
-  static Widget cameraShutter({
+  Widget cameraShutter({
     required VoidCallback onTap,
     double size = 52,
-    Color backgroundColor = SupportColors.light,
+    Color backgroundColor = MuzhikiColors.light,
   }) {
-    return AnimatedButton(
+    return animated(
       size: size,
       backgroundColor: backgroundColor,
       scale: 1.1,
       onTap: onTap,
       iconSize: 16,
-      iconColor: SupportColors.white,
+      iconColor: MuzhikiColors.white,
     );
   }
 
-  static Widget menuItem({
+  Widget menuItem({
     required Widget child,
     VoidCallback? onTap,
     double scale = 1.01,
