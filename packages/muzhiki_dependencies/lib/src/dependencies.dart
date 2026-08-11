@@ -32,6 +32,7 @@ class MuzhikiDependencies {
     bool enableTalker = true,
     bool getRoles = false,
     bool showReqHeaders = false,
+    String deviceId = "",
     required bool needMetricsHttp,
     required bool showTalkerMetricsHttp,
     required TypeApp typeApp,
@@ -78,6 +79,7 @@ class MuzhikiDependencies {
       tokenStorage: tokenStorage,
     );
     final session = SessionApp(
+      deviceId: deviceId,
       tokenStorage: tokenStorage,
       typeApp: typeApp,
       getRoles: getRoles,

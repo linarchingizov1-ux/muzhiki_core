@@ -36,6 +36,7 @@ class SessionApp extends ChangeNotifier {
   final HiveCacheStore hiveStore;
   final SharedPreferences sharedPreferences;
   final Fresh<AuthTokens> fresh;
+  final String deviceId;
   final SecureTokenStorage tokenStorage;
   final Dio dioRefresh;
   final Dio dio;
@@ -61,6 +62,7 @@ class SessionApp extends ChangeNotifier {
   UserModel? get user => _user;
   SessionApp({
     required this.tokenStorage,
+    required this.deviceId,
     required this.typeApp,
     required this.dio,
     this.getRoles = false,
@@ -183,6 +185,7 @@ class SessionApp extends ChangeNotifier {
                   tokenEndpoint: '',
                 ),
                 additionalParameters: {
+                  'device': deviceId,
                   'redirect_url': redirectUri,
                   "app_name": typeApp.nameApp,
                 },
