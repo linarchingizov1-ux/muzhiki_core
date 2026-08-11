@@ -101,7 +101,6 @@ class UserSession {
       username: sharedPreferences.getString('username') ?? '',
       isFake: sharedPreferences.getBool('is_fake') ?? false,
       phone: sharedPreferences.getString('phone') ?? '',
-      isFirstAuth: sharedPreferences.getBool('first_auth') ?? true,
     );
   }
 
@@ -117,15 +116,11 @@ class UserSession {
   Future<UserModel> _restoreFromNewSession(String data) async {
     var user = UserModel.fromJson(jsonDecode(data));
 
-    final isFirstAuth = sharedPreferences.getBool('first_auth');
     final companyId = sharedPreferences.getString(
       'selected_company_${user.mpid}',
     );
 
-    final result = user.copyWith(
-      isFirstAuth: isFirstAuth,
-      selectedRolesCompany: companyId,
-    );
+    final result = user.copyWith(selectedRolesCompany: companyId);
     _user = result;
     return result;
   }

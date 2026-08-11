@@ -18,7 +18,6 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   roles: json['roles'] == null
       ? null
       : RolesModel.fromJson(json['roles'] as Map<String, dynamic>),
-  isFirstAuth: json['is_first_auth'] as bool? ?? true,
   isAllowedAccessInformator: json['isAllowedAccessInformator'] as bool? ?? true,
   isFake: json['is_fake'] as bool? ?? true,
   phone: json['phone'] as String?,
@@ -33,7 +32,6 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'mpid': instance.mpid,
   'phone': instance.phone,
   'avatar': instance.avatar,
-  'is_first_auth': instance.isFirstAuth,
   'is_fake': instance.isFake,
   'isAllowedAccessInformator': instance.isAllowedAccessInformator,
   'roles': instance.roles?.toJson(),

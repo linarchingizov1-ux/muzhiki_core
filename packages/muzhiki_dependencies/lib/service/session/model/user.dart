@@ -22,9 +22,6 @@ class UserModel {
   final String? phone;
   final String? avatar;
 
-  @JsonKey(name: 'is_first_auth', defaultValue: true)
-  final bool isFirstAuth;
-
   @JsonKey(name: 'is_fake', defaultValue: true)
   final bool isFake;
   @JsonKey(name: 'isAllowedAccessInformator', defaultValue: true)
@@ -41,7 +38,6 @@ class UserModel {
     required this.lastName,
     this.selectedRolesCompany = "0",
     this.roles,
-    this.isFirstAuth = true,
     this.isAllowedAccessInformator = false,
     this.isFake = true,
     this.phone,
@@ -64,7 +60,6 @@ class UserModel {
     bool? isFake,
     String? avatar,
     RolesModel? roles,
-    bool? isFirstAuth,
     String? selectedRolesCompany,
   }) {
     return UserModel(
@@ -80,7 +75,6 @@ class UserModel {
       isFake: isFake ?? this.isFake,
       avatar: avatar ?? this.avatar,
       roles: roles ?? this.roles,
-      isFirstAuth: isFirstAuth ?? this.isFirstAuth,
     );
   }
 }

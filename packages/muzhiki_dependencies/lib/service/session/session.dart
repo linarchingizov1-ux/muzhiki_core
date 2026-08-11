@@ -19,15 +19,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum AuthState { init, load, inBrows, success, error }
 
 enum TypeApp {
-  master("mp_master_app", "app.mpmaster.com"),
-  bussines("mp_business_mobile_app", "app.mpbussines.com"),
-  support("mp_support_app", "app.mpsupport.com"),
-  client("mp_client_app", "app.mpclient.com"),
-  task("mp_task_app", "app.mptask.com");
+  master("mp_master_app", "app.mpmaster.com", "МП Мастер"),
+  bussines("mp_business_mobile_app", "app.mpbussines.com", "МП Бизнес"),
+  support("mp_support_app", "app.mpsupport.com", "МП Support"),
+  client("mp_client_app", "app.mpclient.com", "МП Клиент"),
+  task("mp_task_app", "app.mptask.com", "МП Задачник");
 
   final String nameApp;
   final String scheme;
-  const TypeApp(this.nameApp, this.scheme);
+  final String label;
+  const TypeApp(this.nameApp, this.scheme, this.label);
 }
 
 class SessionApp extends ChangeNotifier {
@@ -283,10 +284,8 @@ class SessionApp extends ChangeNotifier {
                   : null;
             }
           }
-          final isFirstAuth = sharedPreferences.getBool('first_auth');
           final user = UserModel(
             isAllowedAccessInformator: allowedInformator,
-            isFirstAuth: isFirstAuth ?? true,
             selectedRolesCompany: selectedCompany ?? "",
             createdAt: DateTime.now(),
             roles: roles,

@@ -15,4 +15,5 @@ workspace:
   - packages/muzhiki_bridge
   - packages/muzhiki_support
   - packages/muzhiki_report_problem
+  - packages/muzhiki_notification
   - packages/flutter_appauth

@@ -1,0 +1,73 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
+
+class FirebasePushDialog extends StatefulWidget {
+  const FirebasePushDialog({
+    super.key,
+    required this.onAccept,
+    required this.onDeleteAccountInfo,
+  });
+
+  final Future<void> Function() onAccept;
+  final VoidCallback onDeleteAccountInfo;
+
+  @override
+  State<FirebasePushDialog> createState() => _FirebasePushDialogState();
+}
+
+class _FirebasePushDialogState extends State<FirebasePushDialog> {
+  bool _isLoading = false;
+
+  Future<void> _onAccept() async {
+    setState(() => _isLoading = true);
+    try {
+      await widget.onAccept();
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        context.pop();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Отправка уведомлений',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+        ),
+        SizedBox(height: 7.h),
+        Text(
+          'Будем уведомлять о полезных событиях. Вы сможете настроить уведомления только для тех событий, которые вам интересны.',
+          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w400),
+        ),
+        SizedBox(height: 69.h),
+        MuzhikiUi.buttons.dark(
+          isLoading: _isLoading,
+          onPressed: _onAccept,
+          label: 'Хорошо',
+        ),
+        SizedBox(height: 16.h),
+        Center(
+          child: GestureDetector(
+            onTap: widget.onDeleteAccountInfo,
+            child: Text(
+              'Как мы удаляем аккаунт',
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w700,
+                color: MuzhikiColors.blood,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
