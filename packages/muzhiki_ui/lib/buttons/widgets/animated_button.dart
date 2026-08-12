@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 class AnimatedButton extends StatefulWidget {
   const AnimatedButton({
@@ -35,6 +36,8 @@ class AnimatedButton extends StatefulWidget {
   final bool enabled;
   final bool enableBackdropFilter;
 
+  bool get _useBackdropFilter => enableBackdropFilter || isGlasses;
+
   @override
   State<AnimatedButton> createState() => _AnimatedButtonState();
 }
@@ -42,11 +45,12 @@ class AnimatedButton extends StatefulWidget {
 class _AnimatedButtonState extends State<AnimatedButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late  Animation<double> _scaleAnimation;
+  late Animation<double> _scaleAnimation;
   bool _isPopping = false;
 
   GoRouter? _router;
   VoidCallback? _routerListener;
+
   @override
   void initState() {
     super.initState();
@@ -168,12 +172,19 @@ class _AnimatedButtonState extends State<AnimatedButton>
 
   @override
   Widget build(BuildContext context) {
-    final content = AnimatedBuilder(
+    // Transform должен быть ВНУТРИ BackdropFilter — иначе blur не работает.
+    final scaled = AnimatedBuilder(
       animation: _scaleAnimation,
       builder: (context, child) {
         return Transform.scale(scale: _scaleAnimation.value, child: child);
       },
-      child: widget.child ?? _defaultButton(),
+      child: widget.child ?? _defaultButtonContent(),
+    );
+
+    final content = wrapButtonBackdropFilter(
+      enable: widget._useBackdropFilter,
+      clipOval: widget.child == null,
+      child: scaled,
     );
 
     if (!widget.enabled) {
@@ -189,42 +200,42 @@ class _AnimatedButtonState extends State<AnimatedButton>
     );
   }
 
-  Widget _defaultButton() {
-    final bg = widget.backgroundColor == null
-        ? null
-        : resolveButtonSurfaceColor(
-            widget.backgroundColor!,
-            enabled: widget.enabled,
-            enableBackdropFilter: widget.enableBackdropFilter,
-          );
+  Widget _defaultButtonContent() {
+    final baseColor =
+        widget.backgroundColor ??
+        (widget._useBackdropFilter
+            ? MuzhikiColors.white.withValues(alpha: 0.35)
+            : MuzhikiColors.alertTextGrey);
 
-    return wrapButtonBackdropFilter(
-      enable: widget.enableBackdropFilter,
-      clipOval: true,
-      child: Container(
-        width: widget.size.r,
-        height: widget.size.r,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: bg,
-        ),
-        alignment: Alignment.center,
-        child: widget.svgAsset != null
-            ? SvgPicture.asset(
-                widget.svgAsset!,
-                width: widget.iconSize.r,
-                height: widget.iconSize.r,
-                colorFilter: ColorFilter.mode(
-                  widget.iconColor,
-                  BlendMode.srcIn,
-                ),
-              )
-            : Icon(
-                widget.icon,
-                size: widget.iconSize.r,
-                color: widget.iconColor,
-              ),
+    final bg = resolveButtonSurfaceColor(
+      baseColor,
+      enabled: widget.enabled,
+      enableBackdropFilter: widget._useBackdropFilter,
+    );
+
+    return Container(
+      width: widget.size.r,
+      height: widget.size.r,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: bg,
       ),
+      alignment: Alignment.center,
+      child: widget.svgAsset != null
+          ? SvgPicture.asset(
+              widget.svgAsset!,
+              width: widget.iconSize.r,
+              height: widget.iconSize.r,
+              colorFilter: ColorFilter.mode(
+                widget.iconColor,
+                BlendMode.srcIn,
+              ),
+            )
+          : Icon(
+              widget.icon,
+              size: widget.iconSize.r,
+              color: widget.iconColor,
+            ),
     );
   }
 }

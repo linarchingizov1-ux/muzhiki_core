@@ -28,6 +28,12 @@ final class MuzhikiDialog {
     return _bottomSheetBottomRadius?.call() ?? 32.r;
   }
 
+  /// На iOS нижний safe-area не добавляем — лист визуально «сидит» у края.
+  double _bottomGap(BuildContext context, double base) {
+    if (Platform.isIOS) return base;
+    return MediaQuery.viewPaddingOf(context).bottom + base;
+  }
+
   Future<T?> standart<T>({
     required Widget child,
     BuildContext? context,
@@ -40,7 +46,7 @@ final class MuzhikiDialog {
     if (sheetContext == null) return null;
 
     return showModalBottomSheet<T>(
-      useSafeArea: Platform.isIOS ? false : true,
+      useSafeArea: !Platform.isIOS,
       context: sheetContext,
       isScrollControlled: true,
       enableDrag: enableDrag,
@@ -85,7 +91,7 @@ final class MuzhikiDialog {
                     padding: EdgeInsets.only(
                       left: 8.w,
                       right: 8.w,
-                      bottom: MediaQuery.viewPaddingOf(context).bottom + 8.w,
+                      bottom: _bottomGap(context, 8.w),
                       top: 8.w,
                     ),
                     child: Container(
@@ -132,6 +138,7 @@ final class MuzhikiDialog {
       enableDrag: false,
       useRootNavigator: true,
       isScrollControlled: true,
+      useSafeArea: !Platform.isIOS,
       builder: (context) {
         return Container(
           width: double.infinity,
@@ -139,7 +146,7 @@ final class MuzhikiDialog {
             left: 20.w,
             right: 20.w,
             top: 20.h,
-            bottom: MediaQuery.of(context).padding.bottom + 20.h,
+            bottom: _bottomGap(context, 20.h),
           ),
           child: PopScope(canPop: false, child: child),
         );

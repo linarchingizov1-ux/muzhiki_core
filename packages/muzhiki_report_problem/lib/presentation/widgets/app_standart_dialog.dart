@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
@@ -19,7 +21,7 @@ class AppStandartDialog {
     if (context == null) return null;
 
     return await showModalBottomSheet(
-      useSafeArea: true,
+      useSafeArea: !Platform.isIOS,
       context: context,
       isScrollControlled: true,
       enableDrag: enableDrag,
