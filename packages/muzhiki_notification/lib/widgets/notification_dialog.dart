@@ -55,6 +55,6 @@ class _FirebasePushDialogState extends State<FirebasePushDialog> {
                 label: 'Хорошо',
               ),
             ],
-          );;
+          );
   }
 }

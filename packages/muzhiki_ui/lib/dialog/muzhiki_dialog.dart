@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:muzhiki_ui/dialog/widgets/delete_account_dialog.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 final class MuzhikiDialog {
@@ -141,6 +142,22 @@ final class MuzhikiDialog {
           child: PopScope(canPop: false, child: child),
         );
       },
+    );
+  }
+
+  Future<bool?> removeAccountDialog({
+    required VoidCallback onOpenDetails,
+    BuildContext? context,
+    bool isDismissible = true,
+    bool enableDrag = true,
+    bool canPop = true,
+  }) {
+    return standart<bool>(
+      context: context,
+      isDismissible: isDismissible,
+      enableDrag: enableDrag,
+      canPop: canPop,
+      child: DeleteAccountDialog(onOpenDetails: onOpenDetails),
     );
   }
 }
