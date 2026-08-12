@@ -4,6 +4,7 @@ import 'package:muzhiki_ui/buttons/muzhiki_buttons.dart';
 import 'package:muzhiki_ui/effect/apple_scroll_edge.dart';
 import 'package:muzhiki_ui/effect/muzhiki_effect.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 
 class SoftEdgeScaffoldMetrics {
   const SoftEdgeScaffoldMetrics({
@@ -105,7 +106,6 @@ class SoftEdgeScaffold extends StatelessWidget {
     final headerBottom = headerBottomPadding ?? 12.h;
     final headerHeight = topInset + headerTop + 40.r + headerBottom;
 
-    // Зона soft-edge чуть длиннее хрома — как у iOS (fade уходит в контент).
     final resolvedTopBlur = topBlurSize ?? (headerHeight + 28);
     final resolvedBottomBlur =
         bottomBlurSize ?? (bottomInset + (bottomBar != null ? 72 : 36));
@@ -168,7 +168,8 @@ class SoftEdgeScaffold extends StatelessWidget {
                           title!,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: 'Manrope',
+                            fontFamily: MuzhikiFonts.manrope,
+                            package: MuzhikiFonts.packageName,
                             fontSize: 18.sp,
                             fontWeight: FontWeight.w800,
                             color: MuzhikiColors.black23,

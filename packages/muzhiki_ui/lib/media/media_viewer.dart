@@ -9,6 +9,7 @@ import 'package:muzhiki_ui/media/media_item.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 
 export 'media_item.dart';
 
@@ -221,7 +222,7 @@ class _MediaViewerState extends State<MediaViewer>
             ? const Center(
                 child: Text(
                   'Нет медиа',
-                  style: TextStyle(fontFamily: 'Manrope', color: Colors.white),
+                  style: TextStyle(fontFamily: MuzhikiFonts.manrope, package: MuzhikiFonts.packageName, color: Colors.white),
                 ),
               )
             : Stack(
@@ -327,7 +328,8 @@ class _MediaViewerState extends State<MediaViewer>
                           child: Text(
                             '${_currentIndex + 1} / ${items.length}',
                             style: const TextStyle(
-                              fontFamily: 'Manrope',
+                              fontFamily: MuzhikiFonts.manrope,
+                        package: MuzhikiFonts.packageName,
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
@@ -393,7 +395,8 @@ class _MediaPhotoPage extends StatelessWidget {
                   child: Text(
                     'Не удалось загрузить изображение',
                     style: TextStyle(
-                      fontFamily: 'Manrope',
+                      fontFamily: MuzhikiFonts.manrope,
+                        package: MuzhikiFonts.packageName,
                       color: Colors.white,
                     ),
                   ),

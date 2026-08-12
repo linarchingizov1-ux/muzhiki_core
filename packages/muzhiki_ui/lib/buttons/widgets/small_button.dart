@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 
 enum SmallButtonMode { icon, standart }
 
@@ -43,6 +44,8 @@ class SmallButton extends StatelessWidget {
       label,
       textAlign: TextAlign.center,
       style: TextStyle(
+        fontFamily: MuzhikiFonts.manrope,
+        package: MuzhikiFonts.packageName,
         fontSize: fontSize.sp,
         fontWeight: fontWeight,
         color: labelColor,

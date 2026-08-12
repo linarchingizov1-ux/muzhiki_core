@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
 import 'package:muzhiki_ui/other/other.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 
 const _other = MuzhikiOther();
 
@@ -196,7 +197,8 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
                 widget.label,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'Manrope',
+                  fontFamily: MuzhikiFonts.manrope,
+                        package: MuzhikiFonts.packageName,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w500,
                   color: widget.isSelected

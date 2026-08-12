@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_ui/buttons/shared/button_loading.dart';
 import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
@@ -89,7 +90,8 @@ class PrimaryButton extends StatelessWidget {
                       label,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: 'Manrope',
+                        fontFamily: MuzhikiFonts.manrope,
+                        package: MuzhikiFonts.packageName,
                         fontSize: labelSize.sp,
                         fontWeight: labelWeight ?? FontWeight.w700,
                         color: textColor,

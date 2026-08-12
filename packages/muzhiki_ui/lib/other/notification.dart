@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 
 class NotificationWidgets extends StatelessWidget {
   final int count;
@@ -20,7 +21,8 @@ class NotificationWidgets extends StatelessWidget {
           child: Text(
             count.toString(),
             style: TextStyle(
-              fontFamily: 'Manrope',
+              fontFamily: MuzhikiFonts.manrope,
+                        package: MuzhikiFonts.packageName,
               letterSpacing: 0,
               wordSpacing: 0,
               height: 1.h,

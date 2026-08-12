@@ -11,6 +11,7 @@ export 'effect/effect.dart';
 export 'scaffold/scaffold.dart';
 export 'media/media_viewer.dart';
 export 'theme/muzhiki_colors.dart';
+export 'theme/muzhiki_fonts.dart';
 export 'other/notification.dart';
 export 'other/skelet.dart';
 export 'buttons/widgets/animated_button.dart';

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/buttons/shared/button_loading.dart';
 import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 
 class PillButton extends StatelessWidget {
   const PillButton({
@@ -72,7 +73,8 @@ class PillButton extends StatelessWidget {
                   label,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Manrope',
+                    fontFamily: MuzhikiFonts.manrope,
+                        package: MuzhikiFonts.packageName,
                     fontSize: labelSize.sp,
                     color: !disabled
                         ? labelColor ?? MuzhikiColors.white
