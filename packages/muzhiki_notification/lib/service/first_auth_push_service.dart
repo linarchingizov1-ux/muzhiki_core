@@ -24,6 +24,7 @@ class FirstAuthPushService {
 
   Future<void> handleOnLoad() async {
     if (shouldShowPushDialog) {
+      await Future<void>.delayed(const Duration(seconds: 1));
       await MuzhikiUi.dialog.standart(
         child: FirebasePushDialog(
           onAccept: acceptPushPermission,
