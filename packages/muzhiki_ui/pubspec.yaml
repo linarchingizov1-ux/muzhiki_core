@@ -27,20 +27,20 @@ flutter:
   fonts:
     - family: Inter
       fonts:
-        - asset: assets/fonts/Inter/Inter.ttf
+        - asset: lib/fonts/Inter/Inter.ttf
     - family: Manrope
       fonts:
-        - asset: assets/fonts/Manrope/Manrope-ExtraLight.ttf
+        - asset: lib/fonts/Manrope/Manrope-ExtraLight.ttf
           weight: 200
-        - asset: assets/fonts/Manrope/Manrope-Light.ttf
+        - asset: lib/fonts/Manrope/Manrope-Light.ttf
           weight: 300
-        - asset: assets/fonts/Manrope/Manrope-Regular.ttf
+        - asset: lib/fonts/Manrope/Manrope-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Manrope/Manrope-Medium.ttf
+        - asset: lib/fonts/Manrope/Manrope-Medium.ttf
           weight: 500
-        - asset: assets/fonts/Manrope/Manrope-SemiBold.ttf
+        - asset: lib/fonts/Manrope/Manrope-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Manrope/Manrope-Bold.ttf
+        - asset: lib/fonts/Manrope/Manrope-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Manrope/Manrope-ExtraBold.ttf
+        - asset: lib/fonts/Manrope/Manrope-ExtraBold.ttf
           weight: 800

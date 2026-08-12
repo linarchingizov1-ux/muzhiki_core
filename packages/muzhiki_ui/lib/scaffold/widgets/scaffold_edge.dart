@@ -167,9 +167,7 @@ class SoftEdgeScaffold extends StatelessWidget {
                         Text(
                           title!,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: MuzhikiFonts.manrope,
-                            package: MuzhikiFonts.packageName,
+                          style: MuzhikiFonts.manropeStyle(
                             fontSize: 18.sp,
                             fontWeight: FontWeight.w800,
                             color: MuzhikiColors.black23,
