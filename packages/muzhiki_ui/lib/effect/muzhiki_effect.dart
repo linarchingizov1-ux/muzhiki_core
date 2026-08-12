@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:soft_edge_blur/soft_edge_blur.dart';
+import 'package:muzhiki_ui/effect/apple_scroll_edge.dart';
 import 'package:muzhiki_ui/effect/widgets/soft_edge_effect.dart';
+
+export 'apple_scroll_edge.dart';
 
 final class MuzhikiEffect {
   const MuzhikiEffect();
 
-  /// Soft progressive blur краёв (через soft_edge_blur), как у iOS scroll edge.
+  /// Soft progressive blur краёв в стиле iOS scroll edge.
   Widget softEdge({
     Key? key,
     required Widget child,
@@ -16,8 +20,9 @@ final class MuzhikiEffect {
     double bottomSize = 100,
     double leftSize = 100,
     double rightSize = 100,
-    double sigma = 30,
+    double sigma = AppleScrollEdge.sigma,
     Color? tintColor,
+    List<ControlPoint>? controlPoints,
     bool enabled = true,
   }) {
     return SoftEdgeEffect(
@@ -32,6 +37,7 @@ final class MuzhikiEffect {
       rightSize: rightSize,
       sigma: sigma,
       tintColor: tintColor,
+      controlPoints: controlPoints,
       enabled: enabled,
       child: child,
     );

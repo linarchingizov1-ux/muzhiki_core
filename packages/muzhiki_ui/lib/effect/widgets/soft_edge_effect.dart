@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:soft_edge_blur/soft_edge_blur.dart';
+import 'package:muzhiki_ui/effect/apple_scroll_edge.dart';
 
 class SoftEdgeEffect extends StatelessWidget {
   const SoftEdgeEffect({
@@ -14,8 +14,9 @@ class SoftEdgeEffect extends StatelessWidget {
     this.bottomSize = 100,
     this.leftSize = 100,
     this.rightSize = 100,
-    this.sigma = 30,
+    this.sigma = AppleScrollEdge.sigma,
     this.tintColor,
+    this.controlPoints,
     this.enabled = true,
   });
 
@@ -24,18 +25,16 @@ class SoftEdgeEffect extends StatelessWidget {
   final bool bottom;
   final bool left;
   final bool right;
+
+  /// Высота/ширина зоны blur в logical pixels (без доп. ScreenUtil).
   final double topSize;
   final double bottomSize;
   final double leftSize;
   final double rightSize;
   final double sigma;
   final Color? tintColor;
+  final List<ControlPoint>? controlPoints;
   final bool enabled;
-
-  List<ControlPoint> get _defaultControlPoints => [
-     ControlPoint(position: 0.5, type: ControlPointType.visible),
-     ControlPoint(position: 1, type: ControlPointType.transparent),
-  ];
 
   EdgeBlur _edge({
     required EdgeType type,
@@ -46,7 +45,7 @@ class SoftEdgeEffect extends StatelessWidget {
       size: size,
       sigma: sigma,
       tintColor: tintColor,
-      controlPoints: _defaultControlPoints,
+      controlPoints: controlPoints ?? AppleScrollEdge.controlPoints,
     );
   }
 
@@ -58,10 +57,10 @@ class SoftEdgeEffect extends StatelessWidget {
 
     return SoftEdgeBlur(
       edges: [
-        if (top) _edge(type: EdgeType.topEdge, size: topSize.h),
-        if (bottom) _edge(type: EdgeType.bottomEdge, size: bottomSize.h),
-        if (left) _edge(type: EdgeType.leftEdge, size: leftSize.w),
-        if (right) _edge(type: EdgeType.rightEdge, size: rightSize.w),
+        if (top) _edge(type: EdgeType.topEdge, size: topSize),
+        if (bottom) _edge(type: EdgeType.bottomEdge, size: bottomSize),
+        if (left) _edge(type: EdgeType.leftEdge, size: leftSize),
+        if (right) _edge(type: EdgeType.rightEdge, size: rightSize),
       ],
       child: child,
     );

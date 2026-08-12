@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/buttons/muzhiki_buttons.dart';
+import 'package:muzhiki_ui/effect/apple_scroll_edge.dart';
 import 'package:muzhiki_ui/effect/muzhiki_effect.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
@@ -104,6 +105,11 @@ class SoftEdgeScaffold extends StatelessWidget {
     final headerBottom = headerBottomPadding ?? 12.h;
     final headerHeight = topInset + headerTop + 40.r + headerBottom;
 
+    // Зона soft-edge чуть длиннее хрома — как у iOS (fade уходит в контент).
+    final resolvedTopBlur = topBlurSize ?? (headerHeight + 28);
+    final resolvedBottomBlur =
+        bottomBlurSize ?? (bottomInset + (bottomBar != null ? 72 : 36));
+
     final metrics = SoftEdgeScaffoldMetrics(
       headerHeight: headerHeight,
       topInset: topInset,
@@ -111,6 +117,10 @@ class SoftEdgeScaffold extends StatelessWidget {
     );
 
     final leadingWidget = _buildLeading();
+    final edgeTint = AppleScrollEdge.defaultTint(
+      tintColor: tintColor,
+      backgroundColor: backgroundColor,
+    );
 
     return Scaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
@@ -124,10 +134,11 @@ class SoftEdgeScaffold extends StatelessWidget {
               bottom: bottomBlur,
               left: false,
               right: false,
-              topSize: topBlurSize ?? headerHeight,
-              bottomSize: bottomBlurSize ?? (bottomInset + 24),
-              tintColor: tintColor ?? backgroundColor,
-              sigma: sigma ?? 30,
+              topSize: resolvedTopBlur,
+              bottomSize: resolvedBottomBlur,
+              tintColor: edgeTint,
+              sigma: sigma ?? AppleScrollEdge.sigma,
+              controlPoints: AppleScrollEdge.controlPoints,
               child: bodyBuilder(context, metrics),
             ),
           ),
