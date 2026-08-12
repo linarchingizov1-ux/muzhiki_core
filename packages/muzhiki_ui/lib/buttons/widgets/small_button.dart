@@ -7,7 +7,6 @@ enum SmallButtonMode { icon, standart }
 
 enum AlignmentButtonIcon { start, end }
 
-/// Компактная pill-кнопка (текст / текст + иконка).
 class SmallButton extends StatelessWidget {
   final SmallButtonMode mode;
   final AlignmentButtonIcon alignment;
@@ -66,20 +65,22 @@ class SmallButton extends StatelessWidget {
                 EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
             child: switch (mode) {
               SmallButtonMode.standart => text,
-              SmallButtonMode.icon => Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null &&
-                      alignment == AlignmentButtonIcon.start) ...[
-                    icon!,
-                    SizedBox(width: 6.w),
+              SmallButtonMode.icon => Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (icon != null &&
+                        alignment == AlignmentButtonIcon.start) ...[
+                      icon!,
+                      SizedBox(width: 6.w),
+                    ],
+                    text,
+                    if (icon != null && alignment == AlignmentButtonIcon.end) ...[
+                      SizedBox(width: 6.w),
+                      icon!,
+                    ],
                   ],
-                  text,
-                  if (icon != null && alignment == AlignmentButtonIcon.end) ...[
-                    SizedBox(width: 6.w),
-                    icon!,
-                  ],
-                ],
+                ),
               ),
             },
           ),
