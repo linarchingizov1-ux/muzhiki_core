@@ -17,6 +17,7 @@ class PillButton extends StatelessWidget {
     this.labelWeight,
     this.isLoading = false,
     this.disabled = false,
+    this.enableBackdropFilter = false,
     this.progressColor = MuzhikiColors.white,
   });
 
@@ -30,6 +31,7 @@ class PillButton extends StatelessWidget {
   final FontWeight? labelWeight;
   final bool isLoading;
   final bool disabled;
+  final bool enableBackdropFilter;
   final Color progressColor;
 
   @override
@@ -39,33 +41,42 @@ class PillButton extends StatelessWidget {
       isLoading: isLoading,
     );
     final bg = buttonBackgroundColor(backgroundColor, enabled: !disabled);
+    final radius = BorderRadius.circular(40.r);
 
     return ButtonTap(
       onPressed: onPressed,
       enabled: canTap,
-      child: Container(
-        height: height.h,
-        padding:
-            padding ?? EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(40.r),
-          color: bg,
-        ),
-        child: Center(
-          child: isLoading
-              ? ButtonLoading(color: progressColor, size: 20, strokeAlign: 0.8)
-              : Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: 'Manrope',
-                    fontSize: labelSize.sp,
-                    color: !disabled
-                        ? labelColor ?? MuzhikiColors.white
-                        : labelColor?.withValues(alpha: 0.2) ??
-                              MuzhikiColors.white.withValues(alpha: 0.2),
-                    fontWeight: labelWeight ?? FontWeight.w500,
+      child: wrapButtonBackdropFilter(
+        enable: enableBackdropFilter,
+        borderRadius: radius,
+        child: Container(
+          height: height.h,
+          padding:
+              padding ?? EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            color: bg,
+          ),
+          child: Center(
+            child: isLoading
+                ? ButtonLoading(
+                    color: progressColor,
+                    size: 20,
+                    strokeAlign: 0.8,
+                  )
+                : Text(
+                    label,
+                    style: TextStyle(
+                      fontFamily: 'Manrope',
+                      fontSize: labelSize.sp,
+                      color: !disabled
+                          ? labelColor ?? MuzhikiColors.white
+                          : labelColor?.withValues(alpha: 0.2) ??
+                                MuzhikiColors.white.withValues(alpha: 0.2),
+                      fontWeight: labelWeight ?? FontWeight.w500,
+                    ),
                   ),
-                ),
+          ),
         ),
       ),
     );

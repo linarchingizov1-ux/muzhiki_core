@@ -1,7 +1,32 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 bool buttonIsInteractive({required bool disabled, bool isLoading = false}) {
   return !disabled && !isLoading;
+}
+
+Widget wrapButtonBackdropFilter({
+  required bool enable,
+  required Widget child,
+  BorderRadius? borderRadius,
+  bool clipOval = false,
+}) {
+  if (!enable) return child;
+
+  final filtered = BackdropFilter(
+    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+    child: child,
+  );
+
+  if (clipOval) {
+    return ClipOval(child: filtered);
+  }
+
+  return ClipRRect(
+    borderRadius: borderRadius ?? BorderRadius.zero,
+    child: filtered,
+  );
 }
 
 class ButtonTap extends StatelessWidget {

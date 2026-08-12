@@ -21,6 +21,7 @@ class PrimaryButton extends StatelessWidget {
     this.iconAsset,
     this.isLoading = false,
     this.disabled = false,
+    this.enableBackdropFilter = false,
     this.progressColor = MuzhikiColors.white,
     this.progressSize = 28,
   });
@@ -38,6 +39,7 @@ class PrimaryButton extends StatelessWidget {
   final String? iconAsset;
   final bool isLoading;
   final bool disabled;
+  final bool enableBackdropFilter;
   final Color progressColor;
   final double progressSize;
 
@@ -49,38 +51,43 @@ class PrimaryButton extends StatelessWidget {
     );
     final bg = buttonBackgroundColor(backgroundColor, enabled: !disabled);
     final textColor = _labelColor(!disabled);
+    final radius = BorderRadius.circular(borderRadius.r);
 
     return ButtonTap(
       onPressed: onPressed,
       enabled: canTap,
-      child: Container(
-        padding:
-            padding ?? EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
-        height: height.h,
-        width: width.w,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(borderRadius.r),
-          color: bg,
-        ),
-        child: Center(
-          child: isLoading
-              ? ButtonLoading(color: progressColor, size: progressSize)
-              : Row(
-                  spacing: 12.w,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (iconAsset != null) SvgPicture.asset(iconAsset!),
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontFamily: 'Manrope',
-                        fontSize: labelSize.sp,
-                        fontWeight: labelWeight ?? FontWeight.w700,
-                        color: textColor,
+      child: wrapButtonBackdropFilter(
+        enable: enableBackdropFilter,
+        borderRadius: radius,
+        child: Container(
+          padding:
+              padding ?? EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
+          height: height.h,
+          width: width.w,
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            color: bg,
+          ),
+          child: Center(
+            child: isLoading
+                ? ButtonLoading(color: progressColor, size: progressSize)
+                : Row(
+                    spacing: 12.w,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (iconAsset != null) SvgPicture.asset(iconAsset!),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontFamily: 'Manrope',
+                          fontSize: labelSize.sp,
+                          fontWeight: labelWeight ?? FontWeight.w700,
+                          color: textColor,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

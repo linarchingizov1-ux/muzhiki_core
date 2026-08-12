@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
 import 'package:muzhiki_ui/other/other.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
@@ -12,11 +13,13 @@ class ChoiceWidgets extends StatefulWidget {
   final String label;
   final int newMessage;
   final ValueChanged<bool>? onSelected;
+  final bool enableBackdropFilter;
 
   const ChoiceWidgets({
     super.key,
     this.newMessage = 0,
     this.isLoading = false,
+    this.enableBackdropFilter = false,
     required this.onSelected,
     required this.isSelected,
     required this.label,
@@ -160,37 +163,45 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
   }
 
   Widget _buildChip() {
+    final radius = BorderRadius.circular(48.r);
+
     return AnimatedBuilder(
       animation: _scaleAnimation,
       builder: (context, child) {
         return Transform.scale(scale: _scaleAnimation.value, child: child);
       },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(48.r),
-          color: widget.isSelected ? MuzhikiColors.black1 : MuzhikiColors.light,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 10.w,
-          children: [
-            Text(
-              widget.label,
-              style: TextStyle(
-                fontFamily: 'Manrope',
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w500,
-                color: widget.isSelected
-                    ? MuzhikiColors.white
-                    : MuzhikiColors.black1,
+      child: wrapButtonBackdropFilter(
+        enable: widget.enableBackdropFilter,
+        borderRadius: radius,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            color: widget.isSelected
+                ? MuzhikiColors.black1
+                : MuzhikiColors.light,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 10.w,
+            children: [
+              Text(
+                widget.label,
+                style: TextStyle(
+                  fontFamily: 'Manrope',
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                  color: widget.isSelected
+                      ? MuzhikiColors.white
+                      : MuzhikiColors.black1,
+                ),
               ),
-            ),
-            if (widget.newMessage > 0)
-              _other.notification(count: widget.newMessage),
-          ],
+              if (widget.newMessage > 0)
+                _other.notification(count: widget.newMessage),
+            ],
+          ),
         ),
       ),
     );

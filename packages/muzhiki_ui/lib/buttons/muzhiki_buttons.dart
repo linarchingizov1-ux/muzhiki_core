@@ -30,6 +30,7 @@ final class MuzhikiButtons {
     EdgeInsets? padding,
     bool isLoading = false,
     bool disabled = false,
+    bool enableBackdropFilter = false,
     Color progressColor = MuzhikiColors.white,
     double progressSize = 28,
   }) {
@@ -48,6 +49,7 @@ final class MuzhikiButtons {
       padding: padding,
       isLoading: isLoading,
       disabled: disabled,
+      enableBackdropFilter: enableBackdropFilter,
       progressColor: progressColor,
       progressSize: progressSize,
     );
@@ -61,6 +63,7 @@ final class MuzhikiButtons {
     double height = 56,
     bool isLoading = false,
     bool disabled = false,
+    bool enableBackdropFilter = false,
     double borderRadius = 16,
   }) {
     return DarkButton(
@@ -71,6 +74,7 @@ final class MuzhikiButtons {
       height: height,
       isLoading: isLoading,
       disabled: disabled,
+      enableBackdropFilter: enableBackdropFilter,
       borderRadius: borderRadius,
     );
   }
@@ -85,6 +89,7 @@ final class MuzhikiButtons {
     Color backgroundColor = MuzhikiColors.black17,
     bool isLoading = false,
     bool disabled = false,
+    bool enableBackdropFilter = false,
     EdgeInsets? padding,
     double labelSize = 15,
     FontWeight? labelWeight,
@@ -99,6 +104,7 @@ final class MuzhikiButtons {
       backgroundColor: backgroundColor,
       isLoading: isLoading,
       disabled: disabled,
+      enableBackdropFilter: enableBackdropFilter,
       padding: padding,
       labelSize: labelSize,
       labelWeight: labelWeight,
@@ -114,6 +120,7 @@ final class MuzhikiButtons {
     double borderRadius = 44,
     bool isLoading = false,
     bool disabled = false,
+    bool enableBackdropFilter = false,
     double pressScale = 1.03,
   }) {
     final interactive = buttonIsInteractive(
@@ -135,6 +142,7 @@ final class MuzhikiButtons {
           borderRadius: borderRadius,
           isLoading: isLoading,
           disabled: disabled,
+          enableBackdropFilter: enableBackdropFilter,
         ),
       ),
     );
@@ -150,6 +158,7 @@ final class MuzhikiButtons {
     EdgeInsets? padding,
     bool isLoading = false,
     bool disabled = false,
+    bool enableBackdropFilter = false,
     FontWeight? labelWeight,
     double labelSize = 15,
     Color progressColor = MuzhikiColors.white,
@@ -164,6 +173,7 @@ final class MuzhikiButtons {
       padding: padding,
       isLoading: isLoading,
       disabled: disabled,
+      enableBackdropFilter: enableBackdropFilter,
       labelWeight: labelWeight,
       labelSize: labelSize,
       progressColor: progressColor,
@@ -184,6 +194,7 @@ final class MuzhikiButtons {
     double radius = 30,
     EdgeInsetsGeometry? labelPadding,
     VoidCallback? onTap,
+    bool enableBackdropFilter = false,
   }) {
     return SmallButton(
       key: key,
@@ -198,6 +209,7 @@ final class MuzhikiButtons {
       radius: radius,
       labelPadding: labelPadding,
       onTap: onTap,
+      enableBackdropFilter: enableBackdropFilter,
     );
   }
 
@@ -209,6 +221,7 @@ final class MuzhikiButtons {
     double size = 42,
     double iconSize = 40,
     bool disabled = false,
+    bool enableBackdropFilter = false,
   }) {
     return CircleButton(
       key: key,
@@ -218,6 +231,7 @@ final class MuzhikiButtons {
       size: size,
       iconSize: iconSize,
       disabled: disabled,
+      enableBackdropFilter: enableBackdropFilter,
     );
   }
 
@@ -233,6 +247,7 @@ final class MuzhikiButtons {
     Color? backgroundColor,
     double scale = 1.1,
     bool enabled = true,
+    bool enableBackdropFilter = false,
   }) => AnimatedButton(
     key: key,
     svgAsset: svgAsset,
@@ -244,6 +259,7 @@ final class MuzhikiButtons {
     iconSize: iconSize,
     backgroundColor: backgroundColor,
     enabled: enabled,
+    enableBackdropFilter: enableBackdropFilter,
     child: child,
   );
 
@@ -254,6 +270,7 @@ final class MuzhikiButtons {
     Color backgroundColor = MuzhikiColors.alertTextGrey,
     Color iconColor = MuzhikiColors.white,
     double size = 40,
+    bool enableBackdropFilter = false,
   }) {
     return animated(
       key: key,
@@ -264,6 +281,7 @@ final class MuzhikiButtons {
       iconSize: 16,
       scale: 1.1,
       onTap: onTap,
+      enableBackdropFilter: enableBackdropFilter,
     );
   }
 
@@ -274,6 +292,7 @@ final class MuzhikiButtons {
     Color backgroundColor = MuzhikiColors.black17,
     Color iconColor = MuzhikiColors.white,
     double iconSize = 24,
+    bool enableBackdropFilter = false,
   }) {
     return animated(
       key: key,
@@ -284,6 +303,7 @@ final class MuzhikiButtons {
       icon: Icons.close,
       scale: 1.1,
       onTap: onTap,
+      enableBackdropFilter: enableBackdropFilter,
     );
   }
 
@@ -295,6 +315,7 @@ final class MuzhikiButtons {
     Color iconColor = MuzhikiColors.white,
     double size = 40,
     double iconSize = 16,
+    bool enableBackdropFilter = false,
   }) {
     return animated(
       key: key,
@@ -305,6 +326,7 @@ final class MuzhikiButtons {
       iconSize: iconSize,
       scale: 1.1,
       onTap: onTap,
+      enableBackdropFilter: enableBackdropFilter,
     );
   }
 
@@ -349,12 +371,14 @@ final class MuzhikiButtons {
     required String label,
     int newMessage = 0,
     bool isLoading = false,
+    bool enableBackdropFilter = false,
   }) => ChoiceWidgets(
     isLoading: isLoading,
     newMessage: newMessage,
     onSelected: onSelected,
     isSelected: isSelected,
     label: label,
+    enableBackdropFilter: enableBackdropFilter,
   );
 
   Widget filterChip({
@@ -363,6 +387,7 @@ final class MuzhikiButtons {
     required ValueChanged<bool>? onSelected,
     int badgeCount = 0,
     bool isLoading = false,
+    bool enableBackdropFilter = false,
   }) {
     return choi(
       label: label,
@@ -370,6 +395,7 @@ final class MuzhikiButtons {
       onSelected: onSelected,
       newMessage: badgeCount,
       isLoading: isLoading,
+      enableBackdropFilter: enableBackdropFilter,
     );
   }
 
@@ -377,6 +403,7 @@ final class MuzhikiButtons {
     required VoidCallback onTap,
     double size = 52,
     Color backgroundColor = MuzhikiColors.light,
+    bool enableBackdropFilter = false,
   }) {
     return animated(
       size: size,
@@ -385,6 +412,7 @@ final class MuzhikiButtons {
       onTap: onTap,
       iconSize: 16,
       iconColor: MuzhikiColors.white,
+      enableBackdropFilter: enableBackdropFilter,
     );
   }
 

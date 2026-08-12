@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 enum SmallButtonMode { icon, standart }
@@ -19,6 +20,7 @@ class SmallButton extends StatelessWidget {
   final double radius;
   final EdgeInsetsGeometry? labelPadding;
   final VoidCallback? onTap;
+  final bool enableBackdropFilter;
 
   const SmallButton({
     super.key,
@@ -33,6 +35,7 @@ class SmallButton extends StatelessWidget {
     this.radius = 30,
     this.labelPadding,
     this.onTap,
+    this.enableBackdropFilter = false,
   });
 
   @override
@@ -46,34 +49,40 @@ class SmallButton extends StatelessWidget {
         height: 1.2,
       ),
     );
+    final borderRadius = BorderRadius.circular(radius.r);
 
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(radius.r),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(radius.r),
-        onTap: onTap,
-        child: Padding(
-          padding:
-              labelPadding ??
-              EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
-          child: switch (mode) {
-            SmallButtonMode.standart => text,
-            SmallButtonMode.icon => Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (icon != null && alignment == AlignmentButtonIcon.start) ...[
-                  icon!,
-                  SizedBox(width: 6.w),
+    return wrapButtonBackdropFilter(
+      enable: enableBackdropFilter,
+      borderRadius: borderRadius,
+      child: Material(
+        color: backgroundColor,
+        borderRadius: borderRadius,
+        child: InkWell(
+          borderRadius: borderRadius,
+          onTap: onTap,
+          child: Padding(
+            padding:
+                labelPadding ??
+                EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
+            child: switch (mode) {
+              SmallButtonMode.standart => text,
+              SmallButtonMode.icon => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null &&
+                      alignment == AlignmentButtonIcon.start) ...[
+                    icon!,
+                    SizedBox(width: 6.w),
+                  ],
+                  text,
+                  if (icon != null && alignment == AlignmentButtonIcon.end) ...[
+                    SizedBox(width: 6.w),
+                    icon!,
+                  ],
                 ],
-                text,
-                if (icon != null && alignment == AlignmentButtonIcon.end) ...[
-                  SizedBox(width: 6.w),
-                  icon!,
-                ],
-              ],
-            ),
-          },
+              ),
+            },
+          ),
         ),
       ),
     );

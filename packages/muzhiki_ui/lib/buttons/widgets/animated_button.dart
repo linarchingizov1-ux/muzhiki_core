@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
 
 class AnimatedButton extends StatefulWidget {
   const AnimatedButton({
@@ -17,6 +18,7 @@ class AnimatedButton extends StatefulWidget {
     this.backgroundColor,
     required this.scale,
     this.enabled = true,
+    this.enableBackdropFilter = false,
   });
 
   final String? svgAsset;
@@ -31,6 +33,7 @@ class AnimatedButton extends StatefulWidget {
   final double iconSize;
   final Color? backgroundColor;
   final bool enabled;
+  final bool enableBackdropFilter;
 
   @override
   State<AnimatedButton> createState() => _AnimatedButtonState();
@@ -187,25 +190,33 @@ class _AnimatedButtonState extends State<AnimatedButton>
   }
 
   Widget _defaultButton() {
-    return Container(
-      width: widget.size.r,
-      height: widget.size.r,
-
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: widget.backgroundColor,
+    return wrapButtonBackdropFilter(
+      enable: widget.enableBackdropFilter,
+      clipOval: true,
+      child: Container(
+        width: widget.size.r,
+        height: widget.size.r,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: widget.backgroundColor,
+        ),
+        alignment: Alignment.center,
+        child: widget.svgAsset != null
+            ? SvgPicture.asset(
+                widget.svgAsset!,
+                width: widget.iconSize.r,
+                height: widget.iconSize.r,
+                colorFilter: ColorFilter.mode(
+                  widget.iconColor,
+                  BlendMode.srcIn,
+                ),
+              )
+            : Icon(
+                widget.icon,
+                size: widget.iconSize.r,
+                color: widget.iconColor,
+              ),
       ),
-
-      alignment: Alignment.center,
-
-      child: widget.svgAsset != null
-          ? SvgPicture.asset(
-              widget.svgAsset!,
-              width: widget.iconSize.r,
-              height: widget.iconSize.r,
-              colorFilter: ColorFilter.mode(widget.iconColor, BlendMode.srcIn),
-            )
-          : Icon(widget.icon, size: widget.iconSize.r, color: widget.iconColor),
     );
   }
 }

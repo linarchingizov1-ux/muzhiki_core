@@ -13,6 +13,7 @@ class CircleButton extends StatelessWidget {
     this.size = 42,
     this.iconSize = 40,
     this.disabled = false,
+    this.enableBackdropFilter = false,
   });
 
   final VoidCallback onPressed;
@@ -21,6 +22,7 @@ class CircleButton extends StatelessWidget {
   final double size;
   final double iconSize;
   final bool disabled;
+  final bool enableBackdropFilter;
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +32,20 @@ class CircleButton extends StatelessWidget {
     return ButtonTap(
       onPressed: onPressed,
       enabled: enabled,
-      child: Container(
-        width: size.h,
-        height: size.h,
-        padding: EdgeInsets.all(15.r),
-        decoration: BoxDecoration(shape: BoxShape.circle, color: bg),
-        child: SvgPicture.asset(
-          iconAsset,
-          height: iconSize.h,
-          width: iconSize.h,
-          alignment: Alignment.center,
+      child: wrapButtonBackdropFilter(
+        enable: enableBackdropFilter,
+        clipOval: true,
+        child: Container(
+          width: size.h,
+          height: size.h,
+          padding: EdgeInsets.all(15.r),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: bg),
+          child: SvgPicture.asset(
+            iconAsset,
+            height: iconSize.h,
+            width: iconSize.h,
+            alignment: Alignment.center,
+          ),
         ),
       ),
     );
