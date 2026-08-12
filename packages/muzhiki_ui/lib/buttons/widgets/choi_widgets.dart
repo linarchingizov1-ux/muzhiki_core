@@ -164,6 +164,13 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
 
   Widget _buildChip() {
     final radius = BorderRadius.circular(48.r);
+    final baseColor =
+        widget.isSelected ? MuzhikiColors.black1 : MuzhikiColors.light;
+    final bg = resolveButtonSurfaceColor(
+      baseColor,
+      enabled: true,
+      enableBackdropFilter: widget.enableBackdropFilter,
+    );
 
     return AnimatedBuilder(
       animation: _scaleAnimation,
@@ -177,9 +184,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
           decoration: BoxDecoration(
             borderRadius: radius,
-            color: widget.isSelected
-                ? MuzhikiColors.black1
-                : MuzhikiColors.light,
+            color: bg,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

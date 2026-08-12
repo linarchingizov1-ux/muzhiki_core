@@ -27,14 +27,18 @@ class CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = !disabled;
-    final bg = buttonBackgroundColor(backgroundColor, enabled: enabled);
-
-    return ButtonTap(
-      onPressed: onPressed,
+    final bg = resolveButtonSurfaceColor(
+      backgroundColor,
       enabled: enabled,
-      child: wrapButtonBackdropFilter(
-        enable: enableBackdropFilter,
-        clipOval: true,
+      enableBackdropFilter: enableBackdropFilter,
+    );
+
+    return wrapButtonBackdropFilter(
+      enable: enableBackdropFilter,
+      clipOval: true,
+      child: ButtonTap(
+        onPressed: onPressed,
+        enabled: enabled,
         child: Container(
           width: size.h,
           height: size.h,

@@ -20,7 +20,7 @@ class LabeledButton extends StatelessWidget {
     this.isLoading = false,
     this.disabled = false,
     this.enableBackdropFilter = false,
-    this.progressColor = MuzhikiColors.white,
+    this.progressColor,
     this.progressSize = 28,
   });
 
@@ -37,7 +37,7 @@ class LabeledButton extends StatelessWidget {
   final bool isLoading;
   final bool disabled;
   final bool enableBackdropFilter;
-  final Color progressColor;
+  final Color? progressColor;
   final double progressSize;
 
   @override
@@ -46,16 +46,20 @@ class LabeledButton extends StatelessWidget {
       disabled: disabled,
       isLoading: isLoading,
     );
-    final bg = buttonBackgroundColor(backgroundColor, enabled: !disabled);
+    final bg = resolveButtonSurfaceColor(
+      backgroundColor,
+      enabled: !disabled,
+      enableBackdropFilter: enableBackdropFilter,
+    );
     final isLight = backgroundColor == MuzhikiColors.light;
     final radius = BorderRadius.circular(borderRadius.r);
 
-    return ButtonTap(
-      onPressed: onPressed,
-      enabled: canTap,
-      child: wrapButtonBackdropFilter(
-        enable: enableBackdropFilter,
-        borderRadius: radius,
+    return wrapButtonBackdropFilter(
+      enable: enableBackdropFilter,
+      borderRadius: radius,
+      child: ButtonTap(
+        onPressed: onPressed,
+        enabled: canTap,
         child: Container(
           padding: padding,
           width: width == double.infinity ? double.infinity : width.w,
@@ -66,7 +70,11 @@ class LabeledButton extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: isLoading
-              ? ButtonLoading(color: progressColor, size: progressSize)
+              ? ButtonLoading(
+                  color: progressColor,
+                  backgroundColor: bg,
+                  size: progressSize,
+                )
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,

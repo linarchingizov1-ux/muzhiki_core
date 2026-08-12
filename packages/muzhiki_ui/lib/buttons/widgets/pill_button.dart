@@ -18,7 +18,7 @@ class PillButton extends StatelessWidget {
     this.isLoading = false,
     this.disabled = false,
     this.enableBackdropFilter = false,
-    this.progressColor = MuzhikiColors.white,
+    this.progressColor,
   });
 
   final VoidCallback onPressed;
@@ -32,7 +32,7 @@ class PillButton extends StatelessWidget {
   final bool isLoading;
   final bool disabled;
   final bool enableBackdropFilter;
-  final Color progressColor;
+  final Color? progressColor;
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +40,19 @@ class PillButton extends StatelessWidget {
       disabled: disabled,
       isLoading: isLoading,
     );
-    final bg = buttonBackgroundColor(backgroundColor, enabled: !disabled);
+    final bg = resolveButtonSurfaceColor(
+      backgroundColor,
+      enabled: !disabled,
+      enableBackdropFilter: enableBackdropFilter,
+    );
     final radius = BorderRadius.circular(40.r);
 
-    return ButtonTap(
-      onPressed: onPressed,
-      enabled: canTap,
-      child: wrapButtonBackdropFilter(
-        enable: enableBackdropFilter,
-        borderRadius: radius,
+    return wrapButtonBackdropFilter(
+      enable: enableBackdropFilter,
+      borderRadius: radius,
+      child: ButtonTap(
+        onPressed: onPressed,
+        enabled: canTap,
         child: Container(
           height: height.h,
           padding:
@@ -61,8 +65,8 @@ class PillButton extends StatelessWidget {
           child: isLoading
               ? ButtonLoading(
                   color: progressColor,
+                  backgroundColor: bg,
                   size: 20,
-                  strokeAlign: 0.8,
                 )
               : Text(
                   label,

@@ -50,12 +50,17 @@ class SmallButton extends StatelessWidget {
       ),
     );
     final borderRadius = BorderRadius.circular(radius.r);
+    final bg = resolveButtonSurfaceColor(
+      backgroundColor,
+      enabled: true,
+      enableBackdropFilter: enableBackdropFilter,
+    );
 
     return wrapButtonBackdropFilter(
       enable: enableBackdropFilter,
       borderRadius: borderRadius,
       child: Material(
-        color: backgroundColor,
+        color: bg,
         borderRadius: borderRadius,
         child: InkWell(
           borderRadius: borderRadius,

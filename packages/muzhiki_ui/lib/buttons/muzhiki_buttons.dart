@@ -31,7 +31,7 @@ final class MuzhikiButtons {
     bool isLoading = false,
     bool disabled = false,
     bool enableBackdropFilter = false,
-    Color progressColor = MuzhikiColors.white,
+    Color? progressColor,
     double progressSize = 28,
   }) {
     return PrimaryButton(
@@ -64,6 +64,7 @@ final class MuzhikiButtons {
     bool isLoading = false,
     bool disabled = false,
     bool enableBackdropFilter = false,
+    Color? progressColor,
     double borderRadius = 16,
   }) {
     return DarkButton(
@@ -75,6 +76,7 @@ final class MuzhikiButtons {
       isLoading: isLoading,
       disabled: disabled,
       enableBackdropFilter: enableBackdropFilter,
+      progressColor: progressColor,
       borderRadius: borderRadius,
     );
   }
@@ -90,6 +92,7 @@ final class MuzhikiButtons {
     bool isLoading = false,
     bool disabled = false,
     bool enableBackdropFilter = false,
+    Color? progressColor,
     EdgeInsets? padding,
     double labelSize = 15,
     FontWeight? labelWeight,
@@ -105,6 +108,7 @@ final class MuzhikiButtons {
       isLoading: isLoading,
       disabled: disabled,
       enableBackdropFilter: enableBackdropFilter,
+      progressColor: progressColor,
       padding: padding,
       labelSize: labelSize,
       labelWeight: labelWeight,
@@ -161,7 +165,7 @@ final class MuzhikiButtons {
     bool enableBackdropFilter = false,
     FontWeight? labelWeight,
     double labelSize = 15,
-    Color progressColor = MuzhikiColors.white,
+    Color? progressColor,
   }) {
     return PillButton(
       key: key,

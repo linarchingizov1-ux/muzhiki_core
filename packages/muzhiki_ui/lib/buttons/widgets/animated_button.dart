@@ -190,6 +190,14 @@ class _AnimatedButtonState extends State<AnimatedButton>
   }
 
   Widget _defaultButton() {
+    final bg = widget.backgroundColor == null
+        ? null
+        : resolveButtonSurfaceColor(
+            widget.backgroundColor!,
+            enabled: widget.enabled,
+            enableBackdropFilter: widget.enableBackdropFilter,
+          );
+
     return wrapButtonBackdropFilter(
       enable: widget.enableBackdropFilter,
       clipOval: true,
@@ -198,7 +206,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
         height: widget.size.r,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: widget.backgroundColor,
+          color: bg,
         ),
         alignment: Alignment.center,
         child: widget.svgAsset != null
