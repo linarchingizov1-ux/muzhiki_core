@@ -63,31 +63,32 @@ class PrimaryButton extends StatelessWidget {
           padding:
               padding ?? EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
           height: height.h,
-          width: width.w,
+          width: width == double.infinity ? double.infinity : width.w,
           decoration: BoxDecoration(
             borderRadius: radius,
             color: bg,
           ),
-          child: Center(
-            child: isLoading
-                ? ButtonLoading(color: progressColor, size: progressSize)
-                : Row(
-                    spacing: 12.w,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (iconAsset != null) SvgPicture.asset(iconAsset!),
-                      Text(
-                        label,
-                        style: TextStyle(
-                          fontFamily: 'Manrope',
-                          fontSize: labelSize.sp,
-                          fontWeight: labelWeight ?? FontWeight.w700,
-                          color: textColor,
-                        ),
+          alignment: Alignment.center,
+          child: isLoading
+              ? ButtonLoading(color: progressColor, size: progressSize)
+              : Row(
+                  spacing: 12.w,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (iconAsset != null) SvgPicture.asset(iconAsset!),
+                    Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Manrope',
+                        fontSize: labelSize.sp,
+                        fontWeight: labelWeight ?? FontWeight.w700,
+                        color: textColor,
                       ),
-                    ],
-                  ),
-          ),
+                    ),
+                  ],
+                ),
         ),
       ),
     );

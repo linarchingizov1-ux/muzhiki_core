@@ -189,6 +189,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
             children: [
               Text(
                 widget.label,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Manrope',
                   fontSize: 15.sp,

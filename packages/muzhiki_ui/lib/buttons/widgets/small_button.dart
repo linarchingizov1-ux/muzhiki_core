@@ -41,6 +41,7 @@ class SmallButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Text(
       label,
+      textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: fontSize.sp,
         fontWeight: fontWeight,
@@ -64,9 +65,10 @@ class SmallButton extends StatelessWidget {
                 labelPadding ??
                 EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
             child: switch (mode) {
-              SmallButtonMode.standart => text,
+              SmallButtonMode.standart => Center(child: text),
               SmallButtonMode.icon => Center(
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (icon != null &&

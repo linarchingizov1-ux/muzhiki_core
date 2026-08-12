@@ -58,26 +58,22 @@ class LabeledButton extends StatelessWidget {
         borderRadius: radius,
         child: Container(
           padding: padding,
-          width: width.w,
+          width: width == double.infinity ? double.infinity : width.w,
           height: height.h,
           decoration: BoxDecoration(
             color: bg,
             borderRadius: radius,
           ),
+          alignment: Alignment.center,
           child: isLoading
-              ? Center(
-                  child: ButtonLoading(
-                    color: progressColor,
-                    size: progressSize,
-                  ),
-                )
+              ? ButtonLoading(color: progressColor, size: progressSize)
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       label,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Manrope',
                         fontSize: labelSize.sp,
@@ -93,6 +89,7 @@ class LabeledButton extends StatelessWidget {
                       FittedBox(
                         child: Text(
                           description!,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Manrope',
                             fontSize: 10.sp,

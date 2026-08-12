@@ -56,43 +56,45 @@ class DarkButton extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
           height: height.h,
-          width: width.w,
+          width: width == double.infinity ? double.infinity : width.w,
           decoration: BoxDecoration(
             borderRadius: radius,
             color: bg,
           ),
-          child: Center(
-            child: isLoading
-                ? ButtonLoading(color: progressColor, size: progressSize)
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        label,
-                        style: TextStyle(
-                          fontFamily: 'Manrope',
-                          fontSize: labelSize,
-                          fontWeight: labelWeight ?? FontWeight.w700,
-                          color: !disabled
-                              ? MuzhikiColors.white
-                              : MuzhikiColors.white.withValues(alpha: 0.5),
-                        ),
+          alignment: Alignment.center,
+          child: isLoading
+              ? ButtonLoading(color: progressColor, size: progressSize)
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Manrope',
+                        fontSize: labelSize,
+                        fontWeight: labelWeight ?? FontWeight.w700,
+                        color: !disabled
+                            ? MuzhikiColors.white
+                            : MuzhikiColors.white.withValues(alpha: 0.5),
                       ),
-                      if (description != null)
-                        FittedBox(
-                          child: Text(
-                            description!,
-                            style: TextStyle(
-                              fontFamily: 'Manrope',
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w400,
-                              color: MuzhikiColors.grey,
-                            ),
+                    ),
+                    if (description != null)
+                      FittedBox(
+                        child: Text(
+                          description!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Manrope',
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w400,
+                            color: MuzhikiColors.grey,
                           ),
                         ),
-                    ],
-                  ),
-          ),
+                      ),
+                  ],
+                ),
         ),
       ),
     );

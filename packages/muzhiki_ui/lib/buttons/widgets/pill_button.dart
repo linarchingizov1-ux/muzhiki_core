@@ -57,26 +57,26 @@ class PillButton extends StatelessWidget {
             borderRadius: radius,
             color: bg,
           ),
-          child: Center(
-            child: isLoading
-                ? ButtonLoading(
-                    color: progressColor,
-                    size: 20,
-                    strokeAlign: 0.8,
-                  )
-                : Text(
-                    label,
-                    style: TextStyle(
-                      fontFamily: 'Manrope',
-                      fontSize: labelSize.sp,
-                      color: !disabled
-                          ? labelColor ?? MuzhikiColors.white
-                          : labelColor?.withValues(alpha: 0.2) ??
-                                MuzhikiColors.white.withValues(alpha: 0.2),
-                      fontWeight: labelWeight ?? FontWeight.w500,
-                    ),
+          alignment: Alignment.center,
+          child: isLoading
+              ? ButtonLoading(
+                  color: progressColor,
+                  size: 20,
+                  strokeAlign: 0.8,
+                )
+              : Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Manrope',
+                    fontSize: labelSize.sp,
+                    color: !disabled
+                        ? labelColor ?? MuzhikiColors.white
+                        : labelColor?.withValues(alpha: 0.2) ??
+                              MuzhikiColors.white.withValues(alpha: 0.2),
+                    fontWeight: labelWeight ?? FontWeight.w500,
                   ),
-          ),
+                ),
         ),
       ),
     );
