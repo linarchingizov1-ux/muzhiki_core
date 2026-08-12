@@ -35,39 +35,26 @@ class _FirebasePushDialogState extends State<FirebasePushDialog> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'Отправка уведомлений',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
-        ),
-        SizedBox(height: 7.h),
-        Text(
-          'Будем уведомлять о полезных событиях. Вы сможете настроить уведомления только для тех событий, которые вам интересны.',
-          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w400),
-        ),
-        SizedBox(height: 69.h),
-        MuzhikiUi.buttons.dark(
-          isLoading: _isLoading,
-          onPressed: _onAccept,
-          label: 'Хорошо',
-        ),
-        SizedBox(height: 16.h),
-        Center(
-          child: GestureDetector(
-            onTap: widget.onDeleteAccountInfo,
-            child: Text(
-              'Как мы удаляем аккаунт',
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
-                color: MuzhikiColors.blood,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Отправка уведомлений',
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
               ),
-            ),
-          ),
-        ),
-      ],
-    );
+              SizedBox(height: 7.h),
+              Text(
+                'Будем уведомлять о полезных событиях. Позже вы сможете настроить уведомления только для тех событий, которые вам интересны.\n\n'
+                'Для доставки уведомлений мы используем ваш идентификатор устройства. Это необходимо для точного уведомления вас о событиях при использовании наших сервисов.',
+                style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 25.h),
+              MuzhikiUi.buttons.dark(
+                isLoading: _isLoading,
+                onPressed: _onAccept,
+                label: 'Хорошо',
+              ),
+            ],
+          );;
   }
 }
