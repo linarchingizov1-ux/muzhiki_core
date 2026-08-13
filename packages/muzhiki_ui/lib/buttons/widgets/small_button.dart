@@ -72,10 +72,15 @@ class SmallButton extends StatelessWidget {
             padding:
                 labelPadding ??
                 EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
-            child: switch (mode) {
-              SmallButtonMode.standart => Center(child: text),
-              SmallButtonMode.icon => Center(
-                child: Row(
+            // widthFactor/heightFactor: по контенту, если родитель не задал
+            // ширину; при растягивании текст остаётся по центру.
+            child: Align(
+              alignment: Alignment.center,
+              widthFactor: 1,
+              heightFactor: 1,
+              child: switch (mode) {
+                SmallButtonMode.standart => text,
+                SmallButtonMode.icon => Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -85,14 +90,15 @@ class SmallButton extends StatelessWidget {
                       SizedBox(width: 6.w),
                     ],
                     text,
-                    if (icon != null && alignment == AlignmentButtonIcon.end) ...[
+                    if (icon != null &&
+                        alignment == AlignmentButtonIcon.end) ...[
                       SizedBox(width: 6.w),
                       icon!,
                     ],
                   ],
                 ),
-              ),
-            },
+              },
+            ),
           ),
         ),
       ),
