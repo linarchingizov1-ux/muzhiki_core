@@ -59,7 +59,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
           ),
         ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
-        child: const SuccessDialog(title: '????? ??????????'),
+        child: const SuccessDialog(title: 'Форма отправлена'),
       );
       await Future.delayed(500.ms);
       if (!mounted) return;
@@ -75,10 +75,10 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
         ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
         child: ErrorDialog(
-          title: '?? ??????? ????????? ?????',
+          title: 'Не удалось отправить форму',
           description:
               viewModel.submitError ??
-              '???-?? ????? ?? ???, ?????????? ??? ???',
+              'Что-то пошло не так, попробуйте ещё раз',
           onRetry: () => _submit(),
         ),
       );
@@ -106,7 +106,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                     alignment: Alignment.centerRight,
                     child: MuzhikiUi.buttons.small(
                       mode: SmallButtonMode.standart,
-                      label: '????????',
+                      label: 'Отменить',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       labelColor: ReportProblemColors.alertTextGrey,
@@ -130,7 +130,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                   ),
                   SizedBox(height: 21.h),
                   Text(
-                    '???????? ? ????????',
+                    'Сообщить о проблеме',
                     style: TextStyle(
                       fontSize: 18.sp,
                       height: 1.3,
@@ -140,7 +140,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                   ),
                   SizedBox(height: 12.h),
                   Text(
-                    '??? ???? ????????? ?????? ??? ?? ???????? ??????????',
+                    'Это окно открылось потому что вы потрясли устройство',
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w500,
@@ -156,7 +156,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                     maxLines: 10,
                     maxLength: 5000,
                     enabled: !viewModel.isSubmitting,
-                    hintText: '??????? ????????',
+                    hintText: 'Опишите проблему',
                     footer: SizedBox(
                       width: double.infinity,
                       child: Wrap(
@@ -175,7 +175,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            label: '???????? ????????',
+                            label: 'Добавить скриншот',
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             labelColor: ReportProblemColors.alertTextGrey,
@@ -265,7 +265,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                   ),
                   SizedBox(height: 27.h),
                   Text(
-                    '?????? ? ????? ?????????? ? ????????? ????? ?????????? ?????????????',
+                    'Данные о вашем устройстве и действиях будут отправлены автоматически',
                     style: TextStyle(
                       fontSize: 15.sp,
                       height: 1.3,
@@ -278,8 +278,8 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                     duration: const Duration(milliseconds: 300),
                     child: MuzhikiUi.buttons.primary(
                       label: viewModel.isSubmitSuccess == false
-                          ? '?????????'
-                          : '?????????',
+                          ? 'Повторить'
+                          : 'Отправить',
                       isLoading: viewModel.isSubmitting,
                       disabled: !viewModel.isValid,
                       backgroundColor: viewModel.isValid

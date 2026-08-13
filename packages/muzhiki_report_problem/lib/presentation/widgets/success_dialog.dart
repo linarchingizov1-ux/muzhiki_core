@@ -9,7 +9,7 @@ import 'package:muzhiki_report_problem/config/report_problem_assets.dart';
 class SuccessDialog extends StatelessWidget {
   final String title;
 
-  const SuccessDialog({super.key, this.title = '������ ����������'});
+  const SuccessDialog({super.key, this.title = 'Заявка отправлена'});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class SuccessDialog extends StatelessWidget {
         ),
         SizedBox(height: 27.h),
         MuzhikiUi.buttons.primary(
-          label: '�������',
+          label: 'Отлично',
           backgroundColor: ReportProblemColors.black23,
           labelColor: ReportProblemColors.white,
           borderRadius: 23,

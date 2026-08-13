@@ -19,19 +19,19 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
   _NetworkIssuePage _page = _NetworkIssuePage.main;
 
   static const _whatToDoText =
-      '���������� �������� ����������� � ����: ������������ ������ ��������, '
-      '����� WiFi ��� �������� ����� ��������� ����. ���������� ��������� VPN '
-      '��� �������� ���������� ���.\n\n'
-      '��� ����� ����, ��� �� ����������� � ���������. ���� �� ��������, ��� '
-      '�������� �� � �����, ��������� ����������, ����� ��������� ���������� '
-      '�������������.';
+      'Попробуйте изменить подключение к сети: подключитесь другим способом, '
+      'через WiFi или наоборот через мобильную сеть. Попробуйте отключить VPN '
+      'или наоборот подключить его.\n\n'
+      'Нам очень жаль, что вы столкнулись с проблемой. Если вы считаете, что '
+      'проблема не с сетью, потрясите устройство, чтобы отправить информацию '
+      'разработчикам.';
 
   static const _whatWeDoText =
-      '��� ����������� � �������� ��� ��������� �� �������� �����, �� ������� '
-      '���� ������������ �������� ����� �� ������� � ����� ������� ����� '
-      '��������.\n\n'
-      '�� �������� �������� �� ������� ������� �������� � �� �������� ��� '
-      '������ ��������������� �������� � �����.';
+      'Для локализации и контроля над проблемой мы замеряем время, за которое '
+      'наши пользователи получают ответ от сервера и видим большую часть '
+      'задержек.\n\n'
+      'Мы проводим миграцию на сервера крупных компаний — со временем это '
+      'должно стабилизировать ситуацию с сетью.';
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +58,10 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
             SizedBox(height: 21.h),
             Text.rich(
               const TextSpan(
-                text: '�� �� ���� ������� ���� �������� ���������',
+                text: 'Не во всех странах сеть работает стабильно',
                 children: [
                   TextSpan(
-                    text: ', ����� �������',
+                    text: ', такие времена',
                     style: TextStyle(color: NetworkProblemColors.greyText),
                   ),
                 ],
@@ -75,8 +75,8 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
             ),
             SizedBox(height: 12.h),
             Text(
-              '�����, ��� ���������� �������� ��-�� ������� � �����. '
-              '��� �� ������� � �������� � ���� ��� ��������� ����������.',
+              'Видим, что приложение зависает из-за проблем с сетью. '
+              'Это не связано с ошибками в коде или качеством разработки.',
               style: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
@@ -89,13 +89,13 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _NetworkIssueButton(
-                  label: '� ��� ������?',
+                  label: 'И что делать?',
                   onTap: () =>
                       setState(() => _page = _NetworkIssuePage.whatToDo),
                 ),
                 SizedBox(height: 9.h),
                 _NetworkIssueButton(
-                  label: '��� �� ������, ����� ����� �����',
+                  label: 'Что мы делаем, чтобы стало лучше',
                   onTap: () =>
                       setState(() => _page = _NetworkIssuePage.whatWeDo),
                 ),
@@ -105,7 +105,7 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
             Align(
               alignment: Alignment.centerLeft,
               child: _NetworkIssueButton(
-                label: '�����',
+                label: 'Назад',
                 onTap: () => setState(() => _page = _NetworkIssuePage.main),
               ),
             ),
@@ -123,7 +123,7 @@ class _NetworkIssueDialogState extends State<NetworkIssueDialog> {
           ],
           SizedBox(height: 27.h),
           MuzhikiUi.buttons.primary(
-            label: '��, �����',
+            label: 'Ох, ладно',
             backgroundColor: NetworkProblemColors.greyLight,
             labelColor: NetworkProblemColors.black23,
             borderRadius: 20,

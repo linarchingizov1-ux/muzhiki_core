@@ -11,7 +11,7 @@ class ErrorDialog extends StatelessWidget {
 
   const ErrorDialog({
     super.key,
-    this.title = '�� ������� ��������� ������',
+    this.title = 'Не удалось отправить заявку',
     this.description,
     this.onRetry,
   });
@@ -48,7 +48,7 @@ class ErrorDialog extends StatelessWidget {
         SizedBox(height: 27.h),
         if (onRetry != null) ...[
           MuzhikiUi.buttons.primary(
-            label: '���������',
+            label: 'Повторить',
             backgroundColor: ReportProblemColors.black23,
             labelColor: ReportProblemColors.white,
             borderRadius: 23,
@@ -60,7 +60,7 @@ class ErrorDialog extends StatelessWidget {
           SizedBox(height: 10.h),
         ],
         MuzhikiUi.buttons.primary(
-          label: '�������',
+          label: 'Понятно',
           backgroundColor: ReportProblemColors.light,
           labelColor: ReportProblemColors.black23,
           onPressed: () => context.pop(),
