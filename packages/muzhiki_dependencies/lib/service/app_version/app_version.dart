@@ -1,6 +1,7 @@
 ﻿import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:muzhiki_dependencies/service/app_version/ios_device_model.dart';
 import 'package:muzhiki_dependencies/service/app_version/model/app_info_model.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:android_id/android_id.dart';
@@ -43,7 +44,7 @@ class AppInfoService {
         platform: 'ios',
         osVersion: iosInfo.systemVersion,
         manufacturer: 'Apple',
-        model: iosInfo.utsname.machine,
+        model: iosMarketingName(iosInfo.utsname.machine),
         deviceId: iosInfo.identifierForVendor ?? '',
       );
     }
