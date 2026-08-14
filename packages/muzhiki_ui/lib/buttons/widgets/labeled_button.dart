@@ -14,7 +14,7 @@ class LabeledButton extends StatelessWidget {
     this.height = 56,
     this.width = double.infinity,
     this.borderRadius = 16,
-    this.backgroundColor = MuzhikiColors.black17,
+    this.backgroundColor = MuzhikiColors.black17Light,
     this.padding,
     this.labelSize = 15,
     this.labelWeight,
@@ -52,7 +52,9 @@ class LabeledButton extends StatelessWidget {
       enabled: !disabled,
       enableBackdropFilter: enableBackdropFilter,
     );
-    final isLight = backgroundColor == MuzhikiColors.light;
+    final isLight = backgroundColor == MuzhikiColors.lightLight ||
+        backgroundColor == MuzhikiColors.lightDark ||
+        backgroundColor == MuzhikiColors.light;
     final radius = BorderRadius.circular(borderRadius.r);
 
     return wrapButtonBackdropFilter(

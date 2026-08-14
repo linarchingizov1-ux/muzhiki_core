@@ -24,14 +24,14 @@ class MediaViewer extends StatefulWidget {
     super.key,
     required this.items,
     this.initialIndex = 0,
-    this.backgroundColor = MuzhikiColors.black17,
+    this.backgroundColor = MuzhikiColors.black17Light,
   });
 
   static Future<T?> open<T>(
     BuildContext context, {
     required List<MediaItem> items,
     int initialIndex = 0,
-    Color backgroundColor = MuzhikiColors.black17,
+    Color backgroundColor = MuzhikiColors.black17Light,
     Duration duration = const Duration(milliseconds: 300),
   }) {
     if (items.isEmpty) return Future.value();

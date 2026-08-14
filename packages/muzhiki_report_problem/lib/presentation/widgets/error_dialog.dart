@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
-import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
 
 class ErrorDialog extends StatelessWidget {
   final String title;
@@ -29,7 +28,7 @@ class ErrorDialog extends StatelessWidget {
             fontSize: 18.sp,
             height: 1.3,
             fontWeight: FontWeight.w600,
-            color: ReportProblemColors.black23,
+            color: MuzhikiColors.black23,
           ),
         ),
         if (description != null) ...[
@@ -41,7 +40,7 @@ class ErrorDialog extends StatelessWidget {
               fontSize: 15.sp,
               height: 1.3,
               fontWeight: FontWeight.w500,
-              color: ReportProblemColors.alertTextGrey,
+              color: MuzhikiColors.alertTextGrey,
             ),
           ),
         ],
@@ -49,8 +48,8 @@ class ErrorDialog extends StatelessWidget {
         if (onRetry != null) ...[
           MuzhikiUi.buttons.primary(
             label: 'Повторить',
-            backgroundColor: ReportProblemColors.black23,
-            labelColor: ReportProblemColors.white,
+            backgroundColor: MuzhikiColors.ink,
+            labelColor: MuzhikiColors.white,
             borderRadius: 23,
             onPressed: () {
               context.pop();
@@ -61,8 +60,8 @@ class ErrorDialog extends StatelessWidget {
         ],
         MuzhikiUi.buttons.primary(
           label: 'Понятно',
-          backgroundColor: ReportProblemColors.light,
-          labelColor: ReportProblemColors.black23,
+          backgroundColor: MuzhikiColors.light,
+          labelColor: MuzhikiColors.black23,
           onPressed: () => context.pop(),
         ),
       ],

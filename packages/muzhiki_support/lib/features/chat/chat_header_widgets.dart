@@ -33,7 +33,7 @@ class ChatHeaderWidgets extends StatelessWidget {
               MuzhikiUi.buttons.animated(
                 onTap: () => context.pop(true),
                 size: 44,
-                backgroundColor: MuzhikiColors.black1,
+                backgroundColor: MuzhikiColors.ink,
                 svgAsset: SupportAssets.I.svg.arrowBack,
               ),
               SizedBox(width: 10.w),

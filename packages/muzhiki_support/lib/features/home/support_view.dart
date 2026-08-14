@@ -87,11 +87,13 @@ class _SupportViewState extends State<SupportView> {
 
   @override
   Widget build(BuildContext context) {
+    MuzhikiColors.depend(context);
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.dark,
       child: RefreshIndicator.noSpinner(
         onRefresh: () async => widget.chatCubit.getMyChats(),
         child: Scaffold(
+          backgroundColor: MuzhikiColors.appBackgroud,
           floatingActionButtonLocation:
               FloatingActionButtonLocation.miniEndFloat,
           floatingActionButton: BlocProvider.value(

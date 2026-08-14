@@ -40,13 +40,21 @@ class _FirebasePushDialogState extends State<FirebasePushDialog> {
             children: [
               Text(
                 'Отправка уведомлений',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                  color: MuzhikiColors.black23,
+                ),
               ),
               SizedBox(height: 7.h),
               Text(
                 'Будем уведомлять о полезных событиях. Позже вы сможете настроить уведомления только для тех событий, которые вам интересны.\n\n'
                 'Для доставки уведомлений мы используем ваш идентификатор устройства. Это необходимо для точного уведомления вас о событиях при использовании наших сервисов.',
-                style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: MuzhikiColors.black23,
+                ),
               ),
               SizedBox(height: 25.h),
               MuzhikiUi.buttons.dark(

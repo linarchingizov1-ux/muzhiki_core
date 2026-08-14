@@ -44,7 +44,7 @@ class DarkButton extends StatelessWidget {
       isLoading: isLoading,
     );
     final bg = resolveButtonSurfaceColor(
-      MuzhikiColors.black17,
+      MuzhikiColors.black17Light,
       enabled: !disabled,
       enableBackdropFilter: enableBackdropFilter,
     );

@@ -21,7 +21,7 @@ class SliverInformator extends StatelessWidget {
             padding: EdgeInsets.all(12.r),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(21.r),
-              color: MuzhikiColors.black17,
+              color: MuzhikiColors.ink,
               image: DecorationImage(
                 alignment: AlignmentGeometry.centerRight,
                 image: AssetImage(SupportAssets.I.png.informatorBackground),

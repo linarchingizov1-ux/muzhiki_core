@@ -49,7 +49,7 @@ class _ChatBottomAreaClosedAndRatedWidgetsState
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.r),
-            color: MuzhikiColors.white,
+            color: MuzhikiColors.surface,
           ),
           child: Column(
             spacing: 24.h,

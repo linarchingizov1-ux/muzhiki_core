@@ -9,7 +9,7 @@ class CircleButton extends StatelessWidget {
     super.key,
     required this.onPressed,
     required this.iconAsset,
-    this.backgroundColor = MuzhikiColors.alertTextGrey,
+    this.backgroundColor = MuzhikiColors.alertTextGreyLight,
     this.size = 42,
     this.iconSize = 40,
     this.disabled = false,

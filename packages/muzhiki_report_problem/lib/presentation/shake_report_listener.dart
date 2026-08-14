@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
-import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
 import 'package:muzhiki_report_problem/config/report_problem_config.dart';
 import 'package:muzhiki_report_problem/presentation/report_problem_dialog.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/app_standart_dialog.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:shake/shake.dart';
 import 'package:vibration/vibration.dart';
 
@@ -51,7 +51,7 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
     }
     try {
       await AppStandartDialog.open<void>(
-        backgroundColor: ReportProblemColors.appBackgroud,
+        backgroundColor: MuzhikiColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
           bottom: Radius.circular(

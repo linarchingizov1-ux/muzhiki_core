@@ -13,7 +13,7 @@ class AppStandartDialog {
     bool isDismissible = true,
     bool enableDrag = true,
     bool canPop = true,
-    Color backgroundColor = MuzhikiColors.white,
+    Color? backgroundColor,
     BorderRadius? borderRadius,
     EdgeInsetsGeometry? outerPadding,
   }) async {
@@ -34,6 +34,8 @@ class AppStandartDialog {
         reverseDuration: const Duration(milliseconds: 250),
       ),
       builder: (_) {
+        final sheetColor = backgroundColor ?? MuzhikiColors.surface;
+
         if (height != null) {
           return PopScope(
             canPop: false,
@@ -47,7 +49,7 @@ class AppStandartDialog {
                   bottom: 20.h,
                 ),
                 decoration: BoxDecoration(
-                  color: MuzhikiColors.white,
+                  color: sheetColor,
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(
                       MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
@@ -68,7 +70,7 @@ class AppStandartDialog {
                         width: double.infinity,
                         padding: EdgeInsets.all(20.w),
                         decoration: BoxDecoration(
-                          color: backgroundColor,
+                          color: sheetColor,
                           borderRadius:
                               borderRadius ?? BorderRadius.circular(40.r),
                         ),

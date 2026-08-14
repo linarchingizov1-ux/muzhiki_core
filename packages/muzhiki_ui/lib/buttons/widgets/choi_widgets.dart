@@ -166,7 +166,7 @@ class _ChoiceWidgetsState extends State<ChoiceWidgets>
   Widget _buildChip() {
     final radius = BorderRadius.circular(48.r);
     final baseColor =
-        widget.isSelected ? MuzhikiColors.black1 : MuzhikiColors.light;
+        widget.isSelected ? MuzhikiColors.ink : MuzhikiColors.light;
     final bg = resolveButtonSurfaceColor(
       baseColor,
       enabled: true,

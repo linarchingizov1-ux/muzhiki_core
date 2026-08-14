@@ -32,7 +32,7 @@ class SoftEdgeScaffold extends StatelessWidget {
     this.trailing,
     this.bottomBar,
     this.bottomBarPadding,
-    this.backgroundColor = MuzhikiColors.appBackgroud,
+    this.backgroundColor = MuzhikiColors.appBackgroudLight,
     this.tintColor,
     this.topBlur = true,
     this.bottomBlur = true,
@@ -92,7 +92,9 @@ class SoftEdgeScaffold extends StatelessWidget {
       iconSize: 18,
       scale: 1.1,
       iconColor: backIconColor ?? MuzhikiColors.alertTextGrey,
-      backgroundColor: backgroundColor,
+      backgroundColor: backgroundColor == MuzhikiColors.appBackgroudLight
+          ? MuzhikiColors.appBackgroud
+          : backgroundColor,
       enabled: backEnabled,
       enableBackdropFilter: enableBackdropFilter,
     );
@@ -100,6 +102,9 @@ class SoftEdgeScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageColor = backgroundColor == MuzhikiColors.appBackgroudLight
+        ? MuzhikiColors.appBackgroud
+        : backgroundColor;
     final topInset = MediaQuery.paddingOf(context).top;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final headerTop = headerTopPadding ?? 8.h;
@@ -119,12 +124,12 @@ class SoftEdgeScaffold extends StatelessWidget {
     final leadingWidget = _buildLeading();
     final edgeTint = AppleScrollEdge.defaultTint(
       tintColor: tintColor,
-      backgroundColor: backgroundColor,
+      backgroundColor: pageColor,
     );
 
     return Scaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-      backgroundColor: backgroundColor,
+      backgroundColor: pageColor,
       body: Stack(
         children: [
           Positioned.fill(

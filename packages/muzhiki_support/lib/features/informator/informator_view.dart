@@ -41,8 +41,9 @@ class _InformatorViewState extends State<InformatorView> {
 
   @override
   Widget build(BuildContext context) {
+    MuzhikiColors.depend(context);
     return Scaffold(
-      backgroundColor: MuzhikiColors.white,
+      backgroundColor: MuzhikiColors.surface,
       appBar: AppBar(title: const Text('Информатор')),
       body: MpBridgeWebView(
         showAppBar: false,

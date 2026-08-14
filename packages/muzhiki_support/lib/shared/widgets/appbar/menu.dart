@@ -31,7 +31,7 @@ class SupportAppBarMenu extends StatelessWidget {
             sessionApp.user!.username,
             style: TextStyle(
               fontFamily: 'Manrope',
-              color: MuzhikiColors.appBackgroud,
+              color: MuzhikiColors.white,
               fontSize: 12.sp,
               height: 1.h,
               fontWeight: FontWeight.w600,
@@ -90,7 +90,7 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
                       fontFamily: 'Manrope',
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: MuzhikiColors.appBackgroud,
+                      color: MuzhikiColors.white,
                       height: 1.5.h,
                     ),
                   ),
@@ -108,7 +108,7 @@ class DashboardMenuBottomWidgets extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              color: MuzhikiColors.appBackgroud,
+              color: MuzhikiColors.white,
               size: 12.h,
             ),
           ],

@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_report_problem/config/report_problem_assets.dart';
-import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
 import 'package:muzhiki_report_problem/config/report_problem_config.dart';
 import 'package:muzhiki_report_problem/data/repository/report_problem_repository_impl.dart';
 import 'package:muzhiki_report_problem/presentation/view_model/report_problem_view_model.dart';
@@ -51,7 +50,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
     if (!mounted) return;
     if (viewModel.isSubmitSuccess == true) {
       await AppStandartDialog.open(
-        backgroundColor: ReportProblemColors.appBackgroud,
+        backgroundColor: MuzhikiColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
           bottom: Radius.circular(
@@ -66,7 +65,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
       context.pop();
     } else {
       await AppStandartDialog.open(
-        backgroundColor: ReportProblemColors.appBackgroud,
+        backgroundColor: MuzhikiColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
           bottom: Radius.circular(
@@ -109,8 +108,8 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                       label: 'Отменить',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      labelColor: ReportProblemColors.alertTextGrey,
-                      backgroundColor: ReportProblemColors.greyLight.withValues(
+                      labelColor: MuzhikiColors.alertTextGrey,
+                      backgroundColor: MuzhikiColors.greyLight.withValues(
                         alpha: 0.3,
                       ),
                       labelPadding: EdgeInsets.symmetric(
@@ -135,7 +134,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                       fontSize: 18.sp,
                       height: 1.3,
                       fontWeight: FontWeight.w600,
-                      color: ReportProblemColors.black23,
+                      color: MuzhikiColors.black23,
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -145,7 +144,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
-                      color: ReportProblemColors.alertTextGrey,
+                      color: MuzhikiColors.alertTextGrey,
                     ),
                   ),
                   SizedBox(height: 27.h),
@@ -171,15 +170,15 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                               width: 16.r,
                               height: 16.r,
                               colorFilter: const ColorFilter.mode(
-                                ReportProblemColors.blood,
+                                MuzhikiColors.blood,
                                 BlendMode.srcIn,
                               ),
                             ),
                             label: 'Добавить скриншот',
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
-                            labelColor: ReportProblemColors.alertTextGrey,
-                            backgroundColor: ReportProblemColors.appBackgroud,
+                            labelColor: MuzhikiColors.alertTextGrey,
+                            backgroundColor: MuzhikiColors.appBackgroud,
                             radius: 20,
                             labelPadding: EdgeInsets.symmetric(
                               vertical: 5.h,
@@ -240,7 +239,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                         padding: EdgeInsets.all(6.r),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: ReportProblemColors.black23
+                                          color: MuzhikiColors.ink
                                               .withValues(alpha: 0.65),
                                         ),
                                         child: SvgPicture.asset(
@@ -248,7 +247,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                           width: 8.w,
                                           height: 8.h,
                                           colorFilter: const ColorFilter.mode(
-                                            ReportProblemColors.white,
+                                            MuzhikiColors.white,
                                             BlendMode.srcIn,
                                           ),
                                         ),
@@ -270,7 +269,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                       fontSize: 15.sp,
                       height: 1.3,
                       fontWeight: FontWeight.w500,
-                      color: ReportProblemColors.alertTextGrey,
+                      color: MuzhikiColors.alertTextGrey,
                     ),
                   ),
                   SizedBox(height: 27.h),
@@ -283,11 +282,11 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                       isLoading: viewModel.isSubmitting,
                       disabled: !viewModel.isValid,
                       backgroundColor: viewModel.isValid
-                          ? ReportProblemColors.black23
-                          : ReportProblemColors.light,
+                          ? MuzhikiColors.ink
+                          : MuzhikiColors.light,
                       labelColor: viewModel.isValid
-                          ? ReportProblemColors.white
-                          : ReportProblemColors.black23,
+                          ? MuzhikiColors.white
+                          : MuzhikiColors.black23,
                       borderRadius: 20,
                       onPressed: () => _submit(),
                     ),

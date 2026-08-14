@@ -23,13 +23,13 @@ class ButtonLoading extends StatelessWidget {
 
   static Color contrastOn(Color background) {
     return background.computeLuminance() > 0.45
-        ? MuzhikiColors.black17
+        ? MuzhikiColors.black17Light
         : MuzhikiColors.white;
   }
 
   Color get _resolvedColor {
     if (color != null) return color!;
-    return contrastOn(backgroundColor ?? MuzhikiColors.black17);
+    return contrastOn(backgroundColor ?? MuzhikiColors.black17Light);
   }
 
   bool _useCupertino(BuildContext context) {

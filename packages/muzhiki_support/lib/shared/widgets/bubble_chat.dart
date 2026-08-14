@@ -62,7 +62,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
             children: [
               if (!widget.isMe)
                 CircleAvatar(
-                  backgroundColor: MuzhikiColors.white,
+                  backgroundColor: MuzhikiColors.surface,
                   radius: 22.r,
                   child: widget.avatar == null || widget.avatar!.isEmpty
                       ? Icon(Icons.person, size: 20.r, color: Colors.grey)
@@ -80,9 +80,9 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                               child: Container(
                                 width: 44.r,
                                 height: 44.r,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white,
+                                  color: MuzhikiColors.surface,
                                 ),
                               ),
                             ),
@@ -102,7 +102,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                   borderRadius: BorderRadius.circular(12.r),
                   color: widget.isMe
                       ? MuzhikiColors.light
-                      : MuzhikiColors.white,
+                      : MuzhikiColors.surface,
                 ),
                 child: IntrinsicWidth(
                   child: Column(

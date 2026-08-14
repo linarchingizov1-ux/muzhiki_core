@@ -14,6 +14,7 @@ import 'package:muzhiki_support/features/chat/chat_header_widgets.dart';
 import 'package:muzhiki_support/features/chat/chat_message_widgets.dart';
 import 'package:muzhiki_support/features/chat/state/attachments_cubit.dart';
 import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 String _startNewSessionText = 'Здравствуйте 👋!';
 
@@ -93,6 +94,7 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
+    MuzhikiColors.depend(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: PopScope(
@@ -102,6 +104,7 @@ class _ChatViewState extends State<ChatView> {
           }
         },
         child: Scaffold(
+          backgroundColor: MuzhikiColors.appBackgroud,
           body: StreamBuilder(
             initialData: websocketApp.state,
             stream: websocketApp.stream,
@@ -137,10 +140,16 @@ class _ChatViewState extends State<ChatView> {
                                 begin: Alignment.bottomCenter,
                                 end: Alignment.topCenter,
                                 colors: [
-                                  Colors.white,
-                                  Colors.white.withValues(alpha: 0.8),
-                                  Colors.white.withValues(alpha: 0.35),
-                                  Colors.white.withValues(alpha: 0),
+                                  MuzhikiColors.appBackgroud,
+                                  MuzhikiColors.appBackgroud.withValues(
+                                    alpha: 0.8,
+                                  ),
+                                  MuzhikiColors.appBackgroud.withValues(
+                                    alpha: 0.35,
+                                  ),
+                                  MuzhikiColors.appBackgroud.withValues(
+                                    alpha: 0,
+                                  ),
                                 ],
                                 stops: const [0.0, 0.3, 0.65, 1.0],
                               ),
@@ -161,9 +170,15 @@ class _ChatViewState extends State<ChatView> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Colors.white.withValues(alpha: 0.95),
-                              Colors.white.withValues(alpha: 0.75),
-                              Colors.white.withValues(alpha: 0.3),
+                              MuzhikiColors.appBackgroud.withValues(
+                                alpha: 0.95,
+                              ),
+                              MuzhikiColors.appBackgroud.withValues(
+                                alpha: 0.75,
+                              ),
+                              MuzhikiColors.appBackgroud.withValues(
+                                alpha: 0.3,
+                              ),
                               Colors.transparent,
                             ],
                             stops: const [0.0, 0.3, 0.65, 1.0],

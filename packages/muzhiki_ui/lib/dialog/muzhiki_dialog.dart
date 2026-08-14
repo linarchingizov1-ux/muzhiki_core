@@ -41,6 +41,7 @@ final class MuzhikiDialog {
     bool isDismissible = true,
     bool enableDrag = true,
     bool canPop = true,
+    Color? backgroundColor,
   }) async {
     final sheetContext = _context(context);
     if (sheetContext == null) return null;
@@ -59,6 +60,8 @@ final class MuzhikiDialog {
         reverseDuration: const Duration(milliseconds: 250),
       ),
       builder: (context) {
+        final sheetColor = backgroundColor ?? MuzhikiColors.surface;
+
         if (height != null) {
           return PopScope(
             canPop: false,
@@ -72,7 +75,7 @@ final class MuzhikiDialog {
                   bottom: 20.h,
                 ),
                 decoration: BoxDecoration(
-                  color: MuzhikiColors.white,
+                  color: sheetColor,
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(22.r),
                     bottom: Radius.circular(_bottomRadius()),
@@ -98,7 +101,7 @@ final class MuzhikiDialog {
                       width: double.infinity,
                       padding: EdgeInsets.all(20.w),
                       decoration: BoxDecoration(
-                        color: MuzhikiColors.white,
+                        color: sheetColor,
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(22.r),
                           bottom: Radius.circular(_bottomRadius()),
@@ -126,13 +129,17 @@ final class MuzhikiDialog {
     );
   }
 
-  Future<bool?> needUpdate({required Widget child, BuildContext? context}) {
+  Future<bool?> needUpdate({
+    required Widget child,
+    BuildContext? context,
+    Color? backgroundColor,
+  }) {
     final sheetContext = _context(context);
     if (sheetContext == null) return Future.value(null);
 
     return showModalBottomSheet<bool>(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      backgroundColor: MuzhikiColors.appBackgroud,
+      backgroundColor: backgroundColor ?? MuzhikiColors.appBackgroud,
       context: sheetContext,
       isDismissible: true,
       enableDrag: false,
@@ -160,12 +167,14 @@ final class MuzhikiDialog {
     bool isDismissible = true,
     bool enableDrag = true,
     bool canPop = true,
+    Color? backgroundColor,
   }) {
     return standart<bool>(
       context: context,
       isDismissible: isDismissible,
       enableDrag: enableDrag,
       canPop: canPop,
+      backgroundColor: backgroundColor,
       child: DeleteAccountDialog(onOpenDetails: onOpenDetails),
     );
   }

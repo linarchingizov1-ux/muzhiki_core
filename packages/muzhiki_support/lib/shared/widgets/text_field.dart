@@ -280,7 +280,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                   spacing: 10.h,
                                   children: [
                                     MuzhikiUi.buttons.animated(
-                                      backgroundColor: MuzhikiColors.white,
+                                      backgroundColor: MuzhikiColors.surface,
                                       iconColor: MuzhikiColors.blood,
                                       svgAsset: SupportAssets.I.svg.image,
                                       onTap: () async {
@@ -293,7 +293,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       },
                                     ),
                                     MuzhikiUi.buttons.animated(
-                                      backgroundColor: MuzhikiColors.white,
+                                      backgroundColor: MuzhikiColors.surface,
                                       svgAsset: SupportAssets.I.svg.recodeVideo,
                                       iconColor: MuzhikiColors.blood,
                                       onTap: () async {
@@ -306,7 +306,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                                       },
                                     ),
                                     MuzhikiUi.buttons.animated(
-                                      backgroundColor: MuzhikiColors.white,
+                                      backgroundColor: MuzhikiColors.surface,
                                       svgAsset: SupportAssets.I.svg.file,
                                       iconColor: MuzhikiColors.blood,
                                       onTap: () async {
@@ -338,7 +338,7 @@ class _CircleMenuAnimatedState extends State<_CircleMenuAnimated>
                     ? SupportAssets.I.svg.close
                     : SupportAssets.I.svg.screpka,
                 backgroundColor: isOpen
-                    ? MuzhikiColors.white
+                    ? MuzhikiColors.surface
                     : MuzhikiColors.blood,
                 onTap: _toggle,
               ),

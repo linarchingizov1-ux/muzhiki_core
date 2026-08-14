@@ -234,9 +234,9 @@ class DialogMenu {
                 Positioned.fromRect(
                   rect: a,
                   child: DecoratedBox(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: MuzhikiColors.appBackgroud,
+                      color: MuzhikiColors.appBackgroudLight,
                     ),
                     child: Material(
                       color: Colors.red,
@@ -247,8 +247,8 @@ class DialogMenu {
                         child: Center(
                           child: SvgPicture.asset(
                             SupportAssets.I.svg.dashboard,
-                            colorFilter: const ColorFilter.mode(
-                              MuzhikiColors.darkGrey,
+                            colorFilter: ColorFilter.mode(
+                              MuzhikiColors.darkGreyLight,
                               BlendMode.srcIn,
                             ),
                           ),

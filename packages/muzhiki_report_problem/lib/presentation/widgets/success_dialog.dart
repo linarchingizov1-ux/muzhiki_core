@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
-import 'package:muzhiki_report_problem/config/report_problem_colors.dart';
 import 'package:muzhiki_report_problem/config/report_problem_assets.dart';
 
 class SuccessDialog extends StatelessWidget {
@@ -30,14 +29,14 @@ class SuccessDialog extends StatelessWidget {
             fontSize: 18.sp,
             height: 1.3,
             fontWeight: FontWeight.w600,
-            color: ReportProblemColors.black23,
+            color: MuzhikiColors.black23,
           ),
         ),
         SizedBox(height: 27.h),
         MuzhikiUi.buttons.primary(
           label: 'Отлично',
-          backgroundColor: ReportProblemColors.black23,
-          labelColor: ReportProblemColors.white,
+          backgroundColor: MuzhikiColors.ink,
+          labelColor: MuzhikiColors.white,
           borderRadius: 23,
           onPressed: () => context.pop(),
         ),
