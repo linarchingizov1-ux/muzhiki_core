@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/buttons/muzhiki_buttons.dart';
-import 'package:muzhiki_ui/effect/apple_scroll_edge.dart';
 import 'package:muzhiki_ui/effect/muzhiki_effect.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
@@ -47,10 +46,8 @@ class SoftEdgeScaffold extends StatelessWidget {
     this.enableBackdropFilter = false,
   });
 
-  final Widget Function(
-    BuildContext context,
-    SoftEdgeScaffoldMetrics metrics,
-  ) bodyBuilder;
+  final Widget Function(BuildContext context, SoftEdgeScaffoldMetrics metrics)
+  bodyBuilder;
 
   final String? title;
   final Widget? titleWidget;
@@ -154,13 +151,11 @@ class SoftEdgeScaffold extends StatelessWidget {
             child: SafeArea(
               bottom: false,
               child: Padding(
-                padding: EdgeInsets.only(
-                  top: headerTop,
-                  bottom: headerBottom,
-                ).add(
-                  headerHorizontalPadding ??
-                      EdgeInsets.only(left: 16.w, right: 20.w),
-                ),
+                padding: EdgeInsets.only(top: headerTop, bottom: headerBottom)
+                    .add(
+                      headerHorizontalPadding ??
+                          EdgeInsets.only(left: 16.w, right: 20.w),
+                    ),
                 child: SizedBox(
                   height: 40.r,
                   child: Stack(
@@ -202,7 +197,8 @@ class SoftEdgeScaffold extends StatelessWidget {
               child: SafeArea(
                 top: false,
                 child: Padding(
-                  padding: bottomBarPadding ??
+                  padding:
+                      bottomBarPadding ??
                       EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
                   child: bottomBar!,
                 ),

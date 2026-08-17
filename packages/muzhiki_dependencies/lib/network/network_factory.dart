@@ -8,16 +8,9 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
-import 'package:muzhiki_dependencies/model/network_model.dart';
-import 'package:muzhiki_dependencies/network/exception/network_map_error.dart';
+import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_dependencies/network/interceptors/metrics_interceptor.dart';
 import 'package:muzhiki_dependencies/network/metrics/request_storage.dart';
-import 'package:muzhiki_dependencies/network/network_type_service.dart';
-import 'package:muzhiki_dependencies/network/token_storage.dart';
-import 'package:muzhiki_dependencies/network/url_launch/url_launch.dart';
-import 'package:muzhiki_dependencies/service/app_version/model/app_info_model.dart';
-import 'package:muzhiki_dependencies/service/session/session.dart';
-import 'package:muzhiki_dependencies/service/session/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
@@ -65,6 +58,9 @@ class NetworkFactory {
         final isAuthError = code == 401 || code == 419;
 
         if (isAuthError && showIsBackendProblem) {
+          BannerController.I.show(
+            message: "Oops - проблемы с сервисом.\nПопробуйте чуть позже",
+          );
           return false;
         }
 
@@ -87,12 +83,8 @@ class NetworkFactory {
               accessToken: access,
               refreshToken: token?.refreshToken ?? "",
             );
-          } catch (e, st) {
-            final error = AppErrorMapper.I.map(e, st);
-
-            if (error.message == "Refresh-токен не найден в базе." ||
-                error.message == "Токен уже использован ранее." ||
-                error.message == "Refresh token был отозван") {
+          } on DioException catch (e) {
+            if (e.response?.statusCode == 401) {
               throw RevokeTokenException();
             }
 
@@ -148,7 +140,11 @@ class NetworkFactory {
             ),
           )
         : null;
-    refreshDio.interceptors.addAll([cookieManager, ?talkerInterceptor]);
+    refreshDio.interceptors.addAll([
+      cookieManager,
+      ?talkerInterceptor,
+      if (needMetricsHttp) metricsInterceptor,
+    ]);
     metricsDio.interceptors.addAll([
       if (showTalkerMetricsHttp) ?talkerInterceptor,
     ]);
