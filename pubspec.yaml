@@ -9,6 +9,7 @@ dev_dependencies:
   melos: ^7.3.0
   flutter_lints: ^6.0.0
 
+
 workspace:
   - packages/muzhiki_ui
   - packages/muzhiki_dependencies
@@ -16,4 +17,6 @@ workspace:
   - packages/muzhiki_support
   - packages/muzhiki_report_problem
   - packages/muzhiki_notification
+  - packages/muzhiki_settings
   - packages/flutter_appauth
+

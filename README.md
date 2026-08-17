@@ -13,6 +13,7 @@ muzhiki_core/
 │   ├── muzhiki_bridge
 │   ├── muzhiki_support
 │   ├── muzhiki_report_problem
+│   ├── muzhiki_settings
 │   └── flutter_appauth
 └── apps/                  # local path-deps placeholders
     ├── mp_master
@@ -41,6 +42,11 @@ dependencies:
       url: https://github.com/linarchingizov1-ux/muzhiki_core.git
       path: packages/muzhiki_support
       ref: main
+  muzhiki_settings:
+    git:
+      url: https://github.com/linarchingizov1-ux/muzhiki_core.git
+      path: packages/muzhiki_settings
+      ref: main
 ```
 
 ## Package graph
@@ -50,5 +56,5 @@ muzhiki_ui
     ↑
 muzhiki_dependencies
     ↑
-muzhiki_bridge / muzhiki_support / muzhiki_report_problem
+muzhiki_bridge / muzhiki_support / muzhiki_report_problem / muzhiki_settings
 ```
