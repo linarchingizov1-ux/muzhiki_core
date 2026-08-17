@@ -260,7 +260,7 @@ class __MessageWidgetStateState extends State<_MessageWidgetState> {
             style: const TextStyle(
               fontFamily: 'Manrope',
               fontSize: 12,
-              color: Colors.black,
+              color: Colors.white,
             ),
           ),
         );
