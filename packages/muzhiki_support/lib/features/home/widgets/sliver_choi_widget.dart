@@ -22,8 +22,8 @@ class SliverChoiWidget extends StatelessWidget {
                 child: SizedBox(
                   height: 40.h,
                   child: Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
+                    baseColor: MuzhikiColors.grey,
+                    highlightColor: MuzhikiColors.light,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       separatorBuilder: (context, index) =>

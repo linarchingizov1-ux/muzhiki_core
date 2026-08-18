@@ -42,10 +42,10 @@ class NotificationRepositoryImpl implements NotificationRepository {
           notificationKey: notificationKey,
         ),
         data: {
-          if (isEnabled != null) 'is_enabled': isEnabled,
+          'is_enabled': ?isEnabled,
           if (resetChannelsToDefault) 'channels': null,
           if (!resetChannelsToDefault && channels != null) 'channels': channels,
-          if (filters != null) 'filters': filters,
+          'filters': ?filters,
         },
       );
 

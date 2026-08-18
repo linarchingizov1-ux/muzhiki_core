@@ -301,9 +301,6 @@ class SessionApp extends ChangeNotifier {
           await userSession.saveUserSession(user);
           _user = user;
           notifyListeners();
-          print(
-            "Ответ при обмене токена на юзера:\n\n${response.data['data']}",
-          );
           Future.delayed(
             const Duration(seconds: 3),
             () => fresh.setToken(
