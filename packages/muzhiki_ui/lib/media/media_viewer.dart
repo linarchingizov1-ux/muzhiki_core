@@ -316,10 +316,8 @@ class _MediaViewerState extends State<MediaViewer>
                           size: 45,
                           iconSize: 20,
                           onTap: _close,
-                          iconColor: MuzhikiColors.white,
-                          backgroundColor: MuzhikiColors.isDark
-                              ? MuzhikiColors.surface
-                              : MuzhikiColors.grey,
+                          iconColor: Colors.white,
+                          backgroundColor: Colors.black,
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
