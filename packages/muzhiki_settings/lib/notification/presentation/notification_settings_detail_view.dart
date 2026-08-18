@@ -113,6 +113,7 @@ class _NotificationSettingsDetailViewState
         errorTitle: 'Не удалось сохранить каналы',
         errorDescription: () => widget.viewModel.state.lastDetailSavingError,
         selected: subscription.channels ?? const [],
+        emptyLabel: 'Список доступных каналов пуст',
         options: subscription.availableChannels
             .map(
               (channel) => NotificationParameterOption(
@@ -189,6 +190,9 @@ class _NotificationSettingsDetailViewState
               isRequired: parameter.required,
               selected: selected,
               options: options,
+              emptyLabel: parameter.type == 'masters'
+                  ? 'Список доступных мастеров пуст'
+                  : 'Список доступных вариантов пуст',
               onSubmit: (pickedOptions) => saveFilter(
                 subscription,
                 parameter,
@@ -202,6 +206,9 @@ class _NotificationSettingsDetailViewState
               isRequired: parameter.required,
               selected: selected,
               options: options,
+              emptyLabel: parameter.type == 'masters'
+                  ? 'Список доступных мастеров пуст'
+                  : 'Список доступных вариантов пуст',
               onSelect: (pickedOption) =>
                   saveFilter(subscription, parameter, pickedOption?.value),
             ),
