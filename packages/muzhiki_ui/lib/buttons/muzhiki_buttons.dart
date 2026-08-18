@@ -269,11 +269,12 @@ final class MuzhikiButtons {
 
   Widget back({
     Key? key,
-    required String svgAsset,
+    String? svgAsset,
     required VoidCallback onTap,
     Color backgroundColor = MuzhikiColors.alertTextGreyLight,
     Color iconColor = MuzhikiColors.white,
     double size = 40,
+    bool enabled = true,
     bool enableBackdropFilter = false,
   }) {
     return animated(
@@ -281,10 +282,12 @@ final class MuzhikiButtons {
       backgroundColor: backgroundColor,
       iconColor: iconColor,
       svgAsset: svgAsset,
+      icon: svgAsset == null ? Icons.arrow_back_ios_new : null,
       size: size,
       iconSize: 16,
       scale: 1.1,
       onTap: onTap,
+      enabled: enabled,
       enableBackdropFilter: enableBackdropFilter,
     );
   }

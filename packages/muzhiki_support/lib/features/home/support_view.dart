@@ -89,7 +89,9 @@ class _SupportViewState extends State<SupportView> {
   Widget build(BuildContext context) {
     MuzhikiColors.depend(context);
     return AnnotatedRegion(
-      value: SystemUiOverlayStyle.dark,
+      value: MuzhikiColors.isDark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       child: RefreshIndicator.noSpinner(
         onRefresh: () async => widget.chatCubit.getMyChats(),
         child: Scaffold(

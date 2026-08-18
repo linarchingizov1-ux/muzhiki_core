@@ -83,16 +83,24 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     );
     _sessionUpdates = bridgeAuthUsecase.sessionUpdates;
     _controller = _buildController();
-    _listenSessionUpdates();
     widget.onClearCookiesReady?.call(clearCookies);
+    unawaited(_bootstrap());
+  }
 
+  Uri get _initialUri {
     final urlParse = widget.companyId != null
         ? "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
         : widget.masterAudit != null && widget.masterAudit!.isNotEmpty
         ? "${widget.initialUrl}/${widget.masterAudit!.first}/audits/${widget.masterAudit!.last}?native_app=true&show_header=${widget.showAppBar}"
         : "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}";
-    final url = Uri.parse(urlParse);
-    _controller.loadRequest(url);
+    return Uri.parse(urlParse);
+  }
+
+  Future<void> _bootstrap() async {
+    await bridgeAuthUsecase.seedSession();
+    if (!mounted || disposed) return;
+    _listenSessionUpdates();
+    await _controller.loadRequest(_initialUri);
   }
 
   @override
@@ -133,19 +141,22 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
   Future<void> _handleWebReady(String? requestId) async {
     await _sendAppContext(requestId);
 
-    final session = await bridgeAuthUsecase.getCurrentSession();
+    var session = await bridgeAuthUsecase.getCurrentSession();
 
-    if (session != null) {
-      await _dispatchEvent(
-        type: 'auth:session',
-        payload: {
-          'requestId': requestId,
-          'accessToken': session.accessToken,
-          'expiresAt': session.expiresAt,
-          'user': session.user,
-        },
-      );
+    if (session == null) {
+      await bridgeAuthUsecase.seedSession();
+      session = await bridgeAuthUsecase.getCurrentSession();
     }
+
+    await _dispatchEvent(
+      type: 'auth:session',
+      payload: {
+        'requestId': requestId,
+        'accessToken': session?.accessToken,
+        'expiresAt': session?.expiresAt,
+        'user': session?.user,
+      },
+    );
   }
 
   Future<void> _sendAppContext(String? requestId) async {
@@ -201,7 +212,6 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
               },
               onPageFinished: (url) async {
                 await _ensureBridgeInjected();
-                await bridgeAuthUsecase.seedSession();
                 if (mounted) {
                   setState(() {
                     isLoading = false;

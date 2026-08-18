@@ -118,7 +118,7 @@ class SupportModule {
             initialUrl: initialUrl,
             session: config.session,
             versin: config.versionApp,
-            build: config.buildApp,
+            buildV: config.buildApp,
           );
         },
       ),

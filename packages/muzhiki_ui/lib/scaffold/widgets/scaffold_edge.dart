@@ -81,17 +81,12 @@ class SoftEdgeScaffold extends StatelessWidget {
     if (leading != null) return leading;
     if (onBack == null) return null;
 
-    return _buttons.animated(
+    return _buttons.back(
       svgAsset: svgAssets,
-      icon: svgAssets == null ? Icons.arrow_back_ios_new_rounded : null,
       onTap: onBack!,
-      size: 39,
-      iconSize: 18,
-      scale: 1.1,
-      iconColor: backIconColor ?? MuzhikiColors.alertTextGrey,
-      backgroundColor: backgroundColor == MuzhikiColors.appBackgroudLight
-          ? MuzhikiColors.appBackgroud
-          : backgroundColor,
+      backgroundColor: MuzhikiColors.isDark
+          ? MuzhikiColors.surface
+          : MuzhikiColors.grey,
       enabled: backEnabled,
       enableBackdropFilter: enableBackdropFilter,
     );
@@ -99,6 +94,7 @@ class SoftEdgeScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MuzhikiColors.depend(context);
     final pageColor = backgroundColor == MuzhikiColors.appBackgroudLight
         ? MuzhikiColors.appBackgroud
         : backgroundColor;

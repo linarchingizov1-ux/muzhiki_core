@@ -1,56 +1,47 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:muzhiki_bridge/data/repository/bridge_auth_repository.dart';
-import 'package:muzhiki_bridge/domain/usecase/bridge_auth_usecase.dart';
+import 'package:go_router/go_router.dart';
 import 'package:muzhiki_bridge/mp_bridge_view.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
-import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_support/config/support_assets.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
-class InformatorView extends StatefulWidget {
+class InformatorView extends StatelessWidget {
   final String initialUrl;
   final SessionApp session;
-  final String versin, build;
+  final String versin, buildV;
   const InformatorView({
     super.key,
     required this.initialUrl,
     required this.session,
     required this.versin,
-    required this.build,
+    required this.buildV,
   });
-
-  @override
-  State<InformatorView> createState() => _InformatorViewState();
-}
-
-class _InformatorViewState extends State<InformatorView> {
-  late BridgeAuthUsecase bridgeAuthUsecase;
-
-  @override
-  void initState() {
-    bridgeAuthUsecase = BridgeAuthUsecase(
-      repository: BridgeAuthRepositoryImpl(widget.session),
-    );
-    bridgeAuthUsecase.seedSession();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    bridgeAuthUsecase.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     MuzhikiColors.depend(context);
     return Scaffold(
       backgroundColor: MuzhikiColors.surface,
-      appBar: AppBar(title: const Text('Информатор')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leadingWidth: 70,
+        leading: Center(
+          child: MuzhikiUi.buttons.back(
+            backgroundColor: MuzhikiColors.isDark
+                ? MuzhikiColors.surface
+                : MuzhikiColors.grey,
+            svgAsset: SupportAssets.I.svg.arrowBack,
+            onTap: context.pop,
+          ),
+        ),
+        title: const Text('Информатор'),
+      ),
       body: MpBridgeWebView(
         showAppBar: false,
-        initialUrl: widget.initialUrl,
-        build: widget.build,
-        version: widget.versin,
-        session: widget.session,
+        initialUrl: initialUrl,
+        build: buildV,
+        version: versin,
+        session: session,
       ),
     );
   }

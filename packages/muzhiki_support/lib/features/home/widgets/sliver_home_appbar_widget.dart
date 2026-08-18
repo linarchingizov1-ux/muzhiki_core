@@ -2,6 +2,7 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
+import 'package:muzhiki_support/config/support_assets.dart';
 import 'package:muzhiki_support/shared/widgets/appbar/appbar_main.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 
@@ -18,6 +19,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MuzhikiColors.depend(context);
     if (typeApp == TypeApp.support && sessionApp != null) {
       return SliverAppBar(
         centerTitle: false,
@@ -40,12 +42,12 @@ class SliverHomeAppbarWidget extends StatelessWidget {
               if (canPop)
                 Padding(
                   padding: EdgeInsets.only(left: 17.w),
-                  child: MuzhikiUi.buttons.animated(
-                    size: 40,
-                    iconSize: 16,
-                    backgroundColor: MuzhikiColors.alertTextGrey,
+                  child: MuzhikiUi.buttons.back(
+                    backgroundColor: MuzhikiColors.isDark
+                        ? MuzhikiColors.surface
+                        : MuzhikiColors.grey,
+                    svgAsset: SupportAssets.I.svg.arrowBack,
                     onTap: context.pop,
-                    icon: Icons.arrow_back_ios_new,
                   ),
                 ),
               Text(
