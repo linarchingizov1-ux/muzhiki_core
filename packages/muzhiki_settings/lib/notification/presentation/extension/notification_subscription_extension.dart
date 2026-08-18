@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 import 'package:muzhiki_settings/notification/data/model/notification_subscription_model.dart';
 
 extension NotificationSubscriptionExtension on NotificationSubscriptionModel {
@@ -17,9 +17,9 @@ extension NotificationSubscriptionExtension on NotificationSubscriptionModel {
       .join(', ');
 
   Color get statusColor =>
-      !isEnabled && isEditable ? SettingsColors.blood : SettingsColors.black23;
+      !isEnabled && isEditable ? MuzhikiColors.blood : MuzhikiColors.black23;
 
   Color get statusBackgroundColor => !isEnabled && isEditable
-      ? SettingsColors.backgroundRed
-      : SettingsColors.light;
+      ? MuzhikiColors.backgroundBlood
+      : MuzhikiColors.light;
 }

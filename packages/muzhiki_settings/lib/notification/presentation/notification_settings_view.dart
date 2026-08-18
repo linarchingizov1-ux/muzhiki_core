@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_settings/config/settings_assets.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
 import 'package:muzhiki_settings/config/settings_route_constant.dart';
 import 'package:muzhiki_settings/notification/presentation/extension/notification_subscription_extension.dart';
 import 'package:muzhiki_settings/notification/presentation/state/notification_settings_view_model.dart';
@@ -52,7 +51,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
 
             return RefreshIndicator.adaptive(
               displacement: 120,
-              color: SettingsColors.black23,
+              color: MuzhikiColors.black23,
               strokeWidth: 0.5,
               onRefresh: () => viewModel.init(isRefresh: true),
               child: Scaffold(
@@ -73,18 +72,18 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                             MuzhikiUi.buttons.animated(
                               size: 40,
                               iconSize: 16,
-                              backgroundColor: SettingsColors.darkGrey,
+                              backgroundColor: MuzhikiColors.darkGrey,
                               onTap: context.pop,
                               icon: Icons.arrow_back_ios_new,
                             ),
                             SizedBox(width: 13.w),
                             Text(
                               'Настройка уведомлений',
-                              style: TextStyle(
+                              style: MuzhikiFonts.manropeStyle(
                                 height: 1.h,
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w700,
-                                color: SettingsColors.black23,
+                                color: MuzhikiColors.black23,
                               ),
                             ),
                           ],
@@ -99,7 +98,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                         ),
                         slivers: [
                           SliverPadding(padding: EdgeInsets.only(top: 7.h)),
-                          if (state.isLoading)
+                          if (state.isSubscriptionsLoading)
                             const SliverFillRemaining(
                               hasScrollBody: false,
                               child: Center(
@@ -108,7 +107,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                                 ),
                               ),
                             )
-                          else if (state.error != null &&
+                          else if (state.subscriptionsError != null &&
                               state.subscriptions == null)
                             SliverFillRemaining(
                               hasScrollBody: false,
@@ -118,11 +117,11 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      state.error!,
+                                      state.subscriptionsError!,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: MuzhikiFonts.manropeStyle(
                                         fontSize: 15.sp,
-                                        color: SettingsColors.alertTextGrey,
+                                        color: MuzhikiColors.alertTextGrey,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -152,28 +151,22 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                                   final subscription =
                                       state.subscriptions![index];
 
-                                  final canEdit =
-                                      subscription.isEditable &&
-                                      !state.isNotificationSaving(
-                                        subscription.notificationKey,
-                                      );
-
                                   return ActionCard(
                                     title: subscription.name,
                                     description: subscription.description,
                                     icon: SettingsAssets.power,
                                     iconColor: !subscription.isEditable
-                                        ? SettingsColors.alertTextGrey
+                                        ? MuzhikiColors.alertTextGrey
                                               .withValues(alpha: 0.3)
                                         : subscription.isEnabled
-                                        ? SettingsColors.alertTextGrey
-                                        : SettingsColors.white,
+                                        ? MuzhikiColors.alertTextGrey
+                                        : MuzhikiColors.white,
                                     backgroundIconColor:
                                         !subscription.isEditable
-                                        ? SettingsColors.background
+                                        ? MuzhikiColors.appBackgroud
                                         : subscription.isEnabled
-                                        ? SettingsColors.background
-                                        : SettingsColors.blood,
+                                        ? MuzhikiColors.appBackgroud
+                                        : MuzhikiColors.blood,
                                     badge: SettingsBadge(
                                       label: subscription.statusLabel,
                                       icon: !subscription.isEditable
@@ -184,7 +177,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                                           subscription.statusBackgroundColor,
                                     ),
                                     badgeSpacing: 10,
-                                    enabled: canEdit,
+                                    enabled: subscription.isEditable,
                                     onIconTap: () =>
                                         widget.viewModel.toggleEnabled(
                                           subscription: subscription,

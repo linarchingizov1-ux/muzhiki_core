@@ -19,6 +19,7 @@ class NotificationSettingsViewModel extends ChangeNotifier {
   NotificationSettingsState get state => _state;
 
   int _subscriptionsRequestId = 0;
+  final Map<String, int> _updateRequestIds = {};
 
   Future<void> init({bool isRefresh = false}) async {
     if (_state.subscriptions != null && !isRefresh) return;
@@ -28,7 +29,10 @@ class NotificationSettingsViewModel extends ChangeNotifier {
   Future<void> getSubscriptions({bool isRefresh = false}) async {
     final requestId = ++_subscriptionsRequestId;
 
-    _state = _state.copyWith(isLoading: !isRefresh, clearError: true);
+    _state = _state.copyWith(
+      isSubscriptionsLoading: !isRefresh,
+      clearSubscriptionsError: true,
+    );
     notifyListeners();
 
     try {
@@ -36,10 +40,16 @@ class NotificationSettingsViewModel extends ChangeNotifier {
 
       if (requestId != _subscriptionsRequestId) return;
 
-      _state = _state.copyWith(isLoading: false, subscriptions: subscriptions);
+      _state = _state.copyWith(
+        isSubscriptionsLoading: false,
+        subscriptions: subscriptions,
+      );
     } on AppException catch (e) {
       if (requestId != _subscriptionsRequestId) return;
-      _state = _state.copyWith(isLoading: false, error: e.message);
+      _state = _state.copyWith(
+        isSubscriptionsLoading: false,
+        subscriptionsError: e.message,
+      );
     } finally {
       if (requestId == _subscriptionsRequestId) notifyListeners();
     }
@@ -108,52 +118,97 @@ class NotificationSettingsViewModel extends ChangeNotifier {
   }) async {
     if (!subscription.isEditable) return false;
 
-    final isEnabled = !subscription.isEnabled;
+    final notificationKey = subscription.notificationKey;
+    final currentSubscription = _state.subscriptions
+        ?.where((item) => item.notificationKey == notificationKey)
+        .firstOrNull;
+    if (currentSubscription == null) return false;
 
-    return await _update(
-      subscription: subscription,
-      isEnabled: isEnabled,
-      optimisticSubscription: subscription.copyWith(isEnabled: isEnabled),
-      showErrorBanner: true,
+    final previousEnabled = currentSubscription.isEnabled;
+    final isEnabled = !previousEnabled;
+
+    _state = _state.copyWith(
+      subscriptions: _replaceSubscription(
+        updatedSubscription: currentSubscription.copyWith(isEnabled: isEnabled),
+      ),
     );
+    notifyListeners();
+
+    try {
+      return await _sendUpdate(
+        notificationKey: notificationKey,
+        isEnabled: isEnabled,
+      );
+    } on AppException catch (e) {
+      final latestSubscription = _state.subscriptions
+          ?.where((item) => item.notificationKey == notificationKey)
+          .firstOrNull;
+      if (latestSubscription != null) {
+        _state = _state.copyWith(
+          subscriptions: _replaceSubscription(
+            updatedSubscription: latestSubscription.copyWith(
+              isEnabled: previousEnabled,
+            ),
+          ),
+        );
+      }
+      BannerController.I.showError(error: e, message: e.message);
+      notifyListeners();
+
+      return false;
+    }
   }
 
   Future<bool> setChannels({
     required NotificationSubscriptionModel subscription,
     required List<String> channels,
   }) async {
-    return await _update(subscription: subscription, channels: channels);
+    return await _updateDetail(
+      notificationKey: subscription.notificationKey,
+      channels: channels,
+    );
   }
 
   Future<bool> setFilters({
     required NotificationSubscriptionModel subscription,
     required Map<String, dynamic> filters,
   }) async {
-    return await _update(subscription: subscription, filters: filters);
+    return await _updateDetail(
+      notificationKey: subscription.notificationKey,
+      filters: filters,
+    );
   }
 
-  Future<bool> _update({
-    required NotificationSubscriptionModel subscription,
+  Future<bool> _updateDetail({
+    required String notificationKey,
+    List<String>? channels,
+    Map<String, dynamic>? filters,
+  }) async {
+    _state = _state.copyWith(clearLastDetailSavingError: true);
+    notifyListeners();
+
+    try {
+      return await _sendUpdate(
+        notificationKey: notificationKey,
+        channels: channels,
+        filters: filters,
+      );
+    } on AppException catch (e) {
+      _state = _state.copyWith(lastDetailSavingError: e.message);
+      notifyListeners();
+
+      return false;
+    }
+  }
+
+  Future<bool> _sendUpdate({
+    required String notificationKey,
     bool? isEnabled,
     List<String>? channels,
     Map<String, dynamic>? filters,
-    NotificationSubscriptionModel? optimisticSubscription,
-    bool showErrorBanner = false,
   }) async {
-    final notificationKey = subscription.notificationKey;
-    if (_state.isNotificationSaving(notificationKey)) return false;
-
-    _state = _state.copyWith(
-      savingNotificationKeys: {
-        ..._state.savingNotificationKeys,
-        notificationKey,
-      },
-      clearLastSavingError: true,
-      subscriptions: optimisticSubscription == null
-          ? _state.subscriptions
-          : _replaceSubscription(updatedSubscription: optimisticSubscription),
-    );
-    notifyListeners();
+    final requestId = (_updateRequestIds[notificationKey] ?? 0) + 1;
+    _updateRequestIds[notificationKey] = requestId;
 
     try {
       final updatedSubscription = await repository.updateSubscription(
@@ -163,39 +218,27 @@ class NotificationSettingsViewModel extends ChangeNotifier {
         filters: filters,
       );
 
+      if (requestId != _updateRequestIds[notificationKey]) return false;
+
       _state = _state.copyWith(
         subscriptions: _replaceSubscription(
           updatedSubscription: updatedSubscription,
         ),
       );
+      notifyListeners();
 
       return true;
-    } on AppException catch (e) {
-      _state = _state.copyWith(
-        subscriptions: _replaceSubscription(updatedSubscription: subscription),
-        lastSavingError: showErrorBanner ? null : e.message,
-        clearLastSavingError: showErrorBanner,
-      );
-
-      if (showErrorBanner) {
-        BannerController.I.showError(error: e, message: e.message);
-      }
-
-      return false;
-    } finally {
-      _state = _state.copyWith(
-        savingNotificationKeys: {..._state.savingNotificationKeys}
-          ..remove(notificationKey),
-      );
-      notifyListeners();
+    } on AppException {
+      if (requestId != _updateRequestIds[notificationKey]) return false;
+      rethrow;
     }
   }
 
-  List<NotificationSubscriptionModel> _replaceSubscription({
+  List<NotificationSubscriptionModel>? _replaceSubscription({
     required NotificationSubscriptionModel updatedSubscription,
   }) {
     final subscriptions = _state.subscriptions;
-    if (subscriptions == null) return [updatedSubscription];
+    if (subscriptions == null) return null;
 
     return [
       for (final item in subscriptions)

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class SettingsErrorDialog extends StatelessWidget {
@@ -24,10 +23,10 @@ class SettingsErrorDialog extends StatelessWidget {
         Text(
           title,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: MuzhikiFonts.manropeStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
-            color: SettingsColors.black23,
+            color: MuzhikiColors.black23,
           ),
         ),
         if (description != null) ...[
@@ -35,18 +34,18 @@ class SettingsErrorDialog extends StatelessWidget {
           Text(
             description!,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: MuzhikiFonts.manropeStyle(
               fontSize: 15.sp,
               fontWeight: FontWeight.w500,
-              color: SettingsColors.black23,
+              color: MuzhikiColors.black23,
             ),
           ),
         ],
         SizedBox(height: 30.h),
         MuzhikiUi.buttons.primary(
           label: 'Повторить',
-          backgroundColor: SettingsColors.black23,
-          labelColor: SettingsColors.white,
+          backgroundColor: MuzhikiColors.black23,
+          labelColor: MuzhikiColors.white,
           onPressed: () {
             context.pop();
             onRetry();
@@ -55,8 +54,8 @@ class SettingsErrorDialog extends StatelessWidget {
         SizedBox(height: 10.h),
         MuzhikiUi.buttons.primary(
           label: 'Понятно',
-          backgroundColor: SettingsColors.light,
-          labelColor: SettingsColors.black23,
+          backgroundColor: MuzhikiColors.light,
+          labelColor: MuzhikiColors.black23,
           onPressed: () => context.pop(),
         ),
       ],

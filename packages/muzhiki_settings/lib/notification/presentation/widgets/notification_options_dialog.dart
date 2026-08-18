@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
 import 'package:muzhiki_settings/notification/domain/model/notification_parameter_option.dart';
 import 'package:muzhiki_settings/widgets/action_card.dart';
 import 'package:muzhiki_settings/widgets/settings_error_dialog.dart';
@@ -56,7 +55,7 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
   late final List<String> selected;
   late final List<String> initialSelected;
   late final List<NotificationParameterOption> options;
-  late final bool isEmpty;
+  late final bool isEmptyOptions;
 
   Future<void> submit(List<NotificationParameterOption> picked) async {
     if (isSaving) return;
@@ -103,7 +102,7 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
         (option) => !selected.contains('${option.value}'),
       ),
     ];
-    isEmpty = options.isEmpty;
+    isEmptyOptions = options.isEmpty;
   }
 
   @override
@@ -117,7 +116,7 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
         children: [
           SingleChildScrollView(
             padding: EdgeInsets.only(
-              bottom: widget.isMultiple || isEmpty ? 72.h : 0,
+              bottom: widget.isMultiple || isEmptyOptions ? 72.h : 0,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -129,9 +128,9 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
                     Expanded(
                       child: Text(
                         widget.title,
-                        style: TextStyle(
+                        style: MuzhikiFonts.manropeStyle(
                           fontSize: 18.sp,
-                          color: SettingsColors.black23,
+                          color: MuzhikiColors.black23,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -147,16 +146,16 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
                   ],
                 ),
                 SizedBox(height: 14.h),
-                if (isEmpty)
+                if (isEmptyOptions)
                   Padding(
                     padding: EdgeInsets.only(top: 80.h),
                     child: Center(
                       child: Text(
                         'Список пустой',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: MuzhikiFonts.manropeStyle(
                           fontSize: 15.sp,
-                          color: SettingsColors.alertTextGrey,
+                          color: MuzhikiColors.alertTextGrey,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -181,19 +180,19 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
                                   fit: BoxFit.cover,
                                   errorWidget: (_, _, _) => Container(
                                     alignment: Alignment.center,
-                                    color: SettingsColors.white,
+                                    color: MuzhikiColors.white,
                                     child: Text(
                                       option.label.characters.firstOrNull ?? '',
-                                      style: TextStyle(
+                                      style: MuzhikiFonts.manropeStyle(
                                         fontSize: 16.sp,
-                                        color: SettingsColors.alertTextGrey,
+                                        color: MuzhikiColors.alertTextGrey,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                        backgroundColor: SettingsColors.background,
+                        backgroundColor: MuzhikiColors.appBackgroud,
                         isCheckSelection: true,
                         isSelected: selected.contains(optionValue),
                         enabled: !isSaving,
@@ -230,7 +229,7 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
               ],
             ),
           ),
-          if (widget.isMultiple || isEmpty)
+          if (widget.isMultiple || isEmptyOptions)
             Positioned(
               left: 0,
               right: 0,
@@ -243,17 +242,17 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
                     end: Alignment.bottomCenter,
                     stops: const [0, 0.5, 1],
                     colors: [
-                      SettingsColors.white.withValues(alpha: 0),
-                      SettingsColors.white,
-                      SettingsColors.white,
+                      MuzhikiColors.white.withValues(alpha: 0),
+                      MuzhikiColors.white,
+                      MuzhikiColors.white,
                     ],
                   ),
                 ),
                 child: MuzhikiUi.buttons.primary(
-                  label: isEmpty ? 'Назад' : 'Готово',
+                  label: isEmptyOptions ? 'Назад' : 'Готово',
                   isLoading: isSaving,
-                  disabled: !isEmpty && widget.isRequired && selected.isEmpty,
-                  onPressed: isEmpty
+                  disabled: !isEmptyOptions && widget.isRequired && selected.isEmpty,
+                  onPressed: isEmptyOptions
                       ? () => context.pop()
                       : () => submit(
                           options

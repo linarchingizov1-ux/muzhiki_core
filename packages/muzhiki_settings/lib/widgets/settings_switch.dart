@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
-class AppSwitch extends StatelessWidget {
+class SettingsSwitch extends StatelessWidget {
   final Function() onTap;
   final bool value;
   final bool enabled;
   final Color? disableSwitchColor;
 
-  const AppSwitch({
+  const SettingsSwitch({
     super.key,
     required this.onTap,
     required this.value,
@@ -25,7 +25,7 @@ class AppSwitch extends StatelessWidget {
         height: 25.h,
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          color: value ? SettingsColors.blood : SettingsColors.greyLight,
+          color: value ? MuzhikiColors.blood : MuzhikiColors.greyLight,
           borderRadius: const BorderRadius.all(Radius.circular(40)),
         ),
         child: Stack(
@@ -41,8 +41,8 @@ class AppSwitch extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: value
-                        ? SettingsColors.greyLight
-                        : disableSwitchColor ?? SettingsColors.blood,
+                        ? MuzhikiColors.greyLight
+                        : disableSwitchColor ?? MuzhikiColors.blood,
                   ),
                 ),
               ),

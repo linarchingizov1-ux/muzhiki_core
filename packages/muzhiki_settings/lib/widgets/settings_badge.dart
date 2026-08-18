@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class SettingsBadge extends StatelessWidget {
   final String label;
@@ -41,8 +41,8 @@ class SettingsBadge extends StatelessWidget {
                 icon!,
                 width: 12.w,
                 height: 12.h,
-                colorFilter: const ColorFilter.mode(
-                  SettingsColors.black23,
+                colorFilter: ColorFilter.mode(
+                  MuzhikiColors.black23,
                   BlendMode.srcIn,
                 ),
               ),
@@ -54,9 +54,9 @@ class SettingsBadge extends StatelessWidget {
               label,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: MuzhikiFonts.manropeStyle(
                 fontSize: fontSize.sp,
-                color: color ?? SettingsColors.greyText,
+                color: color ?? MuzhikiColors.greyText,
                 fontWeight: FontWeight.w500,
               ),
             ),

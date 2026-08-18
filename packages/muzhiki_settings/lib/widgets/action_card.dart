@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:muzhiki_settings/config/settings_assets.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class ActionCard extends StatelessWidget {
   final String title;
@@ -65,7 +64,7 @@ class ActionCard extends StatelessWidget {
             cardPadding ??
             EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
-          color: backgroundColor ?? SettingsColors.white,
+          color: backgroundColor ?? MuzhikiColors.white,
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Row(
@@ -84,13 +83,13 @@ class ActionCard extends StatelessWidget {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color:
-                              backgroundIconColor ?? SettingsColors.background,
+                              backgroundIconColor ?? MuzhikiColors.appBackgroud,
                           borderRadius: BorderRadius.circular(60.r),
                         ),
                         child: TweenAnimationBuilder<Color?>(
                           duration: const Duration(milliseconds: 400),
                           tween: ColorTween(
-                            end: iconColor ?? SettingsColors.alertTextGrey,
+                            end: iconColor ?? MuzhikiColors.alertTextGrey,
                           ),
                           builder: (context, color, _) => SvgPicture.asset(
                             icon!,
@@ -99,7 +98,7 @@ class ActionCard extends StatelessWidget {
                             colorFilter: ColorFilter.mode(
                               color ??
                                   iconColor ??
-                                  SettingsColors.alertTextGrey,
+                                  MuzhikiColors.alertTextGrey,
                               BlendMode.srcIn,
                             ),
                           ),
@@ -117,10 +116,10 @@ class ActionCard extends StatelessWidget {
                     title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: MuzhikiFonts.manropeStyle(
                       fontSize: titleSize?.sp,
                       height: 1.2,
-                      color: titleColor ?? SettingsColors.black23,
+                      color: titleColor ?? MuzhikiColors.black23,
                       fontWeight: titleWeight ?? FontWeight.w500,
                     ),
                   ),
@@ -130,16 +129,16 @@ class ActionCard extends StatelessWidget {
                       description!,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: MuzhikiFonts.manropeStyle(
                         fontSize: 12.sp,
-                        color: SettingsColors.alertTextGrey,
+                        color: MuzhikiColors.alertTextGrey,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                   if (badge != null) ...[
                     if (badgeSpacing != null) SizedBox(height: badgeSpacing?.h),
-                    Skeletonizer(enabled: isLoading, child: badge!),
+                    MuzhikiUi.other.skelet(enable: isLoading, child: badge!),
                   ],
                 ],
               ),
@@ -154,8 +153,8 @@ class ActionCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isSelected
-                        ? SettingsColors.black23
-                        : SettingsColors.white,
+                        ? MuzhikiColors.black23
+                        : MuzhikiColors.white,
                   ),
                   child: isSelected
                       ? SvgPicture.asset(SettingsAssets.check)
@@ -167,8 +166,8 @@ class ActionCard extends StatelessWidget {
                       SettingsAssets.arrowRight,
                       width: 25.w,
                       height: 25.h,
-                      colorFilter: const ColorFilter.mode(
-                        SettingsColors.alertTextGrey,
+                      colorFilter: ColorFilter.mode(
+                        MuzhikiColors.alertTextGrey,
                         BlendMode.srcIn,
                       ),
                     ),

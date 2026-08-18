@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
 import 'package:muzhiki_settings/notification/data/model/notification_parameter_model.dart';
 import 'package:muzhiki_settings/notification/data/model/notification_subscription_model.dart';
 import 'package:muzhiki_settings/notification/domain/model/notification_external_option_source.dart';
@@ -14,7 +13,7 @@ import 'package:muzhiki_settings/notification/presentation/widgets/notification_
 import 'package:muzhiki_settings/widgets/action_card.dart';
 import 'package:muzhiki_settings/widgets/settings_badge.dart';
 import 'package:muzhiki_settings/widgets/settings_error_dialog.dart';
-import 'package:muzhiki_settings/widgets/switch.dart';
+import 'package:muzhiki_settings/widgets/settings_switch.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -112,7 +111,7 @@ class _NotificationSettingsDetailViewState
       child: NotificationOptionsDialog.multiple(
         title: 'Каналы уведомления',
         errorTitle: 'Не удалось сохранить каналы',
-        errorDescription: () => widget.viewModel.state.lastSavingError,
+        errorDescription: () => widget.viewModel.state.lastDetailSavingError,
         selected: subscription.channels ?? const [],
         options: subscription.availableChannels
             .map(
@@ -146,7 +145,7 @@ class _NotificationSettingsDetailViewState
           isRequired: parameter.required,
           onSubmit: (value) => saveFilter(subscription, parameter, value),
           errorTitle: 'Не удалось сохранить настройки',
-          errorDescription: () => widget.viewModel.state.lastSavingError,
+          errorDescription: () => widget.viewModel.state.lastDetailSavingError,
         ),
       );
       return;
@@ -186,7 +185,7 @@ class _NotificationSettingsDetailViewState
           ? NotificationOptionsDialog.multiple(
               title: parameter.name,
               errorTitle: 'Не удалось сохранить настройки',
-              errorDescription: () => widget.viewModel.state.lastSavingError,
+              errorDescription: () => widget.viewModel.state.lastDetailSavingError,
               isRequired: parameter.required,
               selected: selected,
               options: options,
@@ -199,7 +198,7 @@ class _NotificationSettingsDetailViewState
           : NotificationOptionsDialog.single(
               title: parameter.name,
               errorTitle: 'Не удалось сохранить настройки',
-              errorDescription: () => widget.viewModel.state.lastSavingError,
+              errorDescription: () => widget.viewModel.state.lastDetailSavingError,
               isRequired: parameter.required,
               selected: selected,
               options: options,
@@ -244,9 +243,12 @@ class _NotificationSettingsDetailViewState
     NotificationParameterModel parameter,
     Object? value,
   ) {
+    final currentSubscription =
+        widget.viewModel.state.selectedSubscription ?? subscription;
+
     return widget.viewModel.setFilters(
-      subscription: subscription,
-      filters: {...subscription.filters, parameter.key: value},
+      subscription: currentSubscription,
+      filters: {...currentSubscription.filters, parameter.key: value},
     );
   }
 
@@ -259,15 +261,9 @@ class _NotificationSettingsDetailViewState
         child: Consumer<NotificationSettingsViewModel>(
           builder: (context, viewModel, _) {
             final subscription = viewModel.state.selectedSubscription;
-
-            final isSaving =
-                subscription != null &&
-                viewModel.state.isNotificationSaving(
-                  subscription.notificationKey,
-                );
             return RefreshIndicator.adaptive(
               displacement: 120,
-              color: SettingsColors.black23,
+              color: MuzhikiColors.black23,
               strokeWidth: 0.5,
               onRefresh: () async {
                 await widget.viewModel.getSubscriptions(isRefresh: true);
@@ -301,18 +297,18 @@ class _NotificationSettingsDetailViewState
                             MuzhikiUi.buttons.animated(
                               size: 40,
                               iconSize: 16,
-                              backgroundColor: SettingsColors.darkGrey,
+                              backgroundColor: MuzhikiColors.darkGrey,
                               onTap: context.pop,
                               icon: Icons.arrow_back_ios_new,
                             ),
                             SizedBox(width: 13.w),
                             Text(
                               'Настройка уведомлений',
-                              style: TextStyle(
+                              style: MuzhikiFonts.manropeStyle(
                                 height: 1.h,
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w700,
-                                color: SettingsColors.black23,
+                                color: MuzhikiColors.black23,
                               ),
                             ),
                           ],
@@ -325,9 +321,9 @@ class _NotificationSettingsDetailViewState
                           ? Center(
                               child: Text(
                                 'Ничего не найдено',
-                                style: TextStyle(
+                                style: MuzhikiFonts.manropeStyle(
                                   fontSize: 16.sp,
-                                  color: SettingsColors.black23,
+                                  color: MuzhikiColors.black23,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -347,10 +343,10 @@ class _NotificationSettingsDetailViewState
                                 children: [
                                   Text(
                                     subscription.name,
-                                    style: TextStyle(
+                                    style: MuzhikiFonts.manropeStyle(
                                       fontSize: 18.sp,
                                       height: 1,
-                                      color: SettingsColors.black23,
+                                      color: MuzhikiColors.black23,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -358,9 +354,9 @@ class _NotificationSettingsDetailViewState
                                     SizedBox(height: 9.h),
                                     Text(
                                       subscription.description!,
-                                      style: TextStyle(
+                                      style: MuzhikiFonts.manropeStyle(
                                         fontSize: 15.sp,
-                                        color: SettingsColors.alertTextGrey,
+                                        color: MuzhikiColors.alertTextGrey,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -370,12 +366,10 @@ class _NotificationSettingsDetailViewState
                                     title: subscription.isEnabled
                                         ? 'Уведомление включено'
                                         : 'Уведомление отключено',
-                                    suffixIcon: AppSwitch(
+                                    suffixIcon: SettingsSwitch(
                                       value: subscription.isEnabled,
-                                      disableSwitchColor:
-                                          SettingsColors.black23,
-                                      enabled:
-                                          subscription.isEditable && !isSaving,
+                                      disableSwitchColor: MuzhikiColors.black23,
+                                      enabled: subscription.isEditable,
                                       onTap: () =>
                                           widget.viewModel.toggleEnabled(
                                             subscription: subscription,
@@ -385,9 +379,9 @@ class _NotificationSettingsDetailViewState
                                   SizedBox(height: 16.h),
                                   Text(
                                     'Детальные настройки',
-                                    style: TextStyle(
+                                    style: MuzhikiFonts.manropeStyle(
                                       fontSize: 18.sp,
-                                      color: SettingsColors.black23,
+                                      color: MuzhikiColors.black23,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -395,18 +389,17 @@ class _NotificationSettingsDetailViewState
                                   ActionCard(
                                     title: 'Каналы уведомления',
                                     titleSize: 12,
-                                    titleColor: SettingsColors.black23,
+                                    titleColor: MuzhikiColors.black23,
                                     titleWeight: FontWeight.w600,
                                     badge: SettingsBadge(
                                       label:
                                           subscription.channels?.isEmpty ?? true
                                           ? 'Не настроено'
                                           : subscription.channelsLabel,
-                                      color: SettingsColors.alertTextGrey,
+                                      color: MuzhikiColors.alertTextGrey,
                                       fontSize: 15,
                                     ),
                                     badgeSpacing: 5,
-                                    enabled: !isSaving,
                                     onTap: () => pickChannels(subscription),
                                   ),
                                   for (final parameter
@@ -417,14 +410,14 @@ class _NotificationSettingsDetailViewState
                                     ActionCard(
                                       title: parameter.name,
                                       titleSize: 12,
-                                      titleColor: SettingsColors.black23,
+                                      titleColor: MuzhikiColors.black23,
                                       titleWeight: FontWeight.w600,
                                       badge: SettingsBadge(
                                         label: valueLabel(
                                           subscription,
                                           parameter,
                                         ),
-                                        color: SettingsColors.alertTextGrey,
+                                        color: MuzhikiColors.alertTextGrey,
                                         fontSize: 15,
                                       ),
                                       badgeSpacing: 5,
@@ -432,12 +425,10 @@ class _NotificationSettingsDetailViewState
                                           .state
                                           .loadingExternalOptionsTypes
                                           .contains(parameter.type),
-                                      enabled:
-                                          !isSaving &&
-                                          !viewModel
-                                              .state
-                                              .loadingExternalOptionsTypes
-                                              .contains(parameter.type),
+                                      enabled: !viewModel
+                                          .state
+                                          .loadingExternalOptionsTypes
+                                          .contains(parameter.type),
                                       onTap: () => pickParameter(
                                         subscription,
                                         parameter,

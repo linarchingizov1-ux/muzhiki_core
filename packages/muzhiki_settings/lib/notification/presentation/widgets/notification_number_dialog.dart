@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_settings/config/settings_colors.dart';
 import 'package:muzhiki_settings/widgets/settings_error_dialog.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 
@@ -97,16 +96,16 @@ class _NotificationNumberDialogState extends State<NotificationNumberDialog> {
           children: [
             Text(
               widget.title,
-              style: TextStyle(
+              style: MuzhikiFonts.manropeStyle(
                 fontSize: 18.sp,
-                color: SettingsColors.black23,
+                color: MuzhikiColors.black23,
                 fontWeight: FontWeight.w600,
               ),
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               decoration: BoxDecoration(
-                color: SettingsColors.background,
+                color: MuzhikiColors.appBackgroud,
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: TextField(
@@ -125,17 +124,17 @@ class _NotificationNumberDialogState extends State<NotificationNumberDialog> {
                   errorText: widget.isRequired && isFieldEmpty
                       ? 'Поле обязательно для заполнения'
                       : null,
-                  errorStyle: TextStyle(
+                  errorStyle: MuzhikiFonts.manropeStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
-                    color: SettingsColors.blood,
+                    color: MuzhikiColors.blood,
                   ),
                 ),
-                cursorColor: SettingsColors.alertTextGrey,
+                cursorColor: MuzhikiColors.alertTextGrey,
                 onSubmitted: (_) => submit(),
-                style: TextStyle(
+                style: MuzhikiFonts.manropeStyle(
                   fontSize: 15.sp,
-                  color: SettingsColors.black23,
+                  color: MuzhikiColors.black23,
                   fontWeight: FontWeight.w500,
                 ),
               ),

@@ -4,45 +4,39 @@ import 'package:muzhiki_settings/notification/domain/model/notification_paramete
 class NotificationSettingsState {
   final List<NotificationSubscriptionModel>? subscriptions;
   final Map<String, List<NotificationParameterOption>> externalOptionsByType;
-  final Set<String> savingNotificationKeys;
   final String? selectedNotificationKey;
-  final bool isLoading;
-  final Map<String, String> externalOptionsErrorsByType;
+  final bool isSubscriptionsLoading;
   final Set<String> loadingExternalOptionsTypes;
-  final String? error;
-  final String? lastSavingError;
+  final Map<String, String> externalOptionsErrorsByType;
+  final String? subscriptionsError;
+  final String? lastDetailSavingError;
 
   const NotificationSettingsState({
     this.subscriptions,
     this.externalOptionsByType = const {},
-    this.savingNotificationKeys = const {},
     this.selectedNotificationKey,
-    this.externalOptionsErrorsByType = const {},
     this.loadingExternalOptionsTypes = const {},
-    this.isLoading = true,
-    this.error,
-    this.lastSavingError,
+    this.isSubscriptionsLoading = true,
+    this.externalOptionsErrorsByType = const {},
+    this.subscriptionsError,
+    this.lastDetailSavingError,
   });
 
   NotificationSubscriptionModel? get selectedSubscription => subscriptions
       ?.where((item) => item.notificationKey == selectedNotificationKey)
       .firstOrNull;
 
-  bool isNotificationSaving(String notificationKey) =>
-      savingNotificationKeys.contains(notificationKey);
-
   NotificationSettingsState copyWith({
     List<NotificationSubscriptionModel>? subscriptions,
     Map<String, List<NotificationParameterOption>>? externalOptionsByType,
     String? selectedNotificationKey,
-    Set<String>? savingNotificationKeys,
-    bool? isLoading,
+    bool? isSubscriptionsLoading,
     Set<String>? loadingExternalOptionsTypes,
     Map<String, String>? externalOptionsErrorsByType,
-    String? error,
-    String? lastSavingError,
-    bool clearError = false,
-    bool clearLastSavingError = false,
+    String? subscriptionsError,
+    String? lastDetailSavingError,
+    bool clearSubscriptionsError = false,
+    bool clearLastDetailSavingError = false,
   }) {
     return NotificationSettingsState(
       subscriptions: subscriptions ?? this.subscriptions,
@@ -50,17 +44,18 @@ class NotificationSettingsState {
           externalOptionsByType ?? this.externalOptionsByType,
       selectedNotificationKey:
           selectedNotificationKey ?? this.selectedNotificationKey,
-      savingNotificationKeys:
-          savingNotificationKeys ?? this.savingNotificationKeys,
-      isLoading: isLoading ?? this.isLoading,
+      isSubscriptionsLoading:
+          isSubscriptionsLoading ?? this.isSubscriptionsLoading,
       loadingExternalOptionsTypes:
           loadingExternalOptionsTypes ?? this.loadingExternalOptionsTypes,
       externalOptionsErrorsByType:
           externalOptionsErrorsByType ?? this.externalOptionsErrorsByType,
-      error: clearError ? null : error ?? this.error,
-      lastSavingError: clearLastSavingError
+      subscriptionsError: clearSubscriptionsError
           ? null
-          : lastSavingError ?? this.lastSavingError,
+          : subscriptionsError ?? this.subscriptionsError,
+      lastDetailSavingError: clearLastDetailSavingError
+          ? null
+          : lastDetailSavingError ?? this.lastDetailSavingError,
     );
   }
 }
