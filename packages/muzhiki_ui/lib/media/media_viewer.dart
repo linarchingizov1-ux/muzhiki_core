@@ -222,7 +222,11 @@ class _MediaViewerState extends State<MediaViewer>
             ? const Center(
                 child: Text(
                   'Нет медиа',
-                  style: TextStyle(fontFamily: MuzhikiFonts.manrope, package: MuzhikiFonts.packageName, color: Colors.white),
+                  style: TextStyle(
+                    fontFamily: MuzhikiFonts.manrope,
+                    package: MuzhikiFonts.packageName,
+                    color: Colors.white,
+                  ),
                 ),
               )
             : Stack(
@@ -312,9 +316,10 @@ class _MediaViewerState extends State<MediaViewer>
                           size: 45,
                           iconSize: 20,
                           onTap: _close,
-                          backgroundColor: MuzhikiColors.black1.withValues(
-                            alpha: 0.65,
-                          ),
+                          iconColor: MuzhikiColors.white,
+                          backgroundColor: MuzhikiColors.isDark
+                              ? MuzhikiColors.surface
+                              : MuzhikiColors.grey,
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -329,7 +334,7 @@ class _MediaViewerState extends State<MediaViewer>
                             '${_currentIndex + 1} / ${items.length}',
                             style: const TextStyle(
                               fontFamily: MuzhikiFonts.manrope,
-                        package: MuzhikiFonts.packageName,
+                              package: MuzhikiFonts.packageName,
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
@@ -396,7 +401,7 @@ class _MediaPhotoPage extends StatelessWidget {
                     'Не удалось загрузить изображение',
                     style: TextStyle(
                       fontFamily: MuzhikiFonts.manrope,
-                        package: MuzhikiFonts.packageName,
+                      package: MuzhikiFonts.packageName,
                       color: Colors.white,
                     ),
                   ),
