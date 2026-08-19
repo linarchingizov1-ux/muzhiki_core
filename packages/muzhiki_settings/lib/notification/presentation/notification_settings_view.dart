@@ -159,14 +159,14 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                                         ? MuzhikiColors.alertTextGrey
                                               .withValues(alpha: 0.3)
                                         : subscription.isEnabled
-                                        ? MuzhikiColors.alertTextGrey
-                                        : MuzhikiColors.white,
+                                        ? MuzhikiColors.white
+                                        : MuzhikiColors.alertTextGrey,
                                     backgroundIconColor:
                                         !subscription.isEditable
                                         ? MuzhikiColors.appBackgroud
                                         : subscription.isEnabled
-                                        ? MuzhikiColors.appBackgroud
-                                        : MuzhikiColors.blood,
+                                        ? MuzhikiColors.blood
+                                        : MuzhikiColors.appBackgroud,
                                     badge: SettingsBadge(
                                       label: subscription.statusLabel,
                                       icon: !subscription.isEditable
