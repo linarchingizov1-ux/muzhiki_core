@@ -78,9 +78,9 @@ class NetworkFactory {
             );
 
             final access = response.data['data']['access_token'] as String;
-            final refresh = response.data['data']['refresh_token'] as String;
+            print(response.data['data']);
 
-            return AuthTokens(accessToken: access, refreshToken: refresh);
+            return AuthTokens(accessToken: access, refreshToken: "");
           } on DioException catch (e) {
             if (e.response?.statusCode == 401) {
               throw RevokeTokenException();
