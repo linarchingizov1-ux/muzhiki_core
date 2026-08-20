@@ -257,10 +257,10 @@ class __MessageWidgetStateState extends State<_MessageWidgetState> {
         spans.add(
           TextSpan(
             text: t,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Manrope',
               fontSize: 12,
-              color: Colors.white,
+              color: MuzhikiColors.isDark ? Colors.white : Colors.black,
             ),
           ),
         );

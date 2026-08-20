@@ -78,7 +78,6 @@ class NetworkFactory {
             );
 
             final access = response.data['data']['access_token'] as String;
-            print(response.data['data']);
 
             return AuthTokens(accessToken: access, refreshToken: "");
           } on DioException catch (e) {
