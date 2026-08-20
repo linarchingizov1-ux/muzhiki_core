@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_settings/config/settings_path.dart';
+import 'package:muzhiki_settings/notification/data/mapper/notification_subscription_model_mapper.dart';
 import 'package:muzhiki_settings/notification/data/model/notification_subscription_model.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_subscription_entity.dart';
 import 'package:muzhiki_settings/notification/domain/repository/notification_repository.dart';
 
 class NotificationRepositoryImpl implements NotificationRepository {
@@ -10,7 +12,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
   const NotificationRepositoryImpl(this.dio);
 
   @override
-  Future<List<NotificationSubscriptionModel>> getSubscriptions() async {
+  Future<List<NotificationSubscriptionEntity>> getSubscriptions() async {
     try {
       final response = await dio.get(SettingsPath.notificationSubscriptions);
 
@@ -20,7 +22,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
           .map(
             (e) => NotificationSubscriptionModel.fromJson(
               e as Map<String, dynamic>,
-            ),
+            ).toEntity(),
           )
           .toList();
     } catch (e, st) {
@@ -29,7 +31,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
   }
 
   @override
-  Future<NotificationSubscriptionModel> updateSubscription({
+  Future<NotificationSubscriptionEntity> updateSubscription({
     required String notificationKey,
     bool? isEnabled,
     List<String>? channels,
@@ -51,7 +53,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
 
       final data = response.data['data'] as Map<String, dynamic>;
 
-      return NotificationSubscriptionModel.fromJson(data);
+      return NotificationSubscriptionModel.fromJson(data).toEntity();
     } catch (e, st) {
       throw AppErrorMapper.I.map(e, st);
     }

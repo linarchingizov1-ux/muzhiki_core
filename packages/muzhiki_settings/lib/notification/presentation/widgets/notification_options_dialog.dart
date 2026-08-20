@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_settings/notification/domain/model/notification_parameter_option.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_parameter_option_entity.dart';
 import 'package:muzhiki_settings/widgets/action_card.dart';
 import 'package:muzhiki_settings/widgets/settings_error_dialog.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
@@ -13,12 +13,13 @@ class NotificationOptionsDialog extends StatefulWidget {
   final String title;
   final String errorTitle;
   final String? Function() errorDescription;
-  final List<NotificationParameterOption> options;
+  final List<NotificationParameterOptionEntity> options;
   final List<Object> selected;
   final bool isRequired;
   final bool isMultiple;
-  final Future<bool> Function(NotificationParameterOption? option)? onSelect;
-  final Future<bool> Function(List<NotificationParameterOption> options)?
+  final bool isInverted;
+  final Future<bool> Function(NotificationParameterOptionEntity? option)? onSelect;
+  final Future<bool> Function(List<NotificationParameterOptionEntity> options)?
   onSubmit;
   final String emptyLabel;
 
@@ -31,6 +32,7 @@ class NotificationOptionsDialog extends StatefulWidget {
     required this.selected,
     required this.onSelect,
     this.isRequired = false,
+    this.isInverted = false,
     this.emptyLabel = 'Список доступных вариантов пуст',
   }) : isMultiple = false,
        onSubmit = null;
@@ -44,6 +46,7 @@ class NotificationOptionsDialog extends StatefulWidget {
     required this.selected,
     required this.onSubmit,
     this.isRequired = false,
+    this.isInverted = false,
     this.emptyLabel = 'Список доступных вариантов пуст',
   }) : isMultiple = true,
        onSelect = null;
@@ -57,10 +60,10 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
   bool isSaving = false;
   late final List<String> selected;
   late final List<String> initialSelected;
-  late final List<NotificationParameterOption> options;
+  late final List<NotificationParameterOptionEntity> options;
   late final bool isEmptyOptions;
 
-  Future<void> submit(List<NotificationParameterOption> picked) async {
+  Future<void> submit(List<NotificationParameterOptionEntity> picked) async {
     if (isSaving) return;
     if (selected.length == initialSelected.length &&
         initialSelected.every(selected.contains)) {
@@ -100,12 +103,19 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
     selected = widget.selected.map((value) => '$value').toList();
     initialSelected = List<String>.from(selected);
     options = [
-      ...widget.options.where((option) => selected.contains('${option.value}')),
+      ...widget.options.where(
+        (option) => selected.contains('${option.value}'),
+      ),
       ...widget.options.where(
         (option) => !selected.contains('${option.value}'),
       ),
     ];
     isEmptyOptions = options.isEmpty;
+  }
+
+  bool isChecked(NotificationParameterOptionEntity option) {
+    final isSelected = selected.contains('${option.value}');
+    return widget.isInverted ? !isSelected : isSelected;
   }
 
   @override
@@ -213,25 +223,27 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
                                   ),
                             backgroundColor: MuzhikiColors.appBackgroud,
                             isCheckSelection: true,
-                            isSelected: selected.contains(optionValue),
+                            isSelected: isChecked(option),
                             enabled: !isSaving,
                             onTap: isSaving
                                 ? null
                                 : () {
                                     if (!widget.isMultiple) {
-                                      final isAlreadySelected = selected
-                                          .contains(optionValue);
-                                      if (isAlreadySelected &&
-                                          widget.isRequired) {
+                                      final isSelected = selected.contains(
+                                        optionValue,
+                                      );
+                                      if (isSelected &&
+                                          widget.isRequired &&
+                                          !widget.isInverted) {
                                         return;
                                       }
 
                                       selected.clear();
-                                      if (!isAlreadySelected) {
+                                      if (!isSelected) {
                                         selected.add(optionValue);
                                       }
                                       submit(
-                                        isAlreadySelected ? const [] : [option],
+                                        isSelected ? const [] : [option],
                                       );
                                       return;
                                     }
@@ -270,7 +282,7 @@ class _NotificationOptionsDialogState extends State<NotificationOptionsDialog> {
                       child: MuzhikiUi.buttons.primary(
                         label: 'Готово',
                         isLoading: isSaving,
-                        disabled: widget.isRequired && selected.isEmpty,
+                        disabled: widget.isRequired && !options.any(isChecked),
                         onPressed: () => submit(
                           options
                               .where(

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:muzhiki_settings/notification/data/model/notification_parameter_model.dart';
-import 'package:muzhiki_settings/notification/data/model/notification_subscription_model.dart';
-import 'package:muzhiki_settings/notification/domain/model/notification_external_option_source.dart';
-import 'package:muzhiki_settings/notification/domain/model/notification_parameter_option.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_parameter_entity.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_parameter_option_entity.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_parameter_type.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_subscription_entity.dart';
 import 'package:muzhiki_settings/notification/presentation/extension/notification_subscription_extension.dart';
 import 'package:muzhiki_settings/notification/presentation/state/notification_settings_view_model.dart';
 import 'package:muzhiki_settings/notification/presentation/widgets/notification_number_dialog.dart';
@@ -34,8 +34,6 @@ class NotificationSettingsDetailView extends StatefulWidget {
 
 class _NotificationSettingsDetailViewState
     extends State<NotificationSettingsDetailView> {
-  static const builtInParameterTypes = {'number', 'enum', 'multiply_enum'};
-
   @override
   void initState() {
     super.initState();
@@ -49,23 +47,8 @@ class _NotificationSettingsDetailViewState
     });
   }
 
-  List<Object> selectedValues(
-    NotificationSubscriptionModel subscription,
-    NotificationParameterModel parameter,
-  ) {
-    final value = subscription.filters.containsKey(parameter.key)
-        ? subscription.filters[parameter.key]
-        : parameter.defaultValue;
-    if (value == null) return const [];
-
-    return value is List ? value.whereType<Object>().toList() : [value];
-  }
-
-  String valueLabel(
-    NotificationSubscriptionModel subscription,
-    NotificationParameterModel parameter,
-  ) {
-    final selected = selectedValues(subscription, parameter);
+  String valueLabel(NotificationParameterEntity parameter) {
+    final selected = parameter.selectedValues;
     final hasError = widget.viewModel.state.externalOptionsErrorsByType
         .containsKey(parameter.type);
 
@@ -73,14 +56,13 @@ class _NotificationSettingsDetailViewState
       return hasError ? 'Не удалось загрузить' : 'Не настроено';
     }
 
-    final isExternalType = widget.viewModel.externalOptionSources.containsKey(
-      parameter.type,
-    );
-    final availableOptions =
-        widget.viewModel.state.externalOptionsByType[parameter.type] ??
-        const [];
-    final labels = <String>[];
+    final isExternalType = parameter.type.isExternal;
+    final availableOptions = isExternalType
+        ? widget.viewModel.state.externalOptionsByType[parameter.type] ??
+              const []
+        : parameter.options;
 
+    final labels = <String>[];
     for (final value in selected) {
       final matchedOption = availableOptions
           .where((option) => '${option.value}' == '$value')
@@ -102,11 +84,11 @@ class _NotificationSettingsDetailViewState
         : '${labels.first} и ещё ${labels.length - 1}';
   }
 
-  bool isSupported(NotificationParameterModel parameter) =>
-      builtInParameterTypes.contains(parameter.type) ||
+  bool isParameterSupported(NotificationParameterEntity parameter) =>
+      parameter.type.isFromServer ||
       widget.viewModel.externalOptionSources.containsKey(parameter.type);
 
-  Future<void> pickChannels(NotificationSubscriptionModel subscription) async {
+  Future<void> pickChannels(NotificationSubscriptionEntity subscription) async {
     await MuzhikiUi.dialog.standart<void>(
       child: NotificationOptionsDialog.multiple(
         title: 'Каналы уведомления',
@@ -116,7 +98,7 @@ class _NotificationSettingsDetailViewState
         emptyLabel: 'Список доступных каналов пуст',
         options: subscription.availableChannels
             .map(
-              (channel) => NotificationParameterOption(
+              (channel) => NotificationParameterOptionEntity(
                 value: channel.key,
                 label: channel.name,
               ),
@@ -131,20 +113,22 @@ class _NotificationSettingsDetailViewState
   }
 
   Future<void> pickParameter(
-    NotificationSubscriptionModel subscription,
-    NotificationParameterModel parameter,
+    NotificationSubscriptionEntity subscription,
+    NotificationParameterEntity parameter,
   ) async {
-    final selected = selectedValues(subscription, parameter);
-
-    if (parameter.type == 'number') {
+    if (parameter.type == NotificationParameterType.number) {
       await MuzhikiUi.dialog.standart<void>(
         child: NotificationNumberDialog(
           title: parameter.name,
-          value: selected.firstOrNull is num
-              ? selected.firstOrNull as num?
+          value: parameter.selectedValues.firstOrNull is num
+              ? parameter.selectedValues.firstOrNull as num?
               : null,
           isRequired: parameter.required,
-          onSubmit: (value) => saveFilter(subscription, parameter, value),
+          onSubmit: (value) => widget.viewModel.setParameterValue(
+            subscription: subscription,
+            parameterKey: parameter.key,
+            value: value,
+          ),
           errorTitle: 'Не удалось сохранить настройки',
           errorDescription: () => widget.viewModel.state.lastDetailSavingError,
         ),
@@ -153,73 +137,66 @@ class _NotificationSettingsDetailViewState
     }
 
     final source = widget.viewModel.externalOptionSources[parameter.type];
-    final isMultiple = source?.isMultiple ?? parameter.type == 'multiply_enum';
+    final isMultiple =
+        source?.isMultiple ??
+        parameter.type == NotificationParameterType.multiplyEnum;
 
-    List<NotificationParameterOption> options;
+    final options = await optionsOrShowError(
+      subscription: subscription,
+      parameter: parameter,
+    );
+    if (options == null || !mounted) return;
 
-    if (source == null) {
-      if (!builtInParameterTypes.contains(parameter.type)) return;
-
-      options = (parameter.enumValues ?? const [])
-          .map(
-            (value) => NotificationParameterOption(
-              value: value as Object,
-              label: '$value',
-            ),
-          )
-          .toList();
-    } else {
-      final loadedOptions = await getOptionsOrShowError(
-        subscription: subscription,
-        parameter: parameter,
-        source: source,
-      );
-      if (loadedOptions == null) return;
-
-      options = loadedOptions;
-    }
-
-    if (!mounted) return;
+    final emptyLabel = switch (parameter.type) {
+      NotificationParameterType.masters => 'Список доступных мастеров пуст',
+      NotificationParameterType.companies => 'Список доступных салонов пуст',
+      _ => 'Список доступных вариантов пуст',
+    };
 
     await MuzhikiUi.dialog.standart<void>(
       child: isMultiple
           ? NotificationOptionsDialog.multiple(
               title: parameter.name,
               errorTitle: 'Не удалось сохранить настройки',
-              errorDescription: () => widget.viewModel.state.lastDetailSavingError,
+              errorDescription: () =>
+                  widget.viewModel.state.lastDetailSavingError,
               isRequired: parameter.required,
-              selected: selected,
+              isInverted: parameter.isInverted,
+              selected: parameter.selectedValues,
               options: options,
-              emptyLabel: parameter.type == 'masters'
-                  ? 'Список доступных мастеров пуст'
-                  : 'Список доступных вариантов пуст',
-              onSubmit: (pickedOptions) => saveFilter(
-                subscription,
-                parameter,
-                pickedOptions.map((option) => option.value).toList(),
+              emptyLabel: emptyLabel,
+              onSubmit: (pickedOptions) => widget.viewModel.setParameterValue(
+                subscription: subscription,
+                parameterKey: parameter.key,
+                value: pickedOptions.map((option) => option.value).toList(),
               ),
             )
           : NotificationOptionsDialog.single(
               title: parameter.name,
               errorTitle: 'Не удалось сохранить настройки',
-              errorDescription: () => widget.viewModel.state.lastDetailSavingError,
+              errorDescription: () =>
+                  widget.viewModel.state.lastDetailSavingError,
               isRequired: parameter.required,
-              selected: selected,
+              isInverted: parameter.isInverted,
+              selected: parameter.selectedValues,
               options: options,
-              emptyLabel: parameter.type == 'masters'
-                  ? 'Список доступных мастеров пуст'
-                  : 'Список доступных вариантов пуст',
-              onSelect: (pickedOption) =>
-                  saveFilter(subscription, parameter, pickedOption?.value),
+              emptyLabel: emptyLabel,
+              onSelect: (pickedOption) => widget.viewModel.setParameterValue(
+                subscription: subscription,
+                parameterKey: parameter.key,
+                value: pickedOption?.value,
+              ),
             ),
     );
   }
 
-  Future<List<NotificationParameterOption>?> getOptionsOrShowError({
-    required NotificationSubscriptionModel subscription,
-    required NotificationParameterModel parameter,
-    required NotificationExternalOptionSource source,
+  Future<List<NotificationParameterOptionEntity>?> optionsOrShowError({
+    required NotificationSubscriptionEntity subscription,
+    required NotificationParameterEntity parameter,
   }) async {
+    final source = widget.viewModel.externalOptionSources[parameter.type];
+    if (source == null) return parameter.options;
+
     final loadedOptions =
         widget.viewModel.state.externalOptionsByType[parameter.type];
     if (loadedOptions != null) return loadedOptions;
@@ -243,20 +220,6 @@ class _NotificationSettingsDetailViewState
     );
 
     return null;
-  }
-
-  Future<bool> saveFilter(
-    NotificationSubscriptionModel subscription,
-    NotificationParameterModel parameter,
-    Object? value,
-  ) {
-    final currentSubscription =
-        widget.viewModel.state.selectedSubscription ?? subscription;
-
-    return widget.viewModel.setFilters(
-      subscription: currentSubscription,
-      filters: {...currentSubscription.filters, parameter.key: value},
-    );
   }
 
   @override
@@ -411,7 +374,7 @@ class _NotificationSettingsDetailViewState
                                   ),
                                   for (final parameter
                                       in subscription.parameters.values.where(
-                                        isSupported,
+                                        isParameterSupported,
                                       )) ...[
                                     SizedBox(height: 7.h),
                                     ActionCard(
@@ -420,10 +383,7 @@ class _NotificationSettingsDetailViewState
                                       titleColor: MuzhikiColors.black23,
                                       titleWeight: FontWeight.w600,
                                       badge: SettingsBadge(
-                                        label: valueLabel(
-                                          subscription,
-                                          parameter,
-                                        ),
+                                        label: valueLabel(parameter),
                                         color: MuzhikiColors.alertTextGrey,
                                         fontSize: 15,
                                       ),
