@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_subscription_entity.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
-import 'package:muzhiki_settings/notification/data/model/notification_subscription_model.dart';
 
-extension NotificationSubscriptionExtension on NotificationSubscriptionModel {
+extension NotificationSubscriptionExtension on NotificationSubscriptionEntity {
   String get statusLabel {
     if (!isEditable) return 'Нельзя отключить и настроить';
     if (!isEnabled) return 'Отключено';

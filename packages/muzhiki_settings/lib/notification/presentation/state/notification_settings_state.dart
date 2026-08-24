@@ -1,13 +1,15 @@
-import 'package:muzhiki_settings/notification/data/model/notification_subscription_model.dart';
-import 'package:muzhiki_settings/notification/domain/model/notification_parameter_option.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_parameter_option_entity.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_parameter_type.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_subscription_entity.dart';
 
 class NotificationSettingsState {
-  final List<NotificationSubscriptionModel>? subscriptions;
-  final Map<String, List<NotificationParameterOption>> externalOptionsByType;
+  final List<NotificationSubscriptionEntity>? subscriptions;
+  final Map<NotificationParameterType, List<NotificationParameterOptionEntity>>
+  externalOptionsByType;
   final String? selectedNotificationKey;
   final bool isSubscriptionsLoading;
-  final Set<String> loadingExternalOptionsTypes;
-  final Map<String, String> externalOptionsErrorsByType;
+  final Set<NotificationParameterType> loadingExternalOptionsTypes;
+  final Map<NotificationParameterType, String> externalOptionsErrorsByType;
   final String? subscriptionsError;
   final String? lastDetailSavingError;
 
@@ -22,17 +24,18 @@ class NotificationSettingsState {
     this.lastDetailSavingError,
   });
 
-  NotificationSubscriptionModel? get selectedSubscription => subscriptions
+  NotificationSubscriptionEntity? get selectedSubscription => subscriptions
       ?.where((item) => item.notificationKey == selectedNotificationKey)
       .firstOrNull;
 
   NotificationSettingsState copyWith({
-    List<NotificationSubscriptionModel>? subscriptions,
-    Map<String, List<NotificationParameterOption>>? externalOptionsByType,
+    List<NotificationSubscriptionEntity>? subscriptions,
+    Map<NotificationParameterType, List<NotificationParameterOptionEntity>>?
+    externalOptionsByType,
     String? selectedNotificationKey,
     bool? isSubscriptionsLoading,
-    Set<String>? loadingExternalOptionsTypes,
-    Map<String, String>? externalOptionsErrorsByType,
+    Set<NotificationParameterType>? loadingExternalOptionsTypes,
+    Map<NotificationParameterType, String>? externalOptionsErrorsByType,
     String? subscriptionsError,
     String? lastDetailSavingError,
     bool clearSubscriptionsError = false,

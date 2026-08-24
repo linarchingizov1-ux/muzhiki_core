@@ -1,9 +1,9 @@
-import 'package:muzhiki_settings/notification/data/model/notification_subscription_model.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_subscription_entity.dart';
 
 abstract class NotificationRepository {
-  Future<List<NotificationSubscriptionModel>> getSubscriptions();
+  Future<List<NotificationSubscriptionEntity>> getSubscriptions();
 
-  Future<NotificationSubscriptionModel> updateSubscription({
+  Future<NotificationSubscriptionEntity> updateSubscription({
     required String notificationKey,
     bool? isEnabled,
     List<String>? channels,

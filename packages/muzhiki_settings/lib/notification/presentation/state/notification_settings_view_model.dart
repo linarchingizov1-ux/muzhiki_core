@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
-import 'package:muzhiki_settings/notification/data/model/notification_subscription_model.dart';
-import 'package:muzhiki_settings/notification/domain/model/notification_external_option_source.dart';
-import 'package:muzhiki_settings/notification/domain/model/notification_parameter_option.dart';
+import 'package:muzhiki_settings/notification/domain/source/notification_external_option_source.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_parameter_option_entity.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_parameter_type.dart';
+import 'package:muzhiki_settings/notification/domain/entity/notification_subscription_entity.dart';
 import 'package:muzhiki_settings/notification/domain/repository/notification_repository.dart';
 import 'package:muzhiki_settings/notification/presentation/state/notification_settings_state.dart';
 
 class NotificationSettingsViewModel extends ChangeNotifier {
   final NotificationRepository repository;
-  final Map<String, NotificationExternalOptionSource> externalOptionSources;
+  final Map<NotificationParameterType, NotificationExternalOptionSource>
+  externalOptionSources;
 
   NotificationSettingsViewModel({
     required this.repository,
@@ -56,7 +58,7 @@ class NotificationSettingsViewModel extends ChangeNotifier {
   }
 
   Future<void> preloadExternalOptions({
-    required NotificationSubscriptionModel subscription,
+    required NotificationSubscriptionEntity subscription,
     bool isRefresh = false,
   }) async {
     for (final parameter in subscription.parameters.values) {
@@ -71,8 +73,8 @@ class NotificationSettingsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<NotificationParameterOption>?> getExternalOptions({
-    required String type,
+  Future<List<NotificationParameterOptionEntity>?> getExternalOptions({
+    required NotificationParameterType type,
     required NotificationExternalOptionSource source,
   }) async {
     _state = _state.copyWith(
@@ -114,7 +116,7 @@ class NotificationSettingsViewModel extends ChangeNotifier {
   }
 
   Future<bool> toggleEnabled({
-    required NotificationSubscriptionModel subscription,
+    required NotificationSubscriptionEntity subscription,
   }) async {
     if (!subscription.isEditable) return false;
 
@@ -160,7 +162,7 @@ class NotificationSettingsViewModel extends ChangeNotifier {
   }
 
   Future<bool> setChannels({
-    required NotificationSubscriptionModel subscription,
+    required NotificationSubscriptionEntity subscription,
     required List<String> channels,
   }) async {
     return await _updateDetail(
@@ -169,13 +171,16 @@ class NotificationSettingsViewModel extends ChangeNotifier {
     );
   }
 
-  Future<bool> setFilters({
-    required NotificationSubscriptionModel subscription,
-    required Map<String, dynamic> filters,
+  Future<bool> setParameterValue({
+    required NotificationSubscriptionEntity subscription,
+    required String parameterKey,
+    required Object? value,
   }) async {
+    final current = _state.selectedSubscription ?? subscription;
+
     return await _updateDetail(
-      notificationKey: subscription.notificationKey,
-      filters: filters,
+      notificationKey: current.notificationKey,
+      filters: {...current.filters, parameterKey: value},
     );
   }
 
@@ -234,8 +239,8 @@ class NotificationSettingsViewModel extends ChangeNotifier {
     }
   }
 
-  List<NotificationSubscriptionModel>? _replaceSubscription({
-    required NotificationSubscriptionModel updatedSubscription,
+  List<NotificationSubscriptionEntity>? _replaceSubscription({
+    required NotificationSubscriptionEntity updatedSubscription,
   }) {
     final subscriptions = _state.subscriptions;
     if (subscriptions == null) return null;
