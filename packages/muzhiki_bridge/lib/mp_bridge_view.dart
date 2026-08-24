@@ -97,15 +97,17 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
   }
 
   Future<void> _bootstrap() async {
+    // Слушатель до seed, иначе первый auth:tokenUpdated теряется.
+    _listenSessionUpdates();
     await bridgeAuthUsecase.seedSession();
     if (!mounted || disposed) return;
-    _listenSessionUpdates();
     await _controller.loadRequest(_initialUri);
   }
 
   @override
   void dispose() {
-    unawaited(logout());
+    // Не шлём auth:logout в WebView на dispose — cold/warm remount
+    // иначе SPA думает, что пользователь разлогинился.
     disposed = true;
     _sessionSubscription?.cancel();
     bridgeAuthUsecase.dispose();
@@ -148,13 +150,22 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
       session = await bridgeAuthUsecase.getCurrentSession();
     }
 
+    if (session == null || session.accessToken.isEmpty) {
+      await _sendError(
+        requestId: requestId,
+        code: 'NO_SESSION',
+        message: 'Отсутствует активная сессия',
+      );
+      return;
+    }
+
     await _dispatchEvent(
       type: 'auth:session',
       payload: {
         'requestId': requestId,
-        'accessToken': session?.accessToken,
-        'expiresAt': session?.expiresAt,
-        'user': session?.user,
+        'accessToken': session.accessToken,
+        'expiresAt': session.expiresAt,
+        'user': session.user,
       },
     );
   }
@@ -347,9 +358,14 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
 
   Future<void> _handleGetSession(String? requestId) async {
     try {
-      final session = await bridgeAuthUsecase.getCurrentSession();
+      var session = await bridgeAuthUsecase.getCurrentSession();
 
       if (session == null) {
+        await bridgeAuthUsecase.seedSession();
+        session = await bridgeAuthUsecase.getCurrentSession();
+      }
+
+      if (session == null || session.accessToken.isEmpty) {
         await _sendError(
           requestId: requestId,
           code: 'NO_SESSION',

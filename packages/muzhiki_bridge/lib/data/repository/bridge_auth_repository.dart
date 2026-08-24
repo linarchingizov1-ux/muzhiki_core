@@ -16,19 +16,35 @@ class BridgeAuthRepositoryImpl implements BridgeAuthRepository {
   @override
   Stream<BridgeSession> get sessionUpdates => _updates.stream;
 
-  @override
-  Future<void> seedSession() async {
-    final token = await session.accessToken;
+  Future<String?> _readAccessToken({int retries = 5}) async {
+    await session.ready;
 
-    if (token == null) return;
+    for (var attempt = 0; attempt < retries; attempt++) {
+      final token = await session.accessToken;
+      if (token != null && token.isNotEmpty) return token;
+      if (attempt == retries - 1) break;
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+    }
 
-    _session = BridgeSession(
+    return null;
+  }
+
+  BridgeSession _buildSession(String token) {
+    return BridgeSession(
       accessToken: token,
       expiresAt: DateTime.now()
           .add(const Duration(hours: 1))
           .millisecondsSinceEpoch,
       user: {'id': session.user?.mpid, 'name': session.user?.username},
     );
+  }
+
+  @override
+  Future<void> seedSession() async {
+    final token = await _readAccessToken();
+    if (token == null) return;
+
+    _session = _buildSession(token);
 
     if (!_updates.isClosed) {
       _updates.add(_session!);
@@ -42,18 +58,12 @@ class BridgeAuthRepositoryImpl implements BridgeAuthRepository {
 
   @override
   Future<BridgeSession> refresh() async {
-    final current = _session;
-
-    if (current == null) {
+    final token = await _readAccessToken();
+    if (token == null) {
       throw Exception('Отсутствует сессия пользователя');
     }
 
-    final updated = current.copyWith(
-      expiresAt: DateTime.now()
-          .add(const Duration(hours: 1))
-          .millisecondsSinceEpoch,
-    );
-
+    final updated = _buildSession(token);
     _session = updated;
 
     if (!_updates.isClosed) {

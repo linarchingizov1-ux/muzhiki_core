@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -50,13 +52,20 @@ class _SupportViewState extends State<SupportView> {
   }
 
   Future<void> loadChats() async {
-    try {
-      await widget.chatCubit.getMyChats();
-    } catch (_) {}
-
-    if (!mounted) {
+    // Informator открываем сразу: getMyChats на cold-start может
+    // дернуть Fresh/401 и очистить токен до seedSession в bridge.
+    if (widget.action case SupportOpenInformator(:final initalURL)) {
+      if (!mounted) return;
+      context.pushNamed(
+        SupportRouteConstant.I.informator,
+        queryParameters: {"initialUrl": initalURL},
+      );
+      unawaited(_refreshChatsQuietly());
       return;
     }
+
+    await _refreshChatsQuietly();
+    if (!mounted) return;
 
     switch (widget.action) {
       case SupportNone():
@@ -76,13 +85,15 @@ class _SupportViewState extends State<SupportView> {
         );
         break;
 
-      case SupportOpenInformator(:final initalURL):
-        context.pushNamed(
-          SupportRouteConstant.I.informator,
-          queryParameters: {"initialUrl": initalURL},
-        );
+      case SupportOpenInformator():
         break;
     }
+  }
+
+  Future<void> _refreshChatsQuietly() async {
+    try {
+      await widget.chatCubit.getMyChats();
+    } catch (_) {}
   }
 
   @override
