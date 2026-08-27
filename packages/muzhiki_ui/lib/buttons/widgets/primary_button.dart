@@ -20,6 +20,8 @@ class PrimaryButton extends StatelessWidget {
     this.borderRadius = 16,
     this.padding,
     this.iconAsset,
+    this.iconSize,
+    this.iconSpacing = 12,
     this.isLoading = false,
     this.disabled = false,
     this.enableBackdropFilter = false,
@@ -38,6 +40,8 @@ class PrimaryButton extends StatelessWidget {
   final double borderRadius;
   final EdgeInsets? padding;
   final String? iconAsset;
+  final double? iconSize;
+  final double iconSpacing;
   final bool isLoading;
   final bool disabled;
   final bool enableBackdropFilter;
@@ -81,11 +85,16 @@ class PrimaryButton extends StatelessWidget {
                   size: progressSize,
                 )
               : Row(
-                  spacing: 12.w,
+                  spacing: iconSpacing.w,
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (iconAsset != null) SvgPicture.asset(iconAsset!),
+                    if (iconAsset != null)
+                      SvgPicture.asset(
+                        iconAsset!,
+                        width: iconSize?.r,
+                        height: iconSize?.r,
+                      ),
                     Text(
                       label,
                       textAlign: TextAlign.center,

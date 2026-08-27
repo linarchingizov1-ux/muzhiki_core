@@ -19,6 +19,7 @@ class SmallButton extends StatelessWidget {
   final Color backgroundColor;
   final double radius;
   final EdgeInsetsGeometry? labelPadding;
+  final double iconSpacing;
   final VoidCallback? onTap;
   final bool enableBackdropFilter;
 
@@ -34,6 +35,7 @@ class SmallButton extends StatelessWidget {
     this.backgroundColor = MuzhikiColors.lightLight,
     this.radius = 30,
     this.labelPadding,
+    this.iconSpacing = 6,
     this.onTap,
     this.enableBackdropFilter = false,
   });
@@ -87,12 +89,12 @@ class SmallButton extends StatelessWidget {
                     if (icon != null &&
                         alignment == AlignmentButtonIcon.start) ...[
                       icon!,
-                      SizedBox(width: 6.w),
+                      SizedBox(width: iconSpacing.w),
                     ],
                     text,
                     if (icon != null &&
                         alignment == AlignmentButtonIcon.end) ...[
-                      SizedBox(width: 6.w),
+                      SizedBox(width: iconSpacing.w),
                       icon!,
                     ],
                   ],
