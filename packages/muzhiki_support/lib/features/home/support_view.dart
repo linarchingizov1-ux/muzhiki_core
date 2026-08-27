@@ -55,8 +55,6 @@ class _SupportViewState extends State<SupportView> {
   }
 
   Future<void> loadChats() async {
-    // Informator открываем сразу: getMyChats на cold-start может
-    // дернуть Fresh/401 и очистить токен до seedSession в bridge.
     if (widget.action case SupportOpenInformator(:final initalURL)) {
       if (!mounted) return;
       context.pushNamed(

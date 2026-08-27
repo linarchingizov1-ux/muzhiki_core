@@ -23,7 +23,6 @@ class MpBridgeWebView extends StatefulWidget {
   final SessionApp session;
   final List<int>? masterAudit;
 
-  /// Вызывается после инициализации и передаёт функцию очистки cookies WebView.
   final void Function(MpBridgeClearCookies clearCookies)? onClearCookiesReady;
 
   const MpBridgeWebView({
@@ -89,10 +88,10 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
 
   Uri get _initialUri {
     final urlParse = widget.companyId != null
-        ? "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
+        ? "${widget.initialUrl}?show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
         : widget.masterAudit != null && widget.masterAudit!.isNotEmpty
-        ? "${widget.initialUrl}/${widget.masterAudit!.first}/audits/${widget.masterAudit!.last}?native_app=true&show_header=${widget.showAppBar}"
-        : "${widget.initialUrl}?native_app=true&show_header=${widget.showAppBar}";
+        ? "${widget.initialUrl}/${widget.masterAudit!.first}/audits/${widget.masterAudit!.last}?show_header=${widget.showAppBar}"
+        : "${widget.initialUrl}?show_header=${widget.showAppBar}";
     print(urlParse);
     return Uri.parse(urlParse);
   }
