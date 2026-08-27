@@ -48,7 +48,10 @@ class _SupportViewState extends State<SupportView> {
   @override
   void initState() {
     super.initState();
-    loadChats();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(loadChats());
+    });
   }
 
   Future<void> loadChats() async {
