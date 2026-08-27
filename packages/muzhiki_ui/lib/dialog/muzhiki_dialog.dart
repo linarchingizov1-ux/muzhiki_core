@@ -39,6 +39,7 @@ final class MuzhikiDialog {
     double? height,
     bool isDismissible = true,
     bool enableDrag = true,
+    double borderRadius = 35,
     bool canPop = true,
     Color? backgroundColor,
   }) async {
@@ -76,7 +77,7 @@ final class MuzhikiDialog {
                 decoration: BoxDecoration(
                   color: sheetColor,
                   borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(22.r),
+                    top: Radius.circular(borderRadius.r),
                     bottom: Radius.circular(_bottomRadius()),
                   ),
                 ),
@@ -102,7 +103,7 @@ final class MuzhikiDialog {
                       decoration: BoxDecoration(
                         color: sheetColor,
                         borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(35.r),
+                          top: Radius.circular(borderRadius.r),
                           bottom: Radius.circular(_bottomRadius()),
                         ),
                       ),
