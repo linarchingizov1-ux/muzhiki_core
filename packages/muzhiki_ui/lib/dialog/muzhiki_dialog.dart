@@ -28,7 +28,6 @@ final class MuzhikiDialog {
     return _bottomSheetBottomRadius?.call() ?? 32.r;
   }
 
-  /// На iOS нижний safe-area не добавляем — лист визуально «сидит» у края.
   double _bottomGap(BuildContext context, double base) {
     if (Platform.isIOS) return base;
     return MediaQuery.viewPaddingOf(context).bottom + base;
@@ -54,10 +53,10 @@ final class MuzhikiDialog {
       isDismissible: isDismissible,
       backgroundColor: Colors.transparent,
       sheetAnimationStyle: AnimationStyle(
-        curve: Curves.ease,
-        reverseCurve: Curves.easeIn,
-        duration: const Duration(milliseconds: 350),
-        reverseDuration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOutCubic,
+        reverseCurve: Curves.easeInOutCubic,
+        duration: const Duration(milliseconds: 250),
+        reverseDuration: const Duration(milliseconds: 350),
       ),
       builder: (context) {
         final sheetColor = backgroundColor ?? MuzhikiColors.surface;
@@ -103,7 +102,7 @@ final class MuzhikiDialog {
                       decoration: BoxDecoration(
                         color: sheetColor,
                         borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(22.r),
+                          top: Radius.circular(35.r),
                           bottom: Radius.circular(_bottomRadius()),
                         ),
                       ),
