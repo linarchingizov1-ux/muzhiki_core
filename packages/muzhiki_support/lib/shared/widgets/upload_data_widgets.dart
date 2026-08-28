@@ -276,6 +276,8 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
               remote.url,
               fit: BoxFit.cover,
               filterQuality: FilterQuality.medium,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.image),
             ),
           ),
         ),
