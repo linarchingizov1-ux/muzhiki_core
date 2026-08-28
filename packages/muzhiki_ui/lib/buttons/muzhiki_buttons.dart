@@ -20,6 +20,8 @@ final class MuzhikiButtons {
     required String label,
     required VoidCallback onPressed,
     String? iconAsset,
+    double? iconSize,
+    double iconSpacing = 12,
     Color backgroundColor = MuzhikiColors.black17Light,
     Color? labelColor,
     FontWeight? labelWeight,
@@ -38,6 +40,8 @@ final class MuzhikiButtons {
       key: key,
       label: label,
       iconAsset: iconAsset,
+      iconSize: iconSize,
+      iconSpacing: iconSpacing,
       onPressed: onPressed,
       backgroundColor: backgroundColor,
       labelColor: labelColor,
@@ -197,6 +201,7 @@ final class MuzhikiButtons {
     Color backgroundColor = MuzhikiColors.lightLight,
     double radius = 30,
     EdgeInsetsGeometry? labelPadding,
+    double iconSpacing = 6,
     VoidCallback? onTap,
     bool enableBackdropFilter = false,
   }) {
@@ -212,6 +217,7 @@ final class MuzhikiButtons {
       backgroundColor: backgroundColor,
       radius: radius,
       labelPadding: labelPadding,
+      iconSpacing: iconSpacing,
       onTap: onTap,
       enableBackdropFilter: enableBackdropFilter,
     );
