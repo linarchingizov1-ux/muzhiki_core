@@ -1,0 +1,241 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+
+class AnimatedButton extends StatefulWidget {
+  const AnimatedButton({
+    required this.onTap,
+    super.key,
+    this.svgAsset,
+    this.icon,
+    required this.size,
+    required this.iconSize,
+    required this.iconColor,
+    this.child,
+    this.isGlasses = false,
+    this.backgroundColor,
+    required this.scale,
+    this.enabled = true,
+    this.enableBackdropFilter = false,
+  });
+
+  final String? svgAsset;
+  final bool isGlasses;
+  final double scale;
+  final IconData? icon;
+  final Color iconColor;
+  final VoidCallback onTap;
+  final Widget? child;
+
+  final double size;
+  final double iconSize;
+  final Color? backgroundColor;
+  final bool enabled;
+  final bool enableBackdropFilter;
+
+  bool get _useBackdropFilter => enableBackdropFilter || isGlasses;
+
+  @override
+  State<AnimatedButton> createState() => _AnimatedButtonState();
+}
+
+class _AnimatedButtonState extends State<AnimatedButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isPopping = false;
+
+  GoRouter? _router;
+  VoidCallback? _routerListener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+      reverseDuration: const Duration(milliseconds: 180),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: widget.scale).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutBack,
+        reverseCurve: Curves.easeOutCubic,
+      ),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final router = GoRouter.of(context);
+
+    if (identical(_router, router)) {
+      return;
+    }
+
+    _removeRouterListener();
+
+    _router = router;
+
+    _routerListener = () {
+      _resetPressState();
+    };
+
+    router.routerDelegate.addListener(_routerListener!);
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.scale != widget.scale) {
+      _scaleAnimation = Tween<double>(begin: 1.0, end: widget.scale).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Curves.easeOutBack,
+          reverseCurve: Curves.easeOutCubic,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _removeRouterListener();
+    _controller.dispose();
+
+    super.dispose();
+  }
+
+  void _removeRouterListener() {
+    final router = _router;
+    final listener = _routerListener;
+
+    if (router != null && listener != null) {
+      router.routerDelegate.removeListener(listener);
+    }
+
+    _router = null;
+    _routerListener = null;
+  }
+
+  void _resetPressState() {
+    if (!mounted) return;
+
+    _isPopping = false;
+
+    _controller
+      ..stop()
+      ..value = 0.0;
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    if (!widget.enabled || _isPopping) return;
+
+    _controller.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) async {
+    if (!widget.enabled || _isPopping) return;
+
+    _isPopping = true;
+
+    try {
+      _controller.forward();
+
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      if (mounted) {
+        widget.onTap();
+      }
+
+      if (mounted) {
+        await _controller.reverse();
+      }
+    } finally {
+      _isPopping = false;
+    }
+  }
+
+  void _onTapCancel() {
+    if (!widget.enabled || _isPopping) return;
+
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Transform должен быть ВНУТРИ BackdropFilter — иначе blur не работает.
+    final scaled = AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(scale: _scaleAnimation.value, child: child);
+      },
+      child: widget.child ?? _defaultButtonContent(),
+    );
+
+    final content = wrapButtonBackdropFilter(
+      enable: widget._useBackdropFilter,
+      clipOval: widget.child == null,
+      child: scaled,
+    );
+
+    if (!widget.enabled) {
+      return content;
+    }
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: content,
+    );
+  }
+
+  Widget _defaultButtonContent() {
+    final baseColor =
+        widget.backgroundColor ??
+        (widget._useBackdropFilter
+            ? MuzhikiColors.white.withValues(alpha: 0.35)
+            : MuzhikiColors.alertTextGrey);
+
+    final bg = resolveButtonSurfaceColor(
+      baseColor,
+      enabled: widget.enabled,
+      enableBackdropFilter: widget._useBackdropFilter,
+    );
+
+    return Container(
+      width: widget.size.r,
+      height: widget.size.r,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: bg,
+      ),
+      alignment: Alignment.center,
+      child: widget.svgAsset != null
+          ? SvgPicture.asset(
+              widget.svgAsset!,
+              width: widget.iconSize.r,
+              height: widget.iconSize.r,
+              colorFilter: ColorFilter.mode(
+                widget.iconColor,
+                BlendMode.srcIn,
+              ),
+            )
+          : Icon(
+              widget.icon,
+              size: widget.iconSize.r,
+              color: widget.iconColor,
+            ),
+    );
+  }
+}

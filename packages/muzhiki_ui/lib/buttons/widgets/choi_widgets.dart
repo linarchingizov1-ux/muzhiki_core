@@ -1,0 +1,217 @@
+﻿import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
+import 'package:muzhiki_ui/other/other.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
+
+const _other = MuzhikiOther();
+
+class ChoiceWidgets extends StatefulWidget {
+  final bool isSelected;
+  final bool isLoading;
+  final String label;
+  final int newMessage;
+  final ValueChanged<bool>? onSelected;
+  final bool enableBackdropFilter;
+
+  const ChoiceWidgets({
+    super.key,
+    this.newMessage = 0,
+    this.isLoading = false,
+    this.enableBackdropFilter = false,
+    required this.onSelected,
+    required this.isSelected,
+    required this.label,
+  });
+
+  @override
+  State<ChoiceWidgets> createState() => _ChoiceWidgetsState();
+}
+
+class _ChoiceWidgetsState extends State<ChoiceWidgets>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+
+  bool _isPopping = false;
+
+  GoRouter? _router;
+  VoidCallback? _routerListener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 260),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInOutCubic,
+      ),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final router = GoRouter.of(context);
+
+    if (identical(_router, router)) {
+      return;
+    }
+
+    _removeRouterListener();
+
+    _router = router;
+
+    _routerListener = () {
+      _resetPressState();
+    };
+
+    router.routerDelegate.addListener(_routerListener!);
+  }
+
+  @override
+  void dispose() {
+    _removeRouterListener();
+    _controller.dispose();
+
+    super.dispose();
+  }
+
+  void _removeRouterListener() {
+    final router = _router;
+    final listener = _routerListener;
+
+    if (router != null && listener != null) {
+      router.routerDelegate.removeListener(listener);
+    }
+
+    _router = null;
+    _routerListener = null;
+  }
+
+  void _resetPressState() {
+    if (!mounted) return;
+
+    _isPopping = false;
+
+    _controller
+      ..stop()
+      ..value = 0.0;
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    if (_isPopping || widget.isLoading || widget.onSelected == null) return;
+
+    _controller.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) async {
+    if (_isPopping || widget.isLoading || widget.onSelected == null) return;
+
+    _isPopping = true;
+
+    try {
+      final animation = _controller.forward();
+
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      if (mounted && widget.onSelected != null) {
+        widget.onSelected!(!widget.isSelected);
+      }
+
+      await animation;
+
+      if (mounted) {
+        await _controller.reverse();
+      }
+    } finally {
+      _isPopping = false;
+    }
+  }
+
+  void _onTapCancel() {
+    if (_isPopping || widget.isLoading) return;
+
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _other.skelet(
+      enable: widget.isLoading,
+      ignoreContainer: true,
+      child: widget.isLoading || widget.onSelected == null
+          ? _buildChip()
+          : GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: _onTapDown,
+              onTapUp: _onTapUp,
+              onTapCancel: _onTapCancel,
+              child: _buildChip(),
+            ),
+    );
+  }
+
+  Widget _buildChip() {
+    final radius = BorderRadius.circular(48.r);
+    final baseColor =
+        widget.isSelected ? MuzhikiColors.ink : MuzhikiColors.light;
+    final bg = resolveButtonSurfaceColor(
+      baseColor,
+      enabled: true,
+      enableBackdropFilter: widget.enableBackdropFilter,
+    );
+
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(scale: _scaleAnimation.value, child: child);
+      },
+      child: wrapButtonBackdropFilter(
+        enable: widget.enableBackdropFilter,
+        borderRadius: radius,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            color: bg,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 10.w,
+            children: [
+              Text(
+                widget.label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: MuzhikiFonts.manrope,
+                        package: MuzhikiFonts.packageName,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                  color: widget.isSelected
+                      ? MuzhikiColors.white
+                      : MuzhikiColors.black1,
+                ),
+              ),
+              if (widget.newMessage > 0)
+                _other.notification(count: widget.newMessage),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

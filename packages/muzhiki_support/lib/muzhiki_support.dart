@@ -1,0 +1,9 @@
+export 'support_module.dart';
+export 'config/support_route_event.dart';
+export 'config/support_route_constant.dart';
+export 'config/support_assets.dart';
+export 'data/models/support_chats_event_widgets.dart';
+export 'data/models/view_image_item_model.dart';
+export 'features/home/support_view.dart';
+export 'features/chat/chat_view.dart';
+export 'features/informator/informator_view.dart';

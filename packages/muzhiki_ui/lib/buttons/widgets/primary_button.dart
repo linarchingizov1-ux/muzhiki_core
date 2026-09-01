@@ -1,0 +1,128 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:muzhiki_ui/buttons/shared/button_loading.dart';
+import 'package:muzhiki_ui/buttons/shared/button_tap.dart';
+import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
+
+class PrimaryButton extends StatelessWidget {
+  const PrimaryButton({
+    super.key,
+    required this.onPressed,
+    required this.label,
+    this.backgroundColor = MuzhikiColors.black17Light,
+    this.labelColor,
+    this.labelWeight,
+    this.labelSize = 15,
+    this.height = 56,
+    this.width = double.infinity,
+    this.borderRadius = 16,
+    this.padding,
+    this.iconAsset,
+    this.iconSize,
+    this.iconSpacing = 12,
+    this.isLoading = false,
+    this.disabled = false,
+    this.enableBackdropFilter = false,
+    this.progressColor,
+    this.progressSize = 28,
+  });
+
+  final VoidCallback onPressed;
+  final String label;
+  final Color backgroundColor;
+  final Color? labelColor;
+  final FontWeight? labelWeight;
+  final double labelSize;
+  final double height;
+  final double width;
+  final double borderRadius;
+  final EdgeInsets? padding;
+  final String? iconAsset;
+  final double? iconSize;
+  final double iconSpacing;
+  final bool isLoading;
+  final bool disabled;
+  final bool enableBackdropFilter;
+  final Color? progressColor;
+  final double progressSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final canTap = buttonIsInteractive(
+      disabled: disabled,
+      isLoading: isLoading,
+    );
+    final bg = resolveButtonSurfaceColor(
+      backgroundColor,
+      enabled: !disabled,
+      enableBackdropFilter: enableBackdropFilter,
+    );
+    final textColor = _labelColor(!disabled);
+    final radius = BorderRadius.circular(borderRadius.r);
+
+    return wrapButtonBackdropFilter(
+      enable: enableBackdropFilter,
+      borderRadius: radius,
+      child: ButtonTap(
+        onPressed: onPressed,
+        enabled: canTap,
+        child: Container(
+          padding:
+              padding ?? EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
+          height: height.h,
+          width: width == double.infinity ? double.infinity : width.w,
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            color: bg,
+          ),
+          alignment: Alignment.center,
+          child: isLoading
+              ? ButtonLoading(
+                  color: progressColor,
+                  backgroundColor: bg,
+                  size: progressSize,
+                )
+              : Row(
+                  spacing: iconSpacing.w,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (iconAsset != null)
+                      SvgPicture.asset(
+                        iconAsset!,
+                        width: iconSize?.r,
+                        height: iconSize?.r,
+                      ),
+                    Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: MuzhikiFonts.manrope,
+                        package: MuzhikiFonts.packageName,
+                        fontSize: labelSize.sp,
+                        fontWeight: labelWeight ?? FontWeight.w700,
+                        color: textColor,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  Color _labelColor(bool enabled) {
+    final isDarkChrome = backgroundColor == MuzhikiColors.black17Light;
+    if (!enabled) {
+      return isDarkChrome
+          ? MuzhikiColors.white.withValues(alpha: 0.3)
+          : MuzhikiColors.black17.withValues(alpha: 0.3);
+    }
+    if (isDarkChrome) {
+      return MuzhikiColors.white;
+    }
+    return labelColor ?? MuzhikiColors.black17;
+  }
+}

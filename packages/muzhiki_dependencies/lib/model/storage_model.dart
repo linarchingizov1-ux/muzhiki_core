@@ -1,0 +1,19 @@
+﻿import 'dart:io';
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:muzhiki_dependencies/network/token_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class StorageModel {
+  final SharedPreferences sharedPreferences;
+  final FlutterSecureStorage secure;
+  final SecureTokenStorage token;
+  final Directory directory;
+
+  const StorageModel({
+    required this.sharedPreferences,
+    required this.secure,
+    required this.token,
+    required this.directory,
+  });
+}
