@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/dialog/widgets/delete_account_dialog.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
@@ -54,10 +53,10 @@ final class MuzhikiDialog {
       isDismissible: isDismissible,
       backgroundColor: Colors.transparent,
       sheetAnimationStyle: AnimationStyle(
-        curve: Curves.easeInOutCubic,
-        reverseCurve: Curves.easeInOutCubic,
-        duration: const Duration(milliseconds: 250),
-        reverseDuration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+        duration: const Duration(milliseconds: 300),
+        reverseDuration: const Duration(milliseconds: 250),
       ),
       builder: (context) {
         final sheetColor = backgroundColor ?? MuzhikiColors.surface;
@@ -89,41 +88,26 @@ final class MuzhikiDialog {
 
         return PopScope(
           canPop: canPop,
-          child:
-              Padding(
-                    padding: EdgeInsets.only(
-                      left: 8.w,
-                      right: 8.w,
-                      bottom: _bottomGap(context, 8.w),
-                      top: 8.w,
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(20.w),
-                      decoration: BoxDecoration(
-                        color: sheetColor,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(borderRadius.r),
-                          bottom: Radius.circular(_bottomRadius()),
-                        ),
-                      ),
-                      child: child,
-                    ),
-                  )
-                  .animate()
-                  .fade(duration: 250.ms, curve: Curves.easeOut)
-                  .moveY(
-                    begin: 20,
-                    end: 0,
-                    duration: 350.ms,
-                    curve: Curves.easeOutCubic,
-                  )
-                  .scale(
-                    begin: const Offset(0.97, 0.97),
-                    end: const Offset(1, 1),
-                    duration: 350.ms,
-                    curve: Curves.easeOutCubic,
-                  ),
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 8.w,
+              right: 8.w,
+              bottom: _bottomGap(context, 8.w),
+              top: 8.w,
+            ),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(20.w),
+              decoration: BoxDecoration(
+                color: sheetColor,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(borderRadius.r),
+                  bottom: Radius.circular(_bottomRadius()),
+                ),
+              ),
+              child: child,
+            ),
+          ),
         );
       },
     );
