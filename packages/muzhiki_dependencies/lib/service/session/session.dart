@@ -61,6 +61,8 @@ class SessionApp extends ChangeNotifier {
   Future<void> get ready => _ready.future;
   UserModel? _user;
   UserModel? get user => _user;
+  int _sessionGeneration = 0;
+
   SessionApp({
     required this.tokenStorage,
     required this.deviceId,
@@ -112,8 +114,6 @@ class SessionApp extends ChangeNotifier {
             selectedRolesCompany: validCompanyId,
             createdAt: DateTime.now(),
           );
-
-          await userSession.saveUserSession(currUser);
         }
       } catch (_) {
         return currUser;
@@ -123,21 +123,61 @@ class SessionApp extends ChangeNotifier {
     return currUser;
   }
 
+  Future<void> _refreshRolesInBackground({
+    required UserModel user,
+    required String token,
+    required int generation,
+  }) async {
+    final updatedUser = await getRolesBased(currUser: user, token: token);
+    if (updatedUser == null) return;
+
+    final currentStorage = await tokenStorage.read();
+    final isCurrentSession =
+        generation == _sessionGeneration &&
+        _status == AuthenticationStatus.authenticated &&
+        currentStorage?.accessToken == token &&
+        _user?.mpid == user.mpid;
+
+    if (!isCurrentSession) return;
+
+    final resolvedUser = updatedUser.copyWith(
+      isAllowedAccessInformator:
+          updatedUser.roles?.info.accessAllowedInformator,
+    );
+
+    await userSession.saveUserSession(resolvedUser);
+
+    if (generation != _sessionGeneration ||
+        _status != AuthenticationStatus.authenticated ||
+        _user?.mpid != user.mpid) {
+      await userSession.clearUserSession();
+      return;
+    }
+
+    _user = resolvedUser;
+    notifyListeners();
+  }
+
   Future<void> init() async {
     final storage = await tokenStorage.read();
 
     if (storage != null && storage.accessToken.isNotEmpty) {
       _status = AuthenticationStatus.authenticated;
-      var currUser = await userSession.restoreUser();
-      bool? allowedInformator;
+      final currUser = await userSession.restoreUser();
+      _user = currUser?.copyWith(
+        isAllowedAccessInformator:
+            currUser.roles?.info.accessAllowedInformator,
+      );
 
-      if (getRoles) {
-        await getRolesBased(currUser: currUser, token: storage.accessToken);
+      if (getRoles && currUser != null) {
+        unawaited(
+          _refreshRolesInBackground(
+            user: currUser,
+            token: storage.accessToken,
+            generation: _sessionGeneration,
+          ),
+        );
       }
-
-      allowedInformator ??= currUser?.roles?.info.accessAllowedInformator;
-
-      _user = currUser?.copyWith(isAllowedAccessInformator: allowedInformator);
     } else {
       _status = AuthenticationStatus.unauthenticated;
       cleareSession();
@@ -386,6 +426,7 @@ class SessionApp extends ChangeNotifier {
   }
 
   void cleareSession() {
+    _sessionGeneration++;
     fresh.clearToken();
     userSession.clearUserSession();
     cookieJar.deleteAll();
