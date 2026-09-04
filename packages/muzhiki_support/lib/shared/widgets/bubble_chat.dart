@@ -145,13 +145,13 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                 begin: 0.0,
                                 end: widget.playAniamtion ? 1.0 : 0.0,
                               ),
-                              duration: const Duration(milliseconds: 250),
+                              duration: const Duration(milliseconds: 350),
                               curve: Curves.easeOutCubic,
                               builder: (context, value, child) {
                                 if (!widget.playAniamtion) return child!;
 
                                 return Transform.translate(
-                                  offset: Offset(0, 15 * (1.0 - value)),
+                                  offset: Offset(0, 35 * (1.0 - value)),
                                   child: Opacity(opacity: value, child: child),
                                 );
                               },
