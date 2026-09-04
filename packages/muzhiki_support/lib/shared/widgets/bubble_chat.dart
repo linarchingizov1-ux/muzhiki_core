@@ -101,11 +101,14 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                 child: TweenAnimationBuilder<double>(
                   tween: Tween<double>(
                     begin: 0.0,
-                    end: widget.playAniamtion ? 1.0 : 0.0,
+                    end: !widget.playAniamtion ? 1.0 : 0.0,
                   ),
                   duration: const Duration(milliseconds: 350),
                   curve: Curves.easeOutCubic,
                   builder: (context, value, child) {
+                    if (!widget.playAniamtion) {
+                      return child!;
+                    }
                     return Transform.translate(
                       offset: Offset(0, 30 * (1.0 - value)),
                       child: Opacity(
