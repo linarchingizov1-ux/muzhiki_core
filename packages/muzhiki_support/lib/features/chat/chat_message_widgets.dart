@@ -18,6 +18,7 @@ import 'package:muzhiki_ui/other/other.dart';
 const _other = MuzhikiOther();
 
 class ChatMessageWidgets extends StatelessWidget {
+  final bool isInitialScreen;
   final AppWebsocketChat websocket;
   final ChatCubit chatCubit;
   final Directory directory;
@@ -33,6 +34,7 @@ class ChatMessageWidgets extends StatelessWidget {
     required this.bottomInset,
     required this.chatCubit,
     required this.directory,
+    required this.isInitialScreen,
   });
 
   static const _skeletonPlaceholders = [
@@ -85,10 +87,12 @@ class ChatMessageWidgets extends StatelessWidget {
                 final mess = messages[index];
 
                 final isMe = mess.type == MessageType.client;
-
+                final isLastMessage =
+                    index == messages.length - 1 && isInitialScreen == true;
                 return _other.skelet(
                   enable: showSkeleton,
                   child: ChatMessageBubble(
+                    playAniamtion: isLastMessage,
                     chatCubit: chatCubit,
                     directory: directory,
                     websocketChat: websocket,

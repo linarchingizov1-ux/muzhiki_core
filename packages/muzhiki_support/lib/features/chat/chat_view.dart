@@ -45,6 +45,7 @@ class ChatView extends StatefulWidget {
 class _ChatViewState extends State<ChatView> {
   late final AppWebsocketChat websocketApp;
   bool needUpdate = true;
+  bool isInitialScreen = false;
 
   @override
   void initState() {
@@ -56,7 +57,13 @@ class _ChatViewState extends State<ChatView> {
       session: widget.session,
       directory: widget.directory,
     );
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          isInitialScreen = true;
+        });
+      }
+    });
     websocketApp.start();
 
     switch (widget.extra) {
@@ -110,6 +117,7 @@ class _ChatViewState extends State<ChatView> {
               return Stack(
                 children: [
                   ChatMessageWidgets(
+                    isInitialScreen: isInitialScreen,
                     websocket: websocketApp,
                     topInset: topInset,
                     bottomInset: bottomInset,

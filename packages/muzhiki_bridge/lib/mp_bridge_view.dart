@@ -92,7 +92,6 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
         : widget.masterAudit != null && widget.masterAudit!.isNotEmpty
         ? "${widget.initialUrl}/${widget.masterAudit!.first}/audits/${widget.masterAudit!.last}?show_header=${widget.showAppBar}"
         : "${widget.initialUrl}?show_header=${widget.showAppBar}";
-    print(urlParse);
     return Uri.parse(urlParse);
   }
 

@@ -9,7 +9,6 @@ import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_support/data/websocket/extensions/chat_footer_state_extension.dart';
 import 'package:muzhiki_support/features/chat/state/attachments_cubit.dart';
-import 'package:muzhiki_support/features/chat/widgets/chat_send_flight.dart';
 import 'package:muzhiki_support/shared/widgets/text_field.dart';
 
 class ChatBottomWidgets extends StatefulWidget {
@@ -33,7 +32,6 @@ class ChatBottomWidgets extends StatefulWidget {
 
 class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
   late final TextEditingController textEditingController;
-  final GlobalKey _inputKey = GlobalKey();
 
   @override
   void initState() {
@@ -69,7 +67,6 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
         child: BlocBuilder<AttachmentsCubit, AttachmentsState>(
           builder: (context, state) {
             return TextFieldWidgets(
-              inputKey: _inputKey,
               attachmentsCubit: widget.attachmentsCubit,
               directory: widget.directory,
               controller: textEditingController,
@@ -104,12 +101,6 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
                     .whereType<String>()
                     .toSet()
                     .toList();
-
-                ChatSendFlight.play(
-                  context: context,
-                  originKey: _inputKey,
-                  text: text,
-                );
 
                 unawaited(
                   widget.websocket.sendMessage(
