@@ -54,15 +54,10 @@ class _ChatViewState extends State<ChatView> {
       channelId: widget.chatCubit.state.channelId,
       chatUsecase: widget.chatUseCase,
       session: widget.session,
+      directory: widget.directory,
     );
 
-    if (websocketApp.isDraft) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        websocketApp.openDraftChat();
-      });
-    } else {
-      websocketApp.connect();
-    }
+    websocketApp.start();
 
     switch (widget.extra) {
       case SupportChatsEventWidgets event:

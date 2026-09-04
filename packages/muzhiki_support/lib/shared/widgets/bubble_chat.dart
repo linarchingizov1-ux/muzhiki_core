@@ -94,7 +94,9 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                           ),
                         ),
                 ),
-              Container(
+              _SendingAppear(
+                enabled: widget.mess.status == MessageStatus.sending,
+                child: Container(
                 constraints: BoxConstraints(
                   maxWidth: constrained.maxWidth * 0.75,
                 ),
@@ -198,11 +200,28 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                   ),
                 ),
               ),
+              ),
             ],
           );
         },
       ),
     );
+  }
+}
+
+class _SendingAppear extends StatelessWidget {
+  final bool enabled;
+  final Widget child;
+
+  const _SendingAppear({required this.enabled, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!enabled) return child;
+    return child
+        .animate()
+        .fadeIn(duration: 180.ms)
+        .slideY(begin: 0.18, duration: 320.ms, curve: Curves.easeOutCubic);
   }
 }
 

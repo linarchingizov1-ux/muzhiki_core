@@ -35,11 +35,29 @@ class ChatMessageWidgets extends StatelessWidget {
     required this.directory,
   });
 
+  static const _skeletonPlaceholders = [
+    MessageModel(id: 'sk_1', text: 'Здравствуйте', type: MessageType.operator),
+    MessageModel(id: 'sk_2', text: 'Добрый день', type: MessageType.client),
+    MessageModel(
+      id: 'sk_3',
+      text: 'Чем могу помочь?',
+      type: MessageType.operator,
+    ),
+    MessageModel(
+      id: 'sk_4',
+      text: 'Есть вопрос по обращению',
+      type: MessageType.client,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final data = snapshot.data;
+    final showSkeleton = data?.showMessageSkeleton ?? true;
+    final messages = showSkeleton ? _skeletonPlaceholders : data!.messages;
     final hasFooter =
-        snapshot.data?.socket?.footerState == ChatFooterState.chat ||
-        snapshot.data?.socket?.footerState == ChatFooterState.initial;
+        data?.socket?.footerState == ChatFooterState.chat ||
+        data?.socket?.footerState == ChatFooterState.initial;
     return InkWell(
       onTap: () {
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
@@ -50,7 +68,7 @@ class ChatMessageWidgets extends StatelessWidget {
             child: ListView.separated(
               reverse: true,
               scrollCacheExtent: ScrollCacheExtent.pixels(300),
-              physics: snapshot.connectionState != ConnectionState.active
+              physics: showSkeleton
                   ? const NeverScrollableScrollPhysics()
                   : null,
               padding: EdgeInsets.only(
@@ -61,21 +79,21 @@ class ChatMessageWidgets extends StatelessWidget {
                     ? MediaQuery.paddingOf(context).bottom + 65.h + 16.h
                     : 16.h,
               ),
-              itemCount: snapshot.data!.messages.length,
+              itemCount: messages.length,
               separatorBuilder: (_, _) => SizedBox(height: 10.h),
               itemBuilder: (context, index) {
-                final mess = snapshot.data!.messages[index];
+                final mess = messages[index];
 
                 final isMe = mess.type == MessageType.client;
 
                 return _other.skelet(
-                  enable: snapshot.connectionState != ConnectionState.active,
+                  enable: showSkeleton,
                   child: ChatMessageBubble(
                     chatCubit: chatCubit,
                     directory: directory,
                     websocketChat: websocket,
                     key: ValueKey(mess.id),
-                    avatar: snapshot.data!.operatorAvatar,
+                    avatar: data?.operatorAvatar,
                     mess: mess,
                     attachments: mess.attachments,
                     isMe: isMe,

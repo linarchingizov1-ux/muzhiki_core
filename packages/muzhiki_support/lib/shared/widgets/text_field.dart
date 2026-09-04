@@ -14,9 +14,11 @@ class TextFieldWidgets extends StatefulWidget {
   final Directory directory;
   final void Function() send;
   final TextEditingController controller;
+  final Key? inputKey;
 
   const TextFieldWidgets({
     super.key,
+    this.inputKey,
     required this.controller,
     required this.attachmentsCubit,
     required this.send,
@@ -64,6 +66,7 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                     ),
                   SizedBox(height: 6.h),
                   Stack(
+                    key: widget.inputKey,
                     children: [
                       TextSelectionTheme(
                         data: TextSelectionThemeData(

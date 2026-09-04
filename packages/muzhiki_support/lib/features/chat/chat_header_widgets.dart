@@ -47,8 +47,7 @@ class ChatHeaderWidgets extends StatelessWidget {
                   children: [
                     if (snapshot.data!.title != null)
                       _other.skelet(
-                        enable:
-                            snapshot.connectionState != ConnectionState.active,
+                        enable: snapshot.data!.showHeaderSkeleton,
                         child: Text(
                           snapshot.data!.title!,
                           style: TextStyle(
@@ -62,8 +61,7 @@ class ChatHeaderWidgets extends StatelessWidget {
 
                     if (snapshot.data!.createdAt != null)
                       _other.skelet(
-                        enable:
-                            snapshot.connectionState != ConnectionState.active,
+                        enable: snapshot.data!.showHeaderSkeleton,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
