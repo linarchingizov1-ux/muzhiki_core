@@ -161,6 +161,7 @@ class AppWebsocketChat extends WebSocketChat {
       final uri = Uri.parse('wss://api.webchat.muzhiki.pro/ws').replace(
         queryParameters: {
           'chat_id': '${socketConnection.chatId}',
+          'session_id': '$sessionChatId',
           'token': token!.accessToken,
           'is_client': 'true',
         },
