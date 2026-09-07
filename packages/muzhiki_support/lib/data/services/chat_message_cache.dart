@@ -52,7 +52,8 @@ class ChatMessageCache {
       return CachedChat(
         socket: _socketFromCache(map['socket']),
         messages: _messagesFromCache(map['messages']),
-        pending: (map['pending'] as List<dynamic>?)
+        pending:
+            (map['pending'] as List<dynamic>?)
                 ?.whereType<Map<String, dynamic>>()
                 .map(PendingMessage.fromJson)
                 .toList() ??
@@ -116,7 +117,7 @@ class ChatMessageCache {
       createdAt: json['created_at'] is String
           ? DateTime.tryParse(json['created_at'] as String)?.toLocal()
           : null,
-      status: _statusFromName(json['status'] as String?),
+      status: _statusFromName(json['status'] as String),
       type: json['type'] == 2 ? MessageType.operator : MessageType.client,
       name: json['operator_name'] as String?,
       attachments:
@@ -132,7 +133,7 @@ class ChatMessageCache {
     return {
       'id': message.id,
       'created_at': message.createdAt?.toIso8601String(),
-      'status': message.status?.name,
+      'status': message.status.name,
       'text': message.text,
       'type': message.type == MessageType.operator ? 2 : 1,
       'operator_name': message.name,
@@ -171,7 +172,7 @@ class ChatMessageCache {
     };
   }
 
-  MessageStatus? _statusFromName(String? name) {
+  MessageStatus _statusFromName(String name) {
     switch (name) {
       case 'sending':
         return MessageStatus.sending;
@@ -180,7 +181,7 @@ class ChatMessageCache {
       case 'failed':
         return MessageStatus.failed;
       default:
-        return null;
+        return MessageStatus.init;
     }
   }
 

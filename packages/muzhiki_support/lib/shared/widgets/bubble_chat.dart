@@ -96,132 +96,106 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                           ),
                         ),
                 ),
-              _SendingAppear(
-                enabled: widget.mess.status == MessageStatus.sending,
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(
-                    begin: 0.0,
-                    end: !widget.playAniamtion ? 1.0 : 0.0,
-                  ),
-                  duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, value, child) {
-                    if (!widget.playAniamtion) {
-                      return child!;
-                    }
-                    return Transform.translate(
-                      offset: Offset(0, 30 * (1.0 - value)),
-                      child: Opacity(
-                        opacity: value.clamp(0.0, 1.0),
-                        child: child,
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: constrained.maxWidth * 0.75,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  color: widget.isMe
+                      ? MuzhikiColors.light
+                      : MuzhikiColors.surface,
+                ),
+                child: IntrinsicWidth(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: 11.w,
+                          right: 11.w,
+                          top: 5.h,
+                          bottom: 5.h,
+                        ),
+                        child: Text(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          widget.isMe ? 'Вы' : (widget.mess.name ?? ''),
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            height: 1.h,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: MuzhikiColors.blood,
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                  child: Container(
-                    constraints: BoxConstraints(
-                      maxWidth: constrained.maxWidth * 0.75,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                      color: widget.isMe
-                          ? MuzhikiColors.light
-                          : MuzhikiColors.surface,
-                    ),
-                    child: IntrinsicWidth(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(
-                              left: 11.w,
-                              right: 11.w,
-                              top: 5.h,
-                              bottom: 5.h,
-                            ),
-                            child: Text(
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              widget.isMe ? 'Вы' : (widget.mess.name ?? ''),
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                height: 1.h,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: MuzhikiColors.blood,
-                              ),
+                      if (widget.mess.text.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: 11.w,
+                            right: 11.w,
+                            bottom: 5.h,
+                          ),
+                          child: _MessageWidgetState(text: widget.mess.text),
+                        ),
+                      if (widget.attachments != null &&
+                          widget.attachments!.isNotEmpty)
+                        _BubbleAttachment(
+                          directory: widget.directory,
+                          chatCubit: widget.chatCubit,
+                          websocketChat: widget.websocketChat,
+                          attachments: widget.attachments!,
+                          width: constrained.maxWidth,
+                        ),
+                      if (widget.messageDate.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(left: 11.w, right: 11.w),
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: Row(
+                              spacing: 5.w,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  widget.messageDate,
+                                  style: TextStyle(
+                                    fontFamily: 'Manrope',
+                                    height: 2.h,
+                                    color: MuzhikiColors.grey,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                switch (widget.mess.status) {
+                                  (MessageStatus.sending) =>
+                                    Icon(
+                                          Icons.schedule_rounded,
+                                          size: 16.r,
+                                          color: MuzhikiColors.grey,
+                                        )
+                                        .animate(
+                                          onPlay: (controller) =>
+                                              controller.repeat(),
+                                        )
+                                        .rotate(
+                                          duration: 1.seconds,
+                                          curve: Curves.linear,
+                                        ),
+                                  (MessageStatus.failed) => Icon(
+                                    Icons.close,
+                                    size: 16.r,
+                                    color: MuzhikiColors.blood,
+                                  ),
+                                  MessageStatus.sent ||
+                                  MessageStatus.init => const SizedBox.shrink(),
+                                },
+                              ],
                             ),
                           ),
-                          if (widget.mess.text.isNotEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(
-                                left: 11.w,
-                                right: 11.w,
-                                bottom: 5.h,
-                              ),
-                              child: _MessageWidgetState(
-                                text: widget.mess.text,
-                              ),
-                            ),
-                          if (widget.attachments != null &&
-                              widget.attachments!.isNotEmpty)
-                            _BubbleAttachment(
-                              directory: widget.directory,
-                              chatCubit: widget.chatCubit,
-                              websocketChat: widget.websocketChat,
-                              attachments: widget.attachments!,
-                              width: constrained.maxWidth,
-                            ),
-                          if (widget.messageDate.isNotEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(left: 11.w, right: 11.w),
-                              child: Align(
-                                alignment: Alignment.bottomRight,
-                                child: Row(
-                                  spacing: 5.w,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      widget.messageDate,
-                                      style: TextStyle(
-                                        fontFamily: 'Manrope',
-                                        height: 2.h,
-                                        color: MuzhikiColors.grey,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                    if (widget.mess.status != null)
-                                      switch (widget.mess.status) {
-                                        (MessageStatus.sending) =>
-                                          Icon(
-                                                Icons.schedule_rounded,
-                                                size: 16.r,
-                                                color: MuzhikiColors.grey,
-                                              )
-                                              .animate(
-                                                onPlay: (controller) =>
-                                                    controller.repeat(),
-                                              )
-                                              .rotate(
-                                                duration: 1.seconds,
-                                                curve: Curves.linear,
-                                              ),
-                                        (MessageStatus.failed) => Icon(
-                                          Icons.close,
-                                          size: 16.r,
-                                          color: MuzhikiColors.blood,
-                                        ),
-                                        MessageStatus.sent ||
-                                        null => const SizedBox.shrink(),
-                                      },
-                                  ],
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -233,19 +207,23 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
   }
 }
 
-class _SendingAppear extends StatelessWidget {
-  final bool enabled;
+class SendingMessageAnimation extends StatelessWidget {
   final Widget child;
+  final bool isSending;
 
-  const _SendingAppear({required this.enabled, required this.child});
+  const SendingMessageAnimation({
+    super.key,
+    required this.child,
+    required this.isSending,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (!enabled) return child;
-    return child
-        .animate()
-        .fadeIn(duration: 180.ms)
-        .slideY(begin: 0.18, duration: 320.ms, curve: Curves.easeOutCubic);
+    if (!isSending) {
+      return child;
+    }
+
+    return child;
   }
 }
 
