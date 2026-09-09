@@ -15,7 +15,7 @@ import 'package:muzhiki_support/shared/widgets/attachment/attachment_widgets.dar
 import 'package:shimmer/shimmer.dart';
 
 class ChatMessageBubble extends StatefulWidget {
-  final bool playAniamtion;
+  final bool animateInsert;
   final AppWebsocketChat websocketChat;
   final ChatCubit chatCubit;
   final Directory directory;
@@ -37,7 +37,7 @@ class ChatMessageBubble extends StatefulWidget {
     required this.messageDate,
     required this.chatCubit,
     required this.directory,
-    this.playAniamtion = false,
+    this.animateInsert = false,
   });
 
   @override
@@ -45,9 +45,11 @@ class ChatMessageBubble extends StatefulWidget {
 }
 
 class _ChatMessageBubbleState extends State<ChatMessageBubble> {
+  late final bool _animateInsert = widget.animateInsert;
+
   @override
   Widget build(BuildContext context) {
-    return TextSelectionTheme(
+    Widget bubble = TextSelectionTheme(
       data: TextSelectionThemeData(
         selectionColor: const Color(0xFF2AABEE).withValues(alpha: 0.25),
         selectionHandleColor: const Color(0xFF2AABEE),
@@ -204,26 +206,17 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
         },
       ),
     );
-  }
-}
 
-class SendingMessageAnimation extends StatelessWidget {
-  final Widget child;
-  final bool isSending;
+    if (!_animateInsert) return bubble;
 
-  const SendingMessageAnimation({
-    super.key,
-    required this.child,
-    required this.isSending,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (!isSending) {
-      return child;
-    }
-
-    return child;
+    return bubble
+        .animate()
+        .fadeIn(duration: 160.ms, curve: Curves.easeOut)
+        .slideY(
+          begin: 0.18,
+          duration: 220.ms,
+          curve: Curves.easeOutCubic,
+        );
   }
 }
 
