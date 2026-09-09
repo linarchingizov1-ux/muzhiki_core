@@ -14,7 +14,7 @@ final class MuzhikiOther {
     Key? key,
     required bool enable,
     required Widget child,
-    bool? lightPage,
+    bool lightPage = true,
     bool ignoreContainer = false,
   }) => AppSkelet(
     key: key,

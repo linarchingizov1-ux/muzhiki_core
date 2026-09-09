@@ -178,7 +178,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
         padding: EdgeInsets.all(5.r),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.r),
-          color: MuzhikiColors.surface,
+          color: MuzhikiColors.white,
         ),
         child: Image.asset(documentIcon, width: 25.r, height: 25.r),
       ),
@@ -196,7 +196,7 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
             ? Shimmer.fromColors(
                 key: const ValueKey('loading'),
                 baseColor: MuzhikiColors.light,
-                highlightColor: MuzhikiColors.surface,
+                highlightColor: MuzhikiColors.white,
                 child: Container(
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 231, 231, 231),

@@ -88,11 +88,8 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
-    MuzhikiColors.depend(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: MuzhikiColors.isDark
-          ? SystemUiOverlayStyle.light
-          : SystemUiOverlayStyle.dark,
+      value: SystemUiOverlayStyle.dark,
       child: PopScope(
         onPopInvokedWithResult: (didPop, result) {
           if (needUpdate || (widget.id == null && !websocketApp.isDraft)) {

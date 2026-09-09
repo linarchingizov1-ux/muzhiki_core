@@ -48,7 +48,7 @@ class ErrorDialog extends StatelessWidget {
         if (onRetry != null) ...[
           MuzhikiUi.buttons.primary(
             label: 'Повторить',
-            backgroundColor: MuzhikiColors.ink,
+            backgroundColor: MuzhikiColors.black23,
             labelColor: MuzhikiColors.white,
             borderRadius: 23,
             onPressed: () {

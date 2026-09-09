@@ -117,7 +117,7 @@ class _VideoAttachmentState extends State<VideoAttachment> {
           } else {
             return Shimmer.fromColors(
               baseColor: MuzhikiColors.light,
-              highlightColor: MuzhikiColors.surface,
+              highlightColor: MuzhikiColors.white,
               child: SizedBox(
                 height: 77.w,
                 width: 77.h,

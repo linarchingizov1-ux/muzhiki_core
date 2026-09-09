@@ -19,17 +19,14 @@ class InformatorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MuzhikiColors.depend(context);
     return Scaffold(
-      backgroundColor: MuzhikiColors.surface,
+      backgroundColor: MuzhikiColors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leadingWidth: 70,
         leading: Center(
           child: MuzhikiUi.buttons.back(
-            backgroundColor: MuzhikiColors.isDark
-                ? MuzhikiColors.surface
-                : MuzhikiColors.grey,
+            backgroundColor: MuzhikiColors.grey,
             svgAsset: SupportAssets.I.svg.arrowBack,
             onTap: context.pop,
           ),

@@ -36,7 +36,7 @@ class _ChatBottomAreaTicketWidgetsState
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.r),
-            color: MuzhikiColors.surface,
+            color: MuzhikiColors.white,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

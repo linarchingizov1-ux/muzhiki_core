@@ -22,7 +22,7 @@ final class MuzhikiScaffold {
     Widget? trailing,
     Widget? bottomBar,
     EdgeInsetsGeometry? bottomBarPadding,
-    Color backgroundColor = MuzhikiColors.appBackgroudLight,
+    Color backgroundColor = MuzhikiColors.appBackgroud,
     Color? tintColor,
     bool topBlur = true,
     bool bottomBlur = true,

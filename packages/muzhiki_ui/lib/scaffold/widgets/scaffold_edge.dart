@@ -31,7 +31,7 @@ class SoftEdgeScaffold extends StatelessWidget {
     this.trailing,
     this.bottomBar,
     this.bottomBarPadding,
-    this.backgroundColor = MuzhikiColors.appBackgroudLight,
+    this.backgroundColor = MuzhikiColors.appBackgroud,
     this.tintColor,
     this.topBlur = true,
     this.bottomBlur = true,
@@ -84,9 +84,7 @@ class SoftEdgeScaffold extends StatelessWidget {
     return _buttons.back(
       svgAsset: svgAssets,
       onTap: onBack!,
-      backgroundColor: MuzhikiColors.isDark
-          ? MuzhikiColors.surface
-          : MuzhikiColors.grey,
+      backgroundColor: MuzhikiColors.grey,
       enabled: backEnabled,
       enableBackdropFilter: enableBackdropFilter,
     );
@@ -94,10 +92,7 @@ class SoftEdgeScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MuzhikiColors.depend(context);
-    final pageColor = backgroundColor == MuzhikiColors.appBackgroudLight
-        ? MuzhikiColors.appBackgroud
-        : backgroundColor;
+    final pageColor = backgroundColor;
     final topInset = MediaQuery.paddingOf(context).top;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final headerTop = headerTopPadding ?? 8.h;
