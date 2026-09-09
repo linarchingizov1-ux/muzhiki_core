@@ -10,6 +10,7 @@ class MuzhikiUrlLaunch {
     String? path,
     Map<String, dynamic>? queryParameters,
     bool throwError = true,
+    bool openFullScreen = false,
   }) async {
     try {
       Uri parseURL;
@@ -37,8 +38,9 @@ class MuzhikiUrlLaunch {
         ),
         safariVCOptions: SafariViewControllerOptions(
           barCollapsingEnabled: true,
-          modalPresentationStyle:
-              ViewControllerModalPresentationStyle.pageSheet,
+          modalPresentationStyle: openFullScreen
+              ? ViewControllerModalPresentationStyle.fullScreen
+              : ViewControllerModalPresentationStyle.pageSheet,
           dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
         ),
       );

@@ -1,0 +1,32 @@
+name: muzhiki_stories
+description: Fullscreen stories viewer and shared story models for Muzhiki apps.
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.1
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  muzhiki_dependencies:
+    path: ../muzhiki_dependencies
+  muzhiki_ui:
+    path: ../muzhiki_ui
+  dio: ^5.10.0
+  flutter_screenutil: ^5.9.3
+  flutter_svg: ^2.3.0
+  shared_preferences: ^2.5.5
+  soft_edge_blur: ^0.1.3
+  cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
+  flutter_markdown: ^0.7.5
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+
+flutter:
+  assets:
+    - assets/svg/close.svg
