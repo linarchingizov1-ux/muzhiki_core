@@ -9,10 +9,12 @@ import 'package:muzhiki_stories/data/model/story_model.dart';
 import 'package:muzhiki_stories/domain/entity/story_action_entity.dart';
 import 'package:muzhiki_stories/presentation/service/story_cache_manager.dart';
 import 'package:muzhiki_stories/presentation/service/story_controller.dart';
+import 'package:muzhiki_stories/presentation/service/story_image_load_controller.dart';
 import 'package:muzhiki_stories/presentation/state/stories_view_model.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/home_redisign_story_header.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/story_detail_overlay.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/story_geometry.dart';
+import 'package:muzhiki_stories/presentation/widgets/story/story_image_error_placeholder.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 import 'package:soft_edge_blur/soft_edge_blur.dart';
 
@@ -761,129 +763,162 @@ class _StoryImagePage extends StatefulWidget {
 }
 
 class _StoryImagePageState extends State<_StoryImagePage> {
-  bool? _imageLoaded;
+  final _imageLoadController = StoryImageLoadController();
 
-  void _setImageLoaded(bool imageLoaded) {
-    if (_imageLoaded == imageLoaded) return;
-    setState(() => _imageLoaded = imageLoaded);
-    if (widget.isActive) widget.onImageLoaded(imageLoaded);
+  @override
+  void initState() {
+    super.initState();
+    _imageLoadController.addListener(_onLoadsChanged);
+  }
+
+  void _onLoadsChanged() {
+    if (!mounted || !widget.isActive) return;
+    final isImageLoaded =
+        _imageLoadController.isImageLoaded(widget.imageUrl) &&
+        !_imageLoadController.isImageFailed(widget.imageUrl);
+    widget.onImageLoaded(isImageLoaded);
   }
 
   @override
   void didUpdateWidget(covariant _StoryImagePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!oldWidget.isActive && widget.isActive && _imageLoaded != null) {
-      widget.onImageLoaded(_imageLoaded!);
+    if (oldWidget.imageUrl != widget.imageUrl) {
+      _imageLoadController.removeImage(oldWidget.imageUrl);
     }
+    if (!widget.isActive || oldWidget.isActive == widget.isActive) return;
+
+    final isImageLoaded =
+        _imageLoadController.isImageLoaded(widget.imageUrl) &&
+        !_imageLoadController.isImageFailed(widget.imageUrl);
+    widget.onImageLoaded(isImageLoaded);
+  }
+
+  @override
+  void dispose() {
+    _imageLoadController
+      ..removeListener(_onLoadsChanged)
+      ..dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final showLoader = !(_imageLoaded ?? false);
+    return ListenableBuilder(
+      listenable: _imageLoadController,
+      builder: (context, _) {
+        final url = widget.imageUrl;
+        final showLoader =
+            !_imageLoadController.isImageFailed(url) &&
+            !_imageLoadController.isImageLoaded(url);
 
-    return RepaintBoundary(
-      child: ValueListenableBuilder<double>(
-        valueListenable: widget.storyController.sheetSize,
-        child: Image(
-          image: widget.cacheManager.provider(
-            widget.imageUrl,
-            mode: widget.mode,
-          ),
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-          gaplessPlayback: false,
-          errorBuilder: (context, error, stackTrace) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) _setImageLoaded(true);
-            });
-            return ColoredBox(
-              color: MuzhikiColors.black17,
-              child: Center(
-                child: Icon(Icons.image, color: MuzhikiColors.white),
+        return RepaintBoundary(
+          child: ValueListenableBuilder<double>(
+            valueListenable: widget.storyController.sheetSize,
+            child: Image(
+              key: ValueKey(
+                '$url-${_imageLoadController.rebuildKeys[url] ?? 0}',
               ),
-            );
-          },
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            final imageLoaded = wasSynchronouslyLoaded || frame != null;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) _setImageLoaded(imageLoaded);
-            });
+              image: widget.cacheManager.provider(url, mode: widget.mode),
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              gaplessPlayback: false,
+              errorBuilder: (context, error, stackTrace) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) _imageLoadController.setImageFailed(url);
+                });
+                return StoryImageErrorPlaceholder(
+                  onRetry: () async => await _imageLoadController.reloadImage(
+                    url: widget.imageUrl,
+                    cacheManager: widget.cacheManager,
+                    mode: widget.mode,
+                  ),
+                );
+              },
+              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                final hasFrame = wasSynchronouslyLoaded || frame != null;
+                if (hasFrame) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) _imageLoadController.setImageLoaded(url);
+                  });
+                }
 
-            return ColoredBox(
-              color: MuzhikiColors.black17,
-              child: AnimatedOpacity(
-                opacity: imageLoaded ? 1 : 0,
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeOut,
-                child: child,
-              ),
-            );
-          },
-        ),
-        builder: (context, size, child) {
-          final blur = widget.storyGeometry.appBarBlurAt(size);
-          final photoHeight = widget.storyGeometry.photoHeightAt(size);
-          return SoftEdgeBlur(
-            edges: blur != 0
-                ? [
-                    EdgeBlur(
-                      type: EdgeType.topEdge,
-                      size: widget.appBarHeight,
-                      sigma: 50 * blur,
-                      controlPoints: [
-                        ControlPoint(
-                          position: 0.8,
-                          type: ControlPointType.visible,
-                        ),
-                        ControlPoint(
-                          position: 1,
-                          type: ControlPointType.transparent,
-                        ),
-                      ],
-                    ),
-                  ]
-                : const [],
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                ClipRRect(
-                  clipper: StoryPhotoClipper(
-                    size: size,
-                    geometry: widget.storyGeometry,
+                return ColoredBox(
+                  color: MuzhikiColors.black17,
+                  child: AnimatedOpacity(
+                    opacity: hasFrame ? 1 : 0,
+                    duration: const Duration(milliseconds: 280),
+                    curve: Curves.easeOut,
+                    child: child,
                   ),
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: photoHeight,
-                      child: child,
-                    ),
-                  ),
-                ),
-                if (showLoader)
-                  ColoredBox(
-                    color: MuzhikiColors.black17,
-                    child: Center(
-                      child: Transform.scale(
-                        scale: Platform.isIOS ? 1.25 : 1.0,
-                        child: CircularProgressIndicator.adaptive(
-                          strokeWidth: 2.5,
-                          backgroundColor: Platform.isIOS
-                              ? MuzhikiColors.white
-                              : null,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            MuzhikiColors.white,
-                          ),
+                );
+              },
+            ),
+            builder: (context, size, child) {
+              final blur = widget.storyGeometry.appBarBlurAt(size);
+
+              return SoftEdgeBlur(
+                edges: blur != 0
+                    ? [
+                        EdgeBlur(
+                          type: EdgeType.topEdge,
+                          size: widget.appBarHeight,
+                          sigma: 50 * blur,
+                          controlPoints: [
+                            ControlPoint(
+                              position: 0.8,
+                              type: ControlPointType.visible,
+                            ),
+                            ControlPoint(
+                              position: 1,
+                              type: ControlPointType.transparent,
+                            ),
+                          ],
+                        ),
+                      ]
+                    : const [],
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ClipRRect(
+                      clipper: StoryPhotoClipper(
+                        size: size,
+                        geometry: widget.storyGeometry,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: widget.storyGeometry.photoHeightAt(size),
+                          child: child,
                         ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
+                    if (showLoader)
+                      ColoredBox(
+                        color: MuzhikiColors.black17,
+                        child: Center(
+                          child: Transform.scale(
+                            scale: Platform.isIOS ? 1.25 : 1.0,
+                            child: CircularProgressIndicator.adaptive(
+                              strokeWidth: 2.5,
+                              backgroundColor: Platform.isIOS
+                                  ? MuzhikiColors.white
+                                  : null,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                MuzhikiColors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

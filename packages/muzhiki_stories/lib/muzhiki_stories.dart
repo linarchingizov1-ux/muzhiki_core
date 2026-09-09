@@ -16,3 +16,5 @@ export 'presentation/widgets/story/story_geometry.dart';
 export 'presentation/widgets/story/story_progress_painter.dart';
 export 'presentation/service/story_cache_manager.dart';
 export 'presentation/service/story_controller.dart';
+export 'presentation/service/story_image_load_controller.dart';
+export 'presentation/widgets/story/story_image_error_placeholder.dart';

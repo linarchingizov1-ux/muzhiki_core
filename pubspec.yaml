@@ -18,5 +18,6 @@ workspace:
   - packages/muzhiki_report_problem
   - packages/muzhiki_notification
   - packages/muzhiki_settings
+  - packages/muzhiki_stories
   - packages/flutter_appauth
 

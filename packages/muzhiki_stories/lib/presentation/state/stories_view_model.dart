@@ -100,7 +100,7 @@ class StoriesViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> consumeNextFirstScreen() async {
+  Future<bool> waitPreloadStories() async {
     if (_state.firstScreenStories.isNotEmpty) {
       setViewerStories(_state.firstScreenStories);
       return true;

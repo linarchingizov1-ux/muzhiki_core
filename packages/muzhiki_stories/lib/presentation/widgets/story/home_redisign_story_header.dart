@@ -22,27 +22,38 @@ class HomeRedisignStoryHeader extends StatelessWidget {
     return Stack(
       children: [
         Positioned.fill(
-          child: ValueListenableBuilder<bool>(
-            valueListenable: storyController.isDetailOpen,
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: storyController.showPrevious,
-                  ),
+          child: ListenableBuilder(
+            listenable: storyController.isDetailOpen,
+            builder: (context, _) {
+              final sideWidth = MediaQuery.sizeOf(context).width * 0.40;
+              return IgnorePointer(
+                ignoring: storyController.isDetailOpen.value,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: sideWidth,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: storyController.showPrevious,
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: sideWidth,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: storyController.showNext,
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  flex: 2,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: storyController.showNext,
-                  ),
-                ),
-              ],
-            ),
-            builder: (context, isActive, child) =>
-                IgnorePointer(ignoring: isActive, child: child),
+              );
+            },
           ),
         ),
         Positioned(
