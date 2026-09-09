@@ -239,7 +239,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                         padding: EdgeInsets.all(6.r),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: MuzhikiColors.ink
+                                          color: MuzhikiColors.black23
                                               .withValues(alpha: 0.65),
                                         ),
                                         child: SvgPicture.asset(
@@ -282,7 +282,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                       isLoading: viewModel.isSubmitting,
                       disabled: !viewModel.isValid,
                       backgroundColor: viewModel.isValid
-                          ? MuzhikiColors.ink
+                          ? MuzhikiColors.black23
                           : MuzhikiColors.light,
                       labelColor: viewModel.isValid
                           ? MuzhikiColors.white

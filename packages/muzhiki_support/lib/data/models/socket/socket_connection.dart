@@ -10,7 +10,7 @@ enum ChatType {
   session,
 }
 
-enum MessageStatus { sending, sent, failed }
+enum MessageStatus { init, sending, sent, failed }
 
 enum SocketConnectionChatStatus {
   @JsonValue('Закрыт')
@@ -86,7 +86,7 @@ abstract class MessageModel with _$MessageModel {
 
     @JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt,
 
-    MessageStatus? status,
+    @Default(MessageStatus.init) MessageStatus status,
 
     required String text,
 

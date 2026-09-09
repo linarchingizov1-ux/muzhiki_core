@@ -16,7 +16,6 @@ class ChatHeaderWidgets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MuzhikiColors.depend(context);
     if (snapshot.data == null) {
       return SizedBox.shrink();
     }
@@ -33,9 +32,7 @@ class ChatHeaderWidgets extends StatelessWidget {
             children: [
               MuzhikiUi.buttons.back(
                 onTap: () => context.pop(true),
-                backgroundColor: MuzhikiColors.isDark
-                    ? MuzhikiColors.surface
-                    : MuzhikiColors.grey,
+                backgroundColor: MuzhikiColors.grey,
                 svgAsset: SupportAssets.I.svg.arrowBack,
               ),
               SizedBox(width: 10.w),
@@ -47,8 +44,7 @@ class ChatHeaderWidgets extends StatelessWidget {
                   children: [
                     if (snapshot.data!.title != null)
                       _other.skelet(
-                        enable:
-                            snapshot.connectionState != ConnectionState.active,
+                        enable: snapshot.data!.showHeaderSkeleton,
                         child: Text(
                           snapshot.data!.title!,
                           style: TextStyle(
@@ -62,8 +58,7 @@ class ChatHeaderWidgets extends StatelessWidget {
 
                     if (snapshot.data!.createdAt != null)
                       _other.skelet(
-                        enable:
-                            snapshot.connectionState != ConnectionState.active,
+                        enable: snapshot.data!.showHeaderSkeleton,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

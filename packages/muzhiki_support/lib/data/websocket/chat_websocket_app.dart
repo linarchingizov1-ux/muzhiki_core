@@ -1,5 +1,6 @@
 ﻿import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:muzhiki_dependencies/network/exception/network_exception.dart';
@@ -10,6 +11,7 @@ import 'package:muzhiki_support/data/models/socket/chat_websocket_state.dart';
 import 'package:muzhiki_support/data/models/socket/message/new_message.dart';
 import 'package:muzhiki_support/data/models/socket/message/pending_message.dart';
 import 'package:muzhiki_support/data/models/socket/socket_connection.dart';
+import 'package:muzhiki_support/data/services/chat_message_cache.dart';
 import 'package:muzhiki_support/domain/usecases/chat_usecase.dart';
 import 'package:talker/talker.dart';
 import 'package:uuid/v4.dart';
@@ -36,8 +38,9 @@ class AppWebsocketChat extends WebSocketChat {
     required this.sessionChatId,
     required this.chatUsecase,
     required this.session,
+    required Directory directory,
     this.channelId,
-  }) {
+  }) : _cache = ChatMessageCache(directory) {
     _listener = AppLifecycleListener(
       onShow: () async {
         await _resumeWS();
@@ -52,6 +55,7 @@ class AppWebsocketChat extends WebSocketChat {
   final int? channelId;
   final ChatUseCase chatUsecase;
   final SessionApp session;
+  final ChatMessageCache _cache;
 
   late final AppLifecycleListener _listener;
 
@@ -78,7 +82,10 @@ class AppWebsocketChat extends WebSocketChat {
 
   bool get isConnected => _channel != null;
   bool _isCreating = false;
+  bool _disposed = false;
   final List<PendingMessage> _pendingMessages = [];
+  final Set<String> _inflightUuids = {};
+  Timer? _persistTimer;
 
   void _emit(WebSocketChatState Function(WebSocketChatState state) updater) {
     if (_controller.isClosed) return;
@@ -86,21 +93,83 @@ class AppWebsocketChat extends WebSocketChat {
     _state = updater(_state);
 
     _controller.add(_state);
+    _schedulePersist();
+  }
+
+  Future<void> start() async {
+    await _hydrate();
+    if (_disposed) return;
+    if (isDraft) {
+      openDraftChat();
+      return;
+    }
+    await connect();
+  }
+
+  Future<void> _hydrate() async {
+    final cached = await _cache.load(
+      sessionId: sessionChatId,
+      channelId: channelId,
+    );
+    if (_disposed) return;
+    if (cached.isEmpty) return;
+
+    _pendingMessages
+      ..clear()
+      ..addAll(cached.pending);
+
+    _emit(
+      (s) => s.copyWith(
+        socket: cached.socket,
+        messages: _mergePending(cached.messages),
+        isConnecting: cached.messages.isEmpty && cached.socket == null,
+      ),
+    );
+  }
+
+  List<MessageModel> _mergePending(List<MessageModel> messages) {
+    final pendingModels = _pendingMessages
+        .reversed
+        .map((e) => e.toMessage())
+        .toList();
+    final pendingIds = pendingModels.map((e) => e.id).toSet();
+    final rest = messages.where((m) => !pendingIds.contains(m.id)).toList();
+    return [...pendingModels, ...rest];
+  }
+
+  void _schedulePersist() {
+    _persistTimer?.cancel();
+    _persistTimer = Timer(const Duration(milliseconds: 120), () {
+      unawaited(_persist());
+    });
+  }
+
+  Future<void> _persist() async {
+    if (_disposed) return;
+    await _cache.save(
+      sessionId: sessionChatId,
+      channelId: channelId,
+      socket: _state.socket,
+      messages: _state.messages,
+      pending: List<PendingMessage>.from(_pendingMessages),
+    );
   }
 
   void openDraftChat() => _emit(
     (s) => s.copyWith(
-      messages: [],
+      messages: _mergePending(s.messages),
       didSendInitialMessage: true,
-      socket: SocketConnectionModel(
-        id: 0,
-        chatId: 0,
-        channelId: 0,
-        type: ChatType.session,
-        status: SocketConnectionChatStatus.inital,
-        canWrite: true,
-        title: 'Черновик',
-      ),
+      isConnecting: false,
+      socket: s.socket ??
+          SocketConnectionModel(
+            id: 0,
+            chatId: 0,
+            channelId: 0,
+            type: ChatType.session,
+            status: SocketConnectionChatStatus.inital,
+            canWrite: true,
+            title: 'Черновик',
+          ),
     ),
   );
 
@@ -114,6 +183,7 @@ class AppWebsocketChat extends WebSocketChat {
           sessionChatId = await chatUsecase.createSession(
             channelId: channelId!,
           );
+          await _cache.deleteDraft(channelId: channelId!);
         } catch (e, st) {
           _handleError(e, st, showBanner: true);
           return null;
@@ -143,13 +213,10 @@ class AppWebsocketChat extends WebSocketChat {
       );
 
       _emit((s) {
-        final pendingLocal = s.messages
-            .where((m) => m.status == MessageStatus.sending)
-            .toList();
-
         return s.copyWith(
           socket: socketConnection,
-          messages: [...pendingLocal, ...messages],
+          messages: _mergePending(messages),
+          isConnecting: false,
         );
       });
 
@@ -184,6 +251,7 @@ class AppWebsocketChat extends WebSocketChat {
       await _sendPendingMessages();
       await readMessage(sessionId: sessionChatId!);
     } catch (e, st) {
+      _emit((s) => s.copyWith(isConnecting: false));
       _handleError(e, st, showBanner: true);
     } finally {
       _isConnecting = false;
@@ -201,10 +269,14 @@ class AppWebsocketChat extends WebSocketChat {
     _channel = null;
 
     _isConnecting = false;
+    _inflightUuids.clear();
   }
 
   @override
   Future<void> dispose() async {
+    _disposed = true;
+    _persistTimer?.cancel();
+    await _persist();
     await disconnect();
 
     await _controller.close();
@@ -228,22 +300,21 @@ class AppWebsocketChat extends WebSocketChat {
     final uuid = uuidService.generate();
 
     _pendingMessages.add(
-      PendingMessage(uuid: uuid, text: trimmed, attachments: attachments),
-    );
-
-    final local = MessageModel(
-      id: uuid,
-      text: trimmed,
-
-      status: MessageStatus.sending,
-      createdAt: DateTime.now(),
-      attachments: const [],
+      PendingMessage(
+        uuid: uuid,
+        text: trimmed,
+        attachments: attachments,
+        createdAt: DateTime.now(),
+      ),
     );
 
     _emit(
       (s) => s.copyWith(
-        messages: [local, ...s.messages],
+        messages: _mergePending(
+          s.messages.where((m) => m.status != MessageStatus.sending).toList(),
+        ),
         didSendInitialMessage: false,
+        isConnecting: false,
       ),
     );
     if (!isConnected) {
@@ -260,8 +331,9 @@ class AppWebsocketChat extends WebSocketChat {
   Future<void> _sendPendingMessages() async {
     if (_channel == null) return;
 
-    while (_pendingMessages.isNotEmpty) {
-      final pending = _pendingMessages.removeAt(0);
+    for (final pending in List<PendingMessage>.from(_pendingMessages)) {
+      if (_inflightUuids.contains(pending.uuid)) continue;
+      _inflightUuids.add(pending.uuid);
 
       _channel!.sink.add(
         jsonEncode({
@@ -338,6 +410,14 @@ class AppWebsocketChat extends WebSocketChat {
     if (sessionChatId == null) return;
 
     final socketMessage = NewMessageModel.fromJson(json);
+    final payloadMap = json['payload'];
+    String? clientUuid;
+    if (payloadMap is Map<String, dynamic>) {
+      clientUuid =
+          payloadMap['MessageUUID'] as String? ??
+          payloadMap['message_uuid'] as String? ??
+          payloadMap['messageUuid'] as String?;
+    }
 
     final message = MessageModel(
       name: socketMessage.payload.operatorName,
@@ -346,14 +426,25 @@ class AppWebsocketChat extends WebSocketChat {
       text: socketMessage.payload.text,
       type: socketMessage.payload.type,
       attachments: socketMessage.payload.attachments,
+      status: MessageStatus.sent,
     );
 
-    final index = _state.messages.indexWhere((e) => e.id == message.id);
+    _pendingMessages.removeWhere(
+      (p) => p.uuid == message.id || p.uuid == clientUuid,
+    );
+    _inflightUuids.remove(message.id);
+    if (clientUuid != null) {
+      _inflightUuids.remove(clientUuid);
+    }
+
+    final index = _state.messages.indexWhere(
+      (e) => e.id == message.id || e.id == clientUuid,
+    );
 
     if (index != -1) {
       final list = [..._state.messages];
 
-      list[index] = message.copyWith(status: MessageStatus.sent);
+      list[index] = message;
 
       _emit((s) => s.copyWith(messages: list));
     } else {

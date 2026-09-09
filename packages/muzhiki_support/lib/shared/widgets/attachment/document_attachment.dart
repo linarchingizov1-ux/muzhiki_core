@@ -218,7 +218,7 @@ class _DocumentAttachmentState extends State<DocumentAttachment> {
               padding: EdgeInsets.all(5.r),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.r),
-                color: MuzhikiColors.surface,
+                color: MuzhikiColors.white,
               ),
               child: Image.asset(width: 25.r, height: 25.r, fileIcon),
             ),

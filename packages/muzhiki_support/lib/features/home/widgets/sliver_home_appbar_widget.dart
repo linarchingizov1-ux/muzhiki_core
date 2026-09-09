@@ -19,7 +19,6 @@ class SliverHomeAppbarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MuzhikiColors.depend(context);
     if (typeApp == TypeApp.support && sessionApp != null) {
       return SliverAppBar(
         centerTitle: false,
@@ -43,9 +42,7 @@ class SliverHomeAppbarWidget extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(left: 17.w),
                   child: MuzhikiUi.buttons.back(
-                    backgroundColor: MuzhikiColors.isDark
-                        ? MuzhikiColors.surface
-                        : MuzhikiColors.grey,
+                    backgroundColor: MuzhikiColors.grey,
                     svgAsset: SupportAssets.I.svg.arrowBack,
                     onTap: context.pop,
                   ),

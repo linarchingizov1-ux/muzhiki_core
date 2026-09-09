@@ -11,7 +11,7 @@ class PrimaryButton extends StatelessWidget {
     super.key,
     required this.onPressed,
     required this.label,
-    this.backgroundColor = MuzhikiColors.black17Light,
+    this.backgroundColor = MuzhikiColors.black17,
     this.labelColor,
     this.labelWeight,
     this.labelSize = 15,
@@ -114,7 +114,7 @@ class PrimaryButton extends StatelessWidget {
   }
 
   Color _labelColor(bool enabled) {
-    final isDarkChrome = backgroundColor == MuzhikiColors.black17Light;
+    final isDarkChrome = backgroundColor == MuzhikiColors.black17;
     if (!enabled) {
       return isDarkChrome
           ? MuzhikiColors.white.withValues(alpha: 0.3)

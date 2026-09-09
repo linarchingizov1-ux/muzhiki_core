@@ -592,7 +592,7 @@ as bool,
 /// @nodoc
 mixin _$MessageModel {
 
- String get id;@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? get createdAt; MessageStatus? get status; String get text; MessageType get type;@JsonKey(name: 'operator_name') String? get name; List<AttachmentsModel> get attachments;
+ String get id;@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? get createdAt; MessageStatus get status; String get text; MessageType get type;@JsonKey(name: 'operator_name') String? get name; List<AttachmentsModel> get attachments;
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -625,7 +625,7 @@ abstract mixin class $MessageModelCopyWith<$Res>  {
   factory $MessageModelCopyWith(MessageModel value, $Res Function(MessageModel) _then) = _$MessageModelCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus? status, String text, MessageType type,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
+ String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus status, String text, MessageType type,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
 });
 
 
@@ -642,12 +642,12 @@ class _$MessageModelCopyWithImpl<$Res>
 
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdAt = freezed,Object? status = freezed,Object? text = null,Object? type = null,Object? name = freezed,Object? attachments = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdAt = freezed,Object? status = null,Object? text = null,Object? type = null,Object? name = freezed,Object? attachments = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as MessageStatus?,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MessageStatus,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as MessageType,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,attachments: null == attachments ? _self.attachments : attachments // ignore: cast_nullable_to_non_nullable
@@ -736,7 +736,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MessageModel() when $default != null:
 return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.name,_that.attachments);case _:
@@ -757,7 +757,7 @@ return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)  $default,) {final _that = this;
 switch (_that) {
 case _MessageModel():
 return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.name,_that.attachments);case _:
@@ -777,7 +777,7 @@ return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus? status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate)  DateTime? createdAt,  MessageStatus status,  String text,  MessageType type, @JsonKey(name: 'operator_name')  String? name,  List<AttachmentsModel> attachments)?  $default,) {final _that = this;
 switch (_that) {
 case _MessageModel() when $default != null:
 return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_that.name,_that.attachments);case _:
@@ -792,12 +792,12 @@ return $default(_that.id,_that.createdAt,_that.status,_that.text,_that.type,_tha
 @JsonSerializable()
 
 class _MessageModel implements MessageModel {
-  const _MessageModel({required this.id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate) this.createdAt, this.status, required this.text, this.type = MessageType.client, @JsonKey(name: 'operator_name') this.name, final  List<AttachmentsModel> attachments = const []}): _attachments = attachments;
+  const _MessageModel({required this.id, @JsonKey(name: 'created_at', fromJson: _fromJsonDate) this.createdAt, this.status = MessageStatus.init, required this.text, this.type = MessageType.client, @JsonKey(name: 'operator_name') this.name, final  List<AttachmentsModel> attachments = const []}): _attachments = attachments;
   factory _MessageModel.fromJson(Map<String, dynamic> json) => _$MessageModelFromJson(json);
 
 @override final  String id;
 @override@JsonKey(name: 'created_at', fromJson: _fromJsonDate) final  DateTime? createdAt;
-@override final  MessageStatus? status;
+@override@JsonKey() final  MessageStatus status;
 @override final  String text;
 @override@JsonKey() final  MessageType type;
 @override@JsonKey(name: 'operator_name') final  String? name;
@@ -842,7 +842,7 @@ abstract mixin class _$MessageModelCopyWith<$Res> implements $MessageModelCopyWi
   factory _$MessageModelCopyWith(_MessageModel value, $Res Function(_MessageModel) _then) = __$MessageModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus? status, String text, MessageType type,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
+ String id,@JsonKey(name: 'created_at', fromJson: _fromJsonDate) DateTime? createdAt, MessageStatus status, String text, MessageType type,@JsonKey(name: 'operator_name') String? name, List<AttachmentsModel> attachments
 });
 
 
@@ -859,12 +859,12 @@ class __$MessageModelCopyWithImpl<$Res>
 
 /// Create a copy of MessageModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdAt = freezed,Object? status = freezed,Object? text = null,Object? type = null,Object? name = freezed,Object? attachments = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdAt = freezed,Object? status = null,Object? text = null,Object? type = null,Object? name = freezed,Object? attachments = null,}) {
   return _then(_MessageModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as MessageStatus?,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MessageStatus,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as MessageType,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,attachments: null == attachments ? _self._attachments : attachments // ignore: cast_nullable_to_non_nullable

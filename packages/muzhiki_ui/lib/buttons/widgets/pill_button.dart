@@ -10,7 +10,7 @@ class PillButton extends StatelessWidget {
     super.key,
     required this.onPressed,
     required this.label,
-    this.backgroundColor = MuzhikiColors.black17Light,
+    this.backgroundColor = MuzhikiColors.black17,
     this.labelColor,
     this.height = 45,
     this.padding,

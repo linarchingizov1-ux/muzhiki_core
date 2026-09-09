@@ -15,17 +15,22 @@ class ChatCubit extends Cubit<ChatState> {
   ChatCubit({required this.chatUseCase}) : super(const ChatState());
 
   void silenceRefresh() async {
-    final myChat = await chatUseCase.getMyChats(page: state.chatPage);
+    MyChatModel? myChat = state.myChat;
+    try {
+      myChat = await chatUseCase.getMyChats(page: state.chatPage);
+    } on AppException catch (e, st) {
+      addError(e, st);
+    }
     int channelId;
     if (state.channelId != null) {
       channelId = state.channelId!;
-    } else if (myChat.channels.isNotEmpty) {
+    } else if (myChat != null && myChat.channels.isNotEmpty) {
       channelId = myChat.channels.first.id;
+      final chats = myChat.chatsChannel(channelId: channelId);
+      emit(state.copyWith(myChat: myChat, chats: chats, channelId: channelId));
     } else {
       channelId = 0;
     }
-    final chats = myChat.chatsChannel(channelId: channelId);
-    emit(state.copyWith(myChat: myChat, chats: chats, channelId: channelId));
   }
 
   Future<void> getMyChats() async {
@@ -88,8 +93,8 @@ class ChatCubit extends Cubit<ChatState> {
       final chats = myChat.chatsChannel(channelId: channelId);
 
       emit(state.copyWith(myChat: myChat, chats: chats, channelId: channelId));
-    } catch (e, st) {
-      addError(AppErrorMapper.I.map(e, st), st);
+    } on AppException catch (e, st) {
+      addError(e.message, st);
     }
   }
 
@@ -105,8 +110,8 @@ class ChatCubit extends Cubit<ChatState> {
           messageChat: message.messages,
         ),
       );
-    } catch (e, st) {
-      addError(AppErrorMapper.I.map(e, st), st);
+    } on AppException catch (e, st) {
+      addError(e.message, st);
 
       emit(state.copyWith(chatStatus: StateStatus.success));
     }
@@ -139,9 +144,13 @@ class ChatCubit extends Cubit<ChatState> {
         error?.debugMessage ??
         error?.stackTrace?.toString() ??
         'No details';
-    await chatUseCase.sendProblems(
-      error: error ?? AppException(message: validError.toString()),
-      source: 'Список чатов поддержки (mp_master)',
-    );
+    try {
+      await chatUseCase.sendProblems(
+        error: error ?? AppException(message: validError.toString()),
+        source: 'Список чатов поддержки (mp_master)',
+      );
+    } on AppException catch (e, st) {
+      addError(e.message, st);
+    }
   }
 }

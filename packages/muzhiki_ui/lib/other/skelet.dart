@@ -4,39 +4,31 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 class AppSkelet extends StatelessWidget {
   final Widget child;
-
-  /// `null` — автоматически по [MuzhikiColors.isDark].
-  final bool? lightPage;
+  final bool lightPage;
   final bool ignoreContainer;
   final bool enable;
-
   const AppSkelet({
     super.key,
     required this.child,
-    this.lightPage,
+    this.lightPage = true,
     required this.enable,
     this.ignoreContainer = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final useLightShimmer = lightPage ?? !MuzhikiColors.isDark;
-
     return Skeletonizer(
       ignoreContainers: ignoreContainer,
       ignorePointers: true,
       enabled: enable,
-      effect: useLightShimmer
-          ? RawShimmerEffect(
-              colors: [
-                MuzhikiColors.surface,
-                MuzhikiColors.light,
-              ],
+      effect: !lightPage
+          ? const RawShimmerEffect(
+              colors: [MuzhikiColors.blackOpticalZero, MuzhikiColors.grey],
             )
-          : RawShimmerEffect(
+          : const RawShimmerEffect(
               colors: [
-                MuzhikiColors.blackOpticalZero,
-                MuzhikiColors.grey,
+                Color.fromARGB(255, 255, 255, 255),
+                Color.fromARGB(255, 208, 208, 208),
               ],
             ),
       child: child,

@@ -23,112 +23,20 @@ class WebSocketChatState {
 
   final String? errorMessage;
 
+  final bool isConnecting;
+
   const WebSocketChatState({
-    this.messages = const [
-      MessageModel(
-        id: 'mock_1',
-        name: 'Оператор',
-        text: 'Здравствуйте',
-        type: MessageType.operator,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_2',
-        name: 'Вы',
-        text: 'Добрый день',
-        type: MessageType.client,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_3',
-        name: 'Оператор',
-        text: 'Чем могу помочь?',
-        type: MessageType.operator,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_4',
-        name: 'Вы',
-        text: 'Есть вопрос по обращению',
-        type: MessageType.client,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_5',
-        name: 'Оператор',
-        text: 'Конечно, уточните пожалуйста детали',
-        type: MessageType.operator,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_6',
-        name: 'Вы',
-        text: 'Я отправлял фото, но не уверен что они загрузились',
-        type: MessageType.client,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_7',
-        name: 'Оператор',
-        text: 'Сейчас проверю информацию, одну минуту',
-        type: MessageType.operator,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_8',
-        name: 'Оператор',
-        text: 'Да, фотографии получены, всё в порядке',
-        type: MessageType.operator,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_9',
-        name: 'Вы',
-        text: 'Отлично, спасибо',
-        type: MessageType.client,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_10',
-        name: 'Вы',
-        text: 'А когда будет результат проверки?',
-        type: MessageType.client,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_11',
-        name: 'Оператор',
-        text: 'Обычно это занимает до 24 часов',
-        type: MessageType.operator,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_12',
-        name: 'Оператор',
-        text: 'Мы уведомим вас, как только всё будет готово',
-        type: MessageType.operator,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_13',
-        name: 'Вы',
-        text: 'Хорошо, буду ждать',
-        type: MessageType.client,
-        attachments: [],
-      ),
-      MessageModel(
-        id: 'mock_14',
-        name: 'Оператор',
-        text: 'Спасибо за обращение 🙌',
-        type: MessageType.operator,
-        attachments: [],
-      ),
-    ],
+    this.messages = const [],
     this.socket,
     this.didSendInitialMessage = false,
     this.hasError = false,
     this.errorMessage,
+    this.isConnecting = true,
   });
+
+  bool get showMessageSkeleton => isConnecting && messages.isEmpty;
+
+  bool get showHeaderSkeleton => isConnecting && socket == null;
 
   bool get canWrite =>
       socket?.canWrite == true &&
@@ -178,6 +86,7 @@ class WebSocketChatState {
     bool? didSendInitialMessage,
     bool? hasError,
     String? errorMessage,
+    bool? isConnecting,
   }) {
     return WebSocketChatState(
       messages: messages ?? this.messages,
@@ -186,6 +95,7 @@ class WebSocketChatState {
           didSendInitialMessage ?? this.didSendInitialMessage,
       hasError: hasError ?? this.hasError,
       errorMessage: errorMessage,
+      isConnecting: isConnecting ?? this.isConnecting,
     );
   }
 }

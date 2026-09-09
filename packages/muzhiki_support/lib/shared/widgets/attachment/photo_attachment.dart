@@ -77,7 +77,7 @@ class PhotoAttachment extends StatelessWidget {
           placeholder: (context, url) {
             return Shimmer.fromColors(
               baseColor: MuzhikiColors.light,
-              highlightColor: MuzhikiColors.surface,
+              highlightColor: MuzhikiColors.white,
               child: Container(
                 width: 120.w,
                 height: 120.w,

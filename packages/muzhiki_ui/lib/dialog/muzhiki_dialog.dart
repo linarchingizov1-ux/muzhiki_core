@@ -59,7 +59,7 @@ final class MuzhikiDialog {
         reverseDuration: const Duration(milliseconds: 250),
       ),
       builder: (context) {
-        final sheetColor = backgroundColor ?? MuzhikiColors.surface;
+        final sheetColor = backgroundColor ?? MuzhikiColors.white;
 
         if (height != null) {
           return PopScope(

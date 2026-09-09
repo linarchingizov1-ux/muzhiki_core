@@ -17,7 +17,7 @@ import 'package:muzhiki_ui/other/other.dart';
 
 const _other = MuzhikiOther();
 
-class ChatMessageWidgets extends StatelessWidget {
+class ChatMessageWidgets extends StatefulWidget {
   final AppWebsocketChat websocket;
   final ChatCubit chatCubit;
   final Directory directory;
@@ -35,11 +35,90 @@ class ChatMessageWidgets extends StatelessWidget {
     required this.directory,
   });
 
+  static const _skeletonPlaceholders = [
+    MessageModel(id: 'sk_1', text: 'Здравствуйте', type: MessageType.operator),
+    MessageModel(id: 'sk_2', text: 'Добрый день', type: MessageType.client),
+    MessageModel(
+      id: 'sk_3',
+      text: 'Чем могу помочь?',
+      type: MessageType.operator,
+    ),
+    MessageModel(
+      id: 'sk_4',
+      text: 'Есть вопрос по обращению',
+      type: MessageType.client,
+    ),
+  ];
+
+  @override
+  State<ChatMessageWidgets> createState() => _ChatMessageWidgetsState();
+}
+
+class _ChatMessageWidgetsState extends State<ChatMessageWidgets> {
+  final Set<String> _knownIds = {};
+  bool _armed = false;
+  bool _hadSkeleton = false;
+  String? _newestId;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _captureCurrentIds();
+      _armed = true;
+    });
+  }
+
+  @override
+  void didUpdateWidget(ChatMessageWidgets oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_armed) return;
+
+    final messages = _visibleMessages;
+    if (messages == null || messages.isEmpty) return;
+
+    if (_knownIds.isEmpty && (_hadSkeleton || messages.length > 1)) {
+      _captureCurrentIds();
+      return;
+    }
+
+    final newest = messages.first.id;
+    if (_newestId != null &&
+        newest != _newestId &&
+        !_knownIds.contains(newest) &&
+        messages.every((m) => m.id != _newestId)) {
+      _knownIds.add(newest);
+    }
+    _newestId = newest;
+  }
+
+  List<MessageModel>? get _visibleMessages {
+    final data = widget.snapshot.data;
+    if (data == null || data.showMessageSkeleton) return null;
+    return data.messages;
+  }
+
+  void _captureCurrentIds() {
+    final messages = _visibleMessages;
+    if (messages == null) return;
+    _knownIds.addAll(messages.map((m) => m.id));
+    _newestId = messages.firstOrNull?.id;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final data = widget.snapshot.data;
+    final showSkeleton = data?.showMessageSkeleton ?? true;
+    if (showSkeleton) {
+      _hadSkeleton = true;
+    }
+    final messages = showSkeleton
+        ? ChatMessageWidgets._skeletonPlaceholders
+        : data!.messages;
     final hasFooter =
-        snapshot.data?.socket?.footerState == ChatFooterState.chat ||
-        snapshot.data?.socket?.footerState == ChatFooterState.initial;
+        data?.socket?.footerState == ChatFooterState.chat ||
+        data?.socket?.footerState == ChatFooterState.initial;
     return InkWell(
       onTap: () {
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
@@ -50,32 +129,43 @@ class ChatMessageWidgets extends StatelessWidget {
             child: ListView.separated(
               reverse: true,
               scrollCacheExtent: ScrollCacheExtent.pixels(300),
-              physics: snapshot.connectionState != ConnectionState.active
+              physics: showSkeleton
                   ? const NeverScrollableScrollPhysics()
                   : null,
               padding: EdgeInsets.only(
-                top: topInset + 80.h,
+                top: widget.topInset + 80.h,
                 left: 17.w,
                 right: 17.w,
                 bottom: hasFooter
                     ? MediaQuery.paddingOf(context).bottom + 65.h + 16.h
                     : 16.h,
               ),
-              itemCount: snapshot.data!.messages.length,
+              itemCount: messages.length,
               separatorBuilder: (_, _) => SizedBox(height: 10.h),
               itemBuilder: (context, index) {
-                final mess = snapshot.data!.messages[index];
-
+                final mess = messages[index];
                 final isMe = mess.type == MessageType.client;
+                final animateInsert =
+                    !showSkeleton &&
+                    index == 0 &&
+                    _armed &&
+                    !_knownIds.contains(mess.id);
+
+                if (animateInsert) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _knownIds.add(mess.id);
+                  });
+                }
 
                 return _other.skelet(
-                  enable: snapshot.connectionState != ConnectionState.active,
+                  enable: showSkeleton,
                   child: ChatMessageBubble(
-                    chatCubit: chatCubit,
-                    directory: directory,
-                    websocketChat: websocket,
+                    animateInsert: animateInsert,
+                    chatCubit: widget.chatCubit,
+                    directory: widget.directory,
+                    websocketChat: widget.websocket,
                     key: ValueKey(mess.id),
-                    avatar: snapshot.data!.operatorAvatar,
+                    avatar: data?.operatorAvatar,
                     mess: mess,
                     attachments: mess.attachments,
                     isMe: isMe,
@@ -87,26 +177,26 @@ class ChatMessageWidgets extends StatelessWidget {
               },
             ),
           ),
-          if (snapshot.data != null && snapshot.data!.socket != null)
+          if (widget.snapshot.data != null && widget.snapshot.data!.socket != null)
             Builder(
               builder: (context) {
-                switch (snapshot.data!.socket!.footerState) {
+                switch (widget.snapshot.data!.socket!.footerState) {
                   case ChatFooterState.closedNeedRating:
                     return ChatBottomAreaRatedWidgets(
-                      webSocketApp: websocket,
-                      state: snapshot.data!,
+                      webSocketApp: widget.websocket,
+                      state: widget.snapshot.data!,
                     );
 
                   case ChatFooterState.closedRated:
                     return ChatBottomAreaClosedAndRatedWidgets(
-                      webSocketApp: websocket,
-                      state: snapshot.data!,
+                      webSocketApp: widget.websocket,
+                      state: widget.snapshot.data!,
                     );
 
                   case ChatFooterState.ticketActive:
                     return ChatBottomAreaTicketWidgets(
-                      webSocketApp: websocket,
-                      state: snapshot.data!,
+                      webSocketApp: widget.websocket,
+                      state: widget.snapshot.data!,
                     );
                   case ChatFooterState.chat || ChatFooterState.initial:
                     return const SizedBox.shrink();

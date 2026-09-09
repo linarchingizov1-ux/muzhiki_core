@@ -236,7 +236,7 @@ class DialogMenu {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: MuzhikiColors.appBackgroudLight,
+                      color: MuzhikiColors.appBackgroud,
                     ),
                     child: Material(
                       color: Colors.red,
@@ -248,7 +248,7 @@ class DialogMenu {
                           child: SvgPicture.asset(
                             SupportAssets.I.svg.dashboard,
                             colorFilter: ColorFilter.mode(
-                              MuzhikiColors.darkGreyLight,
+                              MuzhikiColors.darkGrey,
                               BlendMode.srcIn,
                             ),
                           ),

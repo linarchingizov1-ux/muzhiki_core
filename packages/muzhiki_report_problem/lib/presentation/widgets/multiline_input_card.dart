@@ -49,7 +49,7 @@ class _MultilineInputCardState extends State<MultilineInputCard> {
         ),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: MuzhikiColors.surface,
+          color: MuzhikiColors.white,
           borderRadius: BorderRadius.circular(21.r),
         ),
         child: Column(

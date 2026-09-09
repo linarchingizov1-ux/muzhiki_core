@@ -47,7 +47,7 @@ class _ChatBottomWidgetsState extends State<ChatBottomWidgets> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.snapshot.connectionState != ConnectionState.active) {
+    if (widget.snapshot.data?.socket == null) {
       return const SizedBox.shrink();
     }
 

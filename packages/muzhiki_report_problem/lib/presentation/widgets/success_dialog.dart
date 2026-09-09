@@ -35,7 +35,7 @@ class SuccessDialog extends StatelessWidget {
         SizedBox(height: 27.h),
         MuzhikiUi.buttons.primary(
           label: 'Отлично',
-          backgroundColor: MuzhikiColors.ink,
+          backgroundColor: MuzhikiColors.black23,
           labelColor: MuzhikiColors.white,
           borderRadius: 23,
           onPressed: () => context.pop(),

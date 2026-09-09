@@ -54,15 +54,9 @@ class _ChatViewState extends State<ChatView> {
       channelId: widget.chatCubit.state.channelId,
       chatUsecase: widget.chatUseCase,
       session: widget.session,
+      directory: widget.directory,
     );
-
-    if (websocketApp.isDraft) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        websocketApp.openDraftChat();
-      });
-    } else {
-      websocketApp.connect();
-    }
+    websocketApp.start();
 
     switch (widget.extra) {
       case SupportChatsEventWidgets event:
@@ -94,11 +88,8 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
-    MuzhikiColors.depend(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: MuzhikiColors.isDark
-          ? SystemUiOverlayStyle.light
-          : SystemUiOverlayStyle.dark,
+      value: SystemUiOverlayStyle.dark,
       child: PopScope(
         onPopInvokedWithResult: (didPop, result) {
           if (needUpdate || (widget.id == null && !websocketApp.isDraft)) {

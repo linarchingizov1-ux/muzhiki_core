@@ -15,6 +15,7 @@ import 'package:muzhiki_support/shared/widgets/attachment/attachment_widgets.dar
 import 'package:shimmer/shimmer.dart';
 
 class ChatMessageBubble extends StatefulWidget {
+  final bool animateInsert;
   final AppWebsocketChat websocketChat;
   final ChatCubit chatCubit;
   final Directory directory;
@@ -36,6 +37,7 @@ class ChatMessageBubble extends StatefulWidget {
     required this.messageDate,
     required this.chatCubit,
     required this.directory,
+    this.animateInsert = false,
   });
 
   @override
@@ -43,9 +45,11 @@ class ChatMessageBubble extends StatefulWidget {
 }
 
 class _ChatMessageBubbleState extends State<ChatMessageBubble> {
+  late final bool _animateInsert = widget.animateInsert;
+
   @override
   Widget build(BuildContext context) {
-    return TextSelectionTheme(
+    Widget bubble = TextSelectionTheme(
       data: TextSelectionThemeData(
         selectionColor: const Color(0xFF2AABEE).withValues(alpha: 0.25),
         selectionHandleColor: const Color(0xFF2AABEE),
@@ -62,7 +66,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
             children: [
               if (!widget.isMe)
                 CircleAvatar(
-                  backgroundColor: MuzhikiColors.surface,
+                  backgroundColor: MuzhikiColors.white,
                   radius: 22.r,
                   child: widget.avatar == null || widget.avatar!.isEmpty
                       ? Icon(Icons.person, size: 20.r, color: Colors.grey)
@@ -82,7 +86,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                 height: 44.r,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: MuzhikiColors.surface,
+                                  color: MuzhikiColors.white,
                                 ),
                               ),
                             ),
@@ -102,7 +106,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                   borderRadius: BorderRadius.circular(12.r),
                   color: widget.isMe
                       ? MuzhikiColors.light
-                      : MuzhikiColors.surface,
+                      : MuzhikiColors.white,
                 ),
                 child: IntrinsicWidth(
                   child: Column(
@@ -166,30 +170,29 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
-                                if (widget.mess.status != null)
-                                  switch (widget.mess.status) {
-                                    (MessageStatus.sending) =>
-                                      Icon(
-                                            Icons.schedule_rounded,
-                                            size: 16.r,
-                                            color: MuzhikiColors.grey,
-                                          )
-                                          .animate(
-                                            onPlay: (controller) =>
-                                                controller.repeat(),
-                                          )
-                                          .rotate(
-                                            duration: 1.seconds,
-                                            curve: Curves.linear,
-                                          ),
-                                    (MessageStatus.failed) => Icon(
-                                      Icons.close,
-                                      size: 16.r,
-                                      color: MuzhikiColors.blood,
-                                    ),
-                                    MessageStatus.sent ||
-                                    null => const SizedBox.shrink(),
-                                  },
+                                switch (widget.mess.status) {
+                                  (MessageStatus.sending) =>
+                                    Icon(
+                                          Icons.schedule_rounded,
+                                          size: 16.r,
+                                          color: MuzhikiColors.grey,
+                                        )
+                                        .animate(
+                                          onPlay: (controller) =>
+                                              controller.repeat(),
+                                        )
+                                        .rotate(
+                                          duration: 1.seconds,
+                                          curve: Curves.linear,
+                                        ),
+                                  (MessageStatus.failed) => Icon(
+                                    Icons.close,
+                                    size: 16.r,
+                                    color: MuzhikiColors.blood,
+                                  ),
+                                  MessageStatus.sent ||
+                                  MessageStatus.init => const SizedBox.shrink(),
+                                },
                               ],
                             ),
                           ),
@@ -203,6 +206,17 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
         },
       ),
     );
+
+    if (!_animateInsert) return bubble;
+
+    return bubble
+        .animate()
+        .fadeIn(duration: 160.ms, curve: Curves.easeOut)
+        .slideY(
+          begin: 0.18,
+          duration: 220.ms,
+          curve: Curves.easeOutCubic,
+        );
   }
 }
 
@@ -260,7 +274,7 @@ class __MessageWidgetStateState extends State<_MessageWidgetState> {
             style: TextStyle(
               fontFamily: 'Manrope',
               fontSize: 12,
-              color: MuzhikiColors.isDark ? Colors.white : Colors.black,
+              color: Colors.black,
             ),
           ),
         );
