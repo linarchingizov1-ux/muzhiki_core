@@ -486,18 +486,13 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        return FadeTransition(opacity: animation, child: child);
-      },
-      child: Stack(
-        children: [
-          WebViewWidget(controller: _controller),
+    return Stack(
+      children: [
+        WebViewWidget(controller: _controller),
 
-          if (isLoading) const Center(child: CircularProgressIndicator()),
-        ],
-      ),
+        if (isLoading)
+          const Center(child: CircularProgressIndicator.adaptive()),
+      ],
     );
   }
 }
