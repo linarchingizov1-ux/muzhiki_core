@@ -4,9 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:muzhiki_bridge/data/model/bridge_session.dart';
-import 'package:muzhiki_bridge/data/repository/bridge_auth_repository.dart';
-import 'package:muzhiki_bridge/domain/usecase/bridge_auth_usecase.dart';
+import 'package:muzhiki_bridge/bridge_auth.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -22,7 +20,6 @@ class MpBridgeWebView extends StatefulWidget {
   final String? companyId;
   final SessionApp session;
   final List<int>? masterAudit;
-
   final void Function(MpBridgeClearCookies clearCookies)? onClearCookiesReady;
 
   const MpBridgeWebView({
@@ -42,64 +39,61 @@ class MpBridgeWebView extends StatefulWidget {
 }
 
 class MpBridgeWebViewState extends State<MpBridgeWebView> {
-  late BridgeAuthUsecase bridgeAuthUsecase;
   static const _channelName = 'MPBridgeChannel';
 
+  late final BridgeAuth _auth;
   late final WebViewController _controller;
-  late final Stream<BridgeSession> _sessionUpdates;
-  StreamSubscription? _sessionSubscription;
-  final WebViewCookieManager _cookieManager = WebViewCookieManager();
+  StreamSubscription<BridgeSession>? _sessionSubscription;
 
   bool _bridgeInjectedForCurrentPage = false;
   bool isLoading = true;
   bool disposed = false;
 
-  (String platform, String appVersion, String buildNumber)
-  get _platformAppInfo {
-    final version = widget.version;
-    final buildNumber = widget.build;
+  bool get _alive => mounted && !disposed;
 
-    if (Platform.isAndroid) {
-      return ('android', version, buildNumber);
-    }
-
-    if (Platform.isIOS) {
-      return ('ios', version, buildNumber);
-    }
-
-    return ('unknown', '', '');
-  }
+  late final String _platform = Platform.isAndroid
+      ? 'android'
+      : Platform.isIOS
+      ? 'ios'
+      : 'unknown';
 
   @override
   void initState() {
     super.initState();
-
-    if (widget.initialUrl.contains("bus-wa")) {
+    if (widget.initialUrl.contains('bus-wa')) {
       Permission.camera.request();
     }
-    bridgeAuthUsecase = BridgeAuthUsecase(
-      repository: BridgeAuthRepositoryImpl(widget.session),
-    );
-    _sessionUpdates = bridgeAuthUsecase.sessionUpdates;
+    _auth = BridgeAuth(widget.session);
     _controller = _buildController();
     widget.onClearCookiesReady?.call(clearCookies);
     unawaited(_bootstrap());
   }
 
   Uri get _initialUri {
-    final urlParse = widget.companyId != null
-        ? "${widget.initialUrl}?show_header=${widget.showAppBar}&salon_id=${widget.companyId}"
-        : widget.masterAudit != null && widget.masterAudit!.isNotEmpty
-        ? "${widget.initialUrl}/${widget.masterAudit!.first}/audits/${widget.masterAudit!.last}?show_header=${widget.showAppBar}"
-        : "${widget.initialUrl}?show_header=${widget.showAppBar}";
-    return Uri.parse(urlParse);
+    final header = 'show_header=${widget.showAppBar}';
+    final audit = widget.masterAudit;
+    final url = widget.companyId != null
+        ? '${widget.initialUrl}?$header&salon_id=${widget.companyId}'
+        : audit != null && audit.isNotEmpty
+        ? '${widget.initialUrl}/${audit.first}/audits/${audit.last}?$header'
+        : '${widget.initialUrl}?$header';
+    return Uri.parse(url);
   }
 
   Future<void> _bootstrap() async {
     // Слушатель до seed, иначе первый auth:tokenUpdated теряется.
-    _listenSessionUpdates();
-    await bridgeAuthUsecase.seedSession();
-    if (!mounted || disposed) return;
+    _sessionSubscription = _auth.sessionUpdates.listen((session) {
+      if (!_alive) return;
+      unawaited(
+        _dispatchEvent('auth:tokenUpdated', {
+          'accessToken': session.accessToken,
+          'expiresAt': session.expiresAt,
+          'user': session.user,
+        }),
+      );
+    });
+    await _auth.seedSession();
+    if (!_alive) return;
     await _controller.loadRequest(_initialUri);
   }
 
@@ -109,82 +103,50 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     // иначе SPA думает, что пользователь разлогинился.
     disposed = true;
     _sessionSubscription?.cancel();
-    bridgeAuthUsecase.dispose();
+    _auth.dispose();
     super.dispose();
   }
 
-  /// Очищает cookies WebView.
   Future<void> clearCookies() async {
     try {
-      await _cookieManager.clearCookies();
+      await WebViewCookieManager().clearCookies();
     } catch (e) {
       debugPrint('Clear cookies failed: $e');
     }
   }
 
-  void _listenSessionUpdates() {
-    _sessionSubscription?.cancel();
+  Map<String, dynamic> _sessionPayload(
+    BridgeSession session, [
+    String? requestId,
+  ]) => {
+    'requestId': requestId,
+    'accessToken': session.accessToken,
+    'expiresAt': session.expiresAt,
+    'user': session.user,
+  };
 
-    _sessionSubscription = _sessionUpdates.listen((session) async {
-      if (!mounted || disposed) return;
+  Future<void> _sendSession(String? requestId) async {
+    final session = await _auth.ensureSession();
+    if (session == null) {
+      await _sendError(requestId, 'NO_SESSION', 'Отсутствует активная сессия');
+      return;
+    }
+    await _dispatchEvent('auth:session', _sessionPayload(session, requestId));
+  }
 
-      await _dispatchEvent(
-        type: 'auth:tokenUpdated',
-        payload: {
-          'accessToken': session.accessToken,
-          'expiresAt': session.expiresAt,
-          'user': session.user,
-        },
-      );
+  Future<void> _sendAppContext(String? requestId) {
+    final known = _platform != 'unknown';
+    return _dispatchEvent('app:context', {
+      'requestId': requestId,
+      'platform': _platform,
+      'appVersion': known ? widget.version : '',
+      'buildNumber': known ? widget.build : '',
+      'environment': kDebugMode ? 'development' : 'production',
     });
   }
 
-  Future<void> _handleWebReady(String? requestId) async {
-    await _sendAppContext(requestId);
-
-    var session = await bridgeAuthUsecase.getCurrentSession();
-
-    if (session == null) {
-      await bridgeAuthUsecase.seedSession();
-      session = await bridgeAuthUsecase.getCurrentSession();
-    }
-
-    if (session == null || session.accessToken.isEmpty) {
-      await _sendError(
-        requestId: requestId,
-        code: 'NO_SESSION',
-        message: 'Отсутствует активная сессия',
-      );
-      return;
-    }
-
-    await _dispatchEvent(
-      type: 'auth:session',
-      payload: {
-        'requestId': requestId,
-        'accessToken': session.accessToken,
-        'expiresAt': session.expiresAt,
-        'user': session.user,
-      },
-    );
-  }
-
-  Future<void> _sendAppContext(String? requestId) async {
-    await _dispatchEvent(
-      type: 'app:context',
-      payload: {
-        'requestId': requestId,
-        'platform': _platformAppInfo.$1,
-        'appVersion': _platformAppInfo.$2,
-        'buildNumber': _platformAppInfo.$3,
-        'environment': kDebugMode ? 'development' : 'production',
-      },
-    );
-  }
-
   WebViewController _buildController() {
-    late final PlatformWebViewControllerCreationParams params;
-
+    final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
       params = WebKitWebViewControllerCreationParams(
         allowsInlineMediaPlayback: true,
@@ -202,36 +164,26 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     final controller =
         WebViewController.fromPlatformCreationParams(
             params,
-            onPermissionRequest: (request) {
-              request.grant();
-            },
+            onPermissionRequest: (request) => request.grant(),
           )
           ..setJavaScriptMode(JavaScriptMode.unrestricted)
           ..setBackgroundColor(Colors.white)
           ..addJavaScriptChannel(
             _channelName,
-            onMessageReceived: (JavaScriptMessage message) async {
-              await _handleWebMessage(message.message);
-            },
+            onMessageReceived: (message) => _handleWebMessage(message.message),
           )
           ..setNavigationDelegate(
             NavigationDelegate(
-              onPageStarted: (url) async {
+              onPageStarted: (_) {
                 _bridgeInjectedForCurrentPage = false;
-                await _ensureBridgeInjected();
+                unawaited(_ensureBridgeInjected());
               },
-              onPageFinished: (url) async {
+              onPageFinished: (_) async {
                 await _ensureBridgeInjected();
-                if (mounted) {
-                  setState(() {
-                    isLoading = false;
-                  });
-                }
+                if (mounted) setState(() => isLoading = false);
               },
               onWebResourceError: (error) {
-                setState(() {
-                  isLoading = false;
-                });
+                setState(() => isLoading = false);
                 debugPrint(
                   'Web resource error: ${error.description}, '
                   'mainFrame=${error.isForMainFrame}',
@@ -240,15 +192,12 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
             ),
           );
 
-    if (controller.platform is AndroidWebViewController) {
+    final platform = controller.platform;
+    if (platform is AndroidWebViewController) {
       AndroidWebViewController.enableDebugging(kDebugMode);
-      final androidController = controller.platform as AndroidWebViewController;
-      androidController.setMediaPlaybackRequiresUserGesture(false);
-    }
-
-    if (controller.platform is WebKitWebViewController) {
-      final iosController = controller.platform as WebKitWebViewController;
-      iosController.setAllowsBackForwardNavigationGestures(true);
+      platform.setMediaPlaybackRequiresUserGesture(false);
+    } else if (platform is WebKitWebViewController) {
+      platform.setAllowsBackForwardNavigationGestures(true);
     }
 
     return controller;
@@ -256,69 +205,43 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
 
   Future<void> _ensureBridgeInjected() async {
     try {
-      await _controller.runJavaScriptReturningResult(
-        _bootstrapBridgeJs(_platformAppInfo.$1),
-      );
+      await _controller.runJavaScriptReturningResult('''
+        (function() {
+          if (window.MPBridge?.__mpInstalled === true) return true;
+          window.MPBridge = {
+            __mpInstalled: true,
+            platform: ${jsonEncode(_platform)},
+            version: "1.0",
+            postMessage: function(messageJson) {
+              try {
+                window.$_channelName.postMessage(
+                  typeof messageJson === 'string'
+                    ? messageJson
+                    : JSON.stringify(messageJson)
+                );
+              } catch (e) { console.error(e); }
+            }
+          };
+          return true;
+        })();
+      ''');
       _bridgeInjectedForCurrentPage = true;
     } catch (e) {
       debugPrint('Bridge injection failed: $e');
     }
   }
 
-  String _bootstrapBridgeJs(String platform) {
-    final platformJson = jsonEncode(platform);
-
-    return '''
-    (function() {
-      if (window.MPBridge?.__mpInstalled === true) {
-        return true;
-      }
-
-      window.MPBridge = {
-        __mpInstalled: true,
-        platform: $platformJson,
-        version: "1.0",
-
-        postMessage: function(messageJson) {
-          try {
-            window.$_channelName.postMessage(
-              typeof messageJson === 'string'
-                ? messageJson
-                : JSON.stringify(messageJson)
-            );
-          } catch (e) {
-            console.error(e);
-          }
-        }
-      };
-
-      return true;
-    })();
-    ''';
-  }
-
   Future<void> _handleWebMessage(String raw) async {
-    Map<String, dynamic> msg;
-
+    late final Map<String, dynamic> msg;
     try {
       final decoded = jsonDecode(raw);
-
       if (decoded is! Map) {
-        await _sendError(
-          requestId: null,
-          code: 'UNAUTHORIZED',
-          message: 'Invalid message format',
-        );
+        await _sendError(null, 'UNAUTHORIZED', 'Invalid message format');
         return;
       }
-
       msg = Map<String, dynamic>.from(decoded);
     } catch (_) {
-      await _sendError(
-        requestId: null,
-        code: 'UNAUTHORIZED',
-        message: 'Message is not valid JSON',
-      );
+      await _sendError(null, 'UNAUTHORIZED', 'Message is not valid JSON');
       return;
     }
 
@@ -327,157 +250,76 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
 
     switch (type) {
       case 'web:ready':
-        await _handleWebReady(requestId);
-        break;
-
+        await _sendAppContext(requestId);
+        await _sendSession(requestId);
       case 'app:getContext':
         await _sendAppContext(requestId);
-        break;
-
       case 'auth:getSession':
-        await _handleGetSession(requestId);
-        break;
-
+        try {
+          await _sendSession(requestId);
+        } catch (e) {
+          await _sendError(
+            requestId,
+            'UNAUTHORIZED',
+            'Ошибка при получении сессии: $e',
+          );
+        }
       case 'auth:refresh':
-        await _handleRefresh(requestId);
-        break;
-
+        try {
+          final session = await _auth.refresh();
+          await _dispatchEvent(
+            'auth:refreshed',
+            _sessionPayload(session, requestId),
+          );
+        } catch (e) {
+          await _sendError(
+            requestId,
+            'REFRESH_FAILED',
+            'Ошибка ревреше в сесии: $e',
+          );
+        }
       case 'auth:logout':
-        await _handleLogout();
-        break;
-
+        try {
+          _auth.logout();
+          await logout();
+        } catch (e) {
+          await _sendError(null, 'UNAUTHORIZED', 'Logout failed: $e');
+        }
       default:
         await _sendError(
-          requestId: requestId,
-          code: 'UNAUTHORIZED',
-          message: 'Unsupported bridge command: $type',
+          requestId,
+          'UNAUTHORIZED',
+          'Unsupported bridge command: $type',
         );
     }
   }
 
-  Future<void> _handleGetSession(String? requestId) async {
-    try {
-      var session = await bridgeAuthUsecase.getCurrentSession();
+  Future<void> logout() => _dispatchEvent('auth:logout', {
+    'reason': 'native_logout',
+    'timestamp': DateTime.now().toIso8601String(),
+  });
 
-      if (session == null) {
-        await bridgeAuthUsecase.seedSession();
-        session = await bridgeAuthUsecase.getCurrentSession();
-      }
+  Future<void> _sendError(String? requestId, String code, String message) =>
+      _dispatchEvent('auth:error', {
+        'requestId': requestId,
+        'code': code,
+        'message': message,
+      });
 
-      if (session == null || session.accessToken.isEmpty) {
-        await _sendError(
-          requestId: requestId,
-          code: 'NO_SESSION',
-          message: 'Отсутствует активная сессия',
-        );
-        return;
-      }
-
-      await _dispatchEvent(
-        type: 'auth:session',
-        payload: {
-          'requestId': requestId,
-          'accessToken': session.accessToken,
-          'expiresAt': session.expiresAt,
-          'user': session.user,
-        },
-      );
-    } catch (e) {
-      await _sendError(
-        requestId: requestId,
-        code: 'UNAUTHORIZED',
-        message: 'Ошибка при получении сессии: $e',
-      );
-    }
-  }
-
-  Future<void> _handleRefresh(String? requestId) async {
-    try {
-      final session = await bridgeAuthUsecase.refresh();
-
-      await _dispatchEvent(
-        type: 'auth:refreshed',
-        payload: {
-          'requestId': requestId,
-          'accessToken': session.accessToken,
-          'expiresAt': session.expiresAt,
-          'user': session.user,
-        },
-      );
-    } catch (e) {
-      await _sendError(
-        requestId: requestId,
-        code: 'REFRESH_FAILED',
-        message: 'Ошибка ревреше в сесии: $e',
-      );
-    }
-  }
-
-  Future<void> _handleLogout() async {
-    try {
-      await bridgeAuthUsecase.logout();
-
-      await _dispatchEvent(
-        type: 'auth:logout',
-        payload: {
-          'reason': "native_logout",
-          'timestamp': DateTime.now().toIso8601String(),
-        },
-      );
-    } catch (e) {
-      await _sendError(
-        requestId: null,
-        code: 'UNAUTHORIZED',
-        message: 'Logout failed: $e',
-      );
-    }
-  }
-
-  Future<void> logout() async {
-    await _dispatchEvent(
-      type: 'auth:logout',
-      payload: {
-        'reason': 'native_logout',
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  Future<void> _sendError({
-    required String? requestId,
-    required String code,
-    required String message,
-  }) async {
-    await _dispatchEvent(
-      type: 'auth:error',
-      payload: {'requestId': requestId, 'code': code, 'message': message},
-    );
-  }
-
-  Future<void> _dispatchEvent({
-    required String type,
-    required Map<String, dynamic> payload,
-  }) async {
-    if (disposed || !mounted) return;
-
-    final eventJson = jsonEncode({'type': type, 'payload': payload});
-
+  Future<void> _dispatchEvent(String type, Map<String, dynamic> payload) async {
+    if (!_alive) return;
     final js =
         '''
     (function() {
       window.dispatchEvent(new CustomEvent('mp:bridge', {
-        detail: $eventJson
+        detail: ${jsonEncode({'type': type, 'payload': payload})}
       }));
     })();
   ''';
 
     try {
-      if (!_bridgeInjectedForCurrentPage) {
-        await _ensureBridgeInjected();
-      }
-
-      if (disposed || !mounted) return;
-
+      if (!_bridgeInjectedForCurrentPage) await _ensureBridgeInjected();
+      if (!_alive) return;
       await _controller.runJavaScript(js);
     } catch (e) {
       debugPrint('Dispatch event failed: $e');
@@ -489,7 +331,6 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     return Stack(
       children: [
         WebViewWidget(controller: _controller),
-
         if (isLoading)
           const Center(child: CircularProgressIndicator.adaptive()),
       ],
