@@ -47,7 +47,7 @@ class ChatRepositoryImpl implements ChatRepository {
   Future<SocketConnectionModel> getMessageChat({required int sessionId}) async {
     try {
       final response = await dio.get(
-        SupportPath.getMessageChat(sessionId: 167506),
+        SupportPath.getMessageChat(sessionId: sessionId),
       );
       final data = SocketConnectionModel.fromJson(response.data);
 
