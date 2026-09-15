@@ -7,7 +7,7 @@ import 'package:muzhiki_support/data/websocket/chat_websocket_app.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class ChatBottomAreaClosedAndRatedWidgets extends StatefulWidget {
-  final WebSocketChat webSocketApp;
+  final AppWebsocketChat webSocketApp;
   final WebSocketChatState state;
   const ChatBottomAreaClosedAndRatedWidgets({
     super.key,

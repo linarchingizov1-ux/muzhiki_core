@@ -17,23 +17,7 @@ import 'package:talker/talker.dart';
 import 'package:uuid/v4.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-abstract class WebSocketChat {
-  Future<void> connect();
-
-  Future<void> disconnect();
-
-  Future<void> dispose();
-
-  Future<void> sendMessage({required String text, List<String> attachments});
-
-  Future<void> reopenWebChat({required int sessionId});
-
-  Future<void> reviewChat({required int sessionId, required int score});
-
-  Future<void> readMessage({required int sessionId});
-}
-
-class AppWebsocketChat extends WebSocketChat {
+class AppWebsocketChat {
   AppWebsocketChat({
     required this.sessionChatId,
     required this.chatUsecase,
@@ -128,8 +112,7 @@ class AppWebsocketChat extends WebSocketChat {
   }
 
   List<MessageModel> _mergePending(List<MessageModel> messages) {
-    final pendingModels = _pendingMessages
-        .reversed
+    final pendingModels = _pendingMessages.reversed
         .map((e) => e.toMessage())
         .toList();
     final pendingIds = pendingModels.map((e) => e.id).toSet();
@@ -160,7 +143,8 @@ class AppWebsocketChat extends WebSocketChat {
       messages: _mergePending(s.messages),
       didSendInitialMessage: true,
       isConnecting: false,
-      socket: s.socket ??
+      socket:
+          s.socket ??
           SocketConnectionModel(
             id: 0,
             chatId: 0,
@@ -198,7 +182,6 @@ class AppWebsocketChat extends WebSocketChat {
     }
   }
 
-  @override
   Future<void> connect() async {
     if (sessionChatId == null || _isConnecting || _channel != null) return;
 
@@ -258,7 +241,6 @@ class AppWebsocketChat extends WebSocketChat {
     }
   }
 
-  @override
   Future<void> disconnect() async {
     await _subscription?.cancel();
 
@@ -272,7 +254,6 @@ class AppWebsocketChat extends WebSocketChat {
     _inflightUuids.clear();
   }
 
-  @override
   Future<void> dispose() async {
     _disposed = true;
     _persistTimer?.cancel();
@@ -284,7 +265,6 @@ class AppWebsocketChat extends WebSocketChat {
     _listener.dispose();
   }
 
-  @override
   Future<void> sendMessage({
     required String text,
     List<String> attachments = const [],
@@ -350,7 +330,6 @@ class AppWebsocketChat extends WebSocketChat {
     }
   }
 
-  @override
   Future<void> readMessage({required int sessionId}) async {
     try {
       _channel?.sink.add(
@@ -532,7 +511,6 @@ class AppWebsocketChat extends WebSocketChat {
     BannerController.I.showError(error: mapped, message: mapped.message);
   }
 
-  @override
   Future<void> reopenWebChat({required int sessionId}) async {
     try {
       final result = await chatUsecase.reopenWebChat(sessionId: sessionId);
@@ -555,7 +533,6 @@ class AppWebsocketChat extends WebSocketChat {
     }
   }
 
-  @override
   Future<void> reviewChat({required int sessionId, required int score}) async {
     try {
       final resutl = await chatUsecase.postScoreWebChat(

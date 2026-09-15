@@ -8,7 +8,7 @@ import 'package:muzhiki_support/shared/extensions/date_format.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class ChatBottomAreaTicketWidgets extends StatefulWidget {
-  final WebSocketChat webSocketApp;
+  final AppWebsocketChat webSocketApp;
   final WebSocketChatState state;
   const ChatBottomAreaTicketWidgets({
     super.key,
