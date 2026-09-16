@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:muzhiki_stories/data/model/story_enums.dart';
-import 'package:muzhiki_stories/presentation/service/story_cache_manager.dart';
+import 'package:muzhiki_stories/data/model/story_item_model.dart';
 import 'package:muzhiki_stories/presentation/service/story_controller.dart';
+import 'package:muzhiki_stories/presentation/state/stories_view_model.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/story_geometry.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/story_image.dart';
 import 'package:soft_edge_blur/soft_edge_blur.dart';
@@ -11,7 +12,7 @@ class StoryPage extends StatefulWidget {
     super.key,
     required this.page,
     required this.lockToSingleStory,
-    required this.cacheManager,
+    required this.viewModel,
     required this.storyController,
     required this.storyGeometry,
     required this.appBarHeight,
@@ -19,7 +20,7 @@ class StoryPage extends StatefulWidget {
 
   final int page;
   final bool lockToSingleStory;
-  final StoryCacheManager cacheManager;
+  final StoriesViewModel viewModel;
   final StoryController storyController;
   final StoryGeometry storyGeometry;
   final double appBarHeight;
@@ -33,7 +34,7 @@ class _StoryPageState extends State<StoryPage> {
       widget.lockToSingleStory ||
       widget.page == widget.storyController.currentStoryIndex.value;
 
-  ({String imageUrl, StoryFirstScreenMode mode, int itemIndex}) _imageInfo() {
+  ({StoryItemModel? item, StoryFirstScreenMode mode}) _imageInfo() {
     final controller = widget.storyController;
     final storyIndex = widget.lockToSingleStory
         ? controller.currentStoryIndex.value
@@ -41,19 +42,17 @@ class _StoryPageState extends State<StoryPage> {
     final story = controller.stories[storyIndex];
     final items = story.items;
     if (items.isEmpty) {
-      return (imageUrl: '', mode: story.firstScreenMode, itemIndex: 0);
+      return (item: null, mode: story.firstScreenMode);
     }
 
     final isCurrentStory = storyIndex == controller.currentStoryIndex.value;
     final itemIndex = isCurrentStory
         ? controller.currentItemIndex.value.clamp(0, items.length - 1)
         : 0;
-    final item = items[itemIndex];
 
     return (
-      imageUrl: item.imageUrl,
+      item: items[itemIndex],
       mode: story.firstScreenMode,
-      itemIndex: itemIndex,
     );
   }
 
@@ -67,19 +66,22 @@ class _StoryPageState extends State<StoryPage> {
       ]),
       builder: (context, _) {
         final imageInfo = _imageInfo();
+        final item = imageInfo.item;
+        final imageUrl = item?.imageUrl ?? '';
 
         return RepaintBoundary(
           child: ValueListenableBuilder<double>(
             valueListenable: widget.storyController.sheetSize,
             child: StoryImage(
-              key: ValueKey('${widget.page}-${imageInfo.itemIndex}'),
-              imageUrl: imageInfo.imageUrl,
-              imageProvider: widget.cacheManager.imageProvider(
-                imageUrl: imageInfo.imageUrl,
+              key: ValueKey('${widget.page}-${item?.id ?? 'empty'}'),
+              item: item,
+              imageProvider: widget.viewModel.storyCacheManager.imageProvider(
+                imageUrl: imageUrl,
                 mode: imageInfo.mode,
               ),
-              storyController: widget.storyController,
-              onLoadedChanged: _isCurrentPage
+              viewModel: widget.viewModel,
+              mode: imageInfo.mode,
+              onImageLoadedChanged: _isCurrentPage
                   ? widget.storyController.setCurrentImageLoaded
                   : null,
             ),

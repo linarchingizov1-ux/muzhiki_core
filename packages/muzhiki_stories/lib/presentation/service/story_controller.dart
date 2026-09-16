@@ -50,7 +50,6 @@ class StoryController {
 
   final Set<StoryPauseReason> _pauseReasons = {StoryPauseReason.imageLoading};
   final Set<String> viewedStoryIds = <String>{};
-  final Set<String> _failedImageUrls = <String>{};
 
   final AnimationController _openPhase;
 
@@ -79,23 +78,8 @@ class StoryController {
     if (isPauseReasonsChanged) _syncPlayback();
   }
 
-  void setCurrentImageLoaded(bool isLoaded) {
-    setPaused(
-      reason: StoryPauseReason.imageLoading,
-      isPaused: !isLoaded,
-    );
-  }
-
-  bool isImageLoadFailed(String imageUrl) =>
-      imageUrl.isNotEmpty && _failedImageUrls.contains(imageUrl);
-
-  void markImageLoadFailed(String imageUrl) {
-    if (imageUrl.isEmpty) return;
-    _failedImageUrls.add(imageUrl);
-  }
-
-  void clearImageLoadFailed(String imageUrl) {
-    _failedImageUrls.remove(imageUrl);
+  void setCurrentImageLoaded(bool isImageLoaded) {
+    setPaused(reason: StoryPauseReason.imageLoading, isPaused: !isImageLoaded);
   }
 
   void _syncPlayback() {
@@ -170,7 +154,7 @@ class StoryController {
     setPaused(reason: StoryPauseReason.details, isPaused: false);
   }
 
-  void markCurrentStoryViewed() {
+  void setCurrentStoryViewed() {
     if (stories.isEmpty) return;
 
     final index = currentStoryIndex.value;
@@ -187,7 +171,7 @@ class StoryController {
     setCurrentImageLoaded(false);
     currentStoryIndex.value = storyIndex;
     currentItemIndex.value = itemIndex;
-    markCurrentStoryViewed();
+    setCurrentStoryViewed();
     canExpand.value = true;
     _restartProgress();
   }
@@ -261,7 +245,6 @@ class StoryController {
 
   void dispose() {
     viewedStoryIds.clear();
-    _failedImageUrls.clear();
     sheet.removeListener(_handleSheetChanged);
     sheet.dispose();
     storyController.dispose();

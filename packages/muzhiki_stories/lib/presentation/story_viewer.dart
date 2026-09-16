@@ -117,7 +117,7 @@ class _StoryViewerState extends State<StoryViewer>
           ..currentStoryIndex.addListener(_onStoryIndexFromController)
           ..currentStoryIndex.addListener(_precacheFromController)
           ..currentItemIndex.addListener(_precacheFromController)
-          ..markCurrentStoryViewed();
+          ..setCurrentStoryViewed();
     storyController = controller;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -193,10 +193,13 @@ class _StoryViewerState extends State<StoryViewer>
   void _precacheAround(int storyIndex, int itemIndex) {
     if (!mounted) return;
 
-    void precacheUrl({required String imageUrl, required StoryFirstScreenMode mode}) {
+    void precacheUrl({
+      required String imageUrl,
+      required StoryFirstScreenMode mode,
+    }) {
       if (imageUrl.isEmpty) return;
       final provider = widget.viewModel.storyCacheManager.imageProvider(
-        imageUrl:  imageUrl,
+        imageUrl: imageUrl,
         mode: mode,
       );
       precacheImage(provider, context, onError: (_, _) {});
@@ -633,9 +636,7 @@ class _StoryViewerState extends State<StoryViewer>
                                                 page: page,
                                                 lockToSingleStory:
                                                     widget.lockToSingleStory,
-                                                cacheManager: widget
-                                                    .viewModel
-                                                    .storyCacheManager,
+                                                viewModel: widget.viewModel,
                                                 storyController:
                                                     storyController!,
                                                 storyGeometry: storyGeometry,

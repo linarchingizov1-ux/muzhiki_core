@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_stories/data/model/story_enums.dart';
+import 'package:muzhiki_stories/data/model/story_item_model.dart';
 import 'package:muzhiki_stories/data/model/story_model.dart';
 import 'package:muzhiki_stories/domain/repository/stories_repository.dart';
 import 'package:muzhiki_stories/presentation/service/story_cache_manager.dart';
@@ -25,6 +26,7 @@ class StoriesViewModel extends ChangeNotifier {
   final StoryCacheManager storyCacheManager;
 
   final viewerStories = ValueNotifier<List<StoryModel>>(const []);
+  final Set<String> _failedImageKeys = <String>{};
 
   List<StoryModel> _firstScreenStories = const [];
 
@@ -143,7 +145,7 @@ class StoriesViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> markFirstScreenStoriesViewed(Iterable<String> viewedIds) async {
+  Future<void> setFirstScreenStoriesViewed(Iterable<String> viewedIds) async {
     final ids = viewedIds.toSet();
 
     for (final story in _firstScreenStories) {
@@ -264,8 +266,30 @@ class StoriesViewModel extends ChangeNotifier {
     await completer.future;
   }
 
+  String storyImageKey({required StoryItemModel item}) {
+    return '${item.storyId}|${item.id}|${item.imageUrl}';
+  }
+
+  bool isImageLoadFailed({required StoryItemModel item}) {
+    final key = storyImageKey(item: item);
+    return key.isNotEmpty && _failedImageKeys.contains(key);
+  }
+
+  void setImageLoadFailed({required StoryItemModel item}) {
+    final key = storyImageKey(item: item);
+    if (key.isEmpty) return;
+    if (_failedImageKeys.add(key)) notifyListeners();
+  }
+
+  void clearImageLoadFailed({required StoryItemModel item}) {
+    final key = storyImageKey(item: item);
+    if (key.isEmpty) return;
+    if (_failedImageKeys.remove(key)) notifyListeners();
+  }
+
   @override
   void dispose() {
+    _failedImageKeys.clear();
     viewerStories.dispose();
     super.dispose();
   }

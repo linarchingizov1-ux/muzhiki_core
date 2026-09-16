@@ -51,4 +51,21 @@ class StoryCacheManager {
     cache.clear();
     cache.clearLiveImages();
   }
+
+  Future<void> evict({
+    required String imageUrl,
+    required StoryFirstScreenMode mode,
+  }) async {
+    if (imageUrl.isEmpty) return;
+
+    try {
+      await imageProvider(imageUrl: imageUrl, mode: mode).evict();
+    } catch (_) {}
+
+    if (mode != StoryFirstScreenMode.always) return;
+
+    try {
+      await _disk.removeFile(imageUrl);
+    } catch (_) {}
+  }
 }

@@ -1,25 +1,29 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:muzhiki_stories/presentation/service/story_controller.dart';
+import 'package:muzhiki_stories/data/model/story_enums.dart';
+import 'package:muzhiki_stories/data/model/story_item_model.dart';
+import 'package:muzhiki_stories/presentation/state/stories_view_model.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/story_image_error_placeholder.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class StoryImage extends StatefulWidget {
   const StoryImage({
     super.key,
-    required this.imageUrl,
+    required this.item,
     required this.imageProvider,
-    required this.storyController,
-    this.fit = BoxFit.cover,
-    this.onLoadedChanged,
+    required this.viewModel,
+    required this.mode,
+    this.showLoader = true,
+    this.onImageLoadedChanged,
   });
 
-  final String imageUrl;
+  final StoryItemModel? item;
   final ImageProvider imageProvider;
-  final StoryController storyController;
-  final BoxFit fit;
-  final ValueChanged<bool>? onLoadedChanged;
+  final StoriesViewModel viewModel;
+  final StoryFirstScreenMode mode;
+  final bool showLoader;
+  final ValueChanged<bool>? onImageLoadedChanged;
 
   @override
   State<StoryImage> createState() => _StoryImageState();
@@ -31,16 +35,18 @@ class _StoryImageState extends State<StoryImage> {
   int _imageReloadCount = 0;
   bool _isImageLoadRetrying = false;
 
-  bool get _isFailed =>
-      _hasImageLoadError ||
-      widget.storyController.isImageLoadFailed(widget.imageUrl);
+  bool get _isImageLoadFailed {
+    final item = widget.item;
+    return _hasImageLoadError ||
+        (item != null && widget.viewModel.isImageLoadFailed(item: item));
+  }
 
   @override
   void initState() {
     super.initState();
-    _hasImageLoadError = widget.storyController.isImageLoadFailed(
-      widget.imageUrl,
-    );
+    final item = widget.item;
+    _hasImageLoadError =
+        item != null && widget.viewModel.isImageLoadFailed(item: item);
     _notifyImageLoaded(false);
   }
 
@@ -48,36 +54,52 @@ class _StoryImageState extends State<StoryImage> {
   void didUpdateWidget(StoryImage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.imageUrl != widget.imageUrl) {
+    final oldItem = oldWidget.item;
+    final item = widget.item;
+    final oldStoryImageKey = oldItem == null
+        ? null
+        : widget.viewModel.storyImageKey(item: oldItem);
+    final storyImageKey = item == null
+        ? null
+        : widget.viewModel.storyImageKey(item: item);
+
+    if (oldStoryImageKey != storyImageKey) {
       _hasFrame = false;
-      _hasImageLoadError = widget.storyController.isImageLoadFailed(
-        widget.imageUrl,
-      );
+      _hasImageLoadError =
+          item != null && widget.viewModel.isImageLoadFailed(item: item);
       _isImageLoadRetrying = false;
       _notifyImageLoaded(false);
       return;
     }
 
-    if (oldWidget.onLoadedChanged != widget.onLoadedChanged) {
-      _notifyImageLoaded(_hasFrame && !_isFailed);
+    if (oldWidget.onImageLoadedChanged != widget.onImageLoadedChanged ||
+        oldWidget.viewModel != widget.viewModel) {
+      _notifyImageLoaded(_hasFrame && !_isImageLoadFailed);
     }
   }
 
-  void _notifyImageLoaded(bool isLoaded) {
-    final onLoadedChanged = widget.onLoadedChanged;
+  void _notifyImageLoaded(bool isImageLoaded) {
+    final onLoadedChanged = widget.onImageLoadedChanged;
     if (onLoadedChanged == null) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      onLoadedChanged(widget.imageUrl.isNotEmpty && isLoaded);
+      onLoadedChanged(
+        (widget.item?.imageUrl.isNotEmpty ?? false) && isImageLoaded,
+      );
     });
   }
 
   Future<void> _retryImageLoad() async {
-    if (widget.imageUrl.isEmpty || _isImageLoadRetrying) return;
+    final item = widget.item;
+    if (item == null ||
+        (widget.item?.imageUrl.isEmpty ?? false) ||
+        _isImageLoadRetrying) {
+      return;
+    }
 
-    final imageUrl = widget.imageUrl;
-    widget.storyController.clearImageLoadFailed(imageUrl);
+    final storyImageKey = widget.viewModel.storyImageKey(item: item);
+    widget.viewModel.clearImageLoadFailed(item: item);
     setState(() {
       _isImageLoadRetrying = true;
       _hasFrame = false;
@@ -86,10 +108,17 @@ class _StoryImageState extends State<StoryImage> {
     _notifyImageLoaded(false);
 
     try {
-      await widget.imageProvider.evict();
+      await widget.viewModel.storyCacheManager.evict(
+        imageUrl: item.imageUrl,
+        mode: widget.mode,
+      );
     } catch (_) {}
 
-    if (!mounted || widget.imageUrl != imageUrl) return;
+    if (!mounted ||
+        widget.item == null ||
+        widget.viewModel.storyImageKey(item: widget.item!) != storyImageKey) {
+      return;
+    }
 
     setState(() {
       _imageReloadCount++;
@@ -97,12 +126,17 @@ class _StoryImageState extends State<StoryImage> {
     });
   }
 
-  void _markImageLoadFailed(String imageUrl) {
-    widget.storyController.markImageLoadFailed(imageUrl);
+  void _setImageLoadFailed(StoryItemModel item) {
+    widget.viewModel.setImageLoadFailed(item: item);
     if (_hasImageLoadError) return;
 
+    final storyImageKey = widget.viewModel.storyImageKey(item: item);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || widget.imageUrl != imageUrl) return;
+      if (!mounted ||
+          widget.item == null ||
+          widget.viewModel.storyImageKey(item: widget.item!) != storyImageKey) {
+        return;
+      }
       setState(() => _hasImageLoadError = true);
       _notifyImageLoaded(false);
     });
@@ -110,7 +144,7 @@ class _StoryImageState extends State<StoryImage> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.imageUrl.isEmpty) {
+    if (widget.item == null || (widget.item?.imageUrl.isEmpty ?? false)) {
       return const StoryImageErrorPlaceholder(message: 'Ссылка на фото пустая');
     }
 
@@ -119,7 +153,8 @@ class _StoryImageState extends State<StoryImage> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (_isImageLoadRetrying || (!_hasFrame && !_isFailed))
+          if (widget.showLoader &&
+              (_isImageLoadRetrying || (!_hasFrame && !_isImageLoadFailed)))
             Center(
               child: Transform.scale(
                 scale: Platform.isIOS ? 1.25 : 1.0,
@@ -132,22 +167,23 @@ class _StoryImageState extends State<StoryImage> {
                 ),
               ),
             ),
-          if (_isFailed && !_isImageLoadRetrying)
+          if (_isImageLoadFailed && !_isImageLoadRetrying)
             StoryImageErrorPlaceholder(
               message: 'Не удалось загрузить фото',
               onRetry: _retryImageLoad,
             )
           else if (!_isImageLoadRetrying)
             Image(
-              key: ValueKey('${widget.imageUrl}-$_imageReloadCount'),
+              key: ValueKey(
+                '${widget.viewModel.storyImageKey(item: widget.item!)}-$_imageReloadCount',
+              ),
               image: widget.imageProvider,
-              fit: widget.fit,
+              fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
               gaplessPlayback: false,
               errorBuilder: (context, error, stackTrace) {
-                final imageUrl = widget.imageUrl;
-                _markImageLoadFailed(imageUrl);
+                _setImageLoadFailed(widget.item!);
 
                 return StoryImageErrorPlaceholder(
                   message: 'Не удалось загрузить фото',
@@ -155,12 +191,19 @@ class _StoryImageState extends State<StoryImage> {
                 );
               },
               frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                final imageUrl = widget.imageUrl;
                 final hasFrame = wasSynchronouslyLoaded || frame != null;
                 if (hasFrame && !_hasFrame) {
+                  final storyImageKey = widget.viewModel.storyImageKey(
+                    item: widget.item!,
+                  );
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!mounted || widget.imageUrl != imageUrl) return;
-                    widget.storyController.clearImageLoadFailed(imageUrl);
+                    if (!mounted ||
+                        widget.item == null ||
+                        widget.viewModel.storyImageKey(item: widget.item!) !=
+                            storyImageKey) {
+                      return;
+                    }
+                    widget.viewModel.clearImageLoadFailed(item: widget.item!);
                     setState(() {
                       _hasFrame = true;
                       _hasImageLoadError = false;
