@@ -7,6 +7,7 @@ class NotificationConfig {
   final MuzhikiUrlLaunch urlLauncher;
   final Future<void> Function() registerPush;
   final bool enableRepeatPushDialogAfterSevenDays;
+  final int? androidSdkInt;
 
   const NotificationConfig({
     required this.session,
@@ -14,5 +15,6 @@ class NotificationConfig {
     required this.urlLauncher,
     required this.registerPush,
     this.enableRepeatPushDialogAfterSevenDays = false,
+    this.androidSdkInt,
   });
 }

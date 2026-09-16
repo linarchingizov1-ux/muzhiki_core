@@ -3,9 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 class StoryImageErrorPlaceholder extends StatelessWidget {
-  const StoryImageErrorPlaceholder({super.key, required this.onRetry});
+  const StoryImageErrorPlaceholder({
+    super.key,
+    required this.message,
+    this.onRetry,
+  });
 
-  final VoidCallback onRetry;
+  final String message;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -21,38 +26,43 @@ class StoryImageErrorPlaceholder extends StatelessWidget {
               color: MuzhikiColors.white,
             ),
             SizedBox(height: 14.h),
-            Text(
-              'Не удалось загрузить фото',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-                color: MuzhikiColors.white,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                  color: MuzhikiColors.white,
+                ),
               ),
             ),
-            SizedBox(height: 18.h),
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: onRetry,
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 28.w,
-                  vertical: 10.h,
-                ),
-                decoration: BoxDecoration(
-                  color: MuzhikiColors.white,
-                  borderRadius: BorderRadius.circular(41.r),
-                ),
-                child: Text(
-                  'Повторить',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: MuzhikiColors.black17,
+            if (onRetry != null) ...[
+              SizedBox(height: 18.h),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onRetry,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 28.w,
+                    vertical: 10.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: MuzhikiColors.white,
+                    borderRadius: BorderRadius.circular(41.r),
+                  ),
+                  child: Text(
+                    'Повторить',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: MuzhikiColors.black17,
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),

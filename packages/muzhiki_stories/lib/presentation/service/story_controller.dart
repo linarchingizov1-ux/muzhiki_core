@@ -3,6 +3,16 @@ import 'package:flutter/scheduler.dart';
 import 'package:muzhiki_stories/data/model/story_model.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/story_geometry.dart';
 
+enum StoryPauseReason {
+  imageLoading,
+  details,
+  scroll,
+  edgeDrag,
+  action,
+  leaveApp,
+  closingViewer,
+}
+
 class StoryController {
   StoryController({
     required TickerProvider vsync,
@@ -38,6 +48,10 @@ class StoryController {
   final currentStoryIndex = ValueNotifier<int>(0);
   final currentItemIndex = ValueNotifier<int>(0);
 
+  final Set<StoryPauseReason> _pauseReasons = {StoryPauseReason.imageLoading};
+  final Set<String> viewedStoryIds = <String>{};
+  final Set<String> _failedImageUrls = <String>{};
+
   final AnimationController _openPhase;
 
   late final Animation<double> detailProgress = _openPhase.view;
@@ -55,6 +69,45 @@ class StoryController {
 
   set detailScroll(ScrollController scrollController) =>
       _detailScroll = scrollController;
+
+  bool isPausedFor(StoryPauseReason reason) => _pauseReasons.contains(reason);
+
+  void setPaused({required StoryPauseReason reason, required bool isPaused}) {
+    final isPauseReasonsChanged = isPaused
+        ? _pauseReasons.add(reason)
+        : _pauseReasons.remove(reason);
+    if (isPauseReasonsChanged) _syncPlayback();
+  }
+
+  void setCurrentImageLoaded(bool isLoaded) {
+    setPaused(
+      reason: StoryPauseReason.imageLoading,
+      isPaused: !isLoaded,
+    );
+  }
+
+  bool isImageLoadFailed(String imageUrl) =>
+      imageUrl.isNotEmpty && _failedImageUrls.contains(imageUrl);
+
+  void markImageLoadFailed(String imageUrl) {
+    if (imageUrl.isEmpty) return;
+    _failedImageUrls.add(imageUrl);
+  }
+
+  void clearImageLoadFailed(String imageUrl) {
+    _failedImageUrls.remove(imageUrl);
+  }
+
+  void _syncPlayback() {
+    if (stories.isEmpty) return;
+    final items = stories[currentStoryIndex.value].items;
+    if (_pauseReasons.isNotEmpty || items.isEmpty) {
+      storyController.stop();
+    } else if (!storyController.isAnimating &&
+        storyController.status != AnimationStatus.completed) {
+      storyController.forward();
+    }
+  }
 
   void _syncDuration() {
     final items = stories[currentStoryIndex.value].items;
@@ -79,16 +132,14 @@ class StoryController {
     sheetSize.value = size;
     _openPhase.value = (size / StoryGeometry.defaultMidSize).clamp(0.0, 1.0);
 
-    final open = size > 0.001;
-    if (isDetailOpen.value == open) return;
+    final isDetailSheetOpen = size > 0.001;
+    if (isDetailOpen.value == isDetailSheetOpen) return;
 
-    isDetailOpen.value = open;
-    if (open) {
-      storyController.stop();
-    } else {
-      if (_detailScroll?.hasClients ?? false) _detailScroll!.jumpTo(0);
-      resumePlay();
+    isDetailOpen.value = isDetailSheetOpen;
+    if (!isDetailSheetOpen && (_detailScroll?.hasClients ?? false)) {
+      _detailScroll!.jumpTo(0);
     }
+    setPaused(reason: StoryPauseReason.details, isPaused: isDetailSheetOpen);
   }
 
   void updateCanExpand(double maxScrollExtent) {
@@ -96,25 +147,13 @@ class StoryController {
     canExpand.value = maxScrollExtent > 0;
   }
 
-  void startPlay() {
-    _syncDuration();
-    storyController.forward(from: 0);
-  }
-
-  void resetPlay() {
+  void _restartProgress() {
     _syncDuration();
     storyController
       ..stop()
       ..value = 0;
+    _syncPlayback();
   }
-
-  void resumePlay() {
-    if (storyController.isAnimating) return;
-    if (storyController.status == AnimationStatus.completed) return;
-    storyController.forward();
-  }
-
-  void pausePlay() => storyController.stop();
 
   void _handlePlayEnd(AnimationStatus status) {
     if (status == AnimationStatus.completed) showNext();
@@ -128,73 +167,78 @@ class StoryController {
     isDetailOpen.value = false;
     sheetSize.value = 0;
     _openPhase.value = 0;
+    setPaused(reason: StoryPauseReason.details, isPaused: false);
   }
 
-  void applyStoryPage(int storyIndex) {
+  void markCurrentStoryViewed() {
+    if (stories.isEmpty) return;
+
+    final index = currentStoryIndex.value;
+    if (index < 0 || index >= stories.length) return;
+
+    final storyId = stories[index].id;
+    if (storyId.isEmpty) return;
+
+    viewedStoryIds.add(storyId);
+  }
+
+  void _setStoryItem({required int storyIndex, required int itemIndex}) {
+    resetDetail();
+    setCurrentImageLoaded(false);
+    currentStoryIndex.value = storyIndex;
+    currentItemIndex.value = itemIndex;
+    markCurrentStoryViewed();
+    canExpand.value = true;
+    _restartProgress();
+  }
+
+  void setStoryPage(int storyIndex) {
     if (currentStoryIndex.value == storyIndex) {
-      resumePlay();
+      _syncPlayback();
       return;
     }
-    resetDetail();
-    currentStoryIndex.value = storyIndex;
-    currentItemIndex.value = 0;
-    canExpand.value = true;
-    resetPlay();
-    startPlay();
+    _setStoryItem(storyIndex: storyIndex, itemIndex: 0);
   }
 
   void showNext() {
     final items = stories[currentStoryIndex.value].items;
     if (items.isNotEmpty && currentItemIndex.value < items.length - 1) {
-      resetDetail();
-      currentItemIndex.value += 1;
-      canExpand.value = true;
-      resetPlay();
-      startPlay();
+      _setStoryItem(
+        storyIndex: currentStoryIndex.value,
+        itemIndex: currentItemIndex.value + 1,
+      );
       return;
     }
 
-    if (lockToSingleStory) {
+    if (lockToSingleStory || currentStoryIndex.value >= stories.length - 1) {
       closeStoryView();
       return;
     }
 
-    if (currentStoryIndex.value >= stories.length - 1) {
-      closeStoryView();
-      return;
-    }
-
-    resetDetail();
-    currentStoryIndex.value += 1;
-    currentItemIndex.value = 0;
-    canExpand.value = true;
-    resetPlay();
-    startPlay();
+    _setStoryItem(storyIndex: currentStoryIndex.value + 1, itemIndex: 0);
   }
 
   void showPrevious() {
     if (currentItemIndex.value > 0) {
-      resetDetail();
-      currentItemIndex.value -= 1;
-      canExpand.value = true;
-      resetPlay();
-      startPlay();
+      _setStoryItem(
+        storyIndex: currentStoryIndex.value,
+        itemIndex: currentItemIndex.value - 1,
+      );
       return;
     }
 
     if (lockToSingleStory || currentStoryIndex.value <= 0) {
       canExpand.value = true;
-      startPlay();
+      _restartProgress();
       return;
     }
 
-    resetDetail();
-    currentStoryIndex.value -= 1;
-    final prevItems = stories[currentStoryIndex.value].items;
-    currentItemIndex.value = prevItems.isEmpty ? 0 : prevItems.length - 1;
-    canExpand.value = true;
-    resetPlay();
-    startPlay();
+    final prevIndex = currentStoryIndex.value - 1;
+    final prevItems = stories[prevIndex].items;
+    _setStoryItem(
+      storyIndex: prevIndex,
+      itemIndex: prevItems.isEmpty ? 0 : prevItems.length - 1,
+    );
   }
 
   Future<void> openDetail() async {
@@ -216,6 +260,8 @@ class StoryController {
   }
 
   void dispose() {
+    viewedStoryIds.clear();
+    _failedImageUrls.clear();
     sheet.removeListener(_handleSheetChanged);
     sheet.dispose();
     storyController.dispose();

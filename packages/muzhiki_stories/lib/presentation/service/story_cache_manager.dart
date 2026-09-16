@@ -15,16 +15,34 @@ class StoryCacheManager {
 
   final CacheManager _disk;
 
-  ImageProvider provider(
-    String url, {
+  ImageProvider imageProvider({
+    required String imageUrl,
     required StoryFirstScreenMode mode,
   }) {
     final ImageProvider base = mode == StoryFirstScreenMode.always
-        ? CachedNetworkImageProvider(url, cacheManager: _disk)
-        : NetworkImage(url);
+        ? CachedNetworkImageProvider(imageUrl, cacheManager: _disk)
+        : NetworkImage(imageUrl);
     final views = WidgetsBinding.instance.platformDispatcher.views;
     if (views.isEmpty) return base;
     return ResizeImage(base, height: views.first.physicalSize.height.round());
+  }
+
+  Future<bool> isImageCached({
+    required String imageUrl,
+    required StoryFirstScreenMode mode,
+  }) async {
+    if (imageUrl.isEmpty) return false;
+
+    if (PaintingBinding.instance.imageCache.containsKey(
+      imageProvider(imageUrl: imageUrl, mode: mode),
+    )) {
+      return true;
+    }
+
+    if (mode != StoryFirstScreenMode.always) return false;
+
+    final fileInfo = await _disk.getFileFromCache(imageUrl);
+    return fileInfo != null;
   }
 
   Future<void> clear() async {

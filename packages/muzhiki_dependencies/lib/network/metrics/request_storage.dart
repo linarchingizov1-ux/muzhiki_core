@@ -105,6 +105,7 @@ class RequestStorage {
       batchTimestamp: DateTime.now().toUtc(),
       sessionId: _getSessionId(),
       appName: typeApp.nameApp,
+      deviceId: infoProject.deviceId,
       platform: platform,
       appVersion: infoProject.version,
       mpid: userMpid,

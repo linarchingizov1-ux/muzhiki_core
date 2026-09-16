@@ -13,6 +13,7 @@ class NotificationPushService with WidgetsBindingObserver {
   NotificationPushService(this._config);
 
   static const _repeatDialogInterval = Duration(days: 7);
+  static const _androidRuntimePermissionSdk = 33;
 
   final NotificationConfig _config;
 
@@ -78,9 +79,7 @@ class NotificationPushService with WidgetsBindingObserver {
     if (_config.session.user?.isFake == true) return false;
 
     final status = await Permission.notification.status;
-    if (status.isGranted || status.isProvisional || status.isLimited) {
-      return false;
-    }
+    if (_isGranted(status)) return false;
 
     final milliseconds = _config.sharedPreferences.getInt(
       NotificationStorageKeys.repeatPushDialogShownAt,
@@ -93,48 +92,55 @@ class NotificationPushService with WidgetsBindingObserver {
 
   Future<void> _onDialogAccepted() async {
     final status = await Permission.notification.status;
-    final alreadyAsked =
-        _config.sharedPreferences.getInt(
-          NotificationStorageKeys.repeatPushDialogShownAt,
-        ) !=
-        null;
-    final openSettings =
-        status.isPermanentlyDenied ||
-        (Platform.isIOS && status.isDenied && alreadyAsked);
-
-    if (openSettings) {
-      _isInSettings = true;
-      if (!_observingLifecycle) {
-        WidgetsBinding.instance.addObserver(this);
-        _observingLifecycle = true;
-      }
-      await AppSettings.openAppSettings(type: AppSettingsType.notification);
+    if (!_canShowNativeDialog(status)) {
+      await _openNotificationSettings();
       return;
     }
 
     await _config.registerPush();
 
-    final permission = await Permission.notification.status;
-    if (permission.isGranted ||
-        permission.isProvisional ||
-        permission.isLimited) {
-      await _clearRepeatDialogShownAt();
-      return;
+    final after = await Permission.notification.status;
+    if (!_isGranted(after)) {
+      await _markRepeatDialogShownAt();
+    }
+  }
+
+  bool _canShowNativeDialog(PermissionStatus status) {
+    if (_isGranted(status)) return true;
+    if (status.isPermanentlyDenied || status.isRestricted) return false;
+
+    final sdk = _config.androidSdkInt;
+    if (Platform.isAndroid &&
+        sdk != null &&
+        sdk < _androidRuntimePermissionSdk) {
+      return false;
     }
 
-    await _markRepeatDialogShownAt();
+    return true;
+  }
+
+  bool _isGranted(PermissionStatus status) =>
+      status.isGranted || status.isProvisional || status.isLimited;
+
+  Future<void> _openNotificationSettings() async {
+    _isInSettings = true;
+    if (!_observingLifecycle) {
+      WidgetsBinding.instance.addObserver(this);
+      _observingLifecycle = true;
+    }
+
+    try {
+      await AppSettings.openAppSettings(type: AppSettingsType.notification);
+    } catch (_) {
+      _isInSettings = false;
+      _stopObservingLifecycle();
+    }
   }
 
   Future<void> _markRepeatDialogShownAt() async {
     await _config.sharedPreferences.setInt(
       NotificationStorageKeys.repeatPushDialogShownAt,
       DateTime.now().millisecondsSinceEpoch,
-    );
-  }
-
-  Future<void> _clearRepeatDialogShownAt() async {
-    await _config.sharedPreferences.remove(
-      NotificationStorageKeys.repeatPushDialogShownAt,
     );
   }
 
@@ -150,17 +156,25 @@ class NotificationPushService with WidgetsBindingObserver {
   Future<void> _onReturnedFromSettings() async {
     try {
       final status = await Permission.notification.status;
-      if (status.isGranted || status.isProvisional || status.isLimited) {
-        await _clearRepeatDialogShownAt();
+      if (_isGranted(status)) {
         await _config.registerPush();
-      } else {
-        await _markRepeatDialogShownAt();
+        return;
       }
+
+      await _markRepeatDialogShownAt();
     } finally {
-      if (_observingLifecycle) {
-        WidgetsBinding.instance.removeObserver(this);
-        _observingLifecycle = false;
-      }
+      _stopObservingLifecycle();
     }
+  }
+
+  void _stopObservingLifecycle() {
+    if (!_observingLifecycle) return;
+    WidgetsBinding.instance.removeObserver(this);
+    _observingLifecycle = false;
+  }
+
+  void dispose() {
+    _isInSettings = false;
+    _stopObservingLifecycle();
   }
 }

@@ -3,55 +3,53 @@ import 'package:muzhiki_stories/data/model/story_enums.dart';
 import 'package:muzhiki_stories/presentation/service/story_cache_manager.dart';
 
 class StoryImageLoadController extends ChangeNotifier {
-  final loadedImages = <String>{};
-  final failedImages = <String>{};
-  final rebuildKeys = <String, int>{};
+  final _loadedImages = <String>{};
+  final _failedImages = <String>{};
+  final _imageRebuildKeys = <String, int>{};
+  final _reloadingImages = <String>{};
 
-  bool isImageLoaded(String url) => loadedImages.contains(url);
+  bool isImageLoaded(String imageUrl) => _loadedImages.contains(imageUrl);
 
-  bool isImageFailed(String url) => failedImages.contains(url);
+  bool isImageFailed(String imageUrl) => _failedImages.contains(imageUrl);
 
-  void setImageLoaded(String url) {
-    final addedToLoaded = loadedImages.add(url);
-    final removedFromFailed = failedImages.remove(url);
-    if (!addedToLoaded && !removedFromFailed) return;
-    notifyListeners();
+  int imageRebuildKey(String imageUrl) => _imageRebuildKeys[imageUrl] ?? 0;
+
+  void setImageLoaded(String imageUrl) {
+    final addedToLoaded = _loadedImages.add(imageUrl);
+    final removedFromFailed = _failedImages.remove(imageUrl);
+    if (addedToLoaded || removedFromFailed) notifyListeners();
   }
 
-  void setImageFailed(String url) {
-    final addedToFailed = failedImages.add(url);
-    final removedFromLoaded = loadedImages.remove(url);
-    if (!addedToFailed && !removedFromLoaded) return;
-    notifyListeners();
-  }
-
-  void setImageLoading(String url) {
-    final removedFromLoaded = loadedImages.remove(url);
-    final removedFromFailed = failedImages.remove(url);
-    if (!removedFromLoaded && !removedFromFailed) return;
-    notifyListeners();
+  void setImageFailed(String imageUrl) {
+    final addedToFailed = _failedImages.add(imageUrl);
+    final removedFromLoaded = _loadedImages.remove(imageUrl);
+    if (addedToFailed || removedFromLoaded) notifyListeners();
   }
 
   Future<void> reloadImage({
-    required String url,
-    required StoryCacheManager cacheManager,
+    required String imageUrl,
+    required StoryCacheManager storyCacheManager,
     required StoryFirstScreenMode mode,
     bool keepFailedUntilLoaded = false,
   }) async {
-    await cacheManager.provider(url, mode: mode).evict();
-    if (!keepFailedUntilLoaded) failedImages.remove(url);
-    loadedImages.remove(url);
-    rebuildKeys[url] = (rebuildKeys[url] ?? 0) + 1;
+    if (!_reloadingImages.add(imageUrl)) return;
+    try {
+      await storyCacheManager.imageProvider(imageUrl: imageUrl, mode: mode).evict();
+    } finally {
+      _reloadingImages.remove(imageUrl);
+    }
+    if (!keepFailedUntilLoaded) _failedImages.remove(imageUrl);
+    _loadedImages.remove(imageUrl);
+    _imageRebuildKeys[imageUrl] = (_imageRebuildKeys[imageUrl] ?? 0) + 1;
     notifyListeners();
   }
 
-  void removeImage(String url) {
-    final removedFromLoaded = loadedImages.remove(url);
-    final removedFromFailed = failedImages.remove(url);
-    final removedRebuildKey = rebuildKeys.remove(url) != null;
-    if (!removedFromLoaded && !removedFromFailed && !removedRebuildKey) {
-      return;
+  void removeImage(String imageUrl) {
+    final removedFromLoaded = _loadedImages.remove(imageUrl);
+    final removedFromFailed = _failedImages.remove(imageUrl);
+    final removedImageRebuildKey = _imageRebuildKeys.remove(imageUrl) != null;
+    if (removedFromLoaded || removedFromFailed || removedImageRebuildKey) {
+      notifyListeners();
     }
-    notifyListeners();
   }
 }

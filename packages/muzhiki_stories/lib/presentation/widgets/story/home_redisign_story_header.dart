@@ -127,7 +127,6 @@ class HomeRedisignStoryHeader extends StatelessWidget {
                     valueListenable: storyController.currentStoryIndex,
                     builder: (context, index, _) {
                       final title = storyController.stories[index].title;
-                      ;
                       if (title == null || title.isEmpty) {
                         return const SizedBox.shrink();
                       }

@@ -54,6 +54,7 @@ class ReportProblemViewModel extends ChangeNotifier {
     return {
       'platform': config.appInfo.platform,
       'os_version': config.appInfo.osVersion,
+      'device_id': config.appInfo.deviceId,
       'manufacturer': config.appInfo.manufacturer,
       'model': config.appInfo.model,
       'screen_width': view.physicalSize.width.round(),

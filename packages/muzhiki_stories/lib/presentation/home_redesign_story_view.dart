@@ -7,20 +7,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:muzhiki_stories/data/model/story_enums.dart';
 import 'package:muzhiki_stories/data/model/story_model.dart';
 import 'package:muzhiki_stories/domain/entity/story_action_entity.dart';
-import 'package:muzhiki_stories/presentation/service/story_cache_manager.dart';
 import 'package:muzhiki_stories/presentation/service/story_controller.dart';
-import 'package:muzhiki_stories/presentation/service/story_image_load_controller.dart';
 import 'package:muzhiki_stories/presentation/state/stories_view_model.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/home_redisign_story_header.dart';
+import 'package:muzhiki_stories/presentation/widgets/story/story_action_buttons.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/story_detail_overlay.dart';
 import 'package:muzhiki_stories/presentation/widgets/story/story_geometry.dart';
-import 'package:muzhiki_stories/presentation/widgets/story/story_image_error_placeholder.dart';
+import 'package:muzhiki_stories/presentation/widgets/story/story_page.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
-import 'package:soft_edge_blur/soft_edge_blur.dart';
 
 class StoryViewer extends StatefulWidget {
   final StoriesViewModel viewModel;
-  final ValueNotifier<List<StoryModel>> stories;
   final int initialStoryIndex;
   final int initialItemIndex;
   final bool lockToSingleStory;
@@ -29,12 +26,42 @@ class StoryViewer extends StatefulWidget {
   const StoryViewer({
     super.key,
     required this.viewModel,
-    required this.stories,
     this.initialStoryIndex = 0,
     this.initialItemIndex = 0,
     this.lockToSingleStory = false,
     this.onAction,
   });
+
+  static Future<Set<String>> show(
+    BuildContext context, {
+    required StoriesViewModel viewModel,
+    int initialStoryIndex = 0,
+    int initialItemIndex = 0,
+    bool lockToSingleStory = false,
+    FutureOr<void> Function(StoryActionEntity action)? onAction,
+  }) async {
+    final viewedIds = await Navigator.of(context, rootNavigator: true)
+        .push<Set<String>>(
+          PageRouteBuilder<Set<String>>(
+            opaque: false,
+            transitionDuration: const Duration(milliseconds: 280),
+            reverseTransitionDuration: const Duration(milliseconds: 220),
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return FadeTransition(
+                opacity: animation,
+                child: StoryViewer(
+                  viewModel: viewModel,
+                  initialStoryIndex: initialStoryIndex,
+                  initialItemIndex: initialItemIndex,
+                  lockToSingleStory: lockToSingleStory,
+                  onAction: onAction,
+                ),
+              );
+            },
+          ),
+        );
+    return viewedIds ?? const <String>{};
+  }
 
   @override
   State<StoryViewer> createState() => _StoryViewerState();
@@ -46,8 +73,6 @@ class _StoryViewerState extends State<StoryViewer>
   PageController? pageController;
 
   bool _syncingPage = false;
-  bool _closing = false;
-  bool _pausedForLeave = false;
   bool _leftAppForAction = false;
 
   final edgeDragDx = ValueNotifier<double>(0);
@@ -63,7 +88,13 @@ class _StoryViewerState extends State<StoryViewer>
   double _edgeLastDx = 0;
   Duration? _edgeLastTime;
 
-  List<StoryModel> get _stories => widget.stories.value;
+  ValueNotifier<List<StoryModel>> get _storiesListenable =>
+      widget.viewModel.viewerStories;
+
+  List<StoryModel> get _stories => _storiesListenable.value;
+
+  bool get _isClosingViewer =>
+      storyController?.isPausedFor(StoryPauseReason.closingViewer) ?? false;
 
   @override
   void initState() {
@@ -77,7 +108,7 @@ class _StoryViewerState extends State<StoryViewer>
     final controller =
         StoryController(
             vsync: this,
-            storiesListenable: widget.stories,
+            storiesListenable: _storiesListenable,
             closeStoryView: handleClosePressed,
             initialStoryIndex: widget.initialStoryIndex,
             initialItemIndex: widget.initialItemIndex,
@@ -85,7 +116,8 @@ class _StoryViewerState extends State<StoryViewer>
           )
           ..currentStoryIndex.addListener(_onStoryIndexFromController)
           ..currentStoryIndex.addListener(_precacheFromController)
-          ..currentItemIndex.addListener(_precacheFromController);
+          ..currentItemIndex.addListener(_precacheFromController)
+          ..markCurrentStoryViewed();
     storyController = controller;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -100,6 +132,7 @@ class _StoryViewerState extends State<StoryViewer>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    widget.viewModel.clearNotFound();
     final controller = storyController;
     if (controller != null) {
       controller.currentStoryIndex.removeListener(_onStoryIndexFromController);
@@ -139,23 +172,31 @@ class _StoryViewerState extends State<StoryViewer>
   }
 
   void handleClosePressed() {
-    if (!mounted || _closing) return;
+    if (!mounted || _isClosingViewer) return;
+    widget.viewModel.clearNotFound();
     final controller = storyController;
     if (controller != null && controller.isDetailOpen.value) {
       controller.closeDetail();
     } else {
-      _closing = true;
-      Navigator.of(context, rootNavigator: true).pop();
+      controller?.setPaused(
+        reason: StoryPauseReason.closingViewer,
+        isPaused: true,
+      );
+
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pop(Set<String>.of(controller?.viewedStoryIds ?? {}));
     }
   }
 
   void _precacheAround(int storyIndex, int itemIndex) {
     if (!mounted) return;
 
-    void precacheUrl(String url, {required StoryFirstScreenMode mode}) {
-      if (url.isEmpty) return;
-      final provider = widget.viewModel.storyCacheManager.provider(
-        url,
+    void precacheUrl({required String imageUrl, required StoryFirstScreenMode mode}) {
+      if (imageUrl.isEmpty) return;
+      final provider = widget.viewModel.storyCacheManager.imageProvider(
+        imageUrl:  imageUrl,
         mode: mode,
       );
       precacheImage(provider, context, onError: (_, _) {});
@@ -182,10 +223,10 @@ class _StoryViewerState extends State<StoryViewer>
           if (precacheItemIndex < 0 || precacheItemIndex >= items.length) {
             continue;
           }
-          precacheUrl(items[precacheItemIndex].imageUrl, mode: mode);
+          precacheUrl(imageUrl: items[precacheItemIndex].imageUrl, mode: mode);
         }
       } else {
-        precacheUrl(items.first.imageUrl, mode: mode);
+        precacheUrl(imageUrl: items.first.imageUrl, mode: mode);
       }
     }
   }
@@ -193,28 +234,17 @@ class _StoryViewerState extends State<StoryViewer>
   void _onPageChanged(int index) {
     if (_syncingPage || widget.lockToSingleStory) return;
     _syncingPage = true;
-    storyController?.applyStoryPage(index);
+    storyController?.setStoryPage(index);
     edgeDragDx.value = 0;
     _edgePointerDx = 0;
     _syncingPage = false;
   }
 
-  bool get _pageSettledAtCurrent {
-    final pages = pageController;
-    final controller = storyController;
-    if (pages == null || controller == null) return true;
-    if (!pages.hasClients) return true;
-    final page = pages.page;
-    if (page == null) return true;
-    final index = widget.lockToSingleStory
-        ? 0
-        : controller.currentStoryIndex.value;
-    return (page - index).abs() < 0.05;
-  }
-
   void _onEdgePointerDown(PointerDownEvent event) {
     final controller = storyController;
-    if (controller == null || controller.isDetailOpen.value || _closing) {
+    if (controller == null ||
+        controller.isDetailOpen.value ||
+        _isClosingViewer) {
       return;
     }
     _edgePointer = event.pointer;
@@ -229,8 +259,18 @@ class _StoryViewerState extends State<StoryViewer>
     final controller = storyController;
     if (controller == null) return;
     if (event.pointer != _edgePointer || _edgePointerStart == null) return;
-    if (controller.isDetailOpen.value || _closing) return;
-    if (!_pageSettledAtCurrent) return;
+    if (controller.isDetailOpen.value || _isClosingViewer) return;
+
+    final pages = pageController;
+    if (pages != null && pages.hasClients) {
+      final page = pages.page;
+      if (page != null) {
+        final index = widget.lockToSingleStory
+            ? 0
+            : controller.currentStoryIndex.value;
+        if ((page - index).abs() >= 0.05) return;
+      }
+    }
 
     final index = widget.lockToSingleStory
         ? 0
@@ -252,7 +292,7 @@ class _StoryViewerState extends State<StoryViewer>
     _edgeLastTime = event.timeStamp;
 
     if (index == 0 && (totalDx > 0 || edgeDragDx.value > 0)) {
-      controller.pausePlay();
+      controller.setPaused(reason: StoryPauseReason.edgeDrag, isPaused: true);
       _edgePointerDx = totalDx.clamp(0.0, width);
       edgeDragDx.value = _edgePointerDx;
       if (!edgeDragging.value) edgeDragging.value = true;
@@ -260,7 +300,7 @@ class _StoryViewerState extends State<StoryViewer>
     }
 
     if (index == last && (totalDx < 0 || edgeDragDx.value < 0)) {
-      controller.pausePlay();
+      controller.setPaused(reason: StoryPauseReason.edgeDrag, isPaused: true);
       _edgePointerDx = totalDx.clamp(-width, 0.0);
       edgeDragDx.value = _edgePointerDx;
       if (!edgeDragging.value) edgeDragging.value = true;
@@ -271,16 +311,21 @@ class _StoryViewerState extends State<StoryViewer>
     if (event.pointer != _edgePointer) return;
     _edgePointer = null;
     _edgePointerStart = null;
-    final wasDragging = edgeDragging.value;
     edgeDragging.value = false;
 
     final controller = storyController;
-    if (controller == null || _closing || _pausedForLeave) return;
+    if (controller == null || _isClosingViewer) return;
+
+    void clearEdgeAndScrollPause() {
+      controller
+        ..setPaused(reason: StoryPauseReason.edgeDrag, isPaused: false)
+        ..setPaused(reason: StoryPauseReason.scroll, isPaused: false);
+    }
 
     final width = MediaQuery.sizeOf(context).width;
     final dx = edgeDragDx.value;
     if (dx == 0) {
-      if (wasDragging) controller.resumePlay();
+      clearEdgeAndScrollPause();
       return;
     }
 
@@ -290,11 +335,12 @@ class _StoryViewerState extends State<StoryViewer>
         (dx < 0 && _edgeDragVelocity < -_edgeDismissVelocity);
 
     if (shouldClose) {
+      clearEdgeAndScrollPause();
       handleClosePressed();
     } else {
       edgeDragDx.value = 0;
       _edgePointerDx = 0;
-      controller.resumePlay();
+      clearEdgeAndScrollPause();
     }
     _edgeDragVelocity = 0;
   }
@@ -303,8 +349,7 @@ class _StoryViewerState extends State<StoryViewer>
     final controller = storyController;
     if (controller == null ||
         controller.isDetailOpen.value ||
-        _closing ||
-        _pausedForLeave) {
+        _isClosingViewer) {
       return false;
     }
     if (notification.metrics.axis != Axis.horizontal) return false;
@@ -312,11 +357,11 @@ class _StoryViewerState extends State<StoryViewer>
     if (notification is ScrollUpdateNotification &&
         notification.dragDetails != null &&
         edgeDragDx.value == 0) {
-      controller.pausePlay();
+      controller.setPaused(reason: StoryPauseReason.scroll, isPaused: true);
     }
 
     if (notification is ScrollEndNotification && edgeDragDx.value == 0) {
-      controller.resumePlay();
+      controller.setPaused(reason: StoryPauseReason.scroll, isPaused: false);
     }
 
     return false;
@@ -356,7 +401,11 @@ class _StoryViewerState extends State<StoryViewer>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!_pausedForLeave) return;
+    final controller = storyController;
+    if (controller == null ||
+        !controller.isPausedFor(StoryPauseReason.leaveApp)) {
+      return;
+    }
 
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.hidden ||
@@ -367,12 +416,8 @@ class _StoryViewerState extends State<StoryViewer>
 
     if (state != AppLifecycleState.resumed || !_leftAppForAction) return;
 
-    _pausedForLeave = false;
     _leftAppForAction = false;
-    if (!mounted || _closing) return;
-    final controller = storyController;
-    if (controller == null || controller.isDetailOpen.value) return;
-    controller.resumePlay();
+    controller.setPaused(reason: StoryPauseReason.leaveApp, isPaused: false);
   }
 
   Future<void> _handleStoryAction({
@@ -382,16 +427,21 @@ class _StoryViewerState extends State<StoryViewer>
     required String? link,
     required String? label,
   }) async {
-    final leavesApp =
+    final isLeaveApp =
         type == StoryActionType.browser || type == StoryActionType.deeplink;
-    final awaitRoute = type == StoryActionType.webview;
+    final isWebViewOpen = type == StoryActionType.webview;
 
-    if (leavesApp || awaitRoute) {
-      storyController?.pausePlay();
-    }
-    if (leavesApp) {
-      _pausedForLeave = true;
+    if (isLeaveApp) {
       _leftAppForAction = false;
+      storyController?.setPaused(
+        reason: StoryPauseReason.leaveApp,
+        isPaused: true,
+      );
+    } else if (isWebViewOpen) {
+      storyController?.setPaused(
+        reason: StoryPauseReason.action,
+        isPaused: true,
+      );
     }
 
     try {
@@ -405,500 +455,78 @@ class _StoryViewerState extends State<StoryViewer>
         ),
       );
     } finally {
-      if (awaitRoute && mounted && !_closing) {
-        final controller = storyController;
-        if (controller != null && !controller.isDetailOpen.value) {
-          controller.resumePlay();
-        }
+      if (isWebViewOpen) {
+        storyController?.setPaused(
+          reason: StoryPauseReason.action,
+          isPaused: false,
+        );
+      } else if (isLeaveApp && !_leftAppForAction) {
+        storyController?.setPaused(
+          reason: StoryPauseReason.leaveApp,
+          isPaused: false,
+        );
       }
     }
-  }
-
-  void _onActiveImageLoaded(bool imageLoaded) {
-    final controller = storyController;
-    if (controller == null || _closing || _pausedForLeave) return;
-    if (controller.isDetailOpen.value) return;
-
-    if (!imageLoaded) {
-      if (controller.storyController.value <= 0) {
-        controller.resetPlay();
-      } else {
-        controller.pausePlay();
-      }
-      return;
-    }
-    if (controller.storyController.isAnimating) return;
-
-    final value = controller.storyController.value;
-    final completed =
-        controller.storyController.status == AnimationStatus.completed;
-    if (value > 0 && !completed) {
-      controller.resumePlay();
-    } else {
-      controller.startPlay();
-    }
-  }
-
-  String _imageUrlForPage(int page) {
-    final controller = storyController;
-    if (controller == null) return '';
-    final storyIndex = widget.lockToSingleStory
-        ? controller.currentStoryIndex.value
-        : page;
-    final story = _stories[storyIndex];
-    final items = story.items;
-    if (items.isEmpty) return '';
-
-    if (storyIndex == controller.currentStoryIndex.value) {
-      return items[controller.currentItemIndex.value].imageUrl;
-    }
-    return items.first.imageUrl;
-  }
-
-  StoryFirstScreenMode _modeForPage(int page) {
-    final controller = storyController;
-    if (controller == null || _stories.isEmpty) {
-      return StoryFirstScreenMode.disabled;
-    }
-    final storyIndex = widget.lockToSingleStory
-        ? controller.currentStoryIndex.value
-        : page;
-    if (storyIndex < 0 || storyIndex >= _stories.length) {
-      return StoryFirstScreenMode.disabled;
-    }
-    return _stories[storyIndex].firstScreenMode;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_stories.isEmpty || storyController == null || pageController == null) {
-      return Scaffold(
-        backgroundColor: MuzhikiColors.black17,
-        body: Stack(
-          children: [
-            Positioned(
-              top: MediaQuery.paddingOf(context).top,
-              left: 22.w,
-              right: 22.w,
-              height: 40.h,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: handleClosePressed,
-                  child: SizedBox(
-                    width: 44.w,
-                    height: 44.h,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        handleClosePressed();
+      },
+      child: ListenableBuilder(
+        listenable: Listenable.merge([widget.viewModel, _storiesListenable]),
+        builder: (context, _) {
+          if (_stories.isEmpty ||
+              storyController == null ||
+              pageController == null) {
+            final state = widget.viewModel.state;
+            final message = state.notFound
+                ? 'Сторис не найден'
+                : state.isLoading
+                ? null
+                : 'Список сторисов пуст';
+
+            return Scaffold(
+              backgroundColor: MuzhikiColors.black17,
+              body: Stack(
+                children: [
+                  Positioned(
+                    top: MediaQuery.paddingOf(context).top,
+                    left: 22.w,
+                    right: 22.w,
+                    height: 40.h,
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: SvgPicture.asset(
-                        'assets/svg/close.svg',
-                        package: 'muzhiki_stories',
-                        width: 12.w,
-                        height: 12.h,
-                        colorFilter: ColorFilter.mode(
-                          MuzhikiColors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Text(
-                  'Список сторисов пуст',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                    color: MuzhikiColors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final padding = MediaQuery.paddingOf(context);
-          final appBarHeight = padding.top + 40.h;
-          final storyGeometry = StoryGeometry(
-            screenHeight: constraints.maxHeight,
-            appBarHeight: appBarHeight,
-            cornerRadius: 25.r,
-            cornerStraightenDistance: 60.h,
-          );
-
-          return GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onVerticalDragEnd: (details) {
-              if ((details.primaryVelocity ?? 0) < 200) return;
-              handleClosePressed();
-            },
-            child: ValueListenableBuilder<double>(
-              valueListenable: edgeDragDx,
-              builder: (context, dragDx, child) {
-                final dismissProgress = (dragDx.abs() / constraints.maxWidth)
-                    .clamp(0.0, 1.0);
-                return AnimatedContainer(
-                  duration: dragDx == 0
-                      ? const Duration(milliseconds: 180)
-                      : Duration.zero,
-                  curve: Curves.easeOutCubic,
-                  transform: Matrix4.translationValues(dragDx, 0, 0),
-                  child: Opacity(
-                    opacity: 1 - dismissProgress * 0.35,
-                    child: child,
-                  ),
-                );
-              },
-              child: ColoredBox(
-                color: MuzhikiColors.appBackgroud,
-                child: Listener(
-                  behavior: HitTestBehavior.translucent,
-                  onPointerDown: _onEdgePointerDown,
-                  onPointerMove: _onEdgePointerMove,
-                  onPointerUp: _onEdgePointerEnd,
-                  onPointerCancel: _onEdgePointerEnd,
-                  child: ValueListenableBuilder<List<StoryModel>>(
-                    valueListenable: widget.stories,
-                    builder: (context, stories, _) {
-                      return Stack(
-                        children: [
-                          NotificationListener<ScrollNotification>(
-                            onNotification: _onStoryScroll,
-                            child: ValueListenableBuilder<bool>(
-                              valueListenable: edgeDragging,
-                              builder: (context, dragging, _) {
-                                return ValueListenableBuilder<bool>(
-                                  valueListenable:
-                                      storyController!.isDetailOpen,
-                                  builder: (context, detailOpen, _) {
-                                    final lockPages = detailOpen || dragging;
-                                    return PageView.builder(
-                                      controller: pageController,
-                                      allowImplicitScrolling: true,
-                                      physics: lockPages
-                                          ? const NeverScrollableScrollPhysics()
-                                          : const ClampingScrollPhysics(
-                                              parent: PageScrollPhysics(),
-                                            ),
-                                      onPageChanged: _onPageChanged,
-                                      itemCount: widget.lockToSingleStory
-                                          ? 1
-                                          : stories.length,
-                                      itemBuilder: (context, page) {
-                                        return ValueListenableBuilder<int>(
-                                          valueListenable: storyController!
-                                              .currentStoryIndex,
-                                          builder: (context, storyIndex, _) {
-                                            return ValueListenableBuilder<int>(
-                                              valueListenable: storyController!
-                                                  .currentItemIndex,
-                                              builder: (context, itemIndex, _) {
-                                                return _StoryImagePage(
-                                                  key: ValueKey(
-                                                    '${page}_${_imageUrlForPage(page)}',
-                                                  ),
-                                                  imageUrl: _imageUrlForPage(
-                                                    page,
-                                                  ),
-                                                  mode: _modeForPage(page),
-                                                  cacheManager: widget
-                                                      .viewModel
-                                                      .storyCacheManager,
-                                                  isActive:
-                                                      widget
-                                                          .lockToSingleStory ||
-                                                      page == storyIndex,
-                                                  storyController:
-                                                      storyController!,
-                                                  storyGeometry: storyGeometry,
-                                                  appBarHeight: appBarHeight,
-                                                  onImageLoaded:
-                                                      _onActiveImageLoaded,
-                                                );
-                                              },
-                                            );
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                          ValueListenableBuilder<int>(
-                            valueListenable: storyController!.currentStoryIndex,
-                            builder: (context, index, _) {
-                              return StoryDetailOverlay(
-                                storyController: storyController!,
-                                storyGeometry: storyGeometry,
-                                story: _stories[index],
-                              );
-                            },
-                          ),
-                          HomeRedisignStoryHeader(
-                            storyController: storyController!,
-                            onClose: handleClosePressed,
-                          ),
-                          Positioned(
-                            left: 16.w,
-                            right: 16.w,
-                            bottom: padding.bottom + 16.h,
-                            child: ValueListenableBuilder<int>(
-                              valueListenable:
-                                  storyController!.currentStoryIndex,
-                              builder: (context, index, _) {
-                                final story = _stories[index];
-                                return ValueListenableBuilder<bool>(
-                                  valueListenable:
-                                      storyController!.isDetailOpen,
-                                  builder: (context, isOpen, child) {
-                                    final hasMarkdownAction =
-                                        story.markdownActionText != null &&
-                                        story.markdownActionText!.isNotEmpty &&
-                                        story.markdownActionType !=
-                                            StoryActionType.none;
-
-                                    final hasFullscreenAction =
-                                        story.fullscreenActionText != null &&
-                                        story
-                                            .fullscreenActionText!
-                                            .isNotEmpty &&
-                                        story.fullscreenActionType !=
-                                            StoryActionType.none;
-
-                                    return Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        FadeTransition(
-                                          opacity: storyController!.textOpacity,
-                                          child: IgnorePointer(
-                                            ignoring: !isOpen,
-                                            child: hasMarkdownAction
-                                                ? MuzhikiUi.buttons.dark(
-                                                    label: story
-                                                        .markdownActionText!,
-                                                    borderRadius: 41,
-                                                    onPressed:
-                                                        openMarkdownAction,
-                                                  )
-                                                : const SizedBox.shrink(),
-                                          ),
-                                        ),
-                                        FadeTransition(
-                                          opacity:
-                                              storyController!.detailFadeOut,
-                                          child: IgnorePointer(
-                                            ignoring: isOpen,
-                                            child: hasFullscreenAction
-                                                ? MuzhikiUi.buttons.primary(
-                                                    label: story
-                                                        .fullscreenActionText!,
-                                                    backgroundColor:
-                                                        MuzhikiColors.greyLight,
-                                                    borderRadius: 41,
-                                                    onPressed:
-                                                        openFullscreenAction,
-                                                  )
-                                                : const SizedBox.shrink(),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _StoryImagePage extends StatefulWidget {
-  const _StoryImagePage({
-    super.key,
-    required this.imageUrl,
-    required this.mode,
-    required this.cacheManager,
-    required this.isActive,
-    required this.storyController,
-    required this.storyGeometry,
-    required this.appBarHeight,
-    required this.onImageLoaded,
-  });
-
-  final String imageUrl;
-  final StoryFirstScreenMode mode;
-  final StoryCacheManager cacheManager;
-  final bool isActive;
-  final StoryController storyController;
-  final StoryGeometry storyGeometry;
-  final double appBarHeight;
-  final ValueChanged<bool> onImageLoaded;
-
-  @override
-  State<_StoryImagePage> createState() => _StoryImagePageState();
-}
-
-class _StoryImagePageState extends State<_StoryImagePage> {
-  final _imageLoadController = StoryImageLoadController();
-
-  @override
-  void initState() {
-    super.initState();
-    _imageLoadController.addListener(_onLoadsChanged);
-  }
-
-  void _onLoadsChanged() {
-    if (!mounted || !widget.isActive) return;
-    final isImageLoaded =
-        _imageLoadController.isImageLoaded(widget.imageUrl) &&
-        !_imageLoadController.isImageFailed(widget.imageUrl);
-    widget.onImageLoaded(isImageLoaded);
-  }
-
-  @override
-  void didUpdateWidget(covariant _StoryImagePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.imageUrl != widget.imageUrl) {
-      _imageLoadController.removeImage(oldWidget.imageUrl);
-    }
-    if (!widget.isActive || oldWidget.isActive == widget.isActive) return;
-
-    final isImageLoaded =
-        _imageLoadController.isImageLoaded(widget.imageUrl) &&
-        !_imageLoadController.isImageFailed(widget.imageUrl);
-    widget.onImageLoaded(isImageLoaded);
-  }
-
-  @override
-  void dispose() {
-    _imageLoadController
-      ..removeListener(_onLoadsChanged)
-      ..dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _imageLoadController,
-      builder: (context, _) {
-        final url = widget.imageUrl;
-        final showLoader =
-            !_imageLoadController.isImageFailed(url) &&
-            !_imageLoadController.isImageLoaded(url);
-
-        return RepaintBoundary(
-          child: ValueListenableBuilder<double>(
-            valueListenable: widget.storyController.sheetSize,
-            child: Image(
-              key: ValueKey(
-                '$url-${_imageLoadController.rebuildKeys[url] ?? 0}',
-              ),
-              image: widget.cacheManager.provider(url, mode: widget.mode),
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-              gaplessPlayback: false,
-              errorBuilder: (context, error, stackTrace) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) _imageLoadController.setImageFailed(url);
-                });
-                return StoryImageErrorPlaceholder(
-                  onRetry: () async => await _imageLoadController.reloadImage(
-                    url: widget.imageUrl,
-                    cacheManager: widget.cacheManager,
-                    mode: widget.mode,
-                  ),
-                );
-              },
-              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                final hasFrame = wasSynchronouslyLoaded || frame != null;
-                if (hasFrame) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) _imageLoadController.setImageLoaded(url);
-                  });
-                }
-
-                return ColoredBox(
-                  color: MuzhikiColors.black17,
-                  child: AnimatedOpacity(
-                    opacity: hasFrame ? 1 : 0,
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeOut,
-                    child: child,
-                  ),
-                );
-              },
-            ),
-            builder: (context, size, child) {
-              final blur = widget.storyGeometry.appBarBlurAt(size);
-
-              return SoftEdgeBlur(
-                edges: blur != 0
-                    ? [
-                        EdgeBlur(
-                          type: EdgeType.topEdge,
-                          size: widget.appBarHeight,
-                          sigma: 50 * blur,
-                          controlPoints: [
-                            ControlPoint(
-                              position: 0.8,
-                              type: ControlPointType.visible,
-                            ),
-                            ControlPoint(
-                              position: 1,
-                              type: ControlPointType.transparent,
-                            ),
-                          ],
-                        ),
-                      ]
-                    : const [],
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ClipRRect(
-                      clipper: StoryPhotoClipper(
-                        size: size,
-                        geometry: widget.storyGeometry,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topCenter,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: handleClosePressed,
                         child: SizedBox(
-                          width: double.infinity,
-                          height: widget.storyGeometry.photoHeightAt(size),
-                          child: child,
+                          width: 44.w,
+                          height: 44.h,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: SvgPicture.asset(
+                              'assets/svg/close.svg',
+                              package: 'muzhiki_stories',
+                              width: 12.w,
+                              height: 12.h,
+                              colorFilter: ColorFilter.mode(
+                                MuzhikiColors.white,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    if (showLoader)
-                      ColoredBox(
-                        color: MuzhikiColors.black17,
-                        child: Center(
-                          child: Transform.scale(
+                  ),
+                  Center(
+                    child: message == null
+                        ? Transform.scale(
                             scale: Platform.isIOS ? 1.25 : 1.0,
                             child: CircularProgressIndicator.adaptive(
                               strokeWidth: 2.5,
@@ -909,16 +537,171 @@ class _StoryImagePageState extends State<_StoryImagePage> {
                                 MuzhikiColors.white,
                               ),
                             ),
+                          )
+                        : Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 24.w),
+                            child: Text(
+                              message,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                                color: MuzhikiColors.white,
+                              ),
+                            ),
                           ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                final padding = MediaQuery.paddingOf(context);
+                final appBarHeight = padding.top + 40.h;
+                final storyGeometry = StoryGeometry(
+                  screenHeight: constraints.maxHeight,
+                  appBarHeight: appBarHeight,
+                  cornerRadius: 25.r,
+                  cornerStraightenDistance: 60.h,
+                );
+
+                return GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onVerticalDragEnd: (details) {
+                    if ((details.primaryVelocity ?? 0) < 200) return;
+                    handleClosePressed();
+                  },
+                  child: ValueListenableBuilder<double>(
+                    valueListenable: edgeDragDx,
+                    builder: (context, dragDx, child) {
+                      final dismissProgress =
+                          (dragDx.abs() / constraints.maxWidth).clamp(0.0, 1.0);
+                      return AnimatedContainer(
+                        duration: dragDx == 0
+                            ? const Duration(milliseconds: 180)
+                            : Duration.zero,
+                        curve: Curves.easeOutCubic,
+                        transform: Matrix4.translationValues(dragDx, 0, 0),
+                        child: Opacity(
+                          opacity: 1 - dismissProgress * 0.35,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: ColoredBox(
+                      color: MuzhikiColors.appBackgroud,
+                      child: Listener(
+                        behavior: HitTestBehavior.translucent,
+                        onPointerDown: _onEdgePointerDown,
+                        onPointerMove: _onEdgePointerMove,
+                        onPointerUp: _onEdgePointerEnd,
+                        onPointerCancel: _onEdgePointerEnd,
+                        child: ValueListenableBuilder<List<StoryModel>>(
+                          valueListenable: _storiesListenable,
+                          builder: (context, stories, _) {
+                            return Stack(
+                              children: [
+                                NotificationListener<ScrollNotification>(
+                                  onNotification: _onStoryScroll,
+                                  child: ValueListenableBuilder<bool>(
+                                    valueListenable: edgeDragging,
+                                    builder: (context, dragging, _) {
+                                      return ValueListenableBuilder<bool>(
+                                        valueListenable:
+                                            storyController!.isDetailOpen,
+                                        builder: (context, detailOpen, _) {
+                                          final lockPages =
+                                              detailOpen || dragging;
+                                          return PageView.builder(
+                                            controller: pageController,
+                                            allowImplicitScrolling: true,
+                                            physics: lockPages
+                                                ? const NeverScrollableScrollPhysics()
+                                                : const ClampingScrollPhysics(
+                                                    parent: PageScrollPhysics(),
+                                                  ),
+                                            onPageChanged: _onPageChanged,
+                                            itemCount: widget.lockToSingleStory
+                                                ? 1
+                                                : stories.length,
+                                            itemBuilder: (context, page) {
+                                              return StoryPage(
+                                                page: page,
+                                                lockToSingleStory:
+                                                    widget.lockToSingleStory,
+                                                cacheManager: widget
+                                                    .viewModel
+                                                    .storyCacheManager,
+                                                storyController:
+                                                    storyController!,
+                                                storyGeometry: storyGeometry,
+                                                appBarHeight: appBarHeight,
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                                ValueListenableBuilder<int>(
+                                  valueListenable:
+                                      storyController!.currentStoryIndex,
+                                  builder: (context, index, _) {
+                                    return StoryDetailOverlay(
+                                      storyController: storyController!,
+                                      storyGeometry: storyGeometry,
+                                      story: _stories[index],
+                                    );
+                                  },
+                                ),
+                                HomeRedisignStoryHeader(
+                                  storyController: storyController!,
+                                  onClose: handleClosePressed,
+                                ),
+                                Positioned(
+                                  left: 16.w,
+                                  right: 16.w,
+                                  bottom: padding.bottom + 16.h,
+                                  child: ValueListenableBuilder<int>(
+                                    valueListenable:
+                                        storyController!.currentStoryIndex,
+                                    builder: (context, index, _) {
+                                      return ValueListenableBuilder<bool>(
+                                        valueListenable:
+                                            storyController!.isDetailOpen,
+                                        builder: (context, isOpen, child) {
+                                          return StoryActionButtons(
+                                            story: _stories[index],
+                                            storyController: storyController!,
+                                            isDetailOpen: isOpen,
+                                            onMarkdownAction:
+                                                openMarkdownAction,
+                                            onFullscreenAction:
+                                                openFullscreenAction,
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
-                  ],
-                ),
-              );
-            },
-          ),
-        );
-      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }

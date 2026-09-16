@@ -1,12 +1,12 @@
 import 'package:muzhiki_stories/config/stories_config.dart';
 import 'package:muzhiki_stories/data/repository/stories_repository_impl.dart';
-import 'package:muzhiki_stories/presentation/state/stories_view_model.dart';
 import 'package:muzhiki_stories/presentation/service/story_cache_manager.dart';
+import 'package:muzhiki_stories/presentation/state/stories_view_model.dart';
 
 class StoriesModule {
   const StoriesModule._();
 
-  static StoriesViewModel initConfig(StoriesConfig config) {
+  static StoriesViewModel initViewModel(StoriesConfig config) {
     return StoriesViewModel(
       repository: StoriesRepositoryImpl(
         dio: config.dio,

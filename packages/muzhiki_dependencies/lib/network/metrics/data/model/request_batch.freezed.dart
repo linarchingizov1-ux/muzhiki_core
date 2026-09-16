@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RequestBatch {
 
-@JsonKey(name: 'batch_timestamp') DateTime get batchTimestamp;@JsonKey(name: 'session_id') String get sessionId;@JsonKey(name: 'app_name') String get appName; RequestPlatform get platform;@JsonKey(name: 'app_version') String get appVersion; int? get mpid; List<RequestMetric> get requests;
+@JsonKey(name: 'batch_timestamp') DateTime get batchTimestamp;@JsonKey(name: 'session_id') String get sessionId;@JsonKey(name: 'app_name') String get appName;@JsonKey(name: 'device_id') String get deviceId; RequestPlatform get platform;@JsonKey(name: 'app_version') String get appVersion; int? get mpid; List<RequestMetric> get requests;
 /// Create a copy of RequestBatch
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $RequestBatchCopyWith<RequestBatch> get copyWith => _$RequestBatchCopyWithImpl<R
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RequestBatch&&(identical(other.batchTimestamp, batchTimestamp) || other.batchTimestamp == batchTimestamp)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.appName, appName) || other.appName == appName)&&(identical(other.platform, platform) || other.platform == platform)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.mpid, mpid) || other.mpid == mpid)&&const DeepCollectionEquality().equals(other.requests, requests));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RequestBatch&&(identical(other.batchTimestamp, batchTimestamp) || other.batchTimestamp == batchTimestamp)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.appName, appName) || other.appName == appName)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.platform, platform) || other.platform == platform)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.mpid, mpid) || other.mpid == mpid)&&const DeepCollectionEquality().equals(other.requests, requests));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,batchTimestamp,sessionId,appName,platform,appVersion,mpid,const DeepCollectionEquality().hash(requests));
+int get hashCode => Object.hash(runtimeType,batchTimestamp,sessionId,appName,deviceId,platform,appVersion,mpid,const DeepCollectionEquality().hash(requests));
 
 @override
 String toString() {
-  return 'RequestBatch(batchTimestamp: $batchTimestamp, sessionId: $sessionId, appName: $appName, platform: $platform, appVersion: $appVersion, mpid: $mpid, requests: $requests)';
+  return 'RequestBatch(batchTimestamp: $batchTimestamp, sessionId: $sessionId, appName: $appName, deviceId: $deviceId, platform: $platform, appVersion: $appVersion, mpid: $mpid, requests: $requests)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $RequestBatchCopyWith<$Res>  {
   factory $RequestBatchCopyWith(RequestBatch value, $Res Function(RequestBatch) _then) = _$RequestBatchCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'batch_timestamp') DateTime batchTimestamp,@JsonKey(name: 'session_id') String sessionId,@JsonKey(name: 'app_name') String appName, RequestPlatform platform,@JsonKey(name: 'app_version') String appVersion, int? mpid, List<RequestMetric> requests
+@JsonKey(name: 'batch_timestamp') DateTime batchTimestamp,@JsonKey(name: 'session_id') String sessionId,@JsonKey(name: 'app_name') String appName,@JsonKey(name: 'device_id') String deviceId, RequestPlatform platform,@JsonKey(name: 'app_version') String appVersion, int? mpid, List<RequestMetric> requests
 });
 
 
@@ -65,11 +65,12 @@ class _$RequestBatchCopyWithImpl<$Res>
 
 /// Create a copy of RequestBatch
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? batchTimestamp = null,Object? sessionId = null,Object? appName = null,Object? platform = null,Object? appVersion = null,Object? mpid = freezed,Object? requests = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? batchTimestamp = null,Object? sessionId = null,Object? appName = null,Object? deviceId = null,Object? platform = null,Object? appVersion = null,Object? mpid = freezed,Object? requests = null,}) {
   return _then(_self.copyWith(
 batchTimestamp: null == batchTimestamp ? _self.batchTimestamp : batchTimestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,sessionId: null == sessionId ? _self.sessionId : sessionId // ignore: cast_nullable_to_non_nullable
 as String,appName: null == appName ? _self.appName : appName // ignore: cast_nullable_to_non_nullable
+as String,deviceId: null == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
 as String,platform: null == platform ? _self.platform : platform // ignore: cast_nullable_to_non_nullable
 as RequestPlatform,appVersion: null == appVersion ? _self.appVersion : appVersion // ignore: cast_nullable_to_non_nullable
 as String,mpid: freezed == mpid ? _self.mpid : mpid // ignore: cast_nullable_to_non_nullable
@@ -159,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'batch_timestamp')  DateTime batchTimestamp, @JsonKey(name: 'session_id')  String sessionId, @JsonKey(name: 'app_name')  String appName,  RequestPlatform platform, @JsonKey(name: 'app_version')  String appVersion,  int? mpid,  List<RequestMetric> requests)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'batch_timestamp')  DateTime batchTimestamp, @JsonKey(name: 'session_id')  String sessionId, @JsonKey(name: 'app_name')  String appName, @JsonKey(name: 'device_id')  String deviceId,  RequestPlatform platform, @JsonKey(name: 'app_version')  String appVersion,  int? mpid,  List<RequestMetric> requests)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RequestBatch() when $default != null:
-return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.platform,_that.appVersion,_that.mpid,_that.requests);case _:
+return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.deviceId,_that.platform,_that.appVersion,_that.mpid,_that.requests);case _:
   return orElse();
 
 }
@@ -180,10 +181,10 @@ return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.platfor
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'batch_timestamp')  DateTime batchTimestamp, @JsonKey(name: 'session_id')  String sessionId, @JsonKey(name: 'app_name')  String appName,  RequestPlatform platform, @JsonKey(name: 'app_version')  String appVersion,  int? mpid,  List<RequestMetric> requests)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'batch_timestamp')  DateTime batchTimestamp, @JsonKey(name: 'session_id')  String sessionId, @JsonKey(name: 'app_name')  String appName, @JsonKey(name: 'device_id')  String deviceId,  RequestPlatform platform, @JsonKey(name: 'app_version')  String appVersion,  int? mpid,  List<RequestMetric> requests)  $default,) {final _that = this;
 switch (_that) {
 case _RequestBatch():
-return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.platform,_that.appVersion,_that.mpid,_that.requests);case _:
+return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.deviceId,_that.platform,_that.appVersion,_that.mpid,_that.requests);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +201,10 @@ return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.platfor
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'batch_timestamp')  DateTime batchTimestamp, @JsonKey(name: 'session_id')  String sessionId, @JsonKey(name: 'app_name')  String appName,  RequestPlatform platform, @JsonKey(name: 'app_version')  String appVersion,  int? mpid,  List<RequestMetric> requests)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'batch_timestamp')  DateTime batchTimestamp, @JsonKey(name: 'session_id')  String sessionId, @JsonKey(name: 'app_name')  String appName, @JsonKey(name: 'device_id')  String deviceId,  RequestPlatform platform, @JsonKey(name: 'app_version')  String appVersion,  int? mpid,  List<RequestMetric> requests)?  $default,) {final _that = this;
 switch (_that) {
 case _RequestBatch() when $default != null:
-return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.platform,_that.appVersion,_that.mpid,_that.requests);case _:
+return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.deviceId,_that.platform,_that.appVersion,_that.mpid,_that.requests);case _:
   return null;
 
 }
@@ -215,12 +216,13 @@ return $default(_that.batchTimestamp,_that.sessionId,_that.appName,_that.platfor
 @JsonSerializable()
 
 class _RequestBatch implements RequestBatch {
-  const _RequestBatch({@JsonKey(name: 'batch_timestamp') required this.batchTimestamp, @JsonKey(name: 'session_id') required this.sessionId, @JsonKey(name: 'app_name') required this.appName, required this.platform, @JsonKey(name: 'app_version') required this.appVersion, this.mpid, required final  List<RequestMetric> requests}): _requests = requests;
+  const _RequestBatch({@JsonKey(name: 'batch_timestamp') required this.batchTimestamp, @JsonKey(name: 'session_id') required this.sessionId, @JsonKey(name: 'app_name') required this.appName, @JsonKey(name: 'device_id') required this.deviceId, required this.platform, @JsonKey(name: 'app_version') required this.appVersion, this.mpid, required final  List<RequestMetric> requests}): _requests = requests;
   factory _RequestBatch.fromJson(Map<String, dynamic> json) => _$RequestBatchFromJson(json);
 
 @override@JsonKey(name: 'batch_timestamp') final  DateTime batchTimestamp;
 @override@JsonKey(name: 'session_id') final  String sessionId;
 @override@JsonKey(name: 'app_name') final  String appName;
+@override@JsonKey(name: 'device_id') final  String deviceId;
 @override final  RequestPlatform platform;
 @override@JsonKey(name: 'app_version') final  String appVersion;
 @override final  int? mpid;
@@ -245,16 +247,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RequestBatch&&(identical(other.batchTimestamp, batchTimestamp) || other.batchTimestamp == batchTimestamp)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.appName, appName) || other.appName == appName)&&(identical(other.platform, platform) || other.platform == platform)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.mpid, mpid) || other.mpid == mpid)&&const DeepCollectionEquality().equals(other._requests, _requests));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RequestBatch&&(identical(other.batchTimestamp, batchTimestamp) || other.batchTimestamp == batchTimestamp)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.appName, appName) || other.appName == appName)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.platform, platform) || other.platform == platform)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.mpid, mpid) || other.mpid == mpid)&&const DeepCollectionEquality().equals(other._requests, _requests));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,batchTimestamp,sessionId,appName,platform,appVersion,mpid,const DeepCollectionEquality().hash(_requests));
+int get hashCode => Object.hash(runtimeType,batchTimestamp,sessionId,appName,deviceId,platform,appVersion,mpid,const DeepCollectionEquality().hash(_requests));
 
 @override
 String toString() {
-  return 'RequestBatch(batchTimestamp: $batchTimestamp, sessionId: $sessionId, appName: $appName, platform: $platform, appVersion: $appVersion, mpid: $mpid, requests: $requests)';
+  return 'RequestBatch(batchTimestamp: $batchTimestamp, sessionId: $sessionId, appName: $appName, deviceId: $deviceId, platform: $platform, appVersion: $appVersion, mpid: $mpid, requests: $requests)';
 }
 
 
@@ -265,7 +267,7 @@ abstract mixin class _$RequestBatchCopyWith<$Res> implements $RequestBatchCopyWi
   factory _$RequestBatchCopyWith(_RequestBatch value, $Res Function(_RequestBatch) _then) = __$RequestBatchCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'batch_timestamp') DateTime batchTimestamp,@JsonKey(name: 'session_id') String sessionId,@JsonKey(name: 'app_name') String appName, RequestPlatform platform,@JsonKey(name: 'app_version') String appVersion, int? mpid, List<RequestMetric> requests
+@JsonKey(name: 'batch_timestamp') DateTime batchTimestamp,@JsonKey(name: 'session_id') String sessionId,@JsonKey(name: 'app_name') String appName,@JsonKey(name: 'device_id') String deviceId, RequestPlatform platform,@JsonKey(name: 'app_version') String appVersion, int? mpid, List<RequestMetric> requests
 });
 
 
@@ -282,11 +284,12 @@ class __$RequestBatchCopyWithImpl<$Res>
 
 /// Create a copy of RequestBatch
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? batchTimestamp = null,Object? sessionId = null,Object? appName = null,Object? platform = null,Object? appVersion = null,Object? mpid = freezed,Object? requests = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? batchTimestamp = null,Object? sessionId = null,Object? appName = null,Object? deviceId = null,Object? platform = null,Object? appVersion = null,Object? mpid = freezed,Object? requests = null,}) {
   return _then(_RequestBatch(
 batchTimestamp: null == batchTimestamp ? _self.batchTimestamp : batchTimestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,sessionId: null == sessionId ? _self.sessionId : sessionId // ignore: cast_nullable_to_non_nullable
 as String,appName: null == appName ? _self.appName : appName // ignore: cast_nullable_to_non_nullable
+as String,deviceId: null == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
 as String,platform: null == platform ? _self.platform : platform // ignore: cast_nullable_to_non_nullable
 as RequestPlatform,appVersion: null == appVersion ? _self.appVersion : appVersion // ignore: cast_nullable_to_non_nullable
 as String,mpid: freezed == mpid ? _self.mpid : mpid // ignore: cast_nullable_to_non_nullable

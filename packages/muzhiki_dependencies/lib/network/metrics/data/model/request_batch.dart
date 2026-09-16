@@ -14,6 +14,8 @@ abstract class RequestBatch with _$RequestBatch {
 
     @JsonKey(name: 'app_name') required String appName,
 
+    @JsonKey(name: 'device_id') required String deviceId,
+
     required RequestPlatform platform,
 
     @JsonKey(name: 'app_version') required String appVersion,
