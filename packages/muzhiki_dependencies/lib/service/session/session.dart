@@ -87,36 +87,45 @@ class SessionApp extends ChangeNotifier {
 
     if (saveDateTime == null ||
         DateTime.now().difference(saveDateTime).inHours >= 1) {
-      try {
-        final rolesData = await dioRefresh.get(
-          "https://api.master.muzhiki.pro/api/v1/get-roles",
-          options: Options(headers: {'Authorization': 'Bearer $token'}),
-        );
-
-        if (rolesData.data != null) {
-          final newRoles = RolesModel.fromJson(rolesData.data["data"]);
-
-          final companies = newRoles.info.getCompaniesByRole(
-            currUser.roles?.currentRole,
+      const maxRetries = 3;
+      const retryDelay = Duration(seconds: 5);
+      for (var i = 1; i <= maxRetries; i++) {
+        if (currUser == null) return null;
+        try {
+          final rolesData = await dioRefresh.get(
+            "https://api.master.muzhiki.pro/api/v1/get-roles",
+            options: Options(headers: {'Authorization': 'Bearer $token'}),
           );
 
-          final allowedInformator = newRoles.info.accessAllowedInformator;
-          final savedCompanyId = currUser.selectedRolesCompany;
-          final exists = companies.any((c) => c.id == savedCompanyId);
+          if (rolesData.data != null) {
+            final newRoles = RolesModel.fromJson(rolesData.data["data"]);
 
-          final validCompanyId = exists
-              ? savedCompanyId
-              : (companies.isNotEmpty ? companies.first.id : "");
+            final companies = newRoles.info.getCompaniesByRole(
+              currUser.roles?.currentRole,
+            );
 
-          currUser = currUser.copyWith(
-            isAllowedAccessInformator: allowedInformator,
-            roles: newRoles,
-            selectedRolesCompany: validCompanyId,
-            createdAt: DateTime.now(),
-          );
+            final allowedInformator = newRoles.info.accessAllowedInformator;
+            final savedCompanyId = currUser.selectedRolesCompany;
+            final exists = companies.any((c) => c.id == savedCompanyId);
+
+            final validCompanyId = exists
+                ? savedCompanyId
+                : (companies.isNotEmpty ? companies.first.id : "");
+
+            currUser = currUser.copyWith(
+              isAllowedAccessInformator: allowedInformator,
+              roles: newRoles,
+              selectedRolesCompany: validCompanyId,
+              createdAt: DateTime.now(),
+            );
+            return currUser;
+          }
+        } catch (_) {
+          if (i == maxRetries) {
+            return currUser;
+          }
+          await Future.delayed(retryDelay);
         }
-      } catch (_) {
-        return currUser;
       }
     }
 
@@ -165,8 +174,7 @@ class SessionApp extends ChangeNotifier {
       _status = AuthenticationStatus.authenticated;
       final currUser = await userSession.restoreUser();
       _user = currUser?.copyWith(
-        isAllowedAccessInformator:
-            currUser.roles?.info.accessAllowedInformator,
+        isAllowedAccessInformator: currUser.roles?.info.accessAllowedInformator,
       );
 
       if (getRoles && currUser != null) {
