@@ -113,7 +113,7 @@ class SupportModule {
         builder: (context, state) {
           final initialUrl =
               state.uri.queryParameters['initialUrl'] ??
-              'https://bus-wa.muzhiki.pro';
+              'https://bus-wa.muzhiki.pro/?native_app=true';
           return InformatorView(
             initialUrl: initialUrl,
             session: config.session,
