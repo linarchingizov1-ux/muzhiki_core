@@ -38,7 +38,7 @@ class VideoAttachment extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12.r),
           child: Container(
-            color: MuzhikiColors.light,
+            color: MuzhikiColors.blackOpticalZero,
             child: Center(
               child: LayoutBuilder(
                 builder: (context, constraints) {
