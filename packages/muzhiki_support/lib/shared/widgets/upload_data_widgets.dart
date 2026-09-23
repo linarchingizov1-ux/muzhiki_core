@@ -3,8 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_dependencies/network/exception/network_map_error.dart';
-import 'package:muzhiki_dependencies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 import 'package:muzhiki_support/data/models/socket/attachments/local_attachments.dart';
 import 'package:muzhiki_support/data/models/socket/attachments/upload_data.dart';
@@ -12,8 +10,6 @@ import 'package:muzhiki_support/data/models/socket/socket_connection.dart';
 import 'package:muzhiki_support/features/chat/state/attachments_cubit.dart';
 import 'package:muzhiki_support/shared/utils/file_icon_mapper.dart';
 import 'package:muzhiki_ui/media/media_viewer.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 class UploadDataWidgets extends StatefulWidget {
   final Directory directory;
@@ -32,8 +28,6 @@ class UploadDataWidgets extends StatefulWidget {
 }
 
 class _UploadDataWidgetsState extends State<UploadDataWidgets> {
-  String? _videoThumbnail;
-
   ChatAttachmentType get type => widget.item.when(
     local: (_, type, _, _, _) => type,
     remote: (_, type, _) => type,
@@ -60,54 +54,6 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
 
   String get id =>
       widget.item.when(local: (id, _, _, _, _) => id, remote: (id, _, _) => id);
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (type == ChatAttachmentType.video) {
-      _getVideoThumbnail();
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant UploadDataWidgets oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.item != widget.item) {
-      _videoThumbnail = null;
-
-      if (type == ChatAttachmentType.video) {
-        _getVideoThumbnail();
-      }
-    }
-  }
-
-  Future<void> _getVideoThumbnail() async {
-    final videoPath = widget.item.when(
-      local: (_, _, path, _, _) => path,
-      remote: (_, _, data) => data.url,
-    );
-
-    try {
-      final result = await VideoThumbnail.thumbnailFile(
-        video: videoPath,
-        thumbnailPath: widget.directory.path,
-        imageFormat: ImageFormat.JPEG,
-        quality: 75,
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        _videoThumbnail = result;
-      });
-    } catch (e, st) {
-      final error = AppErrorMapper.I.map(e, st);
-
-      BannerController.I.showError(error: error, message: error.message);
-    }
-  }
 
   String get documentIcon => FileIconMapper.forFileName(attachmentFileName);
 
@@ -186,53 +132,29 @@ class _UploadDataWidgetsState extends State<UploadDataWidgets> {
   }
 
   Widget _buildVideo() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12.r),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeOutCubic,
-        child: _videoThumbnail == null
-            ? Shimmer.fromColors(
-                key: const ValueKey('loading'),
-                baseColor: MuzhikiColors.light,
-                highlightColor: MuzhikiColors.white,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 231, 231, 231),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-              )
-            : _buildVideoThumbnail(key: const ValueKey('thumbnail')),
-      ),
-    );
-  }
-
-  Widget _buildVideoThumbnail({required Key key}) {
     final remote = remoteData;
 
     return InkWell(
-      key: key,
       onTap: remote == null
           ? null
           : () {
               MediaViewer.open(
                 context,
                 items: [
-                  MediaItem.videoNetwork(
-                    remote.url,
-                    previewPath: _videoThumbnail,
-                    heroTag: remote.url,
-                  ),
+                  MediaItem.videoNetwork(remote.url, heroTag: remote.url),
                 ],
               );
             },
-      child: Image.file(
-        File(_videoThumbnail!),
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
+      child: Center(
+        child: Container(
+          width: 35.w,
+          height: 35.w,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: MuzhikiColors.black17.withValues(alpha: 0.2),
+          ),
+          child: Icon(Icons.play_arrow, size: 22.r, color: Colors.white),
+        ),
       ),
     );
   }

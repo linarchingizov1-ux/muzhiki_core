@@ -212,11 +212,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble> {
     return bubble
         .animate()
         .fadeIn(duration: 160.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.18,
-          duration: 220.ms,
-          curve: Curves.easeOutCubic,
-        );
+        .slideY(begin: 0.18, duration: 220.ms, curve: Curves.easeOutCubic);
   }
 }
 
@@ -347,7 +343,6 @@ class _BubbleAttachment extends StatelessWidget {
             ),
 
             ChatAttachmentType.video => AttachmentWidgets.video(
-              directory: directory,
               url: attachment.url,
               websocketChat: websocketChat,
             ),
@@ -401,7 +396,6 @@ class _BubbleAttachment extends StatelessWidget {
                             ),
 
                             ChatAttachmentType.video => AttachmentWidgets.video(
-                              directory: directory,
                               url: attachment.url,
                               websocketChat: websocketChat,
                             ),
