@@ -8,6 +8,7 @@ enum StoryPauseReason {
   details,
   scroll,
   edgeDrag,
+  closeDrag,
   action,
   leaveApp,
   closingViewer,

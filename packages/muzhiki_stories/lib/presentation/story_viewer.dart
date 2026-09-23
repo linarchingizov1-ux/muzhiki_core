@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -45,7 +46,7 @@ class StoryViewer extends StatefulWidget {
           PageRouteBuilder<Set<String>>(
             opaque: false,
             transitionDuration: const Duration(milliseconds: 280),
-            reverseTransitionDuration: const Duration(milliseconds: 220),
+            reverseTransitionDuration: Duration.zero,
             pageBuilder: (context, animation, secondaryAnimation) {
               return FadeTransition(
                 opacity: animation,
@@ -79,12 +80,17 @@ class _StoryViewerState extends State<StoryViewer>
   final edgeDragging = ValueNotifier<bool>(false);
   double _edgeDragVelocity = 0;
 
+  late final AnimationController _closeDragAnimation;
+  final _closeDragging = ValueNotifier<bool>(false);
+
   static const _edgeDismissDistance = 0.18;
   static const _edgeDismissVelocity = 450.0;
+  static const _minDistanceForCloseDrag = 0.25;
+  static const _closeDragMinScale = 0.6;
 
-  int? _edgePointer;
-  Offset? _edgePointerStart;
-  double _edgePointerDx = 0;
+  int? _activePointer;
+  Offset? _pointerStart;
+  double _edgeDx = 0;
   double _edgeLastDx = 0;
   Duration? _edgeLastTime;
 
@@ -100,6 +106,10 @@ class _StoryViewerState extends State<StoryViewer>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _closeDragAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+    );
     if (_stories.isEmpty) return;
 
     pageController = PageController(
@@ -141,8 +151,10 @@ class _StoryViewerState extends State<StoryViewer>
       controller.dispose();
     }
     pageController?.dispose();
+    _closeDragAnimation.dispose();
     edgeDragDx.dispose();
     edgeDragging.dispose();
+    _closeDragging.dispose();
     super.dispose();
   }
 
@@ -188,6 +200,49 @@ class _StoryViewerState extends State<StoryViewer>
         rootNavigator: true,
       ).pop(Set<String>.of(controller?.viewedStoryIds ?? {}));
     }
+  }
+
+  void _finishCloseDrag({required bool shouldClose}) {
+    _closeDragging.value = false;
+
+    _closeDragAnimation
+        .animateTo(
+          shouldClose ? 1 : 0,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+        )
+        .then((_) {
+          if (!mounted) return;
+          if (shouldClose) {
+            handleClosePressed();
+          } else {
+            storyController?.setPaused(
+              reason: StoryPauseReason.closeDrag,
+              isPaused: false,
+            );
+          }
+        });
+  }
+
+  void _startCloseDrag() {
+    final controller = storyController;
+    if (controller == null) return;
+    _closeDragAnimation.stop();
+    _closeDragging.value = true;
+    controller.setPaused(reason: StoryPauseReason.closeDrag, isPaused: true);
+    final pages = pageController;
+    if (pages != null && pages.hasClients) {
+      final index = widget.lockToSingleStory
+          ? 0
+          : controller.currentStoryIndex.value;
+      pages.jumpToPage(index);
+    }
+  }
+
+  void _closeDragBy(double deltaDy) {
+    final height = MediaQuery.sizeOf(context).height;
+    _closeDragAnimation.value = (_closeDragAnimation.value + deltaDy / height)
+        .clamp(0.0, 1.0);
   }
 
   void _precacheAround(int storyIndex, int itemIndex) {
@@ -239,40 +294,36 @@ class _StoryViewerState extends State<StoryViewer>
     _syncingPage = true;
     storyController?.setStoryPage(index);
     edgeDragDx.value = 0;
-    _edgePointerDx = 0;
+    _edgeDx = 0;
     _syncingPage = false;
   }
 
-  void _onEdgePointerDown(PointerDownEvent event) {
+  void _onPointerDown(PointerDownEvent event) {
     final controller = storyController;
     if (controller == null ||
         controller.isDetailOpen.value ||
-        _isClosingViewer) {
+        _isClosingViewer ||
+        _closeDragging.value ||
+        _closeDragAnimation.value > 0) {
       return;
     }
-    _edgePointer = event.pointer;
-    _edgePointerStart = event.localPosition;
-    _edgePointerDx = 0;
+    _activePointer = event.pointer;
+    _pointerStart = event.localPosition;
+    _edgeDx = 0;
     _edgeLastDx = 0;
     _edgeLastTime = event.timeStamp;
     _edgeDragVelocity = 0;
   }
 
-  void _onEdgePointerMove(PointerMoveEvent event) {
+  void _onPointerMove(PointerMoveEvent event) {
     final controller = storyController;
     if (controller == null) return;
-    if (event.pointer != _edgePointer || _edgePointerStart == null) return;
+    if (event.pointer != _activePointer || _pointerStart == null) return;
     if (controller.isDetailOpen.value || _isClosingViewer) return;
 
-    final pages = pageController;
-    if (pages != null && pages.hasClients) {
-      final page = pages.page;
-      if (page != null) {
-        final index = widget.lockToSingleStory
-            ? 0
-            : controller.currentStoryIndex.value;
-        if ((page - index).abs() >= 0.05) return;
-      }
+    if (_closeDragging.value) {
+      _closeDragBy(event.delta.dy);
+      return;
     }
 
     final index = widget.lockToSingleStory
@@ -280,7 +331,8 @@ class _StoryViewerState extends State<StoryViewer>
         : controller.currentStoryIndex.value;
     final last = (widget.lockToSingleStory ? 1 : _stories.length) - 1;
     final width = MediaQuery.sizeOf(context).width;
-    final totalDx = event.localPosition.dx - _edgePointerStart!.dx;
+    final totalDx = event.localPosition.dx - _pointerStart!.dx;
+    final totalDy = event.localPosition.dy - _pointerStart!.dy;
 
     final dt =
         (_edgeLastTime != null
@@ -294,26 +346,61 @@ class _StoryViewerState extends State<StoryViewer>
     _edgeLastDx = totalDx;
     _edgeLastTime = event.timeStamp;
 
-    if (index == 0 && (totalDx > 0 || edgeDragDx.value > 0)) {
-      controller.setPaused(reason: StoryPauseReason.edgeDrag, isPaused: true);
-      _edgePointerDx = totalDx.clamp(0.0, width);
-      edgeDragDx.value = _edgePointerDx;
-      if (!edgeDragging.value) edgeDragging.value = true;
+    if (edgeDragging.value) {
+      if (index == 0) {
+        _edgeDx = totalDx.clamp(0.0, width);
+      } else if (index == last) {
+        _edgeDx = totalDx.clamp(-width, 0.0);
+      }
+      edgeDragDx.value = _edgeDx;
       return;
     }
 
-    if (index == last && (totalDx < 0 || edgeDragDx.value < 0)) {
+    if (Offset(totalDx, totalDy).distance < kTouchSlop) return;
+
+    if (totalDy > 0 && totalDy >= totalDx.abs()) {
+      _startCloseDrag();
+      _closeDragBy(event.delta.dy);
+      return;
+    }
+
+    if (totalDx.abs() <= totalDy.abs()) return;
+
+    final pages = pageController;
+    if (pages != null && pages.hasClients) {
+      final page = pages.page;
+      if (page != null && (page - index).abs() >= 0.05) return;
+    }
+
+    if (index == 0 && totalDx > 0) {
       controller.setPaused(reason: StoryPauseReason.edgeDrag, isPaused: true);
-      _edgePointerDx = totalDx.clamp(-width, 0.0);
-      edgeDragDx.value = _edgePointerDx;
-      if (!edgeDragging.value) edgeDragging.value = true;
+      _edgeDx = totalDx.clamp(0.0, width);
+      edgeDragDx.value = _edgeDx;
+      edgeDragging.value = true;
+      return;
+    }
+
+    if (index == last && totalDx < 0) {
+      controller.setPaused(reason: StoryPauseReason.edgeDrag, isPaused: true);
+      _edgeDx = totalDx.clamp(-width, 0.0);
+      edgeDragDx.value = _edgeDx;
+      edgeDragging.value = true;
     }
   }
 
-  void _onEdgePointerEnd(PointerEvent event) {
-    if (event.pointer != _edgePointer) return;
-    _edgePointer = null;
-    _edgePointerStart = null;
+  void _onPointerUp(PointerEvent event) {
+    if (event.pointer != _activePointer) return;
+    _activePointer = null;
+    _pointerStart = null;
+
+    if (_closeDragging.value) {
+      edgeDragging.value = false;
+      _finishCloseDrag(
+        shouldClose: _closeDragAnimation.value > _minDistanceForCloseDrag,
+      );
+      return;
+    }
+
     edgeDragging.value = false;
 
     final controller = storyController;
@@ -342,7 +429,7 @@ class _StoryViewerState extends State<StoryViewer>
       handleClosePressed();
     } else {
       edgeDragDx.value = 0;
-      _edgePointerDx = 0;
+      _edgeDx = 0;
       clearEdgeAndScrollPause();
     }
     _edgeDragVelocity = 0;
@@ -572,131 +659,152 @@ class _StoryViewerState extends State<StoryViewer>
                   cornerStraightenDistance: 60.h,
                 );
 
-                return GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onVerticalDragEnd: (details) {
-                    if ((details.primaryVelocity ?? 0) < 200) return;
-                    handleClosePressed();
-                  },
-                  child: ValueListenableBuilder<double>(
-                    valueListenable: edgeDragDx,
-                    builder: (context, dragDx, child) {
-                      final dismissProgress =
-                          (dragDx.abs() / constraints.maxWidth).clamp(0.0, 1.0);
-                      return AnimatedContainer(
-                        duration: dragDx == 0
-                            ? const Duration(milliseconds: 180)
-                            : Duration.zero,
-                        curve: Curves.easeOutCubic,
-                        transform: Matrix4.translationValues(dragDx, 0, 0),
-                        child: Opacity(
-                          opacity: 1 - dismissProgress * 0.35,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: ColoredBox(
-                      color: MuzhikiColors.appBackgroud,
-                      child: Listener(
-                        behavior: HitTestBehavior.translucent,
-                        onPointerDown: _onEdgePointerDown,
-                        onPointerMove: _onEdgePointerMove,
-                        onPointerUp: _onEdgePointerEnd,
-                        onPointerCancel: _onEdgePointerEnd,
-                        child: ValueListenableBuilder<List<StoryModel>>(
-                          valueListenable: _storiesListenable,
-                          builder: (context, stories, _) {
-                            return Stack(
-                              children: [
-                                NotificationListener<ScrollNotification>(
-                                  onNotification: _onStoryScroll,
-                                  child: ValueListenableBuilder<bool>(
-                                    valueListenable: edgeDragging,
-                                    builder: (context, dragging, _) {
-                                      return ValueListenableBuilder<bool>(
-                                        valueListenable:
-                                            storyController!.isDetailOpen,
-                                        builder: (context, detailOpen, _) {
-                                          final lockPages =
-                                              detailOpen || dragging;
-                                          return PageView.builder(
-                                            controller: pageController,
-                                            allowImplicitScrolling: true,
-                                            physics: lockPages
-                                                ? const NeverScrollableScrollPhysics()
-                                                : const ClampingScrollPhysics(
-                                                    parent: PageScrollPhysics(),
-                                                  ),
-                                            onPageChanged: _onPageChanged,
-                                            itemCount: widget.lockToSingleStory
-                                                ? 1
-                                                : stories.length,
-                                            itemBuilder: (context, page) {
-                                              return StoryPage(
-                                                page: page,
-                                                lockToSingleStory:
-                                                    widget.lockToSingleStory,
-                                                viewModel: widget.viewModel,
-                                                storyController:
-                                                    storyController!,
-                                                storyGeometry: storyGeometry,
-                                                appBarHeight: appBarHeight,
-                                              );
-                                            },
-                                          );
-                                        },
+                return ListenableBuilder(
+                  listenable: Listenable.merge([
+                    _closeDragAnimation,
+                    edgeDragDx,
+                    edgeDragging,
+                  ]),
+                  child: Listener(
+                    behavior: HitTestBehavior.translucent,
+                    onPointerDown: _onPointerDown,
+                    onPointerMove: _onPointerMove,
+                    onPointerUp: _onPointerUp,
+                    onPointerCancel: _onPointerUp,
+                    child: ValueListenableBuilder<List<StoryModel>>(
+                      valueListenable: _storiesListenable,
+                      builder: (context, stories, _) {
+                        return Stack(
+                          children: [
+                            NotificationListener<ScrollNotification>(
+                              onNotification: _onStoryScroll,
+                              child: ListenableBuilder(
+                                listenable: Listenable.merge([
+                                  storyController!.isDetailOpen,
+                                  _closeDragging,
+                                  _closeDragAnimation,
+                                  edgeDragging,
+                                ]),
+                                builder: (context, _) {
+                                  final lockPages =
+                                      storyController!.isDetailOpen.value ||
+                                      edgeDragging.value ||
+                                      _closeDragging.value ||
+                                      _closeDragAnimation.value > 0;
+                                  return PageView.builder(
+                                    controller: pageController,
+                                    allowImplicitScrolling: true,
+                                    physics: lockPages
+                                        ? const NeverScrollableScrollPhysics()
+                                        : const ClampingScrollPhysics(
+                                            parent: PageScrollPhysics(),
+                                          ),
+                                    onPageChanged: _onPageChanged,
+                                    itemCount: widget.lockToSingleStory
+                                        ? 1
+                                        : stories.length,
+                                    itemBuilder: (context, page) {
+                                      return StoryPage(
+                                        page: page,
+                                        lockToSingleStory:
+                                            widget.lockToSingleStory,
+                                        viewModel: widget.viewModel,
+                                        storyController: storyController!,
+                                        storyGeometry: storyGeometry,
+                                        appBarHeight: appBarHeight,
                                       );
                                     },
-                                  ),
-                                ),
-                                ValueListenableBuilder<int>(
-                                  valueListenable:
-                                      storyController!.currentStoryIndex,
-                                  builder: (context, index, _) {
-                                    return StoryDetailOverlay(
-                                      storyController: storyController!,
-                                      storyGeometry: storyGeometry,
-                                      story: _stories[index],
-                                    );
-                                  },
-                                ),
-                                HomeRedisignStoryHeader(
+                                  );
+                                },
+                              ),
+                            ),
+                            ValueListenableBuilder<int>(
+                              valueListenable:
+                                  storyController!.currentStoryIndex,
+                              builder: (context, index, _) {
+                                return StoryDetailOverlay(
                                   storyController: storyController!,
-                                  onClose: handleClosePressed,
-                                ),
-                                Positioned(
-                                  left: 16.w,
-                                  right: 16.w,
-                                  bottom: padding.bottom + 16.h,
-                                  child: ValueListenableBuilder<int>(
+                                  storyGeometry: storyGeometry,
+                                  story: _stories[index],
+                                );
+                              },
+                            ),
+                            HomeRedisignStoryHeader(
+                              storyController: storyController!,
+                              onClose: handleClosePressed,
+                            ),
+                            Positioned(
+                              left: 16.w,
+                              right: 16.w,
+                              bottom: padding.bottom + 16.h,
+                              child: ValueListenableBuilder<int>(
+                                valueListenable:
+                                    storyController!.currentStoryIndex,
+                                builder: (context, index, _) {
+                                  return ValueListenableBuilder<bool>(
                                     valueListenable:
-                                        storyController!.currentStoryIndex,
-                                    builder: (context, index, _) {
-                                      return ValueListenableBuilder<bool>(
-                                        valueListenable:
-                                            storyController!.isDetailOpen,
-                                        builder: (context, isOpen, child) {
-                                          return StoryActionButtons(
-                                            story: _stories[index],
-                                            storyController: storyController!,
-                                            isDetailOpen: isOpen,
-                                            onMarkdownAction:
-                                                openMarkdownAction,
-                                            onFullscreenAction:
-                                                openFullscreenAction,
-                                          );
-                                        },
+                                        storyController!.isDetailOpen,
+                                    builder: (context, isOpen, child) {
+                                      return StoryActionButtons(
+                                        story: _stories[index],
+                                        storyController: storyController!,
+                                        isDetailOpen: isOpen,
+                                        onMarkdownAction: openMarkdownAction,
+                                        onFullscreenAction:
+                                            openFullscreenAction,
                                       );
                                     },
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
+                  builder: (context, child) {
+                    final height = constraints.maxHeight;
+                    final closeDragProgress = _closeDragAnimation.value;
+                    final offsetY = closeDragProgress * height;
+                    final dragDx = edgeDragDx.value;
+                    final edgeProgress = (dragDx.abs() / constraints.maxWidth)
+                        .clamp(0.0, 1.0);
+                    final scaleStart = _minDistanceForCloseDrag * 0.4;
+                    final scaleProgress =
+                        ((closeDragProgress - scaleStart) / (1 - scaleStart))
+                            .clamp(0.0, 1.0);
+                    final closeDragScale =
+                        1 - scaleProgress * (1 - _closeDragMinScale);
+
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ColoredBox(
+                          color: Colors.black.withValues(
+                            alpha: 1 - closeDragProgress,
+                          ),
+                        ),
+                        AnimatedContainer(
+                          duration: dragDx == 0
+                              ? const Duration(milliseconds: 180)
+                              : Duration.zero,
+                          curve: Curves.easeOutCubic,
+                          transform: Matrix4.translationValues(dragDx, 0, 0),
+                          child: Transform.translate(
+                            offset: Offset(0, offsetY),
+                            child: Transform.scale(
+                              scale: closeDragScale,
+                              child: Opacity(
+                                opacity: 1 - edgeProgress * 0.35,
+                                child: child,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             ),
