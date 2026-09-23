@@ -28,36 +28,25 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
 
   final _uuid = const Uuid();
 
-  Future<List<PlatformFile>> _addImage() async {
-    final picker = ImagePicker();
+  Future<List<XFile>> _addImage() async {
+    final images = await ImagePicker().pickMultiImage();
 
-    final images = await picker.pickMultiImage();
-
-    if (images.isEmpty) {
-      return [];
-    }
-
-    return Future.wait(images.map(_copyPickedFile));
+    return images;
   }
 
-  Future<List<PlatformFile>> _addDoc() async {
-    final result = await FilePicker.platform.pickFiles(
+  Future<List<XFile>> _addDoc() async {
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['doc', 'docx', 'pdf', 'xlsx'],
     );
-    return result?.files ?? [];
+
+    return result.map((file) => file.xFile).toList();
   }
 
-  Future<List<PlatformFile>> _addVideo() async {
-    final picker = ImagePicker();
+  Future<List<XFile>> _addVideo() async {
+    final videos = await ImagePicker().pickMultiVideo();
 
-    final videos = await picker.pickMultiVideo();
-
-    if (videos.isEmpty) {
-      return [];
-    }
-
-    return Future.wait(videos.map(_copyPickedFile));
+    return videos;
   }
 
   void clear() {
@@ -68,29 +57,23 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
     try {
       emit(state.copyWith(stage: AttachmentProcessStage.picking));
 
-      final files = await (() async {
-        if (type == ChatAttachmentType.photo) return _addImage();
-        if (type == ChatAttachmentType.document) return _addDoc();
-        if (type == ChatAttachmentType.video) return _addVideo();
-        return <PlatformFile>[];
-      })();
+      final files = await switch (type) {
+        ChatAttachmentType.photo => _addImage(),
+        ChatAttachmentType.document => _addDoc(),
+        ChatAttachmentType.video => _addVideo(),
+      };
 
       if (files.isEmpty) {
         emit(state.copyWith(stage: AttachmentProcessStage.idle));
         return;
       }
-      final selectedFiles = files.where((e) => e.path != null).toList();
-      if (selectedFiles.isEmpty) {
-        emit(state.copyWith(stage: AttachmentProcessStage.idle));
-        return;
-      }
 
-      final localItems = selectedFiles.map((file) {
+      final localItems = files.map((file) {
         return LocalAttachmentsModel.local(
           fileName: file.name,
           id: _uuid.v4(),
           type: type,
-          path: file.path!,
+          path: file.path,
           isLoading: true,
         );
       }).toList();
@@ -102,23 +85,25 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
         ),
       );
 
-      for (int i = 0; i < selectedFiles.length; i++) {
-        final file = selectedFiles[i];
+      for (int i = 0; i < files.length; i++) {
+        final file = files[i];
         final localItem = localItems[i];
-        int fileSize = 0;
+
         try {
           _setLocalLoading(localItem.id, true);
 
           final preparedFile = await prepareFileForUpload(
-            platformFile: file,
+            file: file,
             type: type,
           );
+
           if (!await preparedFile.exists()) {
             throw FileSystemException(
               'Не удается найти указанный файл',
               preparedFile.path,
             );
           }
+
           emit(state.copyWith(stage: AttachmentProcessStage.uploading));
 
           final formData = FormData.fromMap({
@@ -148,24 +133,28 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
           );
         } catch (e, st) {
           final error = AppErrorMapper.I.map(e, st);
-          final fileSizeMb = (fileSize / 1024 / 1024).toStringAsFixed(2);
+
           BannerController.I.showError(
             error: error,
-            message:
-                '${error.message}\nФайл: ${file.name}\nРазмер файла: $fileSizeMb байт',
+            message: '${error.message}\nФайл: ${file.name}',
           );
 
           _removeLocalById(localItem.id);
+
           emit(state.copyWith(stage: AttachmentProcessStage.error));
         }
       }
 
       emit(state.copyWith(stage: AttachmentProcessStage.done));
+
       emit(state.copyWith(stage: AttachmentProcessStage.idle));
     } catch (e, st) {
       final error = AppErrorMapper.I.map(e, st);
+
       BannerController.I.showError(error: error, message: error.message);
+
       emit(state.copyWith(stage: AttachmentProcessStage.error));
+
       emit(state.copyWith(stage: AttachmentProcessStage.idle));
     }
   }
@@ -268,31 +257,11 @@ class AttachmentsCubit extends Cubit<AttachmentsState> {
     return info?.file;
   }
 
-  Future<PlatformFile> _copyPickedFile(XFile x) async {
-    final source = File(x.path);
-
-    if (!await source.exists()) {
-      throw FileSystemException('Не удается найти указанный файл', x.path);
-    }
-
-    final extension = p.extension(x.path);
-
-    final targetPath = p.join(directory.path, '${const Uuid().v4()}$extension');
-
-    final copied = await source.copy(targetPath);
-
-    return PlatformFile(
-      name: x.name,
-      path: copied.path,
-      size: await copied.length(),
-    );
-  }
-
   Future<File> prepareFileForUpload({
-    required PlatformFile platformFile,
+    required XFile file,
     required ChatAttachmentType type,
   }) async {
-    final original = File(platformFile.path!);
+    final original = File(file.path);
 
     if (!await original.exists()) {
       throw FileSystemException(
