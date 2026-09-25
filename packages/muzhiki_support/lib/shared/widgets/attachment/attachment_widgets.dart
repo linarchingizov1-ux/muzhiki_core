@@ -8,9 +8,14 @@ import 'package:muzhiki_support/shared/widgets/attachment/video_attachment.dart'
 
 abstract class AttachmentWidgets {
   static VideoAttachment video({
+    required Directory directory,
     required String url,
     required AppWebsocketChat websocketChat,
-  }) => VideoAttachment(url: url, websocketChat: websocketChat);
+  }) => VideoAttachment(
+    url: url,
+    websocketChat: websocketChat,
+    directory: directory,
+  );
   static DocumentAttachment document({
     required Directory directory,
     required String url,

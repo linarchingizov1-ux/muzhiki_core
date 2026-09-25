@@ -343,6 +343,7 @@ class _BubbleAttachment extends StatelessWidget {
             ),
 
             ChatAttachmentType.video => AttachmentWidgets.video(
+              directory: directory,
               url: attachment.url,
               websocketChat: websocketChat,
             ),
@@ -396,6 +397,7 @@ class _BubbleAttachment extends StatelessWidget {
                             ),
 
                             ChatAttachmentType.video => AttachmentWidgets.video(
+                              directory: directory,
                               url: attachment.url,
                               websocketChat: websocketChat,
                             ),
