@@ -87,9 +87,11 @@ class _StoryViewerState extends State<StoryViewer>
   static const _edgeDismissVelocity = 450.0;
   static const _minDistanceForCloseDrag = 0.25;
   static const _closeDragMinScale = 0.6;
+  static const _holdMinDuration = Duration(milliseconds: 200);
 
   int? _activePointer;
   Offset? _pointerStart;
+  Duration? _pointerDownTime;
   double _edgeDx = 0;
   double _edgeLastDx = 0;
   Duration? _edgeLastTime;
@@ -298,21 +300,39 @@ class _StoryViewerState extends State<StoryViewer>
     _syncingPage = false;
   }
 
-  void _onPointerDown(PointerDownEvent event) {
+  bool _canHandleStoryTouch() {
     final controller = storyController;
-    if (controller == null ||
-        controller.isDetailOpen.value ||
-        _isClosingViewer ||
-        _closeDragging.value ||
-        _closeDragAnimation.value > 0) {
-      return;
-    }
+
+    return controller != null &&
+        !controller.isDetailOpen.value &&
+        !_isClosingViewer &&
+        !_closeDragging.value &&
+        _closeDragAnimation.value == 0;
+  }
+
+  void _onPointerDown(PointerDownEvent event) {
+    if (_activePointer != null || !_canHandleStoryTouch()) return;
+
     _activePointer = event.pointer;
     _pointerStart = event.localPosition;
+    _pointerDownTime = event.timeStamp;
+    storyController!.blockNavigationTap = false;
     _edgeDx = 0;
     _edgeLastDx = 0;
     _edgeLastTime = event.timeStamp;
     _edgeDragVelocity = 0;
+    _edgeLastTime = event.timeStamp;
+    edgeDragDx.value = 0;
+    _pauseStoryTimerForHold();
+  }
+
+  void _pauseStoryTimerForHold() {
+    storyController?.setPaused(reason: StoryPauseReason.hold, isPaused: true);
+  }
+
+  void _resumeStoryTimerAfterHold() {
+    if (_isClosingViewer) return;
+    storyController?.setPaused(reason: StoryPauseReason.hold, isPaused: false);
   }
 
   void _onPointerMove(PointerMoveEvent event) {
@@ -390,8 +410,12 @@ class _StoryViewerState extends State<StoryViewer>
 
   void _onPointerUp(PointerEvent event) {
     if (event.pointer != _activePointer) return;
+    final downAt = _pointerDownTime;
     _activePointer = null;
     _pointerStart = null;
+    _pointerDownTime = null;
+
+    _resumeStoryTimerAfterHold();
 
     if (_closeDragging.value) {
       edgeDragging.value = false;
@@ -416,6 +440,9 @@ class _StoryViewerState extends State<StoryViewer>
     final dx = edgeDragDx.value;
     if (dx == 0) {
       clearEdgeAndScrollPause();
+      if (downAt != null && event.timeStamp - downAt >= _holdMinDuration) {
+        controller.blockNavigationTap = true;
+      }
       return;
     }
 
@@ -429,6 +456,9 @@ class _StoryViewerState extends State<StoryViewer>
       handleClosePressed();
     } else {
       edgeDragDx.value = 0;
+      if (downAt != null && event.timeStamp - downAt >= _holdMinDuration) {
+        controller.blockNavigationTap = true;
+      }
       _edgeDx = 0;
       clearEdgeAndScrollPause();
     }

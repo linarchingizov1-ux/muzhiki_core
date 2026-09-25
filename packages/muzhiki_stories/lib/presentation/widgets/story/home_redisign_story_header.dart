@@ -37,7 +37,13 @@ class HomeRedisignStoryHeader extends StatelessWidget {
                       width: sideWidth,
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        onTap: storyController.showPrevious,
+                        onTap: () {
+                          if (storyController.blockNavigationTap) {
+                            storyController.blockNavigationTap = false;
+                            return;
+                          }
+                          storyController.showPrevious();
+                        },
                       ),
                     ),
                     Positioned(
@@ -47,7 +53,13 @@ class HomeRedisignStoryHeader extends StatelessWidget {
                       width: sideWidth,
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        onTap: storyController.showNext,
+                        onTap: () {
+                          if (storyController.blockNavigationTap) {
+                            storyController.blockNavigationTap = false;
+                            return;
+                          }
+                          storyController.showNext();
+                        },
                       ),
                     ),
                   ],

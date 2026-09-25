@@ -21,15 +21,10 @@ class StoryGeometry {
   late final List<double> snapSizes = [defaultMidSize];
 
   double get maxSize => 1 - appBarHeight / screenHeight;
- 
+
   // Сила размытия под шапкой
   double appBarBlurAt(double size) =>
       const Cubic(0.5, 0, 0.5, 1).transform(expandProgressAt(size));
-
-  // Прогресс первой фазы, от него едут заголовок, полосы прогресса,
-  // кнопки и проявление текста
-  static double openProgressAt(double size) =>
-      (size / defaultMidSize).clamp(0.0, 1.0);
 
   // Прогресс второй фазы, от него едет размытие под шапкой
   double expandProgressAt(double size) =>
@@ -53,7 +48,6 @@ class StoryGeometry {
         );
   }
 }
-
 
 // Обрезает фото по нижней кромке и скругляет ему низ
 // Клиппер, а не анимированный ClipRRect сверху, потому что пересчитывается

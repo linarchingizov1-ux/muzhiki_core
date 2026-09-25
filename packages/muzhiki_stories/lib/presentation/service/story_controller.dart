@@ -10,6 +10,7 @@ enum StoryPauseReason {
   edgeDrag,
   closeDrag,
   action,
+  hold,
   leaveApp,
   closingViewer,
 }
@@ -51,6 +52,8 @@ class StoryController {
 
   final Set<StoryPauseReason> _pauseReasons = {StoryPauseReason.imageLoading};
   final Set<String> viewedStoryIds = <String>{};
+
+  bool blockNavigationTap = false;
 
   final AnimationController _openPhase;
 

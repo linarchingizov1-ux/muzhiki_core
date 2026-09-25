@@ -14,6 +14,7 @@ class StoryImage extends StatefulWidget {
     required this.imageProvider,
     required this.viewModel,
     required this.mode,
+    this.alignment = Alignment.center,
     this.showLoader = true,
     this.onImageLoadedChanged,
   });
@@ -22,6 +23,7 @@ class StoryImage extends StatefulWidget {
   final ImageProvider imageProvider;
   final StoriesViewModel viewModel;
   final StoryFirstScreenMode mode;
+  final Alignment alignment;
   final bool showLoader;
   final ValueChanged<bool>? onImageLoadedChanged;
 
@@ -179,6 +181,7 @@ class _StoryImageState extends State<StoryImage> {
               ),
               image: widget.imageProvider,
               fit: BoxFit.cover,
+              alignment: widget.alignment,
               width: double.infinity,
               height: double.infinity,
               gaplessPlayback: false,
