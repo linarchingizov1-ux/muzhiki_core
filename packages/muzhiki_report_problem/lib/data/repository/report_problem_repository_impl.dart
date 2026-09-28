@@ -30,6 +30,7 @@ class ReportProblemRepositoryImpl implements ReportProblemRepository {
 
       return response.data['success'] == true;
     } catch (e, st) {
+      print(e);
       throw AppErrorMapper.I.map(e, st);
     }
   }
