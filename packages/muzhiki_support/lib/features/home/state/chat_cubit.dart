@@ -126,7 +126,7 @@ class ChatCubit extends Cubit<ChatState> {
     if (state.myChat == null) return;
     print("Получили чаты в этом канале");
     final chats = state.myChat!.chatsChannel(channelId: channelId);
-    print("Обновили стейт");
+
     emit(
       state.copyWith(
         channelId: channelId,

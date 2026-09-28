@@ -118,6 +118,11 @@ class _SupportViewState extends State<SupportView> {
                     svgAsset: SupportAssets.I.svg.add,
                     iconSize: 15,
                     onTap: () {
+                      print(
+                        'SUPPORT WIDGET CUBIT: '
+                        '${identityHashCode(widget.chatCubit)}, '
+                        'channel=${widget.chatCubit.state.channelId}',
+                      );
                       context.pushNamed(SupportRouteConstant.I.chatDraft);
                     },
                   );

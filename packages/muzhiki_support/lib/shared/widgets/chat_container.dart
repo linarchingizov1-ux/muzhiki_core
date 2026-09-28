@@ -24,10 +24,12 @@ class ChatContainerWidgets extends StatelessWidget {
     return _other.skelet(
       enable: isLoading,
       child: InkWell(
-        onTap: () => context.pushNamed(
-          SupportRouteConstant.I.chat,
-          pathParameters: {'id': chat.id.toString()},
-        ),
+        onTap: () {
+          context.pushNamed(
+            SupportRouteConstant.I.chat,
+            pathParameters: {'id': chat.id.toString()},
+          );
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
