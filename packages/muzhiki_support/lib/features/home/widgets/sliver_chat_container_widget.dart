@@ -64,9 +64,7 @@ class SliverChatContainerWidget extends StatelessWidget {
                         const SizedBox(height: 24),
                         MuzhikiUi.buttons.dark(
                           onPressed: () {
-                            context.read<ChatCubit>().sendProblems(
-                              error: state.error,
-                            );
+                            chatCubit.sendProblems(error: state.error);
                             Future.delayed(
                               const Duration(milliseconds: 350),
                               () {

@@ -13,6 +13,17 @@ import 'package:muzhiki_support/features/home/support_view.dart';
 import 'package:muzhiki_support/features/chat/state/attachments_cubit.dart';
 import 'package:muzhiki_support/features/home/state/chat_cubit.dart';
 
+class StateModule {
+  final ChatUseCase chatUseCase;
+  final ChatCubit chatCubit;
+  final AttachmentsCubit attachmentsCubit;
+  const StateModule({
+    required this.chatUseCase,
+    required this.chatCubit,
+    required this.attachmentsCubit,
+  });
+}
+
 class SupportModuleConfig {
   final String homeRoute;
   final String profileRoute;
@@ -39,18 +50,32 @@ class SupportModule {
   const SupportModule._();
   static final routeConstant = SupportRouteConstant.I;
 
+  static StateModule? _stateModule;
+
+  static StateModule createStateModule({required SupportModuleConfig config}) {
+    return _stateModule ??= (() {
+      final chatUseCase = ChatUseCase(ChatRepositoryImpl(config.authDio));
+
+      final chatCubit = ChatCubit(chatUseCase: chatUseCase);
+
+      final attachmentsCubit = AttachmentsCubit(
+        dio: config.authDio,
+        directory: config.directory,
+      );
+
+      return StateModule(
+        chatUseCase: chatUseCase,
+        chatCubit: chatCubit,
+        attachmentsCubit: attachmentsCubit,
+      );
+    })();
+  }
+
   static List<RouteBase> routers({
     required SupportModuleConfig config,
     bool? showInformator,
   }) {
-    final ChatUseCase chatUseCase = ChatUseCase(
-      ChatRepositoryImpl(config.authDio),
-    );
-    final ChatCubit chatCubit = ChatCubit(chatUseCase: chatUseCase);
-    final AttachmentsCubit attachmentsCubit = AttachmentsCubit(
-      dio: config.authDio,
-      directory: config.directory,
-    );
+    final stateModule = createStateModule(config: config);
     return [
       GoRoute(
         path: routeConstant.support,
@@ -69,7 +94,7 @@ class SupportModule {
             typeApp: config.typeApp,
             showInformator: isAllowedInformator,
             action: action,
-            chatCubit: chatCubit,
+            chatCubit: stateModule.chatCubit,
             homeRoute: config.homeRoute,
             profileRoute: config.profileRoute,
           );
@@ -82,10 +107,10 @@ class SupportModule {
           return ChatView(
             id: null,
             extra: state.extra,
-            chatUseCase: chatUseCase,
+            chatUseCase: stateModule.chatUseCase,
             session: config.session,
-            attachmentsCubit: attachmentsCubit,
-            chatCubit: chatCubit,
+            attachmentsCubit: stateModule.attachmentsCubit,
+            chatCubit: stateModule.chatCubit,
             directory: config.directory,
           );
         },
@@ -99,10 +124,10 @@ class SupportModule {
           return ChatView(
             id: id,
             extra: state.extra,
-            chatUseCase: chatUseCase,
+            chatUseCase: stateModule.chatUseCase,
             session: config.session,
-            attachmentsCubit: attachmentsCubit,
-            chatCubit: chatCubit,
+            attachmentsCubit: stateModule.attachmentsCubit,
+            chatCubit: stateModule.chatCubit,
             directory: config.directory,
           );
         },
