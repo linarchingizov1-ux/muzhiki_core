@@ -85,6 +85,7 @@ class AppWebsocketChat {
     if (_disposed) return;
     if (isDraft) {
       openDraftChat();
+      print("ID канала в методе start $channelId");
       return;
     }
     await connect();
