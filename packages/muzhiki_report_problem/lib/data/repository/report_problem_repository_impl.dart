@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:muzhiki_dependencies/network/exception/network_map_error.dart';
 import 'package:muzhiki_report_problem/config/report_problem_path.dart';
 import 'package:muzhiki_report_problem/domain/repository/report_problem_repository.dart';
+import 'package:talker/talker.dart';
 
 class ReportProblemRepositoryImpl implements ReportProblemRepository {
   ReportProblemRepositoryImpl(this._dio);
@@ -16,6 +17,7 @@ class ReportProblemRepositoryImpl implements ReportProblemRepository {
     String? screenshotPath,
   }) async {
     try {
+      Talker().debug("Данные которые отправляю:\n$payload");
       final response = await _dio.post(
         ReportProblemPath.bugReports,
         data: FormData.fromMap({
@@ -30,7 +32,7 @@ class ReportProblemRepositoryImpl implements ReportProblemRepository {
 
       return response.data['success'] == true;
     } catch (e, st) {
-      print(e);
+      Talker().error("Ошибка:\n$e\nStack: $st");
       throw AppErrorMapper.I.map(e, st);
     }
   }
