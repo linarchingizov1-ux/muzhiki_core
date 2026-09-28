@@ -49,7 +49,7 @@ class _ChatViewState extends State<ChatView> {
   @override
   void initState() {
     super.initState();
-
+    print("АЙДИ канала в init state ${widget.chatCubit.state.channelId}");
     websocketApp = AppWebsocketChat(
       sessionChatId: widget.id,
       channelId: widget.chatCubit.state.channelId,
