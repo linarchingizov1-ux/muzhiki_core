@@ -121,11 +121,12 @@ class ChatCubit extends Cubit<ChatState> {
     required int index,
     required int channelId,
   }) async {
+    print("Выбали канал $channelId");
     if (index == state.selectedChannels) return;
     if (state.myChat == null) return;
-
+    print("Получили чаты в этом канале");
     final chats = state.myChat!.chatsChannel(channelId: channelId);
-
+    print("Обновили стейт");
     emit(
       state.copyWith(
         channelId: channelId,
