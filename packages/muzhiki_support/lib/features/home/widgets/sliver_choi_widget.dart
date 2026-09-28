@@ -77,7 +77,7 @@ class SliverChoiWidget extends StatelessWidget {
                           channel.id,
                         ),
                         onSelected: (v) {
-                          context.read<ChatCubit>().selecteChannel(
+                          chatCubit.selecteChannel(
                             index: i,
                             channelId: channel.id,
                           );
