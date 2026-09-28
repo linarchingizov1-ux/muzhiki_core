@@ -49,6 +49,7 @@ class _ChatViewState extends State<ChatView> {
   @override
   void initState() {
     super.initState();
+
     websocketApp = AppWebsocketChat(
       sessionChatId: widget.id,
       channelId: widget.chatCubit.state.channelId,
