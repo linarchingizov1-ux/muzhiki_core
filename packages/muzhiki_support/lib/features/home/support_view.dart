@@ -52,11 +52,6 @@ class _SupportViewState extends State<SupportView> {
       if (!mounted) return;
       unawaited(loadChats());
     });
-    print(
-      'CHAT CUBIT В SupportView: '
-      '${widget.chatCubit.hashCode}, '
-      'channel=${widget.chatCubit.state.channelId}',
-    );
   }
 
   Future<void> loadChats() async {

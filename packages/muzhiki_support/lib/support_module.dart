@@ -53,6 +53,12 @@ class SupportModule {
   static StateModule? _stateModule;
 
   static StateModule createStateModule({required SupportModuleConfig config}) {
+    final existing = _stateModule;
+    print(
+      '🏭 createStateModule: '
+      'stateModule=${existing?.hashCode}, '
+      'chatCubit=${existing?.chatCubit.hashCode}',
+    );
     return _stateModule ??= (() {
       final chatUseCase = ChatUseCase(ChatRepositoryImpl(config.authDio));
 
@@ -63,11 +69,19 @@ class SupportModule {
         directory: config.directory,
       );
 
-      return StateModule(
+      final module = StateModule(
         chatUseCase: chatUseCase,
         chatCubit: chatCubit,
         attachmentsCubit: attachmentsCubit,
       );
+
+      print(
+        '🆕 CREATED StateModule: '
+        'module=${module.hashCode}, '
+        'chatCubit=${module.chatCubit.hashCode}',
+      );
+
+      return module;
     })();
   }
 
@@ -76,7 +90,6 @@ class SupportModule {
     bool? showInformator,
   }) {
     final stateModule = createStateModule(config: config);
-    print('🚨 КУБИТ В GOROUTER: ${stateModule.chatCubit.hashCode}');
 
     return [
       GoRoute(

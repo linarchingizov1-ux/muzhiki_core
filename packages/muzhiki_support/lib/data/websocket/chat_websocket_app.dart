@@ -85,7 +85,6 @@ class AppWebsocketChat {
     if (_disposed) return;
     if (isDraft) {
       openDraftChat();
-      print("ID канала в методе start $channelId");
       return;
     }
     await connect();
@@ -165,7 +164,6 @@ class AppWebsocketChat {
       if (isDraft) {
         if (channelId == null) return null;
         try {
-          print("Передали id канала: \n$channelId");
           sessionChatId = await chatUsecase.createSession(
             channelId: channelId!,
           );

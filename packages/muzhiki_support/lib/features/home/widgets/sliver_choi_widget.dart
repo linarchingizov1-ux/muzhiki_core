@@ -77,11 +77,6 @@ class SliverChoiWidget extends StatelessWidget {
                           channel.id,
                         ),
                         onSelected: (v) {
-                          print(
-                            'CHOI CUBIT: ${identityHashCode(chatCubit)}, '
-                            'channel=${chatCubit.state.channelId}',
-                          );
-
                           chatCubit.selecteChannel(
                             index: i,
                             channelId: channel.id,
