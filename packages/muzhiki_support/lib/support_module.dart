@@ -76,6 +76,8 @@ class SupportModule {
     bool? showInformator,
   }) {
     final stateModule = createStateModule(config: config);
+    print('🚨 КУБИТ В GOROUTER: ${stateModule.chatCubit.hashCode}');
+
     return [
       GoRoute(
         path: routeConstant.support,
