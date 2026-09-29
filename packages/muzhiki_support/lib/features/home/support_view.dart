@@ -52,6 +52,10 @@ class _SupportViewState extends State<SupportView> {
       if (!mounted) return;
       unawaited(loadChats());
     });
+    print(
+      '📱 SUPPORT VIEW '
+      'cubit=${identityHashCode(widget.chatCubit)}',
+    );
   }
 
   Future<void> loadChats() async {

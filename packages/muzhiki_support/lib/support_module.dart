@@ -90,7 +90,11 @@ class SupportModule {
     bool? showInformator,
   }) {
     final stateModule = createStateModule(config: config);
-
+    print(
+      '🛣️ SUPPORT ROUTE '
+      'module=${identityHashCode(stateModule)} '
+      'cubit=${identityHashCode(stateModule.chatCubit)}',
+    );
     return [
       GoRoute(
         path: routeConstant.support,
