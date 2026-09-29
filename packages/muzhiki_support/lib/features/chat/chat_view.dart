@@ -50,7 +50,8 @@ class _ChatViewState extends State<ChatView> {
   void initState() {
     super.initState();
     print(
-      'CHAT CUBIT: '
+      'CHAT CUBIT В ChatView: '
+      'Это draft ? ${widget.id == null} '
       '${identityHashCode(widget.chatCubit)}, '
       'channel=${widget.chatCubit.state.channelId}',
     );

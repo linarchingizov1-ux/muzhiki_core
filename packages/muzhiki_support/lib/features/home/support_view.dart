@@ -52,6 +52,11 @@ class _SupportViewState extends State<SupportView> {
       if (!mounted) return;
       unawaited(loadChats());
     });
+    print(
+      'CHAT CUBIT В SupportView: '
+      '${identityHashCode(widget.chatCubit)}, '
+      'channel=${widget.chatCubit.state.channelId}',
+    );
   }
 
   Future<void> loadChats() async {
@@ -103,50 +108,45 @@ class _SupportViewState extends State<SupportView> {
       value: SystemUiOverlayStyle.dark,
       child: RefreshIndicator.noSpinner(
         onRefresh: () async => widget.chatCubit.getMyChats(),
-        child: Scaffold(
-          backgroundColor: MuzhikiColors.appBackgroud,
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.miniEndFloat,
-          floatingActionButton: BlocProvider.value(
-            value: widget.chatCubit,
-            child: BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                if (state.chatStatus == StateStatus.success) {
-                  return MuzhikiUi.buttons.animated(
+        child: BlocProvider.value(
+          value: widget.chatCubit,
+          child: BlocBuilder<ChatCubit, ChatState>(
+            builder: (context, state) {
+              return Scaffold(
+                backgroundColor: MuzhikiColors.appBackgroud,
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.miniEndFloat,
+                floatingActionButton: switch (state.chatStatus ==
+                    StateStatus.success) {
+                  true => MuzhikiUi.buttons.animated(
                     backgroundColor: MuzhikiColors.blood,
                     size: 55,
                     svgAsset: SupportAssets.I.svg.add,
                     iconSize: 15,
                     onTap: () {
-                      print(
-                        'SUPPORT WIDGET CUBIT: '
-                        '${identityHashCode(widget.chatCubit)}, '
-                        'channel=${widget.chatCubit.state.channelId}',
-                      );
                       context.pushNamed(SupportRouteConstant.I.chatDraft);
                     },
-                  );
-                } else {
-                  return const SizedBox.shrink();
-                }
-              },
-            ),
-          ),
-          body: CustomScrollView(
-            slivers: [
-              SliverHomeAppbarWidget(
-                canPop: widget.canPop,
-                typeApp: widget.typeApp,
-                sessionApp: widget.sessionApp,
-              ),
-              if (widget.showInformator) const SliverInformator(),
-              SliverChoiWidget(chatCubit: widget.chatCubit),
-              SliverChatContainerWidget(
-                chatCubit: widget.chatCubit,
-                homeRoute: widget.homeRoute,
-                profileRoute: widget.profileRoute,
-              ),
-            ],
+                  ),
+                  false => const SizedBox.shrink(),
+                },
+                body: CustomScrollView(
+                  slivers: [
+                    SliverHomeAppbarWidget(
+                      canPop: widget.canPop,
+                      typeApp: widget.typeApp,
+                      sessionApp: widget.sessionApp,
+                    ),
+                    if (widget.showInformator) const SliverInformator(),
+                    SliverChoiWidget(chatCubit: widget.chatCubit),
+                    SliverChatContainerWidget(
+                      chatCubit: widget.chatCubit,
+                      homeRoute: widget.homeRoute,
+                      profileRoute: widget.profileRoute,
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),
