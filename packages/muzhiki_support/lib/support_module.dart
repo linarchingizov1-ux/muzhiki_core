@@ -1,6 +1,7 @@
 ﻿import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
 import 'package:muzhiki_support/config/support_route_constant.dart';
@@ -28,6 +29,7 @@ class SupportModuleConfig {
   final String homeRoute;
   final String profileRoute;
   final String versionApp, buildApp;
+  final GlobalKey<NavigatorState>? routerKey;
   final SessionApp session;
   final Dio authDio;
   final bool canPop;
@@ -45,6 +47,7 @@ class SupportModuleConfig {
     required this.session,
     required this.directory,
     this.canPop = true,
+    this.routerKey,
   });
 }
 
@@ -109,6 +112,7 @@ class SupportModule {
       GoRoute(
         path: routeConstant.chatDraft,
         name: routeConstant.chatDraft,
+        parentNavigatorKey: config.routerKey,
         builder: (context, state) {
           return ChatView(
             id: null,
@@ -122,6 +126,7 @@ class SupportModule {
         },
       ),
       GoRoute(
+        parentNavigatorKey: config.routerKey,
         path: routeConstant.chat,
         name: routeConstant.chat,
         builder: (context, state) {
