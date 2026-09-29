@@ -53,12 +53,6 @@ class SupportModule {
   static StateModule? _stateModule;
 
   static StateModule createStateModule({required SupportModuleConfig config}) {
-    final existing = _stateModule;
-    print(
-      '🏭 createStateModule: '
-      'stateModule=${existing?.hashCode}, '
-      'chatCubit=${existing?.chatCubit.hashCode}',
-    );
     return _stateModule ??= (() {
       final chatUseCase = ChatUseCase(ChatRepositoryImpl(config.authDio));
 
@@ -75,12 +69,6 @@ class SupportModule {
         attachmentsCubit: attachmentsCubit,
       );
 
-      print(
-        '🆕 CREATED StateModule: '
-        'module=${module.hashCode}, '
-        'chatCubit=${module.chatCubit.hashCode}',
-      );
-
       return module;
     })();
   }
@@ -90,11 +78,7 @@ class SupportModule {
     bool? showInformator,
   }) {
     final stateModule = createStateModule(config: config);
-    print(
-      '🛣️ SUPPORT ROUTE '
-      'module=${identityHashCode(stateModule)} '
-      'cubit=${identityHashCode(stateModule.chatCubit)}',
-    );
+
     return [
       GoRoute(
         path: routeConstant.support,
