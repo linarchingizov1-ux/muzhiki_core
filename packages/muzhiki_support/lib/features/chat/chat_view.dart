@@ -52,7 +52,7 @@ class _ChatViewState extends State<ChatView> {
     print(
       'CHAT CUBIT В ChatView: '
       'Это draft ? ${widget.id == null} '
-      '${identityHashCode(widget.chatCubit)}, '
+      '${widget.chatCubit.hashCode}, '
       'channel=${widget.chatCubit.state.channelId}',
     );
     websocketApp = AppWebsocketChat(

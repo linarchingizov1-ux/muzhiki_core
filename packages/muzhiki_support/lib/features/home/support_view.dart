@@ -54,7 +54,7 @@ class _SupportViewState extends State<SupportView> {
     });
     print(
       'CHAT CUBIT В SupportView: '
-      '${identityHashCode(widget.chatCubit)}, '
+      '${widget.chatCubit.hashCode}, '
       'channel=${widget.chatCubit.state.channelId}',
     );
   }
