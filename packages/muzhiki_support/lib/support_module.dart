@@ -30,6 +30,7 @@ class SupportModuleConfig {
   final String versionApp, buildApp;
   final SessionApp session;
   final Dio authDio;
+  final bool canPop;
   final Directory directory;
   final TypeApp typeApp;
   final void Function()? firebaseRemoveFCM;
@@ -43,6 +44,7 @@ class SupportModuleConfig {
     required this.buildApp,
     required this.session,
     required this.directory,
+    this.canPop = true,
   });
 }
 
@@ -92,6 +94,7 @@ class SupportModule {
               config.session.user != null &&
                   config.session.user!.isAllowedAccessInformator;
           return SupportView(
+            canPop: config.canPop,
             firebaseRemoveFCM: config.firebaseRemoveFCM,
             sessionApp: config.session,
             typeApp: config.typeApp,

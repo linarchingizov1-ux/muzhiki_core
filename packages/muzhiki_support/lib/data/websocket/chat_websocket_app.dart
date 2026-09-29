@@ -164,7 +164,6 @@ class AppWebsocketChat {
       if (isDraft) {
         if (channelId == null) return null;
         try {
-          print("Канал при создании из draft $channelId");
           sessionChatId = await chatUsecase.createSession(
             channelId: channelId!,
           );
