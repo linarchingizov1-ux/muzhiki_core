@@ -92,6 +92,7 @@ class SupportModule {
               showInformator ??
               config.session.user != null &&
                   config.session.user!.isAllowedAccessInformator;
+          print("Отобразить информатор ? $isAllowedInformator");
           return SupportView(
             canPop: config.canPop,
             firebaseRemoveFCM: config.firebaseRemoveFCM,
@@ -108,10 +109,7 @@ class SupportModule {
     ];
   }
 
-  static List<RouteBase> rootRoute({
-    required SupportModuleConfig config,
-    bool? showInformator,
-  }) {
+  static List<RouteBase> rootRoute({required SupportModuleConfig config}) {
     final stateModule = createStateModule(config: config);
 
     return [
