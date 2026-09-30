@@ -34,7 +34,6 @@ class InformatorView extends StatelessWidget {
         title: const Text('Информатор'),
       ),
       body: MpBridgeWebView(
-        showAppBar: false,
         initialUrl: initialUrl,
         build: buildV,
         version: versin,

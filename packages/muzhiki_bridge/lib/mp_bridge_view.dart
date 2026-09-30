@@ -16,7 +16,6 @@ enum TypeUrl { none, audit, company }
 typedef MpBridgeClearCookies = Future<void> Function();
 
 class MpBridgeWebView extends StatefulWidget {
-  final bool showAppBar;
   final String initialUrl;
   final String version, build;
   final String? companyId;
@@ -27,7 +26,6 @@ class MpBridgeWebView extends StatefulWidget {
 
   const MpBridgeWebView({
     super.key,
-    this.showAppBar = true,
     this.masterAudit,
     required this.initialUrl,
     this.companyId,
@@ -92,20 +90,19 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
       TypeUrl.audit =>
         '${widget.initialUrl}/${audit!.first}/audits/${audit.last}',
 
-      TypeUrl.company => '${widget.initialUrl}&salon_id=${widget.companyId}',
+      TypeUrl.company => '${widget.initialUrl}?salon_id=${widget.companyId}',
 
       TypeUrl.none => widget.initialUrl,
     };
 
     final queryParameters = <String, String>{
-      'show_header': widget.showAppBar.toString(),
       if (!widget.isPush) 'native_app': 'true',
+      'show_header': "false",
     };
 
-    final separator = path.contains('?') ? '&' : '?';
-
     return Uri.parse(
-      '$path$separator${Uri(queryParameters: queryParameters).query}',
+      '$path${path.contains('?') ? '&' : '?'}'
+      '${Uri(queryParameters: queryParameters).query}',
     );
   }
 
