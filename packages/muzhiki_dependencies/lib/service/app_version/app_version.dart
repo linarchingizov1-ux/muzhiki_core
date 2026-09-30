@@ -12,7 +12,6 @@ class AppInfoService {
   static final AppInfoService I = AppInfoService._();
 
   AppInfoModel? _appInfo;
-  String deviceId = '';
 
   Future<AppInfoModel> get info async {
     if (_appInfo != null) {

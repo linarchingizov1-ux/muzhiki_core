@@ -11,6 +11,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
+enum TypeUrl { none, audit, company }
+
 typedef MpBridgeClearCookies = Future<void> Function();
 
 class MpBridgeWebView extends StatefulWidget {
@@ -19,6 +21,7 @@ class MpBridgeWebView extends StatefulWidget {
   final String version, build;
   final String? companyId;
   final SessionApp session;
+  final bool isPush;
   final List<int>? masterAudit;
   final void Function(MpBridgeClearCookies clearCookies)? onClearCookiesReady;
 
@@ -32,6 +35,7 @@ class MpBridgeWebView extends StatefulWidget {
     required this.version,
     required this.session,
     this.onClearCookiesReady,
+    this.isPush = false,
   });
 
   @override
@@ -48,6 +52,7 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
   bool _bridgeInjectedForCurrentPage = false;
   bool isLoading = true;
   bool disposed = false;
+  TypeUrl typeUrl = TypeUrl.none;
 
   bool get _alive => mounted && !disposed;
 
@@ -69,15 +74,39 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     unawaited(_bootstrap());
   }
 
+  bool get auditData =>
+      widget.masterAudit != null && widget.masterAudit!.isNotEmpty;
+
   Uri get _initialUri {
-    final header = 'show_header=${widget.showAppBar}';
     final audit = widget.masterAudit;
-    final url = widget.companyId != null
-        ? '${widget.initialUrl}?$header&salon_id=${widget.companyId}'
-        : audit != null && audit.isNotEmpty
-        ? '${widget.initialUrl}/${audit.first}/audits/${audit.last}?$header'
-        : '${widget.initialUrl}?$header';
-    return Uri.parse(url);
+    final masterId = auditData ? audit!.first : null;
+    final auditId = auditData ? audit!.last : null;
+
+    final typeUrl = switch (true) {
+      _ when widget.companyId != null => TypeUrl.company,
+      _ when masterId != null && auditId != null => TypeUrl.audit,
+      _ => TypeUrl.none,
+    };
+
+    final path = switch (typeUrl) {
+      TypeUrl.audit =>
+        '${widget.initialUrl}/${audit!.first}/audits/${audit.last}',
+
+      TypeUrl.company => '${widget.initialUrl}&salon_id=${widget.companyId}',
+
+      TypeUrl.none => widget.initialUrl,
+    };
+
+    final queryParameters = <String, String>{
+      'show_header': widget.showAppBar.toString(),
+      if (!widget.isPush) 'native_app': 'true',
+    };
+
+    final separator = path.contains('?') ? '&' : '?';
+
+    return Uri.parse(
+      '$path$separator${Uri(queryParameters: queryParameters).query}',
+    );
   }
 
   Future<void> _bootstrap() async {
