@@ -9,12 +9,14 @@ class InformatorView extends StatelessWidget {
   final String initialUrl;
   final SessionApp session;
   final String versin, buildV;
+  final bool isPush;
   const InformatorView({
     super.key,
     required this.initialUrl,
     required this.session,
     required this.versin,
     required this.buildV,
+    this.isPush = false
   });
 
   @override
@@ -38,6 +40,7 @@ class InformatorView extends StatelessWidget {
         build: buildV,
         version: versin,
         session: session,
+        isPush: isPush,
       ),
     );
   }

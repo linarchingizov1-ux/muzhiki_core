@@ -151,12 +151,16 @@ class SupportModule {
         builder: (context, state) {
           final initialUrl =
               state.uri.queryParameters['initialUrl'] ??
-              'https://bus-wa.muzhiki.pro/?native_app=true';
+              'https://bus-wa.muzhiki.pro';
+          final extra = state.extra as Map<String, dynamic>?;
+          final isPush = extra?['isPush'] as bool? ?? false;
+
           return InformatorView(
             initialUrl: initialUrl,
             session: config.session,
             versin: config.versionApp,
             buildV: config.buildApp,
+            isPush: isPush,
           );
         },
       ),

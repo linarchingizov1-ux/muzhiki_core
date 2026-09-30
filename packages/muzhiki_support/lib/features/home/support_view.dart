@@ -60,6 +60,7 @@ class _SupportViewState extends State<SupportView> {
       context.pushNamed(
         SupportRouteConstant.I.informator,
         queryParameters: {"initialUrl": initalURL},
+        extra: {'isPush': true},
       );
       unawaited(_refreshChatsQuietly());
       return;
