@@ -7,9 +7,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_ui/buttons/muzhiki_buttons.dart';
 import 'package:muzhiki_ui/media/media_item.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
+import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
-import 'package:muzhiki_ui/theme/muzhiki_fonts.dart';
 
 export 'media_item.dart';
 
@@ -19,12 +19,14 @@ class MediaViewer extends StatefulWidget {
   final List<MediaItem> items;
   final int initialIndex;
   final Color backgroundColor;
+  final bool showRemarksVisibilityButton;
 
   const MediaViewer({
     super.key,
     required this.items,
     this.initialIndex = 0,
     this.backgroundColor = MuzhikiColors.black17,
+    this.showRemarksVisibilityButton = false,
   });
 
   static Future<T?> open<T>(
@@ -32,6 +34,7 @@ class MediaViewer extends StatefulWidget {
     required List<MediaItem> items,
     int initialIndex = 0,
     Color backgroundColor = MuzhikiColors.black17,
+    bool showRemarksVisibilityButton = false,
     Duration duration = const Duration(milliseconds: 300),
   }) {
     if (items.isEmpty) return Future.value();
@@ -53,6 +56,7 @@ class MediaViewer extends StatefulWidget {
               items: items,
               initialIndex: index,
               backgroundColor: backgroundColor,
+              showRemarksVisibilityButton: showRemarksVisibilityButton,
             ),
           );
         },
@@ -74,6 +78,9 @@ class _MediaViewerState extends State<MediaViewer>
   double _opacity = 1;
   bool _isClosing = false;
   bool _photoZoomed = false;
+  final Set<int> hiddenRemarks = {};
+
+  bool showRemarks({required int index}) => !hiddenRemarks.contains(index);
 
   final Map<int, VideoPlayerController> _videoControllers = {};
 
@@ -258,6 +265,7 @@ class _MediaViewerState extends State<MediaViewer>
                               Widget child = item.isPhoto
                                   ? _MediaPhotoPage(
                                       item: item,
+                                      showRemarks: showRemarks(index: index),
                                       onScaleChanged: (zoomed) {
                                         if (!isActive) return;
                                         if (_photoZoomed == zoomed) return;
@@ -312,12 +320,40 @@ class _MediaViewerState extends State<MediaViewer>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buttons.close(
-                          size: 45,
-                          iconSize: 20,
-                          onTap: _close,
-                          iconColor: Colors.white,
-                          backgroundColor: Colors.black,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buttons.close(
+                              size: 45,
+                              iconSize: 20,
+                              onTap: _close,
+                              iconColor: Colors.white,
+                              backgroundColor: Colors.black,
+                            ),
+                            if (widget.showRemarksVisibilityButton &&
+                                items[_currentIndex].isPhoto &&
+                                items[_currentIndex].hasRemarks) ...[
+                              SizedBox(width: 8.w),
+                              _buttons.animated(
+                                size: 45,
+                                iconSize: 20,
+                                iconColor: Colors.white,
+                                backgroundColor: Colors.black,
+                                icon: showRemarks(index: _currentIndex)
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                onTap: () {
+                                  setState(() {
+                                    if (showRemarks(index: _currentIndex)) {
+                                      hiddenRemarks.add(_currentIndex);
+                                    } else {
+                                      hiddenRemarks.remove(_currentIndex);
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ],
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -351,8 +387,13 @@ class _MediaViewerState extends State<MediaViewer>
 class _MediaPhotoPage extends StatelessWidget {
   final MediaItem item;
   final ValueChanged<bool> onScaleChanged;
+  final bool showRemarks;
 
-  const _MediaPhotoPage({required this.item, required this.onScaleChanged});
+  const _MediaPhotoPage({
+    required this.item,
+    required this.onScaleChanged,
+    required this.showRemarks,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -407,7 +448,7 @@ class _MediaPhotoPage extends StatelessWidget {
               },
             ),
           ),
-          if (item.hasRemarks)
+          if (item.hasRemarks && showRemarks)
             Positioned.fill(
               child: IgnorePointer(
                 child: Opacity(
