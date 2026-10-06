@@ -320,20 +320,18 @@ class _MediaViewerState extends State<MediaViewer>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        _buttons.close(
+                          size: 45,
+                          iconSize: 20,
+                          onTap: _close,
+                          iconColor: Colors.white,
+                          backgroundColor: Colors.black,
+                        ),
                         Row(
-                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            _buttons.close(
-                              size: 45,
-                              iconSize: 20,
-                              onTap: _close,
-                              iconColor: Colors.white,
-                              backgroundColor: Colors.black,
-                            ),
                             if (widget.showRemarksVisibilityButton &&
                                 items[_currentIndex].isPhoto &&
                                 items[_currentIndex].hasRemarks) ...[
-                              SizedBox(width: 8.w),
                               _buttons.animated(
                                 size: 45,
                                 iconSize: 20,
@@ -352,27 +350,28 @@ class _MediaViewerState extends State<MediaViewer>
                                   });
                                 },
                               ),
+                              SizedBox(width: 8.w),
                             ],
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.35),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            '${_currentIndex + 1} / ${items.length}',
-                            style: const TextStyle(
-                              fontFamily: MuzhikiFonts.manrope,
-                              package: MuzhikiFonts.packageName,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${_currentIndex + 1} / ${items.length}',
+                                style: const TextStyle(
+                                  fontFamily: MuzhikiFonts.manrope,
+                                  package: MuzhikiFonts.packageName,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
