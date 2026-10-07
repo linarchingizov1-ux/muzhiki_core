@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:muzhiki_ui/media/media_item.dart';
 
 /// Совместимая обёртка над [MediaItem] для фото.

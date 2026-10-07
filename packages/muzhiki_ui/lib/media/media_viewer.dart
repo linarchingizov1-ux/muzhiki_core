@@ -19,14 +19,12 @@ class MediaViewer extends StatefulWidget {
   final List<MediaItem> items;
   final int initialIndex;
   final Color backgroundColor;
-  final bool showRemarksVisibilityButton;
 
   const MediaViewer({
     super.key,
     required this.items,
     this.initialIndex = 0,
     this.backgroundColor = MuzhikiColors.black17,
-    this.showRemarksVisibilityButton = false,
   });
 
   static Future<T?> open<T>(
@@ -56,7 +54,6 @@ class MediaViewer extends StatefulWidget {
               items: items,
               initialIndex: index,
               backgroundColor: backgroundColor,
-              showRemarksVisibilityButton: showRemarksVisibilityButton,
             ),
           );
         },
@@ -329,9 +326,9 @@ class _MediaViewerState extends State<MediaViewer>
                         ),
                         Row(
                           children: [
-                            if (widget.showRemarksVisibilityButton &&
-                                items[_currentIndex].isPhoto &&
-                                items[_currentIndex].hasRemarks) ...[
+                            if (items[_currentIndex].remarks != null &&
+                                items[_currentIndex].remarks!.isNotEmpty &&
+                                items[_currentIndex].isPhoto) ...[
                               _buttons.animated(
                                 size: 45,
                                 iconSize: 20,
@@ -451,7 +448,7 @@ class _MediaPhotoPage extends StatelessWidget {
             Positioned.fill(
               child: IgnorePointer(
                 child: Opacity(
-                  opacity: 0.5,
+                  opacity: 0.3,
                   child: Image.network(
                     item.remarks!,
                     fit: BoxFit.contain,

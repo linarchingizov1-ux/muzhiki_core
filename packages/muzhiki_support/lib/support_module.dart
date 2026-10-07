@@ -92,7 +92,6 @@ class SupportModule {
               showInformator ??
               config.session.user != null &&
                   config.session.user!.isAllowedAccessInformator;
-          print("Отобразить информатор ? $isAllowedInformator");
           return SupportView(
             canPop: config.canPop,
             firebaseRemoveFCM: config.firebaseRemoveFCM,
