@@ -380,7 +380,7 @@ class _MediaViewerState extends State<MediaViewer>
   }
 }
 
-class _MediaPhotoPage extends StatelessWidget {
+class _MediaPhotoPage extends StatefulWidget {
   final MediaItem item;
   final ValueChanged<bool> onScaleChanged;
   final bool showRemarks;
@@ -390,6 +390,49 @@ class _MediaPhotoPage extends StatelessWidget {
     required this.onScaleChanged,
     required this.showRemarks,
   });
+
+  @override
+  State<_MediaPhotoPage> createState() => _MediaPhotoPageState();
+}
+
+class _MediaPhotoPageState extends State<_MediaPhotoPage> {
+  late Future<void> _imagesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _imagesFuture = _precacheImages();
+  }
+
+  @override
+  void didUpdateWidget(covariant _MediaPhotoPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.item.imageProvider != widget.item.imageProvider ||
+        oldWidget.item.remarks != widget.item.remarks ||
+        oldWidget.showRemarks != widget.showRemarks) {
+      _imagesFuture = _precacheImages();
+    }
+  }
+
+  Future<void> _precacheImages() async {
+    final futures = <Future<void>>[
+      precacheImage(widget.item.imageProvider, context),
+    ];
+
+    if (widget.item.hasRemarks &&
+        widget.showRemarks &&
+        widget.item.remarks != null) {
+      futures.add(
+        precacheImage(
+          NetworkImage(widget.item.remarks!),
+          context,
+        ).catchError((_) {}),
+      );
+    }
+
+    await Future.wait(futures);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -403,62 +446,70 @@ class _MediaPhotoPage extends StatelessWidget {
           case PhotoViewScaleState.initial:
           case PhotoViewScaleState.covering:
             return PhotoViewScaleState.zoomedIn;
+
           case PhotoViewScaleState.zoomedIn:
           case PhotoViewScaleState.zoomedOut:
             return PhotoViewScaleState.initial;
+
           default:
             return PhotoViewScaleState.initial;
         }
       },
       scaleStateChangedCallback: (state) {
-        onScaleChanged(state != PhotoViewScaleState.initial);
+        widget.onScaleChanged(state != PhotoViewScaleState.initial);
       },
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Image(
-              image: item.imageProvider,
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              filterQuality: FilterQuality.high,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress != null) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  );
-                }
-                return child;
-              },
-              errorBuilder: (_, _, _) {
-                return const Center(
-                  child: Text(
-                    'Не удалось загрузить изображение',
-                    style: TextStyle(
-                      fontFamily: MuzhikiFonts.manrope,
-                      package: MuzhikiFonts.packageName,
-                      color: Colors.white,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          if (item.hasRemarks && showRemarks)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Opacity(
-                  opacity: 0.3,
-                  child: Image.network(
-                    item.remarks!,
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                  ),
+      child: FutureBuilder(
+        future: _imagesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            );
+          }
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned.fill(
+                child: Image(
+                  image: widget.item.imageProvider,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (_, _, _) {
+                    return const Center(
+                      child: Text(
+                        'Не удалось загрузить изображение',
+                        style: TextStyle(
+                          fontFamily: MuzhikiFonts.manrope,
+                          package: MuzhikiFonts.packageName,
+                          color: Colors.white,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-        ],
+
+              if (widget.item.hasRemarks &&
+                  widget.showRemarks &&
+                  widget.item.remarks != null)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: 0.3,
+                      child: Image.network(
+                        widget.item.remarks!,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.center,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
