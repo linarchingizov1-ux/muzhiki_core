@@ -412,13 +412,13 @@ class _MediaPhotoPageState extends State<_MediaPhotoPage>
       TweenSequenceItem(
         tween: Tween(
           begin: 1.0,
-          end: 1.04,
+          end: 1.03,
         ).chain(CurveTween(curve: Curves.fastLinearToSlowEaseIn)),
         weight: 50,
       ),
       TweenSequenceItem(
         tween: Tween(
-          begin: 1.02,
+          begin: 1.03,
           end: 1.0,
         ).chain(CurveTween(curve: Curves.fastEaseInToSlowEaseOut)),
         weight: 50,
@@ -434,7 +434,7 @@ class _MediaPhotoPageState extends State<_MediaPhotoPage>
       ),
       TweenSequenceItem(
         tween: Tween(
-          begin: 0.7,
+          begin: 0.8,
           end: 0.3,
         ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 60,
@@ -510,7 +510,11 @@ class _MediaPhotoPageState extends State<_MediaPhotoPage>
 
                             if (isLoadedRemarks && !_remarksAnimationStarted) {
                               _remarksAnimationStarted = true;
-                              animationController.forward();
+
+                              animationController
+                                ..stop()
+                                ..value = 0.0
+                                ..forward();
                             }
 
                             return AnimatedBuilder(
