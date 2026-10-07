@@ -406,22 +406,22 @@ class _MediaPhotoPageState extends State<_MediaPhotoPage>
     super.initState();
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(seconds: 1),
     );
     scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween(
           begin: 1.0,
-          end: 1.08,
-        ).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 40,
+          end: 1.04,
+        ).chain(CurveTween(curve: Curves.fastLinearToSlowEaseIn)),
+        weight: 50,
       ),
       TweenSequenceItem(
         tween: Tween(
-          begin: 1.08,
+          begin: 1.02,
           end: 1.0,
-        ).chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 60,
+        ).chain(CurveTween(curve: Curves.fastEaseInToSlowEaseOut)),
+        weight: 50,
       ),
     ]).animate(animationController);
     opacityAnimation = TweenSequence<double>([
