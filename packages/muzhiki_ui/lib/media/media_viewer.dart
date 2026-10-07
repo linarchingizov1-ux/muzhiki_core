@@ -330,8 +330,8 @@ class _MediaViewerState extends State<MediaViewer>
                                 items[_currentIndex].remarks!.isNotEmpty &&
                                 items[_currentIndex].isPhoto) ...[
                               _buttons.animated(
-                                size: 45,
-                                iconSize: 20,
+                                size: 32,
+                                iconSize: 16,
                                 iconColor: Colors.white,
                                 backgroundColor: Colors.black,
                                 icon: showRemarks(index: _currentIndex)
@@ -442,6 +442,24 @@ class _MediaPhotoPage extends StatelessWidget {
                         fit: BoxFit.contain,
                         alignment: Alignment.center,
                         errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                        frameBuilder:
+                            (
+                              contextRemarks,
+                              childRemarks,
+                              frameRemarks,
+                              wasSynchronouslyLoadedRemarks,
+                            ) {
+                              final isLoadedRemarks =
+                                  frameRemarks != null ||
+                                  wasSynchronouslyLoadedRemarks;
+
+                              return AnimatedOpacity(
+                                opacity: isLoadedRemarks ? 1 : 0,
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.easeOut,
+                                child: childRemarks,
+                              );
+                            },
                       ),
                     ),
                   ),
