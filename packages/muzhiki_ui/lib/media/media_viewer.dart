@@ -380,7 +380,7 @@ class _MediaViewerState extends State<MediaViewer>
   }
 }
 
-class _MediaPhotoPage extends StatelessWidget {
+class _MediaPhotoPage extends StatefulWidget {
   final MediaItem item;
   final ValueChanged<bool> onScaleChanged;
   final bool showRemarks;
@@ -390,6 +390,63 @@ class _MediaPhotoPage extends StatelessWidget {
     required this.onScaleChanged,
     required this.showRemarks,
   });
+
+  @override
+  State<_MediaPhotoPage> createState() => _MediaPhotoPageState();
+}
+
+class _MediaPhotoPageState extends State<_MediaPhotoPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController animationController;
+  late final Animation<double> scaleAnimation;
+  late final Animation<double> opacityAnimation;
+  bool _remarksAnimationStarted = false;
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 1.0,
+          end: 1.08,
+        ).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 1.08,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 60,
+      ),
+    ]).animate(animationController);
+    opacityAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 0.3,
+          end: 0.7,
+        ).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 0.7,
+          end: 0.3,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 60,
+      ),
+    ]).animate(animationController);
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -411,10 +468,10 @@ class _MediaPhotoPage extends StatelessWidget {
         }
       },
       scaleStateChangedCallback: (state) {
-        onScaleChanged(state != PhotoViewScaleState.initial);
+        widget.onScaleChanged(state != PhotoViewScaleState.initial);
       },
       child: Image(
-        image: item.imageProvider,
+        image: widget.item.imageProvider,
         fit: BoxFit.contain,
         alignment: Alignment.center,
         filterQuality: FilterQuality.high,
@@ -432,35 +489,44 @@ class _MediaPhotoPage extends StatelessWidget {
             children: [
               child,
 
-              if (item.hasRemarks && showRemarks)
+              if (widget.item.hasRemarks && widget.showRemarks)
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: Opacity(
-                      opacity: 0.3,
-                      child: Image.network(
-                        item.remarks!,
-                        fit: BoxFit.contain,
-                        alignment: Alignment.center,
-                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                        frameBuilder:
-                            (
-                              contextRemarks,
-                              childRemarks,
-                              frameRemarks,
-                              wasSynchronouslyLoadedRemarks,
-                            ) {
-                              final isLoadedRemarks =
-                                  frameRemarks != null ||
-                                  wasSynchronouslyLoadedRemarks;
+                    child: Image.network(
+                      widget.item.remarks!,
+                      fit: BoxFit.contain,
+                      alignment: Alignment.center,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                      frameBuilder:
+                          (
+                            contextRemarks,
+                            childRemarks,
+                            frameRemarks,
+                            wasSynchronouslyLoadedRemarks,
+                          ) {
+                            final isLoadedRemarks =
+                                frameRemarks != null ||
+                                wasSynchronouslyLoadedRemarks;
 
-                              return AnimatedOpacity(
-                                opacity: isLoadedRemarks ? 1 : 0,
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeOut,
-                                child: childRemarks,
-                              );
-                            },
-                      ),
+                            if (isLoadedRemarks && !_remarksAnimationStarted) {
+                              _remarksAnimationStarted = true;
+                              animationController.forward();
+                            }
+
+                            return AnimatedBuilder(
+                              animation: animationController,
+                              child: childRemarks,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: opacityAnimation.value,
+                                  child: Transform.scale(
+                                    scale: scaleAnimation.value,
+                                    child: child,
+                                  ),
+                                );
+                              },
+                            );
+                          },
                     ),
                   ),
                 ),
