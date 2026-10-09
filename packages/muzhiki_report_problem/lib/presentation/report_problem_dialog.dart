@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_report_problem/config/report_problem_assets.dart';
 import 'package:muzhiki_report_problem/config/report_problem_config.dart';
-import 'package:muzhiki_report_problem/data/repository/report_problem_repository_impl.dart';
+import 'package:muzhiki_report_problem/domain/queue/manager/queue_manager.dart';
 import 'package:muzhiki_report_problem/presentation/view_model/report_problem_view_model.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/app_standart_dialog.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/error_dialog.dart';
@@ -20,8 +20,13 @@ import 'package:provider/provider.dart';
 
 class ReportProblemDialog extends StatefulWidget {
   final ReportProblemConfig config;
+  final QueueManager queueManager;
 
-  const ReportProblemDialog({super.key, required this.config});
+  const ReportProblemDialog({
+    super.key,
+    required this.config,
+    required this.queueManager,
+  });
 
   @override
   State<ReportProblemDialog> createState() => _ReportProblemDialogState();
@@ -29,13 +34,13 @@ class ReportProblemDialog extends StatefulWidget {
 
 class _ReportProblemDialogState extends State<ReportProblemDialog> {
   late final ReportProblemViewModel viewModel;
-
   @override
   void initState() {
     super.initState();
+
     viewModel = ReportProblemViewModel(
+      queueManager: widget.queueManager,
       config: widget.config,
-      repository: ReportProblemRepositoryImpl(widget.config.dio),
     );
   }
 
@@ -214,8 +219,8 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
                                               items: [
                                                 MediaItem.photoFile(
                                                   viewModel.screenshotPath!,
-                                                  heroTag: viewModel
-                                                      .screenshotPath!,
+                                                  heroTag:
+                                                      viewModel.screenshotPath!,
                                                 ),
                                               ],
                                             );

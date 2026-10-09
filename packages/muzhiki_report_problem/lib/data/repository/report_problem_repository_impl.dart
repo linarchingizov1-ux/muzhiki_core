@@ -2,7 +2,6 @@
 
 import 'package:dio/dio.dart';
 import 'package:muzhiki_dependencies/network/exception/network_map_error.dart';
-import 'package:muzhiki_report_problem/config/report_problem_path.dart';
 import 'package:muzhiki_report_problem/domain/repository/report_problem_repository.dart';
 
 class ReportProblemRepositoryImpl implements ReportProblemRepository {
@@ -17,7 +16,7 @@ class ReportProblemRepositoryImpl implements ReportProblemRepository {
   }) async {
     try {
       final response = await _dio.post(
-        ReportProblemPath.bugReports,
+        "https://metrics.dev.muzhiki.pro/api/v1/bug-reports",
         data: FormData.fromMap({
           'payload': MultipartFile.fromString(
             jsonEncode(payload),

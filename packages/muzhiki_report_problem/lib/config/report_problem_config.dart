@@ -1,17 +1,19 @@
-﻿import 'package:dio/dio.dart';
+﻿import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:muzhiki_dependencies/network/metrics/request_storage.dart';
 import 'package:muzhiki_dependencies/service/app_banner/app_banner_controller.dart';
 import 'package:muzhiki_dependencies/service/app_version/model/app_info_model.dart';
 import 'package:muzhiki_dependencies/service/session/session.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker/talker.dart';
 
 class ReportProblemConfig {
   final SessionApp session;
-
+  final Directory dir;
+  final SharedPreferences shared;
   final Talker talker;
-
   final AppInfoModel appInfo;
-
   final RequestStorage requestStorage;
 
   final BannerController bannerController;
@@ -31,5 +33,7 @@ class ReportProblemConfig {
     required this.dio,
     required this.appName,
     this.screenInfo,
+    required this.dir,
+    required this.shared,
   });
 }

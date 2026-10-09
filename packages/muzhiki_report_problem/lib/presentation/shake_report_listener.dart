@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_report_problem/config/report_problem_config.dart';
+import 'package:muzhiki_report_problem/domain/queue/manager/queue_manager.dart';
 import 'package:muzhiki_report_problem/presentation/report_problem_dialog.dart';
 import 'package:muzhiki_report_problem/presentation/widgets/app_standart_dialog.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
@@ -13,12 +14,14 @@ import 'package:vibration/vibration.dart';
 
 class ShakeReportListener extends StatefulWidget {
   final ReportProblemConfig config;
+  final QueueManager queueManager;
   final Widget child;
 
   const ShakeReportListener({
     super.key,
     required this.config,
     required this.child,
+    required this.queueManager,
   });
 
   @override
@@ -33,6 +36,7 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
   void initState() {
     super.initState();
     final isIos = Platform.isIOS;
+    widget.queueManager.init();
     _detector = ShakeDetector.autoStart(
       minimumShakeCount: 2,
       shakeThresholdGravity: isIos ? 1.7 : 2,
@@ -64,7 +68,10 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
           top: 8.h,
           bottom: 20.h,
         ),
-        child: ReportProblemDialog(config: widget.config),
+        child: ReportProblemDialog(
+          config: widget.config,
+          queueManager: widget.queueManager,
+        ),
       );
     } finally {
       _isDialogOpen = false;

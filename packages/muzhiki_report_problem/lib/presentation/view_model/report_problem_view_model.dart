@@ -4,20 +4,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:muzhiki_dependencies/network/exception/network_exception.dart';
 import 'package:muzhiki_dependencies/network/network_signal_info_service.dart';
 import 'package:muzhiki_report_problem/config/report_problem_config.dart';
-import 'package:muzhiki_report_problem/domain/repository/report_problem_repository.dart';
+import 'package:muzhiki_report_problem/domain/queue/manager/queue_manager.dart';
 import 'package:path/path.dart' as path;
 import 'package:talker/talker.dart';
 
 class ReportProblemViewModel extends ChangeNotifier {
-  ReportProblemViewModel({required this.config, required this._repository}) {
+  ReportProblemViewModel({required this.config, required this.queueManager}) {
     descriptionController.addListener(notifyListeners);
   }
-
+  final QueueManager queueManager;
   final ReportProblemConfig config;
-  final ReportProblemRepository _repository;
 
   bool isSubmitting = false;
   bool? isSubmitSuccess;
@@ -241,7 +239,7 @@ class ReportProblemViewModel extends ChangeNotifier {
     submitError = null;
     notifyListeners();
     try {
-      final payload = {
+      final payload = <String, Object?>{
         'description': descriptionController.text.trim(),
         'mpid': _mpid,
         'occurred_at': _occurredAt,
@@ -253,17 +251,15 @@ class ReportProblemViewModel extends ChangeNotifier {
         'screen': _screenRoute(),
       };
 
-      final isSent = await _repository.sendBugReport(
+      await queueManager.createActive(
         payload: payload,
         screenshotPath: screenshotPath,
       );
 
-      if (!isSent) {
-        submitError = 'Не удалось отправить форму о проблеме';
-      }
-      isSubmitSuccess = isSent;
-    } on AppException catch (e) {
-      submitError = e.message;
+      isSubmitSuccess = true;
+    } catch (_) {
+      // Только ошибка записи на диск: отправка идёт в фоне.
+      submitError = 'Не удалось сохранить форму о проблеме';
       isSubmitSuccess = false;
     } finally {
       isSubmitting = false;

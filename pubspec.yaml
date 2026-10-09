@@ -21,3 +21,8 @@ workspace:
   - packages/muzhiki_stories
   - packages/flutter_appauth
 
+melos:
+  scripts:
+    build:
+      run: dart run melos exec --depends-on="build_runner" -- dart run build_runner build --delete-conflicting-outputs
+      description: "Запустить build_runner для сгенерированных файлов"
