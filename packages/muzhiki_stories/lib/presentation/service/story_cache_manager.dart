@@ -15,11 +15,18 @@ class StoryCacheManager {
 
   final CacheManager _disk;
 
+  bool isAssetImage({required String imageUrl}) {
+    final url = imageUrl.trim().toLowerCase();
+    return !url.startsWith('http://') && !url.startsWith('https://');
+  }
+
   ImageProvider imageProvider({
     required String imageUrl,
     required StoryFirstScreenMode mode,
   }) {
-    final ImageProvider base = mode == StoryFirstScreenMode.always
+    final ImageProvider base = isAssetImage(imageUrl: imageUrl)
+        ? AssetImage(imageUrl)
+        : mode == StoryFirstScreenMode.always
         ? CachedNetworkImageProvider(imageUrl, cacheManager: _disk)
         : NetworkImage(imageUrl);
     final views = WidgetsBinding.instance.platformDispatcher.views;
@@ -32,6 +39,7 @@ class StoryCacheManager {
     required StoryFirstScreenMode mode,
   }) async {
     if (imageUrl.isEmpty) return false;
+    if (isAssetImage(imageUrl: imageUrl)) return true;
 
     if (PaintingBinding.instance.imageCache.containsKey(
       imageProvider(imageUrl: imageUrl, mode: mode),
@@ -62,7 +70,10 @@ class StoryCacheManager {
       await imageProvider(imageUrl: imageUrl, mode: mode).evict();
     } catch (_) {}
 
-    if (mode != StoryFirstScreenMode.always) return;
+    if (mode != StoryFirstScreenMode.always ||
+        isAssetImage(imageUrl: imageUrl)) {
+      return;
+    }
 
     try {
       await _disk.removeFile(imageUrl);
