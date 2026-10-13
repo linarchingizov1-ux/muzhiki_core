@@ -22,6 +22,7 @@ class MpBridgeWebView extends StatefulWidget {
   final SessionApp session;
   final bool isPush;
   final List<int>? masterAudit;
+  final bool ignoreParametr;
   final void Function(MpBridgeClearCookies clearCookies)? onClearCookiesReady;
 
   const MpBridgeWebView({
@@ -34,6 +35,7 @@ class MpBridgeWebView extends StatefulWidget {
     required this.session,
     this.onClearCookiesReady,
     this.isPush = false,
+    this.ignoreParametr = false,
   });
 
   @override
@@ -69,41 +71,47 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
     _auth = BridgeAuth(widget.session);
     _controller = _buildController();
     widget.onClearCookiesReady?.call(clearCookies);
-    unawaited(_bootstrap());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_bootstrap());
+    });
   }
 
   bool get auditData =>
       widget.masterAudit != null && widget.masterAudit!.isNotEmpty;
 
   Uri get _initialUri {
-    final audit = widget.masterAudit;
-    final masterId = auditData ? audit!.first : null;
-    final auditId = auditData ? audit!.last : null;
+    if (widget.ignoreParametr) {
+      return Uri.parse(widget.initialUrl);
+    } else {
+      final audit = widget.masterAudit;
+      final masterId = auditData ? audit!.first : null;
+      final auditId = auditData ? audit!.last : null;
 
-    final typeUrl = switch (true) {
-      _ when widget.companyId != null => TypeUrl.company,
-      _ when masterId != null && auditId != null => TypeUrl.audit,
-      _ => TypeUrl.none,
-    };
+      final typeUrl = switch (true) {
+        _ when widget.companyId != null => TypeUrl.company,
+        _ when masterId != null && auditId != null => TypeUrl.audit,
+        _ => TypeUrl.none,
+      };
 
-    final path = switch (typeUrl) {
-      TypeUrl.audit =>
-        '${widget.initialUrl}/${audit!.first}/audits/${audit.last}',
+      final path = switch (typeUrl) {
+        TypeUrl.audit =>
+          '${widget.initialUrl}/${audit!.first}/audits/${audit.last}',
 
-      TypeUrl.company => '${widget.initialUrl}?salon_id=${widget.companyId}',
+        TypeUrl.company => '${widget.initialUrl}?salon_id=${widget.companyId}',
 
-      TypeUrl.none => widget.initialUrl,
-    };
+        TypeUrl.none => widget.initialUrl,
+      };
 
-    final queryParameters = <String, String>{
-      if (!widget.isPush) 'native_app': 'true',
-      'show_header': "false",
-    };
+      final queryParameters = <String, String>{
+        if (!widget.isPush) 'native_app': 'true',
+        'show_header': "false",
+      };
 
-    return Uri.parse(
-      '$path${path.contains('?') ? '&' : '?'}'
-      '${Uri(queryParameters: queryParameters).query}',
-    );
+      return Uri.parse(
+        '$path${path.contains('?') ? '&' : '?'}'
+        '${Uri(queryParameters: queryParameters).query}',
+      );
+    }
   }
 
   Future<void> _bootstrap() async {
@@ -354,12 +362,18 @@ class MpBridgeWebViewState extends State<MpBridgeWebView> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        WebViewWidget(controller: _controller),
-        if (isLoading)
-          const Center(child: CircularProgressIndicator.adaptive()),
-      ],
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 550),
+      child: switch (isLoading) {
+        true => const Center(
+          key: ValueKey("loading_bridge"),
+          child: CircularProgressIndicator.adaptive(),
+        ),
+        false => WebViewWidget(
+          key: ValueKey("ui_bridge"),
+          controller: _controller,
+        ),
+      },
     );
   }
 }
