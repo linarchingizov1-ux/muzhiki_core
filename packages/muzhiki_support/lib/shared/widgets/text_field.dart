@@ -10,6 +10,7 @@ import 'package:muzhiki_support/shared/widgets/upload_data_widgets.dart';
 import 'package:muzhiki_ui/muzhiki_ui.dart';
 
 class TextFieldWidgets extends StatefulWidget {
+  final bool hideAttachments;
   final AttachmentsCubit attachmentsCubit;
   final Directory directory;
   final void Function() send;
@@ -21,6 +22,7 @@ class TextFieldWidgets extends StatefulWidget {
     required this.attachmentsCubit,
     required this.send,
     required this.directory,
+    this.hideAttachments = false,
   });
 
   @override
@@ -41,7 +43,8 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
           spacing: 8.w,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _CircleMenuAnimated(attachmentsCubit: widget.attachmentsCubit),
+            if (!widget.hideAttachments)
+              _CircleMenuAnimated(attachmentsCubit: widget.attachmentsCubit),
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
