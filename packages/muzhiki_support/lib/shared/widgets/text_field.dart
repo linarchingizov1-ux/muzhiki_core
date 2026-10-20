@@ -14,6 +14,7 @@ class TextFieldWidgets extends StatefulWidget {
   final AttachmentsCubit attachmentsCubit;
   final Directory directory;
   final void Function() send;
+  final Function(String)? onChanged;
   final TextEditingController controller;
 
   const TextFieldWidgets({
@@ -23,6 +24,7 @@ class TextFieldWidgets extends StatefulWidget {
     required this.send,
     required this.directory,
     this.hideAttachments = false,
+    this.onChanged
   });
 
   @override
@@ -85,7 +87,7 @@ class _TextFieldWidgetsState extends State<TextFieldWidgets> {
                           cursorWidth: 2.w,
                           cursorHeight: 16.h,
                           textAlignVertical: TextAlignVertical.top,
-                          onChanged: (_) => setState(() {}),
+                          onChanged: widget.onChanged ?? (_) => setState(() {}),
                           style: TextStyle(
                             fontFamily: 'Manrope',
                             fontSize: 12.sp,
