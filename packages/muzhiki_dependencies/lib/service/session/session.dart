@@ -77,60 +77,79 @@ class SessionApp extends ChangeNotifier {
     required this.hiveStore,
   });
 
-  Future<UserModel?> getRolesBased({
-    required UserModel? currUser,
-    required String token,
-  }) async {
-    if (currUser == null) return null;
+Future<UserModel?> getRolesBased({
+  required UserModel? currUser,
+  required String token,
+}) async {
+  if (currUser == null) return null;
 
-    final saveDateTime = currUser.createdAt;
+  final saveDateTime = currUser.createdAt;
 
-    if (saveDateTime == null ||
-        DateTime.now().difference(saveDateTime).inHours >= 1) {
-      const maxRetries = 3;
-      const retryDelay = Duration(seconds: 5);
-      for (var i = 1; i <= maxRetries; i++) {
-        if (currUser == null) return null;
-        try {
-          final rolesData = await dioRefresh.get(
-            "https://api.master.muzhiki.pro/api/v1/get-roles",
-            options: Options(headers: {'Authorization': 'Bearer $token'}),
+  if (saveDateTime == null ||
+      DateTime.now().difference(saveDateTime).inHours >= 1) {
+    const maxRetries = 3;
+    const retryDelay = Duration(seconds: 5);
+
+    for (var i = 1; i <= maxRetries; i++) {
+      try {
+        final storage = await tokenStorage.read();
+        final actualToken = storage?.accessToken;
+
+        if (actualToken == null || actualToken.isEmpty) {
+          return currUser;
+        }
+
+        final rolesData = await dioRefresh.get(
+          "https://api.master.muzhiki.pro/api/v1/get-roles",
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $actualToken',
+            },
+          ),
+        );
+
+        if (rolesData.data != null) {
+          final newRoles = RolesModel.fromJson(
+            rolesData.data["data"],
           );
 
-          if (rolesData.data != null) {
-            final newRoles = RolesModel.fromJson(rolesData.data["data"]);
+          final companies = newRoles.info.getCompaniesByRole(
+            currUser!.roles?.currentRole,
+          );
 
-            final companies = newRoles.info.getCompaniesByRole(
-              currUser.roles?.currentRole,
-            );
+          final allowedInformator =
+              newRoles.info.accessAllowedInformator;
 
-            final allowedInformator = newRoles.info.accessAllowedInformator;
-            final savedCompanyId = currUser.selectedRolesCompany;
-            final exists = companies.any((c) => c.id == savedCompanyId);
+          final savedCompanyId = currUser.selectedRolesCompany;
+          final exists = companies.any(
+            (c) => c.id == savedCompanyId,
+          );
 
-            final validCompanyId = exists
-                ? savedCompanyId
-                : (companies.isNotEmpty ? companies.first.id : "");
+          final validCompanyId = exists
+              ? savedCompanyId
+              : (companies.isNotEmpty ? companies.first.id : "");
 
-            currUser = currUser.copyWith(
-              isAllowedAccessInformator: allowedInformator,
-              roles: newRoles,
-              selectedRolesCompany: validCompanyId,
-              createdAt: DateTime.now(),
-            );
-            return currUser;
-          }
-        } catch (_) {
-          if (i == maxRetries) {
-            return currUser;
-          }
-          await Future.delayed(retryDelay);
+          currUser = currUser.copyWith(
+            isAllowedAccessInformator: allowedInformator,
+            roles: newRoles,
+            selectedRolesCompany: validCompanyId,
+            createdAt: DateTime.now(),
+          );
+
+          return currUser;
         }
+      } catch (_) {
+        if (i == maxRetries) {
+          return currUser;
+        }
+
+        await Future.delayed(retryDelay);
       }
     }
-
-    return currUser;
   }
+
+  return currUser;
+}
 
   Future<void> _refreshRolesInBackground({
     required UserModel user,
