@@ -77,93 +77,75 @@ class SessionApp extends ChangeNotifier {
     required this.hiveStore,
   });
 
-Future<UserModel?> getRolesBased({
-  required UserModel? currUser,
-  required String token,
-}) async {
-  if (currUser == null) return null;
+  Future<UserModel?> getRolesBased({
+    required UserModel? currUser,
+  }) async {
+    if (currUser == null) return null;
 
-  final saveDateTime = currUser.createdAt;
+    final saveDateTime = currUser.createdAt;
 
-  if (saveDateTime == null ||
-      DateTime.now().difference(saveDateTime).inHours >= 1) {
-    const maxRetries = 3;
-    const retryDelay = Duration(seconds: 5);
+    if (saveDateTime == null ||
+        DateTime.now().difference(saveDateTime).inHours >= 1) {
+      const maxRetries = 3;
+      const retryDelay = Duration(seconds: 5);
 
-    for (var i = 1; i <= maxRetries; i++) {
-      try {
-        final storage = await tokenStorage.read();
-        final actualToken = storage?.accessToken;
-
-        if (actualToken == null || actualToken.isEmpty) {
-          return currUser;
-        }
-
-        final rolesData = await dioRefresh.get(
-          "https://api.master.muzhiki.pro/api/v1/get-roles",
-          options: Options(
-            headers: {
-              'Authorization': 'Bearer $actualToken',
-            },
-          ),
-        );
-
-        if (rolesData.data != null) {
-          final newRoles = RolesModel.fromJson(
-            rolesData.data["data"],
+      for (var i = 1; i <= maxRetries; i++) {
+        try {
+          final rolesData = await dio.get(
+            'https://api.master.muzhiki.pro/api/v1/get-roles',
           );
 
-          final companies = newRoles.info.getCompaniesByRole(
-            currUser!.roles?.currentRole,
-          );
+          if (rolesData.data != null) {
+            final newRoles = RolesModel.fromJson(
+              rolesData.data['data'],
+            );
 
-          final allowedInformator =
-              newRoles.info.accessAllowedInformator;
+            final companies = newRoles.info.getCompaniesByRole(
+              currUser.roles?.currentRole,
+            );
 
-          final savedCompanyId = currUser.selectedRolesCompany;
-          final exists = companies.any(
-            (c) => c.id == savedCompanyId,
-          );
+            final savedCompanyId = currUser.selectedRolesCompany;
 
-          final validCompanyId = exists
-              ? savedCompanyId
-              : (companies.isNotEmpty ? companies.first.id : "");
+            final exists = companies.any(
+              (company) => company.id == savedCompanyId,
+            );
 
-          currUser = currUser.copyWith(
-            isAllowedAccessInformator: allowedInformator,
-            roles: newRoles,
-            selectedRolesCompany: validCompanyId,
-            createdAt: DateTime.now(),
-          );
+            final validCompanyId = exists
+                ? savedCompanyId
+                : (companies.isNotEmpty ? companies.first.id : '');
+
+            return currUser.copyWith(
+              isAllowedAccessInformator:
+                  newRoles.info.accessAllowedInformator,
+              roles: newRoles,
+              selectedRolesCompany: validCompanyId,
+              createdAt: DateTime.now(),
+            );
+          }
 
           return currUser;
-        }
-      } catch (_) {
-        if (i == maxRetries) {
-          return currUser;
-        }
+        } catch (e) {
+          if (i == maxRetries) {
+            return currUser;
+          }
 
-        await Future.delayed(retryDelay);
+          await Future.delayed(retryDelay);
+        }
       }
     }
-  }
 
-  return currUser;
-}
+    return currUser;
+  }
 
   Future<void> _refreshRolesInBackground({
     required UserModel user,
-    required String token,
     required int generation,
   }) async {
-    final updatedUser = await getRolesBased(currUser: user, token: token);
+    final updatedUser = await getRolesBased(currUser: user);
     if (updatedUser == null) return;
-
-    final currentStorage = await tokenStorage.read();
     final isCurrentSession =
         generation == _sessionGeneration &&
         _status == AuthenticationStatus.authenticated &&
-        currentStorage?.accessToken == token &&
         _user?.mpid == user.mpid;
 
     if (!isCurrentSession) return;
@@ -200,7 +182,6 @@ Future<UserModel?> getRolesBased({
         unawaited(
           _refreshRolesInBackground(
             user: currUser,
-            token: storage.accessToken,
             generation: _sessionGeneration,
           ),
         );
