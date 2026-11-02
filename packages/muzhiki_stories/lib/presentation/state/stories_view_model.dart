@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_stories/data/model/story_enums.dart';
