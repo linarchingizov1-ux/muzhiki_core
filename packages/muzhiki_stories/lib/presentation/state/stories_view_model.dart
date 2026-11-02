@@ -19,7 +19,7 @@ class StoriesViewModel extends ChangeNotifier {
   });
 
   final _onceStoriesKeyPrefix = 'stories_once';
-
+  bool _disposed = false;
   final StoriesRepository repository;
   final int placeId;
   final SharedPreferences sharedPreferences;
@@ -37,6 +37,18 @@ class StoriesViewModel extends ChangeNotifier {
   int _firstScreenPreloadRequestId = 0;
 
   Future<List<StoryModel>>? _firstScreenPreloadStories;
+
+  void _notifySafely() {
+    if (_disposed) return;
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (!_disposed) notifyListeners();
+      });
+    } else {
+      notifyListeners();
+    }
+  }
 
   Future<void> getStories({
     bool isRefresh = false,
@@ -278,17 +290,18 @@ class StoriesViewModel extends ChangeNotifier {
   void setImageLoadFailed({required StoryItemModel item}) {
     final key = storyImageKey(item: item);
     if (key.isEmpty) return;
-    if (_failedImageKeys.add(key)) notifyListeners();
+    if (_failedImageKeys.add(key)) _notifySafely();
   }
 
   void clearImageLoadFailed({required StoryItemModel item}) {
     final key = storyImageKey(item: item);
     if (key.isEmpty) return;
-    if (_failedImageKeys.remove(key)) notifyListeners();
+    if (_failedImageKeys.remove(key)) _notifySafely();
   }
 
   @override
   void dispose() {
+    _disposed = true;
     _failedImageKeys.clear();
     viewerStories.dispose();
     super.dispose();
