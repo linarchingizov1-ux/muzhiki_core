@@ -38,13 +38,33 @@ class StoryModel {
     required this.items,
   });
 
+  StoryModel copyWith({List<StoryItemModel>? items}) {
+    return StoryModel(
+      id: id,
+      title: title,
+      description: description,
+      previewActionText: previewActionText,
+      firstScreenMode: firstScreenMode,
+      firstScreenPreload: firstScreenPreload,
+      fullscreenActionType: fullscreenActionType,
+      fullscreenActionText: fullscreenActionText,
+      fullscreenActionLink: fullscreenActionLink,
+      colorMode: colorMode,
+      markdownActionType: markdownActionType,
+      markdownBody: markdownBody,
+      markdownActionText: markdownActionText,
+      markdownActionLink: markdownActionLink,
+      isActive: isActive,
+      items: items ?? this.items,
+    );
+  }
+
   factory StoryModel.fromJson(Map<String, dynamic> json) {
     final rawItems = json['items'] as List<dynamic>? ?? const [];
     final items = rawItems
         .whereType<Map<String, dynamic>>()
         .map(StoryItemModel.fromJson)
-        .toList()
-      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+        .toList();
 
     return StoryModel(
       id: json['id']?.toString() ?? '',
