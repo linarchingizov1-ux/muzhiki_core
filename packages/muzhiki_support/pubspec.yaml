@@ -42,7 +42,10 @@ dependencies:
   video_compress: ^3.1.4
   video_player: ^2.11.1
   web_socket_channel: ^3.0.3
-  video_thumbnail: ^0.5.6
+  video_thumbnail:
+    git:
+      url: https://github.com/47gurvinder/video_thumbnail.git
+      ref: 82fd0da
   go_router_builder: ^4.0.1
 
 dev_dependencies:
