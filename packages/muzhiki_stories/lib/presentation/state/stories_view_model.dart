@@ -173,7 +173,15 @@ class StoriesViewModel extends ChangeNotifier {
   }
 
   void setViewerStories(List<StoryModel> stories) {
-    viewerStories.value = List.of(stories);
+    viewerStories.value = stories
+        .map((story) => story.copyWith(items: _viewerItems(story)))
+        .toList();
+  }
+
+  List<StoryItemModel> _viewerItems(StoryModel story) {
+    final items = story.items.where((item) => !item.isPreview).toList();
+    return (items.isEmpty ? List.of(story.items) : items)
+      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
   }
 
   void clearViewerStories() {
@@ -227,8 +235,9 @@ class StoriesViewModel extends ChangeNotifier {
       '${_onceStoriesKeyPrefix}_${placeId}_$storyId';
 
   Future<void> _precacheFirstImage(StoryModel story) async {
-    if (story.items.isEmpty) return;
-    final imageUrl = story.items.first.imageUrl;
+    final items = _viewerItems(story);
+    if (items.isEmpty) return;
+    final imageUrl = items.first.imageUrl;
     if (imageUrl.isEmpty) return;
     try {
       if (!await storyCacheManager.isImageCached(
