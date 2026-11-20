@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_report_problem/config/report_problem_config.dart';
 import 'package:muzhiki_report_problem/domain/queue/manager/queue_manager.dart';
 import 'package:muzhiki_report_problem/presentation/report_problem_dialog.dart';
@@ -53,14 +52,14 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
         Vibration.vibrate(duration: 100, amplitude: 200, sharpness: 0.7),
       );
     }
+    if (!mounted) return;
     try {
       await AppStandartDialog.open<void>(
+        context: context,
         backgroundColor: MuzhikiColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
-          bottom: Radius.circular(
-            MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
-          ),
+          bottom: Radius.circular(widget.config.dialogBottomRadius.r),
         ),
         outerPadding: EdgeInsets.only(
           left: 8.w,

@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_ui/theme/muzhiki_colors.dart';
 
 class AppStandartDialog {
   static Future<T?> open<T>({
+    required BuildContext context,
     required Widget child,
     double? height,
     bool isDismissible = true,
@@ -17,9 +17,6 @@ class AppStandartDialog {
     BorderRadius? borderRadius,
     EdgeInsetsGeometry? outerPadding,
   }) async {
-    final context = MuzhikiDependencies.I.routerKey.currentContext;
-    if (context == null) return null;
-
     return await showModalBottomSheet(
       useSafeArea: !Platform.isIOS,
       context: context,
@@ -51,9 +48,7 @@ class AppStandartDialog {
                 decoration: BoxDecoration(
                   color: sheetColor,
                   borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(
-                      MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
-                    ),
+                    top: Radius.circular(32.r),
                   ),
                 ),
                 child: child,

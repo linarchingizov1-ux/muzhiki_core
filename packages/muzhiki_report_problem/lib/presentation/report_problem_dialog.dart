@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_report_problem/config/report_problem_assets.dart';
 import 'package:muzhiki_report_problem/config/report_problem_config.dart';
 import 'package:muzhiki_report_problem/domain/queue/manager/queue_manager.dart';
@@ -55,12 +54,11 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
     if (!mounted) return;
     if (viewModel.isSubmitSuccess == true) {
       await AppStandartDialog.open(
+        context: context,
         backgroundColor: MuzhikiColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
-          bottom: Radius.circular(
-            MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
-          ),
+          bottom: Radius.circular(widget.config.dialogBottomRadius.r),
         ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
         child: const SuccessDialog(title: 'Форма отправлена'),
@@ -70,17 +68,18 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
       context.pop();
     } else {
       await AppStandartDialog.open(
+        context: context,
         backgroundColor: MuzhikiColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
-          bottom: Radius.circular(
-            MuzhikiDependencies.I.divesRadius?.bottomLeft ?? 32.r,
-          ),
+          bottom: Radius.circular(widget.config.dialogBottomRadius.r),
         ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
         child: ErrorDialog(
           title: 'Неудачное отправление формы',
-          description: viewModel.submitError ?? 'Мы добавили ее в очередь и отправим в фоне, вы можете продолжить работу',
+          description:
+              viewModel.submitError ??
+              'Мы добавили ее в очередь и отправим в фоне, вы можете продолжить работу',
           onRetry: () => _submit(),
         ),
       );

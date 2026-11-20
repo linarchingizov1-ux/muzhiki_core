@@ -4,11 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:muzhiki_dependencies/network/network_signal_info_service.dart';
 import 'package:muzhiki_report_problem/config/report_problem_config.dart';
 import 'package:muzhiki_report_problem/domain/queue/manager/queue_manager.dart';
 import 'package:path/path.dart' as path;
-import 'package:talker/talker.dart';
 
 class ReportProblemViewModel extends ChangeNotifier {
   ReportProblemViewModel({required this.config, required this.queueManager}) {
@@ -29,7 +27,7 @@ class ReportProblemViewModel extends ChangeNotifier {
 
   static const _maxScreenshotBytes = 10 * 1024 * 1024;
 
-  int? get _mpid => int.tryParse(config.session.user?.mpid ?? '');
+  int? get _mpid => int.tryParse(config.mpid ?? '');
 
   String get _occurredAt => DateTime.now().toUtc().toIso8601String();
 
@@ -63,60 +61,24 @@ class ReportProblemViewModel extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> _connection() async {
-    final metrics = config.requestStorage.metrics;
-    final type = metrics.isNotEmpty
-        ? metrics.last.networkType.jsonKey
-        : 'unknown';
+    final type = config.resolvedNetworkType;
+    final details = await config.connectionDetails?.call(type) ?? const {};
 
-    int? signalStrength;
-    String? carrier;
-
-    try {
-      switch (type) {
-        case 'cellular':
-          final sims = await NetworkSignalInfoService.simsInfo();
-          if (sims.isNotEmpty) {
-            carrier = sims.map(_simLabel).join(' | ');
-          } else {
-            carrier = await NetworkSignalInfoService.carrierName();
-          }
-          // signal_strength dBm активной симкарты
-          signalStrength = await NetworkSignalInfoService.cellularDbm();
-        case 'wifi':
-          signalStrength = await NetworkSignalInfoService.wifiRssi();
-      }
-    } catch (_) {}
-
-    return {
-      'type': type,
-      'is_online': type != 'none',
-      'carrier': carrier,
-      'signal_strength': signalStrength,
-    };
-  }
-
-  String _simLabel(Map<String, dynamic> sim) {
-    final name = (sim['carrier'] as String?) ?? '?';
-    return sim['is_data_sim'] == true ? '$name (активная)' : name;
+    return {'type': type, 'is_online': type != 'none', ...details};
   }
 
   List<Map<String, dynamic>> _consoleLogs() {
-    final history = config.talker.history;
-    final items = history.length > 100
-        ? history.sublist(history.length - 100)
-        : history;
-
+    final items = config.resolvedConsoleLogs;
     return items.map((item) {
-      final message = item.generateTextMessage();
-      final sanitizedMessage = _sanitizeLog(message);
-
-      return {
-        'timestamp': item.time.toUtc().toIso8601String(),
-        'level': _logLevel(item.logLevel),
-        'message': sanitizedMessage.length > 10000
-            ? sanitizedMessage.substring(0, 10000)
-            : sanitizedMessage,
-      };
+      final result = Map<String, dynamic>.from(item);
+      final message = result['message'];
+      if (message is String) {
+        final sanitized = _sanitizeLog(message);
+        result['message'] = sanitized.length > 10000
+            ? sanitized.substring(0, 10000)
+            : sanitized;
+      }
+      return result;
     }).toList();
   }
 
@@ -133,42 +95,14 @@ class ReportProblemViewModel extends ChangeNotifier {
   }
 
   List<Map<String, dynamic>> _recentRequests() {
-    final metrics = config.requestStorage.metrics;
-    final items = metrics.length > 10
-        ? metrics.sublist(metrics.length - 10)
-        : metrics;
-
-    return items.map((metric) {
-      final json = metric.toJson();
-      final statusCode = metric.statusCode;
-
-      return {
-        'timestamp': metric.startedAt.toUtc().toIso8601String(),
-        'method': json['method'],
-        'url': metric.path,
-        'status_code': statusCode,
-        'duration_ms': metric.durationMs,
-        'success': metric.success,
-        'request_id': metric.requestId,
-        'error': json['error_type'],
-      };
-    }).toList();
+    final items = config.resolvedRecentRequests;
+    return items.length > 10 ? items.sublist(items.length - 10) : items;
   }
 
   Map<String, dynamic> _screenRoute() {
     return config.screenInfo?.call() ??
         {'route': null, 'name': null, 'previous_route': null};
   }
-
-  String _logLevel(LogLevel? level) => switch (level) {
-    LogLevel.verbose => 'debug',
-    LogLevel.debug => 'debug',
-    LogLevel.info => 'info',
-    LogLevel.warning => 'warning',
-    LogLevel.error => 'error',
-    LogLevel.critical => 'fatal',
-    null => 'info',
-  };
 
   Future<void> setScreenshot(XFile? pickedFile) async {
     await _deleteCompressedScreenshot();
@@ -210,9 +144,7 @@ class ReportProblemViewModel extends ChangeNotifier {
       _compressedScreenshot = null;
       notifyListeners();
 
-      config.bannerController.show(
-        message: 'Файл не может весить больше 10 МБ',
-      );
+      config.showMessageResolved('Файл не может весить больше 10 МБ');
 
       return;
     }
@@ -258,7 +190,8 @@ class ReportProblemViewModel extends ChangeNotifier {
 
       isSubmitSuccess = sent;
       if (!sent) {
-        submitError = 'Мы добавили ее в очередь и отправим в фоне, вы можете продолжить работу';
+        submitError =
+            'Мы добавили ее в очередь и отправим в фоне, вы можете продолжить работу';
       }
     } catch (_) {
       // Только ошибка записи на диск: отправка идёт в фоне.

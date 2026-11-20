@@ -11,8 +11,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  muzhiki_dependencies:
-    path: ../muzhiki_dependencies
   muzhiki_ui:
     path: ../muzhiki_ui
   dio: ^5.10.0
@@ -28,7 +26,6 @@ dependencies:
   path: ^1.9.1
   provider: ^6.1.5+1
   shake: ^3.0.0
-  talker: ^5.1.17
   vibration: ^3.2.0
 
 dev_dependencies:
