@@ -15,8 +15,6 @@ dependencies:
     path: ../muzhiki_dependencies
   muzhiki_ui:
     path: ../muzhiki_ui
-  muzhiki_support:
-    path: ../muzhiki_support
   dio: ^5.10.0
   flutter_animate: ^4.5.2
   flutter_image_compress: ^2.4.0

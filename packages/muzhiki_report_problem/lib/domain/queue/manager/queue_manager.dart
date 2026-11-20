@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:muzhiki_report_problem/data/repository/report_problem_repository_impl.dart';
 import 'package:muzhiki_report_problem/domain/queue/model/problem_queue.dart';
 import 'package:muzhiki_report_problem/domain/repository/report_problem_repository.dart';
@@ -40,6 +41,7 @@ class QueueManager {
 
   final Queue<ProblemQueue> _active = Queue();
   final Queue<ProblemQueue> _postponed = Queue();
+  final Map<String, Completer<bool>> _activeResults = {};
 
   static const _pingInterval = Duration(seconds: 1);
 
@@ -79,7 +81,11 @@ class QueueManager {
   }
 
   /// Сохранение в очередь [active].
-  Future<void> createActive({
+  /// Сохраняет форму и ждёт завершения первой попытки отправки.
+  ///
+  /// `true` означает, что сервер подтвердил отправку. При `false` запись уже
+  /// сохранена локально и будет отправляться фоновым обработчиком очереди.
+  Future<bool> createActive({
     required Map<String, Object?> payload,
     String? screenshotPath,
   }) async {
@@ -99,7 +105,10 @@ class QueueManager {
     await _persist();
 
     _active.add(item);
+    final result = Completer<bool>();
+    _activeResults[id] = result;
     unawaited(_drainActive());
+    return result.future;
   }
 
   /// Текущая коллекция проблем.
@@ -118,14 +127,23 @@ class QueueManager {
         final item = _active.removeFirst();
         if (await _send(item)) {
           await _remove(item);
+          _completeActive(item.id, true);
         } else {
           _createPostponed(item);
+          _completeActive(item.id, false);
         }
       }
     } finally {
       _activeRunning = false;
     }
     unawaited(_drainPostponed());
+  }
+
+  void _completeActive(String id, bool result) {
+    final completer = _activeResults.remove(id);
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(result);
+    }
   }
 
   // -------------------------------------------------------------- postponed

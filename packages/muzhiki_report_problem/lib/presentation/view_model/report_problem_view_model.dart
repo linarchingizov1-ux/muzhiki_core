@@ -251,12 +251,15 @@ class ReportProblemViewModel extends ChangeNotifier {
         'screen': _screenRoute(),
       };
 
-      await queueManager.createActive(
+      final sent = await queueManager.createActive(
         payload: payload,
         screenshotPath: screenshotPath,
       );
 
-      isSubmitSuccess = true;
+      isSubmitSuccess = sent;
+      if (!sent) {
+        submitError = 'Мы добавили ее в очередь и отправим в фоне, вы можете продолжить работу';
+      }
     } catch (_) {
       // Только ошибка записи на диск: отправка идёт в фоне.
       submitError = 'Не удалось сохранить форму о проблеме';
