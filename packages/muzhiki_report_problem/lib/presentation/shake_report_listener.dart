@@ -13,6 +13,7 @@ import 'package:vibration/vibration.dart';
 
 class ShakeReportListener extends StatefulWidget {
   final ReportProblemConfig config;
+  final GlobalKey<NavigatorState> navigatorKey;
   final QueueManager queueManager;
   final Widget child;
 
@@ -21,6 +22,7 @@ class ShakeReportListener extends StatefulWidget {
     required this.config,
     required this.child,
     required this.queueManager,
+    required this.navigatorKey,
   });
 
   @override
@@ -47,15 +49,17 @@ class _ShakeReportListenerState extends State<ShakeReportListener> {
   Future<void> _openDialog() async {
     if (_isDialogOpen) return;
     _isDialogOpen = true;
+    final navigatorContext = widget.navigatorKey.currentContext;
+    if (navigatorContext == null) return;
     if (await Vibration.hasVibrator()) {
       unawaited(
         Vibration.vibrate(duration: 100, amplitude: 200, sharpness: 0.7),
       );
     }
-    if (!mounted) return;
     try {
+      if (!navigatorContext.mounted) return;
       await AppStandartDialog.open<void>(
-        context: context,
+        context: navigatorContext,
         backgroundColor: MuzhikiColors.appBackgroud,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(22.r),
