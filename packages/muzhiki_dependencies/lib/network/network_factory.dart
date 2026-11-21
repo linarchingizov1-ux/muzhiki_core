@@ -10,6 +10,7 @@ import 'package:fresh_dio/fresh_dio.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:muzhiki_dependencies/muzhiki_dependencies.dart';
 import 'package:muzhiki_dependencies/network/interceptors/metrics_interceptor.dart';
+import 'package:muzhiki_dependencies/network/interceptors/request_id_interceptor.dart';
 import 'package:muzhiki_dependencies/network/metrics/request_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker/talker.dart';
@@ -110,6 +111,7 @@ class NetworkFactory {
     await metricsStorage.init();
     final connectivityService = NetworkConnectivityService(Connectivity());
     await connectivityService.init();
+    final requestIdInterceptor = const RequestIdInterceptor();
     final metricsInterceptor = MetricsInterceptor(
       showTalkerMetricsHttp: showTalkerMetricsHttp,
       userSession: userSession,
@@ -138,14 +140,17 @@ class NetworkFactory {
           )
         : null;
     refreshDio.interceptors.addAll([
+      requestIdInterceptor,
       cookieManager,
       ?talkerInterceptor,
       if (needMetricsHttp) metricsInterceptor,
     ]);
     metricsDio.interceptors.addAll([
+      requestIdInterceptor,
       if (showTalkerMetricsHttp) ?talkerInterceptor,
     ]);
     authDio.interceptors.addAll([
+      requestIdInterceptor,
       fresh,
       ?talkerInterceptor,
       if (needMetricsHttp) metricsInterceptor,
