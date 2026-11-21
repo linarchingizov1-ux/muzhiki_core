@@ -499,7 +499,7 @@ class DioErrorMapper {
       case 403:
         return backendMessage ?? 'Доступ запрещён.';
       case 404:
-        return backendMessage ?? 'Данные не найдены.';
+        return 'Сервис временно недоступен.';
       case 405:
         return backendMessage ?? 'Метод запроса не поддерживается.';
       case 408:
