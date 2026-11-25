@@ -18,7 +18,7 @@ class AppStandartDialog {
     EdgeInsetsGeometry? outerPadding,
   }) async {
     return await showModalBottomSheet(
-      useSafeArea: !Platform.isIOS,
+      useSafeArea: false,
       context: context,
       isScrollControlled: true,
       enableDrag: enableDrag,
@@ -31,6 +31,9 @@ class AppStandartDialog {
         reverseDuration: const Duration(milliseconds: 250),
       ),
       builder: (_) {
+        final paddingSafeAreaBottom = Platform.isAndroid
+            ? MediaQuery.viewInsetsOf(context).bottom
+            : 0.0;
         final sheetColor = backgroundColor ?? MuzhikiColors.white;
 
         if (height != null) {
@@ -43,7 +46,7 @@ class AppStandartDialog {
                   left: 20.w,
                   right: 20.w,
                   top: 20.h,
-                  bottom: 20.h,
+                  bottom: paddingSafeAreaBottom + 20.h,
                 ),
                 decoration: BoxDecoration(
                   color: sheetColor,

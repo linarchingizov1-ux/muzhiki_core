@@ -95,205 +95,199 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Consumer<ReportProblemViewModel>(
           builder: (context, viewModel, child) => SingleChildScrollView(
-            child: SafeArea(
-              top: false,
-              bottom: Platform.isAndroid ? true : false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: MuzhikiUi.buttons.small(
-                      mode: SmallButtonMode.standart,
-                      label: 'Отменить',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      labelColor: MuzhikiColors.alertTextGrey,
-                      backgroundColor: MuzhikiColors.greyLight.withValues(
-                        alpha: 0.3,
-                      ),
-                      labelPadding: EdgeInsets.symmetric(
-                        vertical: 5.h,
-                        horizontal: 15.w,
-                      ),
-                      onTap: () => context.pop(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: MuzhikiUi.buttons.small(
+                    mode: SmallButtonMode.standart,
+                    label: 'Отменить',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    labelColor: MuzhikiColors.alertTextGrey,
+                    backgroundColor: MuzhikiColors.greyLight.withValues(
+                      alpha: 0.3,
                     ),
-                  ),
-                  SizedBox(height: 21.h),
-                  Center(
-                    child: SvgPicture.asset(
-                      ReportProblemAssets.vibrateSVG,
-                      width: 122.r,
-                      height: 122.r,
+                    labelPadding: EdgeInsets.symmetric(
+                      vertical: 5.h,
+                      horizontal: 15.w,
                     ),
+                    onTap: () => context.pop(),
                   ),
-                  SizedBox(height: 21.h),
-                  Text(
-                    'Сообщить о проблеме',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      height: 1.3,
-                      fontWeight: FontWeight.w600,
-                      color: MuzhikiColors.black23,
-                    ),
+                ),
+                SizedBox(height: 21.h),
+                Center(
+                  child: SvgPicture.asset(
+                    ReportProblemAssets.vibrateSVG,
+                    width: 122.r,
+                    height: 122.r,
                   ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    'Это окно открылось потому что вы потрясли устройство',
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
-                      height: 1.3,
-                      color: MuzhikiColors.alertTextGrey,
-                    ),
+                ),
+                SizedBox(height: 21.h),
+                Text(
+                  'Сообщить о проблеме',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    height: 1.3,
+                    fontWeight: FontWeight.w600,
+                    color: MuzhikiColors.black23,
                   ),
-                  SizedBox(height: 27.h),
-                  MultilineInputCard(
-                    controller: viewModel.descriptionController,
-                    minHeight: 190,
-                    maxHeight: 400,
-                    maxLines: 10,
-                    maxLength: 5000,
-                    enabled: !viewModel.isSubmitting,
-                    hintText: 'Опишите проблему',
-                    footer: SizedBox(
-                      width: double.infinity,
-                      child: Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        children: [
-                          MuzhikiUi.buttons.small(
-                            mode: SmallButtonMode.icon,
-                            alignment: AlignmentButtonIcon.start,
-                            icon: SvgPicture.asset(
-                              ReportProblemAssets.screpka,
-                              width: 16.r,
-                              height: 16.r,
-                              colorFilter: const ColorFilter.mode(
-                                MuzhikiColors.blood,
-                                BlendMode.srcIn,
-                              ),
+                ),
+                SizedBox(height: 12.h),
+                Text(
+                  'Это окно открылось потому что вы потрясли устройство',
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                    height: 1.3,
+                    color: MuzhikiColors.alertTextGrey,
+                  ),
+                ),
+                SizedBox(height: 27.h),
+                MultilineInputCard(
+                  controller: viewModel.descriptionController,
+                  minHeight: 190,
+                  maxHeight: 400,
+                  maxLines: 10,
+                  maxLength: 5000,
+                  enabled: !viewModel.isSubmitting,
+                  hintText: 'Опишите проблему',
+                  footer: SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.end,
+                      children: [
+                        MuzhikiUi.buttons.small(
+                          mode: SmallButtonMode.icon,
+                          alignment: AlignmentButtonIcon.start,
+                          icon: SvgPicture.asset(
+                            ReportProblemAssets.screpka,
+                            width: 16.r,
+                            height: 16.r,
+                            colorFilter: const ColorFilter.mode(
+                              MuzhikiColors.blood,
+                              BlendMode.srcIn,
                             ),
-                            label: 'Добавить скриншот',
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            labelColor: MuzhikiColors.alertTextGrey,
-                            backgroundColor: MuzhikiColors.appBackgroud,
-                            radius: 20,
-                            labelPadding: EdgeInsets.symmetric(
-                              vertical: 5.h,
-                              horizontal: 12.w,
-                            ),
-                            onTap: () async {
-                              if (viewModel.isSubmitting) return;
-                              final picked = await ImagePicker().pickImage(
-                                source: ImageSource.gallery,
-                              );
-                              if (picked == null) return;
-                              await viewModel.setScreenshot(picked);
-                            },
                           ),
-                          if (viewModel.screenshotPath != null) ...[
-                            SizedBox(height: 10.w),
-                            SizedBox(
-                              width: 90.w,
-                              height: 90.h,
-                              child: Stack(
-                                children: [
-                                  Positioned.fill(
-                                    child: Hero(
-                                      tag: viewModel.screenshotPath!,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          21.r,
-                                        ),
-                                        child: InkWell(
-                                          onTap: () {
-                                            MediaViewer.open(
-                                              context,
-                                              items: [
-                                                MediaItem.photoFile(
-                                                  viewModel.screenshotPath!,
-                                                  heroTag:
-                                                      viewModel.screenshotPath!,
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                          child: Image.file(
-                                            File(viewModel.screenshotPath!),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 6.r,
-                                    top: 6.r,
-                                    child: InkWell(
-                                      onTap: () =>
-                                          viewModel.setScreenshot(null),
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        padding: EdgeInsets.all(6.r),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: MuzhikiColors.black23
-                                              .withValues(alpha: 0.65),
-                                        ),
-                                        child: SvgPicture.asset(
-                                          ReportProblemAssets.close,
-                                          width: 8.w,
-                                          height: 8.h,
-                                          colorFilter: const ColorFilter.mode(
-                                            MuzhikiColors.white,
-                                            BlendMode.srcIn,
-                                          ),
+                          label: 'Добавить скриншот',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          labelColor: MuzhikiColors.alertTextGrey,
+                          backgroundColor: MuzhikiColors.appBackgroud,
+                          radius: 20,
+                          labelPadding: EdgeInsets.symmetric(
+                            vertical: 5.h,
+                            horizontal: 12.w,
+                          ),
+                          onTap: () async {
+                            if (viewModel.isSubmitting) return;
+                            final picked = await ImagePicker().pickImage(
+                              source: ImageSource.gallery,
+                            );
+                            if (picked == null) return;
+                            await viewModel.setScreenshot(picked);
+                          },
+                        ),
+                        if (viewModel.screenshotPath != null) ...[
+                          SizedBox(height: 10.w),
+                          SizedBox(
+                            width: 90.w,
+                            height: 90.h,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Hero(
+                                    tag: viewModel.screenshotPath!,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(21.r),
+                                      child: InkWell(
+                                        onTap: () {
+                                          MediaViewer.open(
+                                            context,
+                                            items: [
+                                              MediaItem.photoFile(
+                                                viewModel.screenshotPath!,
+                                                heroTag:
+                                                    viewModel.screenshotPath!,
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                        child: Image.file(
+                                          File(viewModel.screenshotPath!),
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                Positioned(
+                                  right: 6.r,
+                                  top: 6.r,
+                                  child: InkWell(
+                                    onTap: () => viewModel.setScreenshot(null),
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      padding: EdgeInsets.all(6.r),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: MuzhikiColors.black23.withValues(
+                                          alpha: 0.65,
+                                        ),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        ReportProblemAssets.close,
+                                        width: 8.w,
+                                        height: 8.h,
+                                        colorFilter: const ColorFilter.mode(
+                                          MuzhikiColors.white,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ],
-                      ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 27.h),
-                  Text(
-                    'Данные о вашем устройстве и действиях будут отправлены автоматически',
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      height: 1.3,
-                      fontWeight: FontWeight.w500,
-                      color: MuzhikiColors.alertTextGrey,
-                    ),
+                ),
+                SizedBox(height: 27.h),
+                Text(
+                  'Данные о вашем устройстве и действиях будут отправлены автоматически',
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    height: 1.3,
+                    fontWeight: FontWeight.w500,
+                    color: MuzhikiColors.alertTextGrey,
                   ),
-                  SizedBox(height: 27.h),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: MuzhikiUi.buttons.primary(
-                      label: viewModel.isSubmitSuccess == false
-                          ? 'Повторить'
-                          : 'Отправить',
-                      isLoading: viewModel.isSubmitting,
-                      disabled: !viewModel.isValid,
-                      backgroundColor: viewModel.isValid
-                          ? MuzhikiColors.black23
-                          : MuzhikiColors.light,
-                      labelColor: viewModel.isValid
-                          ? MuzhikiColors.white
-                          : MuzhikiColors.black23,
-                      borderRadius: 20,
-                      onPressed: () => _submit(),
-                    ),
+                ),
+                SizedBox(height: 27.h),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: MuzhikiUi.buttons.primary(
+                    label: viewModel.isSubmitSuccess == false
+                        ? 'Повторить'
+                        : 'Отправить',
+                    isLoading: viewModel.isSubmitting,
+                    disabled: !viewModel.isValid,
+                    backgroundColor: viewModel.isValid
+                        ? MuzhikiColors.black23
+                        : MuzhikiColors.light,
+                    labelColor: viewModel.isValid
+                        ? MuzhikiColors.white
+                        : MuzhikiColors.black23,
+                    borderRadius: 20,
+                    onPressed: () => _submit(),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
