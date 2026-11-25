@@ -36,7 +36,7 @@ class AppStandartDialog {
         if (height != null) {
           return SafeArea(
             top: false,
-            bottom: !Platform.isAndroid,
+            bottom: Platform.isAndroid,
             child: PopScope(
               canPop: false,
               child: FractionallySizedBox(
@@ -62,7 +62,7 @@ class AppStandartDialog {
         } else {
           return SafeArea(
             top: false,
-            bottom: !Platform.isAndroid,
+            bottom: Platform.isAndroid,
             child: PopScope(
               canPop: canPop,
               child:

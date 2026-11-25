@@ -76,7 +76,7 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
         ),
         outerPadding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
         child: ErrorDialog(
-          title: 'Неудачное отправка формы',
+          title: 'Неудачная отправка формы',
           description:
               viewModel.submitError ??
               'Мы добавили ее в очередь и отправим в фоне, вы можете продолжить работу',
