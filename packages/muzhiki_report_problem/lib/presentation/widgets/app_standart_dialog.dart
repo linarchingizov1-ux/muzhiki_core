@@ -32,7 +32,7 @@ class AppStandartDialog {
       ),
       builder: (_) {
         final paddingSafeAreaBottom = Platform.isAndroid
-            ? MediaQuery.viewInsetsOf(context).bottom
+            ? MediaQuery.paddingOf(context).bottom
             : 0.0;
         final sheetColor = backgroundColor ?? MuzhikiColors.white;
 
