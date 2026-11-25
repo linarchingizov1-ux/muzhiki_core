@@ -31,64 +31,69 @@ class AppStandartDialog {
         reverseDuration: const Duration(milliseconds: 250),
       ),
       builder: (_) {
-        final paddingSafeAreaBottom = Platform.isAndroid
-            ? MediaQuery.paddingOf(context).bottom
-            : 0.0;
         final sheetColor = backgroundColor ?? MuzhikiColors.white;
 
         if (height != null) {
-          return PopScope(
-            canPop: false,
-            child: FractionallySizedBox(
-              heightFactor: height,
-              child: Container(
-                padding: EdgeInsets.only(
-                  left: 20.w,
-                  right: 20.w,
-                  top: 20.h,
-                  bottom: paddingSafeAreaBottom + 20.h,
-                ),
-                decoration: BoxDecoration(
-                  color: sheetColor,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(32.r),
+          return SafeArea(
+            top: false,
+            bottom: !Platform.isAndroid,
+            child: PopScope(
+              canPop: false,
+              child: FractionallySizedBox(
+                heightFactor: height,
+                child: Container(
+                  padding: EdgeInsets.only(
+                    left: 20.w,
+                    right: 20.w,
+                    top: 20.h,
+                    bottom: 20.h,
                   ),
+                  decoration: BoxDecoration(
+                    color: sheetColor,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(32.r),
+                    ),
+                  ),
+                  child: child,
                 ),
-                child: child,
               ),
             ),
           );
         } else {
-          return PopScope(
-            canPop: canPop,
-            child:
-                Padding(
-                      padding: outerPadding ?? EdgeInsets.all(8.r),
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(20.w),
-                        decoration: BoxDecoration(
-                          color: sheetColor,
-                          borderRadius:
-                              borderRadius ?? BorderRadius.circular(40.r),
+          return SafeArea(
+            top: false,
+            bottom: !Platform.isAndroid,
+            child: PopScope(
+              canPop: canPop,
+              child:
+                  Padding(
+                        padding: outerPadding ?? EdgeInsets.all(8.r),
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(20.w),
+                          decoration: BoxDecoration(
+                            color: sheetColor,
+                            borderRadius:
+                                borderRadius ?? BorderRadius.circular(40.r),
+                          ),
+                          child: child,
                         ),
-                        child: child,
+                      )
+                      .animate()
+                      .fade(duration: 250.ms, curve: Curves.easeOut)
+                      .moveY(
+                        begin: 20,
+                        end: 0,
+                        duration: 350.ms,
+                        curve: Curves.easeOutCubic,
+                      )
+                      .scale(
+                        begin: const Offset(0.97, 0.97),
+                        end: const Offset(1, 1),
+                        duration: 350.ms,
+                        curve: Curves.easeOutCubic,
                       ),
-                    )
-                    .animate()
-                    .fade(duration: 250.ms, curve: Curves.easeOut)
-                    .moveY(
-                      begin: 20,
-                      end: 0,
-                      duration: 350.ms,
-                      curve: Curves.easeOutCubic,
-                    )
-                    .scale(
-                      begin: const Offset(0.97, 0.97),
-                      end: const Offset(1, 1),
-                      duration: 350.ms,
-                      curve: Curves.easeOutCubic,
-                    ),
+            ),
           );
         }
       },
