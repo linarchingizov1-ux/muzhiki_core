@@ -95,10 +95,9 @@ class _ReportProblemDialogState extends State<ReportProblemDialog> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Consumer<ReportProblemViewModel>(
           builder: (context, viewModel, child) => SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.viewInsetsOf(context).bottom,
-              ),
+            child: SafeArea(
+              top: false,
+              bottom: Platform.isAndroid ? true : false,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
