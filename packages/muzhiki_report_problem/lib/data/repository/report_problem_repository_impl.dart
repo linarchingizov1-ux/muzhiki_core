@@ -16,10 +16,10 @@ class ReportProblemRepositoryImpl implements ReportProblemRepository {
     final response = await _dio.post(
       "https://metrics.dev.muzhiki.pro/api/v1/bug-reports",
       data: FormData.fromMap({
-        'payload': MultipartFile.fromString(
-          jsonEncode(payload),
-          contentType: DioMediaType('application', 'json'),
-        ),
+        // `payload` is a regular multipart field containing a JSON object.
+        // Sending it as MultipartFile makes the backend treat it as an
+        // uploaded file instead of parsing the BugReportPayload object.
+        'payload': jsonEncode(payload),
         if (screenshotPath != null)
           'screenshot': await MultipartFile.fromFile(screenshotPath),
       }),
